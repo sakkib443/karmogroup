@@ -22,8 +22,19 @@ Opens on http://localhost:3001 (port 3000 is used by another local project).
 | --- | --- |
 | `npm run dev` | Dev server on port 3001 (Turbopack) |
 | `npm run build` | Production build |
-| `npm start` | Production server on port 5005 |
+| `npm start` | Production server — respects `PORT`, defaults to 3000 |
 | `npm run lint` | ESLint |
+
+## Deploying
+
+The app lives in `client/`, not at the repo root, so the host has to be
+pointed at it or it will not detect a Node project:
+
+- **Coolify** — set *Base Directory* to `/client`
+- **Vercel** — set *Root Directory* to `client`
+
+`npm start` deliberately does not hardcode a port; platforms that inject
+`PORT` (Coolify, Railway, Render) need Next.js to read it.
 
 ## Structure
 
