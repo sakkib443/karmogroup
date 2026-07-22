@@ -88,11 +88,10 @@ export default function Footer() {
         {/* Columns */}
         <div className="shell grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-5">
           <div className="sm:col-span-2 lg:col-span-1">
-            {/* The mark carries black linework, so it needs a light panel to
-                sit on against this background. */}
-            <span className="inline-block rounded-xl bg-white px-4 py-3">
-              <Logo className="h-12 w-auto" />
-            </span>
+            {/* Reversed artwork — red mark with white type on transparency —
+                so it sits straight on the dark panel. A light chip behind it
+                would swallow the white half of the wordmark. */}
+            <Logo className="h-8 w-auto shrink-0" />
 
             <p className="mt-5 max-w-xs text-sm leading-relaxed">
               Foam, mattress, bedding and polymers, manufactured in Bangladesh

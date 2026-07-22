@@ -4,7 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { FiArrowRight, FiArrowLeft, FiArrowDown } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiArrowLeft,
+  FiArrowDown,
+  FiArrowUpRight,
+} from "react-icons/fi";
 
 const slides = [
   {
@@ -277,11 +282,16 @@ export default function Hero() {
               <FiArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
 
+            {/* Padding is asymmetric so the circle sits flush inside the pill
+                and the button still matches the primary's height. */}
             <Link
               href="/find-store"
-              className="btn-secondary inline-flex items-center rounded-full border border-white/30 px-9 py-4 text-[12px] font-bold uppercase tracking-[0.14em] text-white"
+              className="btn-secondary group inline-flex items-center gap-4 rounded-full border border-white/30 py-1.5 pl-8 pr-1.5 text-[12px] font-bold uppercase tracking-[0.14em] text-white"
             >
               Find a store
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white transition-transform duration-300 group-hover:rotate-45">
+                <FiArrowUpRight className="text-base" />
+              </span>
             </Link>
             </motion.span>
           </span>

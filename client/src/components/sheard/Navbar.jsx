@@ -14,6 +14,23 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { FaFacebookF, FaLinkedinIn, FaYoutube, FaInstagram } from "react-icons/fa";
+import { motion, useReducedMotion } from "framer-motion";
+
+// Matches the curve the hero and the rest of the page settle on.
+const SETTLE = [0.22, 1, 0.36, 1];
+
+// The bar assembles on load: strip first, then the logo, then the menu items
+// one after another. Kept short so it is finished well before the hero has
+// stopped building underneath it.
+const bar = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.055, delayChildren: 0.15 } },
+};
+
+const drop = {
+  hidden: { opacity: 0, y: -12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: SETTLE } },
+};
 
 /**
  * Menu structure comes from "Site Reference Final.xlsx" (Menu / Sub Menu
@@ -88,6 +105,13 @@ export default function Navbar() {
   const [openGroup, setOpenGroup] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
+
+  // With motion turned down the bar is simply there on load.
+  const entrance = reduceMotion
+    ? {}
+    : { variants: bar, initial: "hidden", animate: "show" };
+  const item = reduceMotion ? {} : { variants: drop };
 
   // Transparent over the hero image, solid once the page moves — the bar
   // stops competing with the headline but never loses contrast.
@@ -99,7 +123,8 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header
+    <motion.header
+      {...entrance}
       className={`fixed inset-x-0 top-0 z-[10000] transition-colors duration-500 ${
         scrolled || drawerOpen
           ? "bg-shade/95 shadow-lg backdrop-blur-md"
@@ -108,12 +133,13 @@ export default function Navbar() {
     >
       {/* Utility strip. Career, Dealership and Find Store live up here so the
           main bar only has to carry the seven product menus. */}
-      <div
+      <motion.div
+        {...item}
         className={`hidden border-b border-white/10 transition-colors duration-500 lg:block ${
           scrolled ? "bg-black/30" : "bg-black/25"
         }`}
       >
-        <div className="shell flex h-10 items-center justify-between gap-6 text-[11.5px] text-white/60">
+        <div className="shell flex h-10 items-center justify-between gap-6 text-[11.5px] text-white/75">
           <div className="flex shrink-0 items-center gap-3.5">
             {[FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube].map(
               (Icon, i) => (
@@ -155,35 +181,34 @@ export default function Navbar() {
             </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Three tracks so the menu is centred on the page rather than in the
-          space left over beside the logo. */}
-      <div className="shell grid h-20 grid-cols-[1fr_auto_1fr] items-center gap-6">
-        <Link
-          href="/"
-          aria-label="Karmo Group home"
-          className="justify-self-start"
-        >
-          {/* The mark is stacked, so it needs the taller bar to stay legible. */}
-          <Logo className="h-14 w-auto" priority />
-        </Link>
+      {/* Flex rather than grid so `shrink-0` actually protects the logo — a
+          grid column would squeeze it regardless. The two `ml-auto`s split the
+          free space either side of the menu, which lands it right of the page
+          centre because the logo is wider than the tools. */}
+      <div className="shell flex h-20 items-center">
+        <motion.div {...item} className="shrink-0">
+          <Link href="/" aria-label="Karmo Group home" className="block">
+            <Logo className="h-7 w-auto sm:h-8" priority />
+          </Link>
+        </motion.div>
 
         {/* Desktop menu */}
-        <ul className="hidden min-w-0 items-center justify-self-center xl:flex">
-          {menu.map((item) => {
-            const active = pathname.startsWith(item.href);
+        <ul className="ml-auto hidden shrink-0 items-center xl:flex">
+          {menu.map((entry) => {
+            const active = pathname.startsWith(entry.href);
             return (
-            <li key={item.href} className="group relative">
+            <motion.li key={entry.href} {...item} className="group relative">
               <Link
-                href={item.href}
+                href={entry.href}
                 aria-current={active ? "page" : undefined}
                 className={`relative flex items-center gap-1 whitespace-nowrap px-3.5 py-5 text-[12px] font-medium uppercase tracking-[0.1em] transition-colors duration-300 group-hover:text-white ${
-                  active ? "text-white" : "text-white/80"
+                  active ? "text-white" : "text-white/90"
                 }`}
               >
-                {item.name}
-                {item.submenu && <FiChevronDown className="text-[11px]" />}
+                {entry.name}
+                {entry.submenu && <FiChevronDown className="text-[11px]" />}
                 {/* Underline: always shown on the current page, otherwise
                     grows out from the centre on hover. */}
                 <span
@@ -193,9 +218,9 @@ export default function Navbar() {
                 />
               </Link>
 
-              {item.submenu && (
+              {entry.submenu && (
                 <ul className="invisible absolute left-0 top-full z-[1100] min-w-60 translate-y-1 bg-shade/95 py-2 opacity-0 shadow-xl backdrop-blur-md transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                  {item.submenu.map((sub) => (
+                  {entry.submenu.map((sub) => (
                     <li key={sub.href}>
                       <Link
                         href={sub.href}
@@ -207,13 +232,13 @@ export default function Navbar() {
                   ))}
                 </ul>
               )}
-            </li>
+            </motion.li>
             );
           })}
 
         </ul>
 
-        <div className="flex items-center gap-1 justify-self-end">
+        <motion.div {...item} className="ml-auto flex shrink-0 items-center gap-1">
           <button
             aria-label="Search"
             className="hidden p-2.5 text-lg text-white/80 transition-colors duration-300 hover:text-white xl:block"
@@ -228,7 +253,7 @@ export default function Navbar() {
           >
             <FiMenu />
           </button>
-        </div>
+        </motion.div>
       </div>
 
       {/* Mobile drawer */}
@@ -241,7 +266,7 @@ export default function Navbar() {
           />
           <div className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-shade p-5">
             <div className="mb-6 flex items-center justify-between">
-              <Logo className="h-12 w-auto" />
+              <Logo className="h-7 w-auto" />
               <button
                 onClick={() => setDrawerOpen(false)}
                 aria-label="Close menu"
@@ -326,6 +351,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </header>
+    </motion.header>
   );
 }
