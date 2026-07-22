@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #e60000;
+  --color-brand-dark: #cc0000;
+  --color-ink: #222222;
+  --color-cream: #f5f5f5;
+  --color-sand: #e4e4e4;
+
+  /* Dark surfaces are a cool slate rather than black. The blue-green
+     undertone keeps photographs looking graded instead of just dimmed, and
+     stops the red brand colour from going muddy the way it does on pure
+     black. --shade-deep is the same hue pushed darker, for scrims that sit
+     directly under text. */
+  --color-shade: #2b333c;
+  --color-shade-deep: #161c24;
+
+  /* Warm off-white for editorial sections, so they read as paper rather than
+     as another grey panel between the dark hero and the dark footer. */
+  --color-linen: #f2eeea;
+
+  /* Primary face — headings, navigation, buttons. Plus Jakarta Sans loads
+     from Google Fonts, so unlike the earlier Google Sans stack it renders
+     the same on every device rather than falling back to Helvetica. */
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", Helvetica, Arial,
+    sans-serif;
+
+  /* Running copy — descriptions, paragraphs, list text. */
+  --font-body: var(--font-poppins), "Poppins", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply overflow-x-hidden bg-white text-ink;
+    scrollbar-gutter: stable;
+    font-family: var(--font-sans);
+  }
+
+  /* Paragraphs pick up the body face automatically; headings and nav keep
+     the heading stack. */
+  p {
+    font-family: var(--font-body);
+  }
+}
+
+/* For running copy that is not a <p> — the hero subtitle sits in a span so
+   it can be masked line by line. */
+.body-copy {
+  font-family: var(--font-body);
+}
+
+/* Buttons.
+   Both variants fill from the left edge across to the right on hover. The
+   fill is a two-stop background gradient on a double-width canvas that is
+   simply slid into place — no pseudo-element, so nothing has to be layered
+   above or below the label. A small lift rides along on its own curve so the
+   two motions do not land at the same instant. */
+.btn-primary,
+.btn-secondary {
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  transition:
+    background-position 600ms cubic-bezier(0.76, 0, 0.24, 1),
+    color 350ms ease,
+    border-color 350ms ease,
+    transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  background-position: 0 0;
+  transform: translateY(-2px);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0);
+  transition-duration: 90ms;
+}
+
+/* Solid red, deepening as it fills. */
+.btn-primary {
+  background-image: linear-gradient(
+    to right,
+    var(--color-brand-dark) 50%,
+    var(--color-brand) 50%
+  );
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  box-shadow: 0 14px 30px -12px rgba(230, 0, 0, 0.7);
+}
+
+.btn-primary:active {
+  box-shadow: 0 6px 14px -10px rgba(230, 0, 0, 0.7);
+}
+
+/* Outlined, filling with white; the label flips to ink as the fill lands. */
+.btn-secondary {
+  background-image: linear-gradient(
+    to right,
+    #ffffff 50%,
+    transparent 50%
+  );
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+  color: #14110f;
+  border-color: #ffffff;
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .btn-secondary {
+    transition:
+      color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .btn-primary:hover,
+  .btn-primary:focus-visible,
+  .btn-secondary:hover,
+  .btn-secondary:focus-visible {
+    background-position: 0 0;
+    transform: none;
+  }
+}
+
+/* Bengali text */
+.hind-siliguri {
+  font-family: var(--font-hind-siliguri), "Hind Siliguri", sans-serif;
+  font-style: normal;
+}
+
+/* Headings share the body face now — kept as a hook so the markup does not
+   need touching if a separate display face is introduced later. */
+.display {
+  font-family: var(--font-sans);
+}
+
+@layer utilities {
+  /* Single page gutter. Every section uses this so the hero headline, the
+     controls rail and the sections below all sit on the same left edge. */
+  .shell {
+    margin-inline: auto;
+    max-width: 1600px;
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .shell {
+      padding-inline: 3.5rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .shell {
+      padding-inline: 5rem;
+    }
+  }
+
+  /* Light counterpart, for slides whose product shot sits on white. Fades the
+     left side to near-solid white so the dark headline stays legible. */
+  /* Hero wash. Two gradients stack here, and their opacities compound — 0.6
+     over 0.5 leaves 80% black, not 60%. So each layer is kept deliberately
+     light and confined to where it earns its keep: the left column under the
+     copy, and a thin floor under the controls. The right two-thirds, where
+     the product actually is, stays almost clear. Legibility is topped up by
+     .hero-copy's text shadow rather than by more black. */
+  .hero-veil {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(22, 28, 36, 0.8) 0%,
+        rgba(22, 28, 36, 0.5) 30%,
+        rgba(22, 28, 36, 0.12) 58%,
+        rgba(22, 28, 36, 0) 80%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(22, 28, 36, 0.26) 0%,
+        rgba(22, 28, 36, 0) 20%,
+        rgba(22, 28, 36, 0) 72%,
+        rgba(22, 28, 36, 0.38) 100%
+      );
+  }
+
+  /* Narrow screens put the copy over the full width, so the wash has to be
+     even — but far lighter than the desktop left column. */
+  @media (width < 48rem) {
+    .hero-veil {
+      background: linear-gradient(
+        180deg,
+        rgba(22, 28, 36, 0.42) 0%,
+        rgba(22, 28, 36, 0.58) 100%
+      );
+    }
+  }
+
+  /* Lets the scrim stay light without the headline losing its edges. */
+  .hero-copy {
+    text-shadow: 0 1px 24px rgba(10, 8, 6, 0.55);
+  }
+
+  /* Keeps overlay text readable over any hero photograph. Narrow screens get
+     an even wash because the copy spans the full width there; from md up the
+     copy sits in the left column, so the scrim can fade out to the right. */
+  .hero-scrim {
+    background: linear-gradient(
+      180deg,
+      rgba(20, 15, 12, 0.55) 0%,
+      rgba(20, 15, 12, 0.68) 100%
+    );
+  }
+
+  @media (width >= 48rem) {
+    .hero-scrim {
+      background: linear-gradient(
+        90deg,
+        rgba(20, 15, 12, 0.78) 0%,
+        rgba(20, 15, 12, 0.55) 45%,
+        rgba(20, 15, 12, 0.15) 100%
+      );
+    }
+  }
+}
+
+@keyframes kenburns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.animate-kenburns {
+  animation: kenburns 8s ease-out forwards;
+}

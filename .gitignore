@@ -1,0 +1,19 @@
+# dependencies / build output
+node_modules/
+.next/
+out/
+build/
+
+# env
+.env
+.env*.local
+
+# Reference material only — the extracted static site, blueprint PDF and
+# spreadsheet. Kept out of the repo because the two TVC videos inside are
+# 202 MB and 160 MB, well past GitHub's 100 MB per-file limit.
+korbo group/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.log
