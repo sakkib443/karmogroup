@@ -49,6 +49,72 @@
   font-family: var(--font-body);
 }
 
+/* Gallery marquee.
+   Each row renders its list twice; the track travels exactly half its own
+   width, so the second copy lands where the first began and the loop repeats
+   with no visible jump. The two rows use different durations and directions
+   so they never fall into step with each other. */
+@keyframes marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+}
+
+.marquee-left {
+  animation: marquee-left 46s linear infinite;
+}
+
+.marquee-right {
+  animation: marquee-right 52s linear infinite;
+}
+
+/* Holds still while someone is looking at a particular tile. */
+.marquee-rows:hover .marquee {
+  animation-play-state: paused;
+}
+
+/* Content dissolves at the edges instead of meeting a hard crop. */
+.marquee-rows {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6%,
+    #000 94%,
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-left,
+  .marquee-right {
+    animation: none;
+  }
+}
+
 /* Buttons.
    Both variants fill from the left edge across to the right on hover. The
    fill is a two-stop background gradient on a double-width canvas that is
