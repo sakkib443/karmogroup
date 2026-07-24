@@ -10,8 +10,14 @@ build/
 
 # Reference material only — the extracted static site, blueprint PDF and
 # spreadsheet. Kept out of the repo because the two TVC videos inside are
-# 202 MB and 160 MB, well past GitHub's 100 MB per-file limit.
+# 202 MB and 160 MB, well past GitHub's 100 MB per-file limit. The folder on
+# disk is named "recource"; the old "korbo group" line never matched it.
+recource/
 korbo group/
+
+# Money receipts that were dropped into public/images by mistake. They carry
+# personal and financial details and would be served by the site if committed.
+client/public/images/MoneyReceipt*
 
 # editor / OS
 .DS_Store

@@ -6,7 +6,13 @@ import {
   FaLinkedinIn,
   FaYoutube,
 } from "react-icons/fa";
-import { FiArrowRight, FiPhoneCall } from "react-icons/fi";
+import {
+  FiArrowRight,
+  FiPhoneCall,
+  FiMapPin,
+  FiMail,
+  FiSmartphone,
+} from "react-icons/fi";
 import Logo from "@/components/Logo";
 
 const columns = [
@@ -56,7 +62,7 @@ export default function Footer() {
           rather than a picture. The wash on top keeps every link legible no
           matter which part of the photo falls behind it. */}
       <Image
-        src="/SLIDE02.png"
+        src="/images/mattress-suite.jpg"
         alt=""
         aria-hidden="true"
         fill
@@ -110,6 +116,40 @@ export default function Footer() {
                 <span className="text-xs text-brand">Round-the-clock</span>
               </span>
             </a>
+
+            {/* Head office details, exactly as they appear in the footer of
+                Karmo's own reference build. The hotline above stays on its
+                own so it keeps the weight a phone number needs. */}
+            <ul className="mt-6 space-y-3 text-sm">
+              <li className="flex gap-3">
+                <FiMapPin className="mt-0.5 shrink-0 text-base text-brand" />
+                <span className="leading-relaxed">
+                  Ibrahim Chamber, 4th Floor
+                  <br />
+                  95 Motijheel, Dhaka-1000, Bangladesh
+                </span>
+              </li>
+
+              <li className="flex gap-3">
+                <FiSmartphone className="mt-0.5 shrink-0 text-base text-brand" />
+                <a
+                  href="tel:+8801713483285"
+                  className="transition-colors duration-300 hover:text-white"
+                >
+                  +88 01713483285
+                </a>
+              </li>
+
+              <li className="flex gap-3">
+                <FiMail className="mt-0.5 shrink-0 text-base text-brand" />
+                <a
+                  href="mailto:info@karmogroup.com"
+                  className="transition-colors duration-300 hover:text-white"
+                >
+                  info@karmogroup.com
+                </a>
+              </li>
+            </ul>
 
             <div className="mt-6 flex gap-4">
               {socials.map(({ Icon, label }) => (

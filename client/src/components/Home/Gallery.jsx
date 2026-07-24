@@ -10,20 +10,20 @@ import { motion, useReducedMotion } from "framer-motion";
  */
 const topRow = [
   { src: "/images/FurnitureFoam1.png", alt: "Karmo 180 foam sheets", h: "h-44" },
-  { src: "/SLIDE02.png", alt: "Living room on Karmo upholstery foam", h: "h-64" },
+  { src: "/images/foam-sofa-1965.jpg", alt: "Sofa beside Karmo 1965 foam blocks", h: "h-64" },
   { src: "/images/FurnitureFoam2.png", alt: "Karmo 2001 foam sheets", h: "h-48" },
-  { src: "/SLIDE01.png", alt: "Bedroom with a Karmo mattress", h: "h-60" },
+  { src: "/images/mattress-suite.jpg", alt: "Karmo mattress in a chandelier-lit suite", h: "h-60" },
   { src: "/images/FurnitureFoam4.png", alt: "Karmo Poly foam sheets", h: "h-44" },
-  { src: "/image10.jpg", alt: "Bedroom finished with Karmo materials", h: "h-56" },
+  { src: "/images/mattress-family.jpg", alt: "Children playing on a Karmo mattress", h: "h-56" },
 ];
 
 const bottomRow = [
-  { src: "/SLIDE03.png", alt: "Beds dressed in Karmo bedding", h: "h-60" },
+  { src: "/images/comforter-red-stripe.jpg", alt: "Karmo Red Stripe comforter", h: "h-60" },
   { src: "/images/FurnitureFoam5.png", alt: "Karmo foam sheet range", h: "h-44" },
-  { src: "/image10.jpg", alt: "Interior finished with Karmo materials", h: "h-52" },
-  { src: "/images/FurnitureFoam3.jpg", alt: "Karmo foam grades", h: "h-48" },
-  { src: "/SLIDE02.png", alt: "Seating built on Karmo foam", h: "h-64" },
-  { src: "/SLIDE01.png", alt: "Karmo mattress in a bedroom", h: "h-48" },
+  { src: "/images/mattress-detail.jpg", alt: "Quilted top of a Karmo mattress", h: "h-52" },
+  { src: "/images/fabric-alpona.jpg", alt: "Alpona printed cotton bed sheet fabric", h: "h-48" },
+  { src: "/image10.jpg", alt: "Interior finished with Karmo materials", h: "h-64" },
+  { src: "/images/foam-karmo-280.jpg", alt: "Stack of Karmo 280 foam blocks", h: "h-48" },
 ];
 
 const SETTLE = [0.22, 1, 0.36, 1];

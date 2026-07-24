@@ -10,8 +10,8 @@ const posts = [
   {
     title: "How foam density actually decides how long a mattress lasts",
     href: "/blog/foam-density",
-    image: "/SLIDE01.png",
-    alt: "Bedroom with a Karmo mattress and timber bed frame",
+    image: "/images/FurnitureFoam2.png",
+    alt: "Karmo 2001 foam sheets",
     date: "12 June 2026",
     author: "Karmo Desk",
     excerpt:
@@ -20,8 +20,8 @@ const posts = [
   {
     title: "Choosing bedding that survives a Dhaka summer",
     href: "/blog/summer-bedding",
-    image: "/SLIDE02.png",
-    alt: "Living room seating built on Karmo upholstery foam",
+    image: "/images/mattress-comfort.jpg",
+    alt: "Karmo mattress in a plant-filled bedroom",
     date: "28 May 2026",
     author: "Karmo Desk",
     excerpt:
@@ -30,8 +30,8 @@ const posts = [
   {
     title: "Inside the plant: what a batch test looks like",
     href: "/blog/batch-testing",
-    image: "/SLIDE01.png",
-    alt: "Bedroom with a Karmo mattress and timber bed frame",
+    image: "/images/mattress-cloud.jpg",
+    alt: "Karmo mattress photographed above a bank of cloud",
     date: "09 May 2026",
     author: "Karmo Desk",
     excerpt:
@@ -40,8 +40,8 @@ const posts = [
   {
     title: "Adhesives, quietly holding your furniture together",
     href: "/blog/adhesives",
-    image: "/SLIDE02.png",
-    alt: "Living room seating built on Karmo upholstery foam",
+    image: "/image10.jpg",
+    alt: "Interior finished with materials bonded by Karmo adhesives",
     date: "21 April 2026",
     author: "Karmo Desk",
     excerpt:
@@ -283,8 +283,8 @@ export default function Journal() {
             className="absolute inset-0"
           >
             <Image
-              src="/SLIDE03.png"
-              alt="Bedroom finished with Karmo mattress and bedding"
+              src="/images/comforter-red-stripe.jpg"
+              alt="Karmo Red Stripe comforter, rolled"
               fill
               sizes="(min-width: 1024px) 30vw, 100vw"
               className="object-cover"

@@ -38,8 +38,8 @@ const spotlights = [
     ],
     quote: "Everyone assures quality, but not everyone can promise experiences.",
     href: "/mattress",
-    image: "/SLIDE01.png",
-    alt: "Karmo mattress on a timber bed frame",
+    image: "/images/mattress-detail.jpg",
+    alt: "A hand pressing into the quilted top of a Karmo mattress",
   },
   {
     index: "02",
@@ -56,8 +56,8 @@ const spotlights = [
     ],
     quote: "Blending tradition with innovation to redefine home comfort.",
     href: "/hometex",
-    image: "/SLIDE03.png",
-    alt: "Beds dressed in Karmo HomeTex bedding",
+    image: "/images/comforter-red-stripe.jpg",
+    alt: "Karmo Red Stripe comforter, rolled",
   },
   {
     index: "03",
@@ -75,8 +75,8 @@ const spotlights = [
     quote:
       "Fifty years outlasting competing brands on recognition and quality.",
     href: "/chemicals",
-    image: "/images/FurnitureFoam2.png",
-    alt: "Karmo 2001 polyurethane foam sheets",
+    image: "/images/foam-karmo-hd.jpg",
+    alt: "Stack of green Karmo HD polyurethane foam blocks",
   },
 ];
 

@@ -38,6 +38,14 @@ const drop = {
  */
 const menu = [
   {
+    name: "Home",
+    href: "/",
+    submenu: [
+      { name: "Home 01 — Editorial", href: "/" },
+      { name: "Home 02 — Cinematic", href: "/home-2" },
+    ],
+  },
+  {
     name: "Foam",
     href: "/foam",
     submenu: [
@@ -197,7 +205,12 @@ export default function Navbar() {
         {/* Desktop menu */}
         <ul className="ml-auto hidden shrink-0 items-center xl:flex">
           {menu.map((entry) => {
-            const active = pathname.startsWith(entry.href);
+            // "/" is a prefix of every route, so the home entry has to match
+            // exactly or it would sit lit up on every page of the site.
+            const active =
+              entry.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(entry.href);
             return (
             <motion.li key={entry.href} {...item} className="group relative">
               <Link

@@ -45,7 +45,7 @@ export default function WhyKarmo() {
           wash is heaviest on the left where the headline sits, easing off to
           the right so the picture still shows through beside the card. */}
       <Image
-        src="/SLIDE03.png"
+        src="/images/mattress-comfort.jpg"
         alt=""
         aria-hidden="true"
         fill
@@ -140,8 +140,8 @@ export default function WhyKarmo() {
             className="absolute inset-0"
           >
             <Image
-              src="/SLIDE02.png"
-              alt="Living room furnished with deep buttoned leather sofas"
+              src="/images/mattress-family.jpg"
+              alt="Two children playing on a Karmo mattress"
               fill
               sizes="(min-width: 1024px) 46vw, 100vw"
               className="object-cover"
