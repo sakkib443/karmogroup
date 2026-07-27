@@ -16,11 +16,17 @@ import {
   FiX,
 } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
+
+/* The slate-ink wordmark. Every surface in this header is white, and the
+   default artwork sets "GROUP", "Since 1965" and the ® in white — on a white
+   bar just over half the mark vanishes. The footer stays on the default,
+   because that panel is dark and the reversed artwork is drawn for it. */
+const LOGO_INK = "/home2/logo-ink.png";
 import { SETTLE } from "./motion";
 
 /**
- * Navigation is the same tree Home 01 carries — same labels, same order, same
- * hrefs — so a visitor moving between the two homepages never has to relearn
+ * Navigation is the same tree Home 01 carries â same labels, same order, same
+ * hrefs â so a visitor moving between the two homepages never has to relearn
  * where anything lives. Only the styling differs.
  *
  * Kept as its own copy rather than imported from the shared Navbar: that file
@@ -33,8 +39,8 @@ const NAV = [
     name: "Home",
     href: "/",
     submenu: [
-      { name: "Home 01 — Organized", href: "/" },
-      { name: "Home 02 — Luxe Retail", href: "/home-2" },
+      { name: "Home 01 â Organized", href: "/" },
+      { name: "Home 02 â Luxe Retail", href: "/home-2" },
     ],
   },
   {
@@ -129,7 +135,7 @@ export default function Header() {
         {stuck && <div className="header-spacer" aria-hidden="true" />}
 
         <div className={`header-sticky${stuck ? " active" : ""}`}>
-          {/* Row 1 — wordmark and tools. Dropped once the bar sticks. */}
+          {/* Row 1 â wordmark and tools. Dropped once the bar sticks. */}
           <div className="header-top">
             <div className="container">
               <div className="header-wrapper">
@@ -140,7 +146,7 @@ export default function Header() {
                 >
                   {/* Same sizing Home 01 uses, so the wordmark reads at the
                       same scale on both homepages. */}
-                  <Logo className="h-7 w-auto sm:h-8" priority />
+                  <Logo src={LOGO_INK} className="h-7 w-auto sm:h-8" priority />
                 </Link>
 
                 <div className="header-actions">
@@ -165,7 +171,7 @@ export default function Header() {
 
                   <div className="header-tools">
                   {/* Search, wishlist and account drop out below the menu
-                      breakpoint — four 44px targets plus the logo do not fit a
+                      breakpoint â four 44px targets plus the logo do not fit a
                       375px bar, and cart is the only one that has to survive. */}
                   <button className="tool-secondary" aria-label="Search">
                     <FiSearch />
@@ -202,7 +208,7 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Row 2 — navigation, with the full container to itself. */}
+          {/* Row 2 â navigation, with the full container to itself. */}
           <div className="header-nav">
             <div className="container">
               {/* Only visible once row 1 is gone, so the stuck bar still
@@ -214,7 +220,7 @@ export default function Header() {
                 tabIndex={stuck ? undefined : -1}
                 aria-hidden={stuck ? undefined : true}
               >
-                <Logo className="h-6 w-auto" />
+                <Logo src={LOGO_INK} className="h-6 w-auto" />
               </Link>
 
               <ul className="main-menu">
@@ -242,7 +248,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ── Mobile drawer ─────────────────────────────────────────────── */}
+      {/* ââ Mobile drawer âââââââââââââââââââââââââââââââââââââââââââââââ */}
       <AnimatePresence>
         {drawer && (
           <div className="fixed inset-0 z-[9500]">
@@ -262,7 +268,7 @@ export default function Header() {
               className="absolute inset-y-0 left-0 flex w-[85vw] max-w-sm flex-col overflow-y-auto bg-white"
             >
               <div className="flex items-center justify-between border-b border-[#1616161a] px-5 py-4">
-                <Logo className="h-7 w-auto" />
+                <Logo src={LOGO_INK} className="h-7 w-auto" />
                 <button
                   onClick={() => setDrawer(false)}
                   aria-label="Close menu"
