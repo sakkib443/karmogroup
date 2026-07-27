@@ -32,7 +32,7 @@ const fade = {
   show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: SETTLE } },
 };
 
-export default function WhyKarmo() {
+export default function WhyKarmo({ heading }) {
   const reduceMotion = useReducedMotion();
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -45,14 +45,23 @@ export default function WhyKarmo() {
           wash is heaviest on the left where the headline sits, easing off to
           the right so the picture still shows through beside the card. */}
       <Image
-        src="/images/mattress-comfort.jpg"
+        src="/images/products/whykarmo-bg.png"
         alt=""
         aria-hidden="true"
         fill
         sizes="100vw"
-        className="object-cover opacity-25"
+        className="object-cover opacity-60"
+        /* Mirrored. This room has its sofa on the right, which is exactly
+           where the family photograph sits — unflipped, the only part worth
+           seeing was the part being covered up. Set as an inline style rather
+           than a scale utility so it cannot be dropped by the class scanner. */
+        style={{ transform: "scaleX(-1)" }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-shade-deep via-shade-deep/92 to-shade-deep/70" />
+      {/* The wash used to run from fully opaque on the left, which combined
+          with the photograph's own low opacity left nothing of the room
+          visible at all. Both were opened up: the picture carries more of
+          itself, and the wash only does as much as the white headline needs. */}
+      <div className="absolute inset-0 bg-gradient-to-r from-shade-deep/85 via-shade-deep/60 to-shade-deep/30" />
 
       {/* Oversized wordmark sitting just above the background — enough to give
           the panel some depth, far too faint to compete with the copy. */}
@@ -65,26 +74,32 @@ export default function WhyKarmo() {
 
       <div className="shell relative grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
         <motion.div variants={group} {...reveal} viewport={once}>
-          <motion.span
-            variants={fade}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/80"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            Started in 1965
-          </motion.span>
+          {/* Home 03 passes the unified SectionHeading here; Home 01 keeps its
+              pill badge and headline. */}
+          {heading ?? (
+            <>
+              <motion.span
+                variants={fade}
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/80"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                Started in 1965
+              </motion.span>
 
-          <h2 className="display mt-7 text-[2.1rem] font-bold leading-[1.15] tracking-[-0.02em] text-white sm:text-[2.75rem] lg:text-[3.25rem]">
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span variants={line} className="block">
-                Where comfort begins,
-              </motion.span>
-            </span>
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span variants={line} className="block">
-                And <span className="text-brand">quality lives on</span>
-              </motion.span>
-            </span>
-          </h2>
+              <h2 className="display mt-7 text-[2.1rem] font-bold leading-[1.15] tracking-[-0.02em] text-white sm:text-[2.75rem] lg:text-[3.25rem]">
+                <span className="block overflow-hidden pb-[0.06em]">
+                  <motion.span variants={line} className="block">
+                    Where comfort begins,
+                  </motion.span>
+                </span>
+                <span className="block overflow-hidden pb-[0.06em]">
+                  <motion.span variants={line} className="block">
+                    And <span className="text-brand">quality lives on</span>
+                  </motion.span>
+                </span>
+              </h2>
+            </>
+          )}
 
           <motion.ul
             variants={group}
@@ -140,8 +155,8 @@ export default function WhyKarmo() {
             className="absolute inset-0"
           >
             <Image
-              src="/images/mattress-family.jpg"
-              alt="Two children playing on a Karmo mattress"
+              src="/images/products/whykarmo-family.jpg"
+              alt="A Bangladeshi family together on a sofa built on Karmo upholstery foam"
               fill
               sizes="(min-width: 1024px) 46vw, 100vw"
               className="object-cover"

@@ -13,16 +13,17 @@ import {
 
 const slides = [
   {
-    id: "foam",
+    id: "hometex",
     index: "01",
-    eyebrow: "Foam",
-    titleLight: "Comfort that",
-    titleBold: "starts within",
+    eyebrow: "HomeTex / Bedding",
+    titleLight: "Where comfort",
+    titleBold: "settles in",
+    // "woven" was wrong here — pillows and cushions are filled, not woven.
     subtitle:
-      "Furniture and upholstery foam, footwear, automotive and acoustic grades — engineered in Bangladesh since 1965.",
-    href: "/foam",
-    image: "/SLIDE01.png",
-    alt: "Couple reading together in a bedroom furnished with a wardrobe, bed and mattress",
+      "Bed sheets, comforters, pillows and cushions — the layers that finish a bedroom.",
+    href: "/hometex",
+    image: "/images/hero/slide-1-hometex-couple.png",
+    alt: "Couple reading together on a jute rug beside a bed dressed in Karmo HomeTex bedding",
   },
   {
     id: "mattress",
@@ -33,20 +34,22 @@ const slides = [
     subtitle:
       "EuroTop, pocket spring, orthopaedic and memory foam mattresses, made for every kind of sleep.",
     href: "/mattress",
-    image: "/SLIDE02.png",
-    alt: "Living room furnished with deep buttoned leather sofas and armchairs",
+    image: "/images/hero/slide-2-mattress-suite.png",
+    alt: "Quilted Karmo euro-top mattress on a low walnut bed frame in a sunlit bedroom",
   },
   {
-    id: "hometex",
+    id: "foam",
     index: "03",
-    eyebrow: "HomeTex / Bedding",
-    titleLight: "The finishing",
-    titleBold: "layer",
+    eyebrow: "Foam",
+    titleLight: "Comfort that",
+    titleBold: "starts within",
     subtitle:
-      "Pillows, cushions, bed sheets and comforters woven to complete the bedroom.",
-    href: "/hometex",
-    image: "/SLIDE03.png",
-    alt: "Family of three generations together in a bedroom with twin beds and dressed bedding",
+      "Furniture and upholstery foam, footwear, automotive and acoustic grades — engineered in Bangladesh since 1965.",
+    href: "/foam",
+    // Upholstery foam is the material inside the sofa, so the foam slide shows
+    // the living-room scene; the bedroom scene stays with Mattress above.
+    image: "/images/hero/slide-3-foam-livingroom.png",
+    alt: "Sunlit living-room corner with a cream bouclé sofa built on Karmo upholstery foam",
   },
   // Three slides, one per supplied image. Chemicals & Polymers is reached
   // from the nav instead — add it here as "04" if a fourth image arrives.
@@ -123,7 +126,15 @@ export default function Hero() {
     // Negative margin cancels the layout's header offset so the hero runs
     // under the fixed bar. Keep both numbers in step with the header height:
     // 80px bar, plus the 40px utility strip from lg up.
-    <section className="relative -mt-20 h-screen min-h-[620px] overflow-hidden bg-shade-deep lg:-mt-30">
+    //
+    // Height tracks a 16:9 ratio (56.25vw) so a 16:9 hero image fills the frame
+    // with no side-cropping on a normal laptop or desktop, whatever the exact
+    // window shape. It is capped at the viewport height so it can never
+    // overflow the screen, with a floor so it stays usable on small phones.
+    <section
+      className="relative -mt-20 overflow-hidden bg-shade-deep lg:-mt-30"
+      style={{ height: "max(620px, min(100svh, 56.25vw))" }}
+    >
       {/* Imagery. The incoming picture is cut into vertical panels that rise
           from the bottom in sequence, so it builds across the frame instead
           of arriving as one moving slab. Each panel holds its own slice of
@@ -247,14 +258,26 @@ export default function Hero() {
             </motion.span>
           </span>
 
+          {/* Two registers rather than one: a quiet lead-in line, then the
+              statement. The first line is sized in `em` so it stays at the same
+              proportion of the headline across all three breakpoints. */}
           <h1 className="display mt-8 text-[3rem] leading-[0.98] tracking-[-0.02em] text-white sm:text-[4.25rem] lg:text-[5.5rem]">
-            <span className="block overflow-hidden pb-[0.08em]">
-              <motion.span variants={lineRise} className="block font-light">
+            <span className="block overflow-hidden pb-[0.1em]">
+              <motion.span
+                variants={lineRise}
+                className="block text-[0.56em] font-light leading-[1.1] tracking-[-0.01em] text-white/85"
+              >
                 {slide.titleLight}
               </motion.span>
             </span>
+            {/* Title case rather than all-caps: the slide titles are written
+                lowercase in the data, so `capitalize` sets them without the
+                copy having to carry the styling. */}
             <span className="block overflow-hidden pb-[0.08em]">
-              <motion.span variants={lineRise} className="block font-extrabold">
+              <motion.span
+                variants={lineRise}
+                className="block font-extrabold capitalize"
+              >
                 {slide.titleBold}
               </motion.span>
             </span>

@@ -9,22 +9,23 @@ import {
   FiWind,
   FiHeart,
   FiLayers,
-  FiFeather,
-  FiDroplet,
-  FiThermometer,
-  FiBox,
 } from "react-icons/fi";
 
 /**
- * Headlines, copy and claims below are taken from Karmo's own company profile
- * — the pages reproduced in korbo group/Karmo Website/images as matts.png
- * (p06), homms.png (p08-09) and Polly.png (p05), each carrying the
- * karmogroup.com footer. Nothing here is invented; the wording is condensed,
- * not embellished.
+ * A single deep-dive row on the mattress division.
+ *
+ * The headline, copy and the four roundel claims come from Karmo's own company
+ * profile — the page reproduced in recource/Karmo Website/images as matts.png
+ * (p06), carrying the karmogroup.com footer. Nothing here is invented; the
+ * wording is condensed, not embellished.
+ *
+ * It was a three-row block (HomeTex and Chemicals alongside) until 27 July
+ * 2026. Both were dropped: their divisions already have a card in the deck
+ * above, and three long rows in a row read as the same section three times.
+ * Kept as an array so a second row can be added back without a rewrite.
  */
 const spotlights = [
   {
-    index: "01",
     tag: "Mattress",
     title: "We test every mattress.",
     titleAccent: "Every single one.",
@@ -38,45 +39,8 @@ const spotlights = [
     ],
     quote: "Everyone assures quality, but not everyone can promise experiences.",
     href: "/mattress",
-    image: "/images/mattress-detail.jpg",
-    alt: "A hand pressing into the quilted top of a Karmo mattress",
-  },
-  {
-    index: "02",
-    tag: "HomeTex",
-    title: "Where comfort",
-    titleAccent: "meets elegance.",
-    lead: "Nearly two decades in homes across the nation.",
-    body: "Premium bedsheets from classic cotton twills to silky sateen weaves and Egyptian cotton. The country's largest manufacturer of comforters and duvets by revenue and distribution — and an extensive range of pillows, from hollow conjugate fibre to feather-touch microfibre and memory foam contour.",
-    points: [
-      { icon: FiLayers, label: "Bed sheets" },
-      { icon: FiBox, label: "Comforters" },
-      { icon: FiFeather, label: "Pillows" },
-      { icon: FiHeart, label: "Cushions" },
-    ],
-    quote: "Blending tradition with innovation to redefine home comfort.",
-    href: "/hometex",
-    image: "/images/comforter-red-stripe.jpg",
-    alt: "Karmo Red Stripe comforter, rolled",
-  },
-  {
-    index: "03",
-    tag: "Chemicals & Polymers",
-    title: "The world of",
-    titleAccent: "polyurethane.",
-    lead: "Footbeds, insoles and the chemistry behind them.",
-    body: "Karmo has operated in Bangladesh since 1965 and became the market leader in the foaming industry by volume, as the largest manufacturer. From foam and mattresses to pillows, the group expanded into chemicals and polymers — with every imported raw material coming from world-class suppliers.",
-    points: [
-      { icon: FiDroplet, label: "Adhesives" },
-      { icon: FiThermometer, label: "Polyurethane" },
-      { icon: FiBox, label: "Sodium silicate" },
-      { icon: FiShield, label: "Footbeds & insole" },
-    ],
-    quote:
-      "Fifty years outlasting competing brands on recognition and quality.",
-    href: "/chemicals",
-    image: "/images/foam-karmo-hd.jpg",
-    alt: "Stack of green Karmo HD polyurethane foam blocks",
+    image: "/images/products/spotlight-mattress-cutaway.png",
+    alt: "Karmo mattress cut away at one corner, showing the quilted top, comfort foam and pocketed spring base",
   },
 ];
 
@@ -137,9 +101,15 @@ function Spotlight({ item, flipped, reveal, once, curtainColour }) {
             className={`absolute inset-0 z-10 ${curtainColour}`}
           />
 
-          {/* Index sits on the picture, the way a chapter number would. */}
-          <span className="display absolute bottom-5 left-5 z-20 text-[2.5rem] font-bold leading-none text-white/85 mix-blend-difference">
-            {item.index}
+          {/* The division name set down the outer edge — the same marking
+              Karmo runs on its own division pages, and the same device the
+              divisions deck above uses. */}
+          <span
+            aria-hidden="true"
+            className="display absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 select-none text-[0.68rem] font-bold uppercase tracking-[0.32em] text-white/60 lg:block"
+            style={{ writingMode: "vertical-rl" }}
+          >
+            {item.tag}
           </span>
         </div>
       </div>
@@ -184,33 +154,42 @@ function Spotlight({ item, flipped, reveal, once, curtainColour }) {
           {item.body}
         </motion.p>
 
+        {/* Set as circular badges rather than a bulleted list — the four claims
+            are exactly the four roundels Karmo prints on its own product
+            pages, so they are given the same shape here. */}
         <motion.ul
           variants={group}
-          className="mt-7 grid gap-x-6 gap-y-3 sm:grid-cols-2"
+          className="mt-9 flex flex-wrap gap-x-8 gap-y-6 border-t border-ink/10 pt-8"
         >
           {item.points.map((point) => (
             <motion.li
               key={point.label}
               variants={fade}
-              className="flex items-center gap-3 text-[13px] font-semibold text-ink"
+              className="group/pt flex w-[calc(50%-1rem)] items-center gap-3 sm:w-auto sm:max-w-[7.5rem] sm:flex-col sm:gap-2.5 sm:text-center"
             >
-              <point.icon className="shrink-0 text-base text-brand" />
-              {point.label}
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/[0.07] ring-1 ring-brand/15 transition-colors duration-500 group-hover/pt:bg-brand/[0.13]">
+                <point.icon className="text-[19px] text-brand" />
+              </span>
+              <span className="text-[12px] font-semibold leading-tight text-ink">
+                {point.label}
+              </span>
             </motion.li>
           ))}
         </motion.ul>
 
         <motion.p
           variants={fade}
-          className="mt-7 border-l-2 border-brand/40 pl-4 text-[13px] italic leading-relaxed text-ink/55"
+          className="mt-8 border-l-2 border-brand/40 pl-4 text-[13px] italic leading-relaxed text-ink/55"
         >
           {item.quote}
         </motion.p>
 
         <motion.div variants={fade}>
+          {/* Not btn-secondary here: that variant fills white on hover, which on
+              this white section leaves nothing to see. */}
           <Link
             href={item.href}
-            className="btn-secondary group mt-8 inline-flex items-center gap-4 rounded-full border border-ink/20 py-2 pl-7 pr-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink"
+            className="group mt-8 inline-flex items-center gap-4 rounded-full border border-ink/20 py-2 pl-7 pr-2 text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition-colors duration-300 hover:border-brand hover:text-brand"
           >
             Explore {item.tag}
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white transition-transform duration-500 group-hover:rotate-45">
@@ -223,7 +202,7 @@ function Spotlight({ item, flipped, reveal, once, curtainColour }) {
   );
 }
 
-export default function Spotlights() {
+export default function Spotlights({ heading }) {
   const reduceMotion = useReducedMotion();
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -231,6 +210,11 @@ export default function Spotlights() {
 
   return (
     <section className="bg-white py-20 md:py-24">
+      {/* This section never had a header of its own — each row carries its own
+          tag. Home 03 gives the group a single heading for consistency; Home 01
+          renders it headerless as before. */}
+      {heading && <div className="shell mb-16 md:mb-20">{heading}</div>}
+
       <div className="space-y-20 md:space-y-28">
         {spotlights.map((item, index) => (
           <Spotlight

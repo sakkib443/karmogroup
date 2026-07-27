@@ -41,8 +41,8 @@ const menu = [
     name: "Home",
     href: "/",
     submenu: [
-      { name: "Home 01 — Editorial", href: "/" },
-      { name: "Home 02 — Cinematic", href: "/home-2" },
+      { name: "Home 01 — Organized", href: "/" },
+      { name: "Home 02 — Luxe Retail", href: "/home-2" },
     ],
   },
   {
@@ -140,11 +140,20 @@ export default function Navbar() {
       }`}
     >
       {/* Utility strip. Career, Dealership and Find Store live up here so the
-          main bar only has to carry the seven product menus. */}
+          main bar only has to carry the seven product menus.
+
+          It rolls away as soon as the page moves: contact details are worth a
+          row at the top of the hero, but not a permanent one stealing height
+          from every screen below it. Collapsed by max-height rather than
+          `display`, so it slides rather than snapping, and `invisible` takes it
+          out of the tab order once it is shut. */}
       <motion.div
         {...item}
-        className={`hidden border-b border-white/10 transition-colors duration-500 lg:block ${
-          scrolled ? "bg-black/30" : "bg-black/25"
+        aria-hidden={scrolled || undefined}
+        className={`hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block ${
+          scrolled
+            ? "invisible max-h-0 border-b-0 bg-black/30 opacity-0"
+            : "visible max-h-16 border-b border-white/10 bg-black/25 opacity-100"
         }`}
       >
         <div className="shell flex h-10 items-center justify-between gap-6 text-[11.5px] text-white/75">

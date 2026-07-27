@@ -94,6 +94,83 @@ have not been watched. Open `/home-2` and scroll before showing the client.
 
 ---
 
+## 1d. The three homepages are now separate code
+
+Separated 25 July 2026, at the client's request, so the main homepage can be
+developed without changing the others.
+
+| Route | Name | Components | Header style |
+|---|---|---|---|
+| `/` | Home 1 (main) | `components/Home/*` + `Home/SectionHeading` | Unified, numbered 01–09 |
+| `/home-2` | Home 2 | `components/Home2/*` (+ `Home/DivisionStack`) | Cinematic, scroll-driven |
+| `/home-3` | Home 3 | `components/Home3/*` (frozen copy) | Editorial, per-section headers |
+
+`components/Home3/` began as a byte-for-byte copy of `components/Home/` at the
+moment of separation, so `/` and `/home-3` looked identical except for the
+header treatment. They will drift as `/` is developed. `SectionHeading.jsx`
+moved from `Home3/` to `Home/` (it only ever served the main page).
+
+**One shared dependency remains:** `/home-2` still imports
+`Home/DivisionStack`, so an edit to the divisions block on the main page would
+also change Home 2's. Home 1 ↔ Home 3 are fully independent; Home 1 ↔ Home 2
+share that one component. Say the word to split it too.
+
+## 1c. Home 03 — the organized copy
+
+Added 25 July 2026 at `/home-3`, third entry in the Home dropdown
+(Editorial / Cinematic / Organized). Same sections as Home 01, same order,
+same content — the client felt Home 01's headings read as scattered and asked
+for a tidier version.
+
+The only change is the **header system**. Home 01 grew its section headers one
+at a time, so they drifted: two eyebrow styles (a pill badge on Capabilities
+and WhyKarmo, a line-and-caps everywhere else), five title sizes (1.6rem to
+3.25rem), and no numbering. Home 03 routes every section through one
+`Home3/SectionHeading.jsx` — a numbered index (01–09), one eyebrow style, one
+type scale (~1.9/2.5/2.9rem), one accent treatment (bold + brand). Verified in
+the browser: all nine section titles now render at an identical size.
+
+It works through a new optional `heading` prop on the shared section
+components (Capabilities, DivisionStack, Spotlights, BestSellers, WhyKarmo,
+Gallery, Clients, Reels, Journal). Default is `undefined`, so each renders its
+original header and **Home 01 is byte-for-byte unchanged** (confirmed: Home 01
+still shows its nine original h2s, pill badges intact). Home 03 passes a
+`SectionHeading` with the same words. The section bodies — cards, carousels,
+marquees, the reel lightbox — are the identical shared components, so nothing
+about the content can drift between the two pages.
+
+One header is genuinely new: Spotlights never had a section title on Home 01
+(each row carries its own), so Home 03 gives it "In depth / Three divisions,
+up close" for consistency. Everything else is the original wording.
+
+Not yet seen on screen — the browser pane was not displaying, so this was
+verified against the DOM (headings, sizes, colours, card counts) and lint, not
+watched. Open `/home-3` and compare with `/` before showing the client.
+
+---
+
+## 1e. Image studio — generate section imagery with Imagen
+
+Added 26 July 2026. An internal tool that generates homepage imagery through
+Google's Imagen API and saves it straight into the project.
+
+- **`/studio`** — pick a section preset (or write a prompt), choose aspect
+  ratio and model, generate. The shared house style (from `IMAGE-PROMPTS.md`)
+  is appended automatically. Files land in `public/images/generated/`.
+- **`/api/generate-image`** — the server route that calls Imagen. The key is
+  read from `GEMINI_API_KEY` server-side and never reaches the browser.
+
+**Setup:** get a free key at aistudio.google.com/apikey, paste it into
+`client/.env.local` (git-ignored), restart the dev server, open `/studio`.
+Default model is `imagen-4.0-generate-001`; falls back message points to
+`imagen-3.0-generate-002` if a key/tier lacks 4.
+
+**Safety:** the route is disabled in a production build unless
+`ENABLE_IMAGE_STUDIO=true` is set, so a deployed site cannot burn API credits.
+`/studio` is a dev tool and should not be linked from the public site.
+
+---
+
 ## 2. Routes — 36 of 44 links are dead
 
 This is the largest gap and it is not cosmetic: the navbar, footer, every
@@ -146,7 +223,7 @@ The reference build (`index.html`) has 16 blocks. Mapping:
 | Mattress technology diagram | — | **missing** |
 | Best Sellers — product carousel | BestSellers | done 24 July 2026 — **order is a curation, not a ranking** (see §6.6) |
 | Awards / certifications | — | **missing, and no source** — the reference block (`cf.PNG`) is a screenshot of Tempur-Pedic's awards page (J.D. Power, Space Foundation). Karmo's own awards have not been supplied. |
-| Floating WhatsApp + hotline | — | **missing** |
+| Floating WhatsApp + hotline | FloatingActions | done on Home 1 — WhatsApp + message + back-to-top; **confirm WhatsApp number** |
 
 Not in the reference, added by us: **Journal** (blog carousel).
 
@@ -380,6 +457,34 @@ brand — layout reference only, none of that imagery is usable.
 **Also worth asking the client:** `FurnitureFoam1.png` is branded "KARMO 180",
 but there is no Karmo 180 anywhere in the site map. Either the spreadsheet is
 missing a grade or the photograph is of a discontinued one.
+
+### 6.8 Trust strip — claims to confirm
+
+The second section (`Home/Capabilities.jsx`) now leads with a six-point trust
+strip in the site's own card style, at the client's request. It is an
+auto-rotating carousel: four cards in view on desktop, all six cycling one step
+every two seconds, looping seamlessly (the track carries two copies and snaps
+back silently after a full lap). It pauses on hover/focus, and under reduced
+motion it drops the autoplay for a static six-up grid. The layout the client
+supplied came from an Indian mattress site, so its wording was that company's —
+it has been rewritten to what Karmo can stand behind, but three of the six
+still need the client to confirm a real basis before launch:
+
+| Point | Status |
+|---|---|
+| A legacy of 60 years — since 1965 | **OK** — founding date is verified |
+| Free delivery — on every order | **OK** — Karmo's own campaign posters advertise it |
+| Market leader in foam — by volume | Karmo's own company profile says this; confirm it is still current |
+| Trusted by families — across Bangladesh | Softened from "Million families worldwide"; no number is claimed. Supply a real figure if wanted |
+| Stockists nationwide | Was "5k+ Stores **Pan India**" — Karmo is Bangladesh, not India, and no store count exists (see §6.3). Kept deliberately vague |
+| Natural & sustainable — materials | Generic; **no evidence supplied**. Confirm or drop |
+
+This replaced the four capability cards that were here (In-house
+Manufacturing, Quality & Testing, Bulk & Trade Supply, Nationwide
+Distribution). That copy is not lost — it is the same wording still used by the
+four `Home/Divisions`/`Spotlights` cards and can be brought back with
+`git checkout <sha> -- client/src/components/Home/Capabilities.jsx`. The change
+shows on both `/` and `/home-3`, since they share the component.
 
 ### 6.7 Blog posts are placeholders
 

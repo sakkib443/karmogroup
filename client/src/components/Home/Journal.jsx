@@ -10,8 +10,8 @@ const posts = [
   {
     title: "How foam density actually decides how long a mattress lasts",
     href: "/blog/foam-density",
-    image: "/images/FurnitureFoam2.png",
-    alt: "Karmo 2001 foam sheets",
+    image: "/images/products/karmo-280-scene.png",
+    alt: "Karmo foam blocks on a workbench beside a part-finished cushion",
     date: "12 June 2026",
     author: "Karmo Desk",
     excerpt:
@@ -20,7 +20,7 @@ const posts = [
   {
     title: "Choosing bedding that survives a Dhaka summer",
     href: "/blog/summer-bedding",
-    image: "/images/mattress-comfort.jpg",
+    image: "/images/mattress/plant-bedroom.jpg",
     alt: "Karmo mattress in a plant-filled bedroom",
     date: "28 May 2026",
     author: "Karmo Desk",
@@ -30,7 +30,7 @@ const posts = [
   {
     title: "Inside the plant: what a batch test looks like",
     href: "/blog/batch-testing",
-    image: "/images/mattress-cloud.jpg",
+    image: "/images/mattress/cloud-poster.jpg",
     alt: "Karmo mattress photographed above a bank of cloud",
     date: "09 May 2026",
     author: "Karmo Desk",
@@ -40,7 +40,7 @@ const posts = [
   {
     title: "Adhesives, quietly holding your furniture together",
     href: "/blog/adhesives",
-    image: "/image10.jpg",
+    image: "/images/interiors/bedroom-neutral.jpg",
     alt: "Interior finished with materials bonded by Karmo adhesives",
     date: "21 April 2026",
     author: "Karmo Desk",
@@ -56,7 +56,12 @@ const SETTLE = [0.22, 1, 0.36, 1];
 // Slide geometry lives here because both the basis and the transform have to
 // agree on it — change the gap in one place only.
 const GAP_REM = 1.25;
-const AUTOPLAY_MS = 5000;
+// One step a second. The slide transition below is kept well under this so a
+// card comes to rest before the next step begins — at 900ms against a 1000ms
+// gap the rail never actually stops, which reads as a judder rather than a
+// carousel.
+const AUTOPLAY_MS = 2000;
+const SLIDE_MS = 550;
 
 const group = {
   hidden: {},
@@ -73,10 +78,11 @@ const fade = {
   show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
 };
 
-export default function Journal() {
+export default function Journal({ heading }) {
   const reduceMotion = useReducedMotion();
   const [perView, setPerView] = useState(1);
   const [rawIndex, setIndex] = useState(0);
+  const [animate, setAnimate] = useState(true);
   const [paused, setPaused] = useState(false);
 
   // Two cards from md up, one below it. Starts at one so the server render and
@@ -90,33 +96,37 @@ export default function Journal() {
     return () => query.removeEventListener("change", sync);
   }, []);
 
-  // The last valid position leaves no gap at the tail of the track.
-  const lastIndex = Math.max(0, posts.length - perView);
+  // The rail never rewinds. It carries two copies of the list, so once it has
+  // travelled a full lap the view is pixel-identical to the start — at that
+  // point the transition is switched off, the index is reset to zero, and the
+  // transition is re-armed on the next frame. Nothing visible happens, so the
+  // first card simply follows the last, round and round.
+  const index = rawIndex;
 
-  // Dropping to a narrower viewport can strand the stored index past the new
-  // end. Clamped on read rather than corrected in an effect — writing state
-  // from an effect costs an extra render pass and trips the lint rule.
-  const index = Math.min(rawIndex, lastIndex);
-
-  const go = useCallback(
-    (step) =>
-      setIndex((current) => {
-        // Step from the clamped position, in case the stored one is stale
-        // after a resize.
-        const next = Math.min(current, lastIndex) + step;
-        if (next < 0) return lastIndex;
-        if (next > lastIndex) return 0;
-        return next;
-      }),
-    [lastIndex],
-  );
+  const go = useCallback((step) => setIndex((current) => current + step), []);
 
   useEffect(() => {
-    if (reduceMotion || paused || lastIndex === 0) return;
-
+    if (reduceMotion || paused) return;
     const timer = setInterval(() => go(1), AUTOPLAY_MS);
     return () => clearInterval(timer);
-  }, [go, lastIndex, paused, reduceMotion]);
+  }, [go, paused, reduceMotion]);
+
+  // Let the last slide land, then jump back with the transition suppressed.
+  useEffect(() => {
+    if (index !== posts.length) return;
+    const timer = setTimeout(() => {
+      setAnimate(false);
+      setIndex(0);
+    }, SLIDE_MS);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  // Re-arm on the frame after the silent snap.
+  useEffect(() => {
+    if (animate) return;
+    const raf = requestAnimationFrame(() => setAnimate(true));
+    return () => cancelAnimationFrame(raf);
+  }, [animate]);
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const once = { once: true, amount: 0.2 };
@@ -125,6 +135,7 @@ export default function Journal() {
   // one step moves the track by exactly one slide plus one gap.
   const slide = `calc((100% - ${(perView - 1) * GAP_REM}rem) / ${perView})`;
   const shift = `calc(-${index} * (${slide} + ${GAP_REM}rem))`;
+  const doubled = [...posts, ...posts];
 
   return (
     <section className="relative overflow-hidden bg-white py-16 md:py-20">
@@ -148,26 +159,28 @@ export default function Journal() {
             viewport={once}
             className="flex flex-wrap items-end justify-between gap-6"
           >
-            <div>
-              <span className="block overflow-hidden">
-                <motion.span
-                  variants={line}
-                  className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
-                >
-                  <span className="h-px w-10 bg-brand" />
-                  Our blog
-                </motion.span>
-              </span>
-
-              <h2 className="display mt-5 text-[1.6rem] font-light leading-[1.15] text-ink sm:text-[2rem]">
-                <span className="block overflow-hidden pb-[0.06em]">
-                  <motion.span variants={line} className="block">
-                    Follow the
-                    <span className="font-bold"> latest news</span>
+            {heading ?? (
+              <div>
+                <span className="block overflow-hidden">
+                  <motion.span
+                    variants={line}
+                    className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
+                  >
+                    <span className="h-px w-10 bg-brand" />
+                    Our blog
                   </motion.span>
                 </span>
-              </h2>
-            </div>
+
+                <h2 className="display mt-5 text-[1.6rem] font-light leading-[1.15] text-ink sm:text-[2rem]">
+                  <span className="block overflow-hidden pb-[0.06em]">
+                    <motion.span variants={line} className="block">
+                      Follow the
+                      <span className="font-bold"> latest news</span>
+                    </motion.span>
+                  </span>
+                </h2>
+              </div>
+            )}
 
             <motion.div variants={fade} className="flex items-center gap-3">
               <button
@@ -200,20 +213,24 @@ export default function Journal() {
               style={{
                 gap: `${GAP_REM}rem`,
                 transform: `translateX(${shift})`,
-                transition: reduceMotion
-                  ? "none"
-                  : `transform 900ms cubic-bezier(${SWEEP.join(",")})`,
+                transition:
+                  reduceMotion || !animate
+                    ? "none"
+                    : `transform ${SLIDE_MS}ms cubic-bezier(${SWEEP.join(",")})`,
               }}
             >
-              {posts.map((post, position) => {
+              {doubled.map((post, position) => {
                 // Cards scrolled out of view stay in the DOM, so they are taken
                 // off the tab order rather than being focusable off-screen.
+                // The second copy of the list is decoration only — it exists to
+                // cover the seam — so it is hidden from assistive tech outright.
+                const isCopy = position >= posts.length;
                 const visible =
-                  position >= index && position < index + perView;
+                  !isCopy && position >= index && position < index + perView;
 
                 return (
                   <article
-                    key={post.href}
+                    key={`${post.href}-${position}`}
                     aria-hidden={!visible}
                     className="shrink-0"
                     style={{ flexBasis: slide }}
@@ -283,8 +300,8 @@ export default function Journal() {
             className="absolute inset-0"
           >
             <Image
-              src="/images/comforter-red-stripe.jpg"
-              alt="Karmo Red Stripe comforter, rolled"
+              src="/images/products/journal-panel.jpg"
+              alt="Living-room corner with a linen sofa, cushions and a carved side table"
               fill
               sizes="(min-width: 1024px) 30vw, 100vw"
               className="object-cover"

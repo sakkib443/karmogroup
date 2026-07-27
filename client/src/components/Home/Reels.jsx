@@ -1,73 +1,103 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import { FiPlay, FiX, FiArrowLeft, FiArrowRight, FiVolume2 } from "react-icons/fi";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import {
+  FiPlay,
+  FiPause,
+  FiX,
+  FiVolume2,
+  FiVolumeX,
+  FiMaximize2,
+} from "react-icons/fi";
 
 /**
- * Labels come from Karmo's own reference build, not from watching the files —
- * index.html names the two TVCs, and product-Foam.html captions each of the
- * four short clips. Worth confirming against the footage before launch.
+ * Karmo on screen — a screening room rather than a carousel.
+ *
+ * This section used to run the clips as 9:16 phone-style cards. Every file was
+ * checked on 27 July 2026 and not one of them is vertical:
+ *
+ *   tvc-mattress  1280x720   16:9   1:02
+ *   product-film  2560x1440  16:9   0:05
+ *   reel-1..4     1536x1152  4:3    0:04 - 0:06
+ *   tvc-foam       352x288   4:3    0:20
+ *
+ * A 4:3 frame forced into a 9:16 card loses about two thirds of its width, so
+ * the old treatment was throwing away most of the picture. The stage below is
+ * 16:9 and the video is contained, not cropped — the 4:3 clips sit pillarboxed
+ * on black, the way a real player shows them, and nothing is lost.
+ *
+ * Captions were written from the actual frames, not from the old reference
+ * build. Two things need the client's word before launch:
+ *
+ *   - reel-2.mp4 is deliberately NOT in this list. Its compression rig carries
+ *     "durfi" branding on screen — a competing mattress brand — so it is not
+ *     Karmo footage and cannot go on Karmo's homepage. Do not add it back
+ *     without a replacement clip.
+ *   - reel-1.mp4 is a CertiGuard certification sting. It is kept, but only if
+ *     Karmo actually holds that certification.
+ *   - tvc-foam.mp4 is 352x288. It is genuine archive footage and is labelled as
+ *     such, but a higher-resolution master would help.
+ *
+ * `at` is the second the playlist thumbnail is pulled from, passed as a media
+ * fragment so the browser paints that frame instead of a black opening one.
  */
-const reels = [
+const films = [
   {
     src: "/videos/tvc-mattress.mp4",
-    title: "Karmo Mattress TVC",
-    tag: "Mattress",
-    blurb: "The full commercial, start to finish.",
+    title: "Karmo Mattress, the commercial",
+    tag: "Commercial",
+    blurb: "The full television spot, start to finish.",
     length: "1:02",
+    at: 3,
+  },
+  {
+    src: "/videos/product-film.mp4",
+    title: "A room built on Karmo",
+    tag: "Interiors",
+    blurb: "Foam, cushioning and bedding, seen where they end up.",
+    length: "0:05",
+    at: 2.2,
   },
   {
     src: "/videos/reel-4.mp4",
-    title: "High-grade spring system",
+    title: "Pocketed spring array",
     tag: "Inside the product",
-    blurb: "Pocket springs that answer to each sleeper.",
+    blurb: "Every spring answers on its own, so weight stays where it lands.",
     length: "0:06",
+    at: 2.7,
   },
   {
     src: "/videos/reel-3.mp4",
-    title: "Motion isolation",
+    title: "Rebound on the quilted top",
     tag: "Inside the product",
-    blurb: "One side moves, the other stays still.",
+    blurb: "A steel ball dropped on the sleeping surface, over and over.",
     length: "0:06",
+    at: 2.6,
   },
   {
     src: "/videos/reel-1.mp4",
-    title: "Certiguard protection",
-    tag: "Inside the product",
-    blurb: "An antimicrobial layer, worked into the build.",
+    title: "CertiGuard germ protection",
+    tag: "Certification",
+    blurb: "The antimicrobial mark carried on the mattress range.",
     length: "0:04",
-  },
-  {
-    src: "/videos/reel-2.mp4",
-    title: "Lab tested",
-    tag: "Quality",
-    blurb: "Compression and wear, measured every batch.",
-    length: "0:04",
+    at: 1.9,
   },
   {
     src: "/videos/tvc-foam.mp4",
-    title: "Karmo Foam TVC",
-    tag: "Foam",
+    title: "Karmo Foam, from the archive",
+    tag: "Archive",
     blurb: "Where the group started, on film.",
     length: "0:20",
+    at: 3,
   },
 ];
 
 const SETTLE = [0.22, 1, 0.36, 1];
 
-// Both the slide width and the step have to agree on the gap — one source.
-const GAP_REM = 1.25;
-
-// Advances every two seconds. The track transition below is kept shorter
-// than this so each slide comes to rest before the next step begins —
-// otherwise the rail never stops moving and the hover preview is unusable.
-const AUTOPLAY_MS = 2000;
-const SLIDE_MS = 700;
-
 const group = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 
 const line = {
@@ -76,168 +106,123 @@ const line = {
 };
 
 const fade = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 22 },
   show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
 };
 
-function ReelCard({ reel, onOpen, reduceMotion, width }) {
-  const videoRef = useRef(null);
+export default function Reels({ heading }) {
+  const reduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const stageRef = useRef(null);
+  const barRef = useRef(null);
+  const lightboxRef = useRef(null);
 
-  // Preview plays silently on hover and rewinds on the way out, so a card
-  // always starts from its opening frame.
-  const preview = (playing) => {
-    const video = videoRef.current;
-    if (!video || reduceMotion) return;
+  const [active, setActive] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
-    if (playing) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-      video.currentTime = 0;
+  // The flagship film is 8.5MB. Nothing is fetched until the section is
+  // actually reached, so a visitor who never scrolls this far pays nothing.
+  //
+  // Pressing play arms it too. Without that second route the section is one
+  // failed IntersectionObserver away from a dead black rectangle with a play
+  // button that does nothing — the exact state a zero-height viewport produces.
+  const inView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const [forced, setForced] = useState(false);
+  const armed = inView || forced;
+
+  const current = films[active];
+
+  // Sound is wanted by default. It cannot simply be switched on, though:
+  // every current browser refuses to start a video that has audio until the
+  // visitor has interacted with the page, and a blocked play() means nothing
+  // plays at all. So the clip always starts muted — which is never blocked —
+  // and the sound is turned on the moment it is allowed.
+  //
+  // `soundWanted` is a ref, not state: it is the visitor's standing preference
+  // and must survive the video remounting on every clip change without
+  // re-running any of this.
+  const soundWanted = useRef(true);
+
+  const tryUnmute = useCallback(() => {
+    const video = stageRef.current;
+    if (!video || !soundWanted.current || !video.muted) return;
+
+    video.muted = false;
+    // Unmuting can make the browser reject playback outright, so the promise
+    // is checked and the clip put back to muted rather than left stalled.
+    const started = video.play();
+    if (started) started.catch(() => { video.muted = true; });
+  }, []);
+
+  // First touch, click or key anywhere on the page counts as the gesture the
+  // browser is waiting for, so the sound comes on then even if the attempt
+  // above was refused.
+  useEffect(() => {
+    const events = ["pointerdown", "keydown", "touchstart"];
+    const onGesture = () => tryUnmute();
+
+    events.forEach((name) =>
+      window.addEventListener(name, onGesture, { passive: true }),
+    );
+    return () =>
+      events.forEach((name) => window.removeEventListener(name, onGesture));
+  }, [tryUnmute]);
+
+  const step = useCallback((delta) => {
+    setActive((index) => (index + delta + films.length) % films.length);
+  }, []);
+
+  // Progress is written straight to the node. Through state it would re-render
+  // the whole section several times a second for a bar nobody interacts with.
+  const onTime = (event) => {
+    const video = event.currentTarget;
+    if (barRef.current && video.duration) {
+      barRef.current.style.width = `${(video.currentTime / video.duration) * 100}%`;
     }
   };
 
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      onMouseEnter={() => preview(true)}
-      onMouseLeave={() => preview(false)}
-      onFocus={() => preview(true)}
-      onBlur={() => preview(false)}
-      style={{ flex: `0 0 ${width}` }}
-      className="group relative block text-left"
-    >
-      {/* The frame is what scales, so the whole card grows without disturbing
-          the track geometry the carousel measures against. */}
-      <span className="relative block aspect-[9/16] overflow-hidden rounded-2xl bg-black shadow-[0_18px_40px_-24px_rgba(34,34,34,0.5)] transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-2 group-hover:scale-[1.04] group-hover:shadow-[0_40px_70px_-30px_rgba(34,34,34,0.6)]">
-        <video
-          ref={videoRef}
-          src={reel.src}
-          muted
-          loop
-          playsInline
-          // Only the first frame is fetched up front; the rest streams when a
-          // card is hovered or opened.
-          preload="metadata"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.14]"
-        />
+  const toggle = () => {
+    const video = stageRef.current;
 
-        {/* Deepens on hover so the caption keeps its footing once the copy
-            grows into the space. */}
-        <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-black/35 transition-opacity duration-700 group-hover:from-black/95 group-hover:via-black/30" />
+    // Not mounted yet: mount it. It carries autoPlay, so it starts on its own.
+    if (!video) {
+      setForced(true);
+      return;
+    }
 
-        <span className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-black/10 transition-colors duration-500 group-hover:ring-white/40" />
+    if (video.paused) video.play().catch(() => {});
+    else video.pause();
+  };
 
-        <span className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-5">
-          <span className="rounded-full bg-white/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-md">
-            {reel.tag}
-          </span>
-          <span className="text-[11px] font-semibold tabular-nums text-white/85">
-            {reel.length}
-          </span>
-        </span>
+  // A click is the gesture the browser wants, so unmuting from here always
+  // takes. Muting is recorded as a standing choice and respected from then on.
+  const toggleSound = () => {
+    const video = stageRef.current;
+    soundWanted.current = !soundWanted.current;
+    if (!video) return;
 
-        {/* Play glyph swells, then hands over to the running preview. */}
-        <span className="pointer-events-none absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-white/15 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-150 group-hover:opacity-0">
-          <FiPlay className="ml-0.5 text-xl text-white" />
-        </span>
+    video.muted = !soundWanted.current;
+    if (soundWanted.current) video.play().catch(() => {});
+  };
 
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
-          <span className="display block text-[1.05rem] font-bold leading-snug text-white transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1">
-            {reel.title}
-          </span>
+  const open = () => {
+    stageRef.current?.pause();
+    setExpanded(true);
+  };
 
-          {/* Blurb is folded away until the card is picked out — grid-rows
-              animates height without needing a fixed value. */}
-          <span className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:grid-rows-[1fr]">
-            <span className="overflow-hidden">
-              <span className="block pt-2 text-[12.5px] leading-relaxed text-white/75">
-                {reel.blurb}
-              </span>
-            </span>
-          </span>
-
-          <span className="mt-3 block h-px w-0 bg-brand transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:w-full" />
-        </span>
-      </span>
-    </button>
-  );
-}
-
-export default function Reels() {
-  const reduceMotion = useReducedMotion();
-  const [active, setActive] = useState(null);
-  const [perView, setPerView] = useState(1);
-  const [rawIndex, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const lightboxRef = useRef(null);
-
-  // Starts at one so the server render and the first client render agree.
-  useEffect(() => {
-    // Deliberately few per view — a 9:16 card only reads as a reel when it
-    // is big enough to look like a phone screen, so the count is kept low
-    // and the width per card high.
-    const steps = [
-      { query: window.matchMedia("(min-width: 1536px)"), value: 4 },
-      { query: window.matchMedia("(min-width: 1280px)"), value: 3 },
-      { query: window.matchMedia("(min-width: 768px)"), value: 2 },
-    ];
-
-    const sync = () => {
-      const hit = steps.find(({ query }) => query.matches);
-      setPerView(hit ? hit.value : 1);
-    };
-
-    sync();
-    steps.forEach(({ query }) => query.addEventListener("change", sync));
-    return () =>
-      steps.forEach(({ query }) => query.removeEventListener("change", sync));
-  }, []);
-
-  // The last position that still leaves no gap at the tail of the track.
-  const lastIndex = Math.max(0, reels.length - perView);
-
-  // Clamped on read rather than corrected in an effect, which would cost an
-  // extra render pass every time the viewport changes.
-  const index = Math.min(rawIndex, lastIndex);
-
-  const go = useCallback(
-    (step) =>
-      setIndex((current) => {
-        const next = Math.min(current, lastIndex) + step;
-        if (next < 0) return lastIndex;
-        if (next > lastIndex) return 0;
-        return next;
-      }),
-    [lastIndex],
-  );
-
-  useEffect(() => {
-    if (reduceMotion || paused || lastIndex === 0 || active !== null) return;
-
-    const timer = setInterval(() => go(1), AUTOPLAY_MS);
-    return () => clearInterval(timer);
-  }, [go, lastIndex, paused, reduceMotion, active]);
-
-  const close = useCallback(() => setActive(null), []);
-
-  const stepLightbox = useCallback((delta) => {
-    setActive((current) => {
-      if (current === null) return current;
-      return (current + delta + reels.length) % reels.length;
-    });
-  }, []);
+  const close = useCallback(() => setExpanded(false), []);
 
   // Keyboard control while the lightbox is up, and the page held still behind
   // it so scrolling does not run on underneath.
   useEffect(() => {
-    if (active === null) return;
+    if (!expanded) return;
 
     const onKey = (event) => {
       if (event.key === "Escape") close();
-      if (event.key === "ArrowRight") stepLightbox(1);
-      if (event.key === "ArrowLeft") stepLightbox(-1);
+      if (event.key === "ArrowRight") step(1);
+      if (event.key === "ArrowLeft") step(-1);
     };
 
     const { overflow } = document.body.style;
@@ -248,22 +233,24 @@ export default function Reels() {
       document.body.style.overflow = overflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [active, close, stepLightbox]);
+  }, [expanded, close, step]);
 
   useEffect(() => {
-    if (active !== null) lightboxRef.current?.focus();
-  }, [active]);
+    if (expanded) lightboxRef.current?.focus();
+  }, [expanded]);
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const once = { once: true, amount: 0.15 };
 
-  // A slide is an even share of the viewport once the gaps are removed, and
-  // one step moves the track by exactly one slide plus one gap.
-  const slide = `calc((100% - ${(perView - 1) * GAP_REM}rem) / ${perView})`;
-  const shift = `calc(-${index} * (${slide} + ${GAP_REM}rem))`;
-
   return (
-    <section className="relative overflow-hidden bg-linen py-20 md:py-28">
+    <section
+      ref={sectionRef}
+      className="relative overflow-hidden bg-linen py-20 md:py-28"
+    >
+      {/* Deliberately a light section. The page runs light the whole way down
+          apart from 04, and a second dark band this close to it broke that. The
+          only dark thing here is the stage itself, which has to be black for
+          the video to letterbox against. */}
       <div className="shell relative">
         <motion.div
           variants={group}
@@ -271,110 +258,272 @@ export default function Reels() {
           viewport={once}
           className="flex flex-wrap items-end justify-between gap-6"
         >
-          <div>
-            <span className="block overflow-hidden">
-              <motion.span
-                variants={line}
-                className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
-              >
-                <span className="h-px w-10 bg-brand" />
-                Karmo on screen
-              </motion.span>
-            </span>
-
-            <h2 className="display mt-6 max-w-xl text-[2rem] font-light leading-[1.15] text-ink sm:text-[2.5rem]">
-              <span className="block overflow-hidden pb-[0.06em]">
-                <motion.span variants={line} className="block">
-                  See what
-                  <span className="font-bold"> comfort is made of</span>
+          {heading ?? (
+            <div>
+              <span className="block overflow-hidden">
+                <motion.span
+                  variants={line}
+                  className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
+                >
+                  <span className="h-px w-10 bg-brand" />
+                  Karmo on screen
                 </motion.span>
               </span>
-            </h2>
-          </div>
 
-          <motion.div variants={fade} className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label="Previous videos"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white"
-            >
-              <FiArrowLeft />
-            </button>
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label="Next videos"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white"
-            >
-              <FiArrowRight />
-            </button>
-          </motion.div>
+              <h2 className="display mt-6 max-w-xl text-[2rem] font-light leading-[1.15] text-ink sm:text-[2.5rem]">
+                <span className="block overflow-hidden pb-[0.06em]">
+                  <motion.span variants={line} className="block">
+                    See what
+                    <span className="font-bold text-brand">
+                      {" "}
+                      comfort is made of
+                    </span>
+                  </motion.span>
+                </span>
+              </h2>
+            </div>
+          )}
+
+          <motion.span
+            variants={fade}
+            className="display hidden text-[12px] font-bold tabular-nums tracking-[0.1em] text-ink/35 sm:block"
+          >
+            {String(active + 1).padStart(2, "0")}
+            <span className="mx-2 text-ink/20">/</span>
+            {String(films.length).padStart(2, "0")}
+          </motion.span>
         </motion.div>
 
-        {/* Vertical padding gives the hovered card room to grow; horizontal
-            overflow stays clipped so off-track slides never show. */}
         <motion.div
           variants={fade}
           {...reveal}
           viewport={once}
-          className="-mx-2 mt-12 overflow-x-clip px-2 py-6"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onFocusCapture={() => setPaused(true)}
-          onBlurCapture={() => setPaused(false)}
+          className="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8"
         >
-          <div
-            className="flex ease-[cubic-bezier(0.22,1,0.36,1)]"
-            style={{
-              gap: `${GAP_REM}rem`,
-              transform: `translateX(${shift})`,
-              transition: `transform ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`,
-            }}
-          >
-            {reels.map((reel, cardIndex) => (
-              <ReelCard
-                key={reel.src}
-                reel={reel}
-                width={slide}
-                reduceMotion={reduceMotion}
-                onOpen={() => setActive(cardIndex)}
+          {/* Stage. Fixed at 16:9 so the layout never jumps between clips, with
+              the picture contained inside it — a 4:3 clip is pillarboxed on
+              black instead of being cropped to fit. */}
+          <div className="min-w-0 lg:col-span-8">
+            <div className="group/stage relative aspect-video overflow-hidden rounded-2xl bg-black shadow-[0_40px_80px_-40px_rgba(34,34,34,0.55)] ring-1 ring-ink/10">
+              {armed && (
+                <video
+                  // Keyed on the source: switching clips remounts the element
+                  // rather than leaving the previous one running underneath.
+                  key={current.src}
+                  ref={stageRef}
+                  src={current.src}
+                  // Held back under reduced motion, unless the visitor pressed
+                  // play themselves — an explicit request outranks the setting.
+                  autoPlay={!reduceMotion || forced}
+                  muted
+                  playsInline
+                  preload="auto"
+                  onTimeUpdate={onTime}
+                  onEnded={() => step(1)}
+                  onPlay={() => {
+                    setPlaying(true);
+                    tryUnmute();
+                  }}
+                  onPause={() => setPlaying(false)}
+                  // The element is the single source of truth for sound: it can
+                  // be muted by a refused play() as well as by the button.
+                  onVolumeChange={(event) =>
+                    setMuted(event.currentTarget.muted)
+                  }
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+              )}
+
+              {/* Click anywhere on the picture to stop and start. Sits under
+                  the controls, which stop the event. */}
+              <button
+                type="button"
+                onClick={toggle}
+                aria-label={playing ? "Pause video" : "Play video"}
+                className="absolute inset-0 z-10 cursor-pointer"
               />
-            ))}
+
+              <span className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-2/5 bg-gradient-to-t from-black/85 to-transparent" />
+
+              <span className="pointer-events-none absolute left-5 top-5 z-20 rounded-full bg-white/12 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-md">
+                {current.tag}
+              </span>
+
+              {/* Shown only while the browser is still holding the sound back,
+                  so the silence reads as "one tap away" rather than broken. */}
+              {playing && muted && (
+                <button
+                  type="button"
+                  onClick={toggleSound}
+                  className="absolute right-5 top-5 z-30 flex items-center gap-2 rounded-full bg-brand px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-lg transition-transform duration-300 hover:scale-105"
+                >
+                  <FiVolumeX className="text-[13px]" />
+                  Tap for sound
+                </button>
+              )}
+
+              {/* Rests over the middle while paused and clears out of the way
+                  once the clip is running. */}
+              <span
+                className={`pointer-events-none absolute left-1/2 top-1/2 z-20 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-black/35 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  playing
+                    ? "scale-125 opacity-0"
+                    : "scale-100 opacity-100 group-hover/stage:bg-brand group-hover/stage:border-brand"
+                }`}
+              >
+                <FiPlay className="ml-1 text-2xl text-white" />
+              </span>
+
+              <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-7">
+                <div className="flex items-end justify-between gap-6">
+                  <div className="min-w-0">
+                    <p className="display truncate text-[1.15rem] font-bold text-white sm:text-[1.4rem]">
+                      {current.title}
+                    </p>
+                    <p className="mt-1.5 hidden text-[13px] text-white/60 sm:block">
+                      {current.blurb}
+                    </p>
+                  </div>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={toggle}
+                      aria-label={playing ? "Pause video" : "Play video"}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
+                    >
+                      {playing ? <FiPause /> : <FiPlay className="ml-0.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleSound}
+                      aria-label={muted ? "Unmute video" : "Mute video"}
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
+                    >
+                      {muted ? <FiVolumeX /> : <FiVolume2 />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={open}
+                      aria-label="Open video full size"
+                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
+                    >
+                      <FiMaximize2 />
+                    </button>
+                  </div>
+                </div>
+
+                <span className="mt-5 block h-[3px] w-full overflow-hidden rounded-full bg-white/15">
+                  <span ref={barRef} className="block h-full w-0 bg-brand" />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Playlist. On wide screens it is pinned to the stage's height and
+              scrolls inside it, so the two columns always end level; below
+              that it lies down into a horizontal strip. */}
+          {/* min-w-0 is load-bearing. A grid item defaults to min-width:auto,
+              so without it this column refuses to shrink below the full width
+              of the six cards inside — the strip stops scrolling and the
+              section's overflow-hidden simply cuts the rest off. */}
+          <div className="relative min-w-0 lg:col-span-4">
+            {/* Below lg this is a horizontal strip that scrolls. From lg it is
+                pinned over the stage's own box, and the rows divide that height
+                between them — so the two columns finish level at every width
+                instead of the rail running short under a taller stage. */}
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-3 lg:absolute lg:inset-0 lg:mx-0 lg:flex-col lg:overflow-hidden lg:px-0 lg:pb-0 [scrollbar-color:rgba(34,34,34,0.22)_transparent] [scrollbar-width:thin]">
+              {films.map((film, index) => {
+                const on = index === active;
+
+                return (
+                  <button
+                    key={film.src}
+                    type="button"
+                    onClick={() => setActive(index)}
+                    aria-current={on}
+                    className={`group/row flex w-60 shrink-0 items-center gap-3.5 rounded-xl p-2 text-left transition-all duration-500 lg:w-full lg:flex-1 lg:min-h-0 ${
+                      on
+                        ? "bg-white shadow-[0_14px_34px_-22px_rgba(34,34,34,0.55)]"
+                        : "bg-white/55 hover:bg-white"
+                    }`}
+                  >
+                    {/* Fixed width in the mobile strip; from lg it takes the
+                        row's height and lets the 16:9 ratio set its width, so
+                        the thumbnails grow and shrink with the rows. */}
+                    <span className="relative block aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-black lg:h-full lg:w-auto">
+                      {armed && (
+                        <video
+                          // Media fragment, so the strip shows a real frame
+                          // from the middle of the clip rather than whatever
+                          // the first one happens to be.
+                          src={`${film.src}#t=${film.at}`}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          tabIndex={-1}
+                          aria-hidden="true"
+                          className="absolute inset-0 h-full w-full object-cover"
+                        />
+                      )}
+
+                      <span
+                        className={`absolute inset-0 transition-colors duration-500 ${
+                          on
+                            ? "bg-transparent"
+                            : "bg-white/45 group-hover/row:bg-white/10"
+                        }`}
+                      />
+
+                      {on && (
+                        <span className="absolute inset-0 rounded-lg ring-2 ring-inset ring-brand" />
+                      )}
+                    </span>
+
+                    {/* Tag and running time share a line — on their own rows
+                        the six entries no longer fit beside the stage. */}
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={`truncate text-[9.5px] font-bold uppercase tracking-[0.16em] transition-colors duration-500 ${
+                            on ? "text-brand" : "text-ink/45"
+                          }`}
+                        >
+                          {film.tag}
+                        </span>
+                        <span className="h-[3px] w-[3px] shrink-0 rounded-full bg-ink/25" />
+                        <span className="shrink-0 text-[10.5px] tabular-nums text-ink/40">
+                          {film.length}
+                        </span>
+                      </span>
+
+                      <span
+                        className={`display mt-1.5 block truncate text-[13px] font-semibold transition-colors duration-500 ${
+                          on ? "text-ink" : "text-ink/65"
+                        }`}
+                      >
+                        {film.title}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </motion.div>
-
-        {/* Position readout, matching the carousel elsewhere on the page. */}
-        <div className="mt-2 flex items-center gap-4">
-          <span className="display text-sm font-bold tabular-nums text-ink">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span className="h-px flex-1 bg-ink/12">
-            <span
-              className="block h-px bg-brand transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                width: `${((index + 1) / (lastIndex + 1)) * 100}%`,
-              }}
-            />
-          </span>
-          <span className="text-xs font-medium tabular-nums text-ink/45">
-            {String(lastIndex + 1).padStart(2, "0")}
-          </span>
-        </div>
       </div>
 
       {/* Lightbox.
           Rendered conditionally rather than through AnimatePresence: the exit
           animation completed but the node was never unmounted, leaving an
-          invisible full-screen backdrop that swallowed every click on the
-          page afterwards. It animates in and closes immediately, which is how
-          most video players behave anyway. */}
-      {active !== null && (
+          invisible full-screen backdrop that swallowed every click on the page
+          afterwards. */}
+      {expanded && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.35 }}
-          className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
           onClick={close}
         >
           <motion.div
@@ -382,51 +531,53 @@ export default function Reels() {
             tabIndex={-1}
             role="dialog"
             aria-modal="true"
-            aria-label={reels[active].title}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 20 }}
-            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            aria-label={current.title}
+            initial={
+              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 20 }
+            }
+            animate={
+              reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }
+            }
             transition={{ duration: 0.5, ease: SETTLE }}
             onClick={(event) => event.stopPropagation()}
-            className="relative w-full max-w-4xl outline-none"
+            className="relative w-full max-w-5xl outline-none"
           >
             <video
-              // Keyed on the source so switching clips remounts the element
-              // rather than leaving the previous one playing underneath.
-              key={reels[active].src}
-              src={reels[active].src}
+              key={current.src}
+              src={current.src}
               controls
               autoPlay
               playsInline
-              className="w-full rounded-xl bg-black"
+              className="max-h-[76vh] w-full rounded-xl bg-black"
             />
 
             <div className="mt-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="display text-lg font-bold text-white">
-                  {reels[active].title}
+              <div className="min-w-0">
+                <p className="display truncate text-lg font-bold text-white">
+                  {current.title}
                 </p>
                 <p className="mt-1 flex items-center gap-2 text-xs text-white/55">
                   <FiVolume2 />
-                  {reels[active].tag} · {reels[active].length}
+                  {current.tag} · {current.length}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => stepLightbox(-1)}
+                  onClick={() => step(-1)}
                   aria-label="Previous video"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-shade-deep"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
                 >
-                  <FiArrowLeft />
+                  <FiPlay className="rotate-180" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => stepLightbox(1)}
+                  onClick={() => step(1)}
                   aria-label="Next video"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-shade-deep"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
                 >
-                  <FiArrowRight />
+                  <FiPlay className="ml-0.5" />
                 </button>
               </div>
             </div>
@@ -435,7 +586,7 @@ export default function Reels() {
               type="button"
               onClick={close}
               aria-label="Close video"
-              className="absolute -top-3 right-0 flex h-10 w-10 -translate-y-full items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-shade-deep"
+              className="absolute -top-3 right-0 flex h-10 w-10 -translate-y-full items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
             >
               <FiX />
             </button>

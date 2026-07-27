@@ -1,0 +1,3036 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   HOME 02 — retail treatment
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ISOLATION CONTRACT — read before editing.
+
+   Next.js serves every stylesheet globally once its route has been visited, so
+   a bare `.container` or `.hero` rule in here would follow the visitor to
+   Home 01 and Home 03 and quietly restyle them. Those pages are being designed
+   separately and must not be touched by this file.
+
+   So the rule is absolute: **every selector in this file lives inside the one
+   `.lv { … }` block below.** Not "is prefixed with .lv" — actually nested
+   inside it, so leaking is structurally impossible rather than a matter of
+   discipline. The only things at file scope are @keyframes, which are
+   name-scoped instead and all carry an `lv-` prefix.
+
+   `scripts/check-luxe-isolation.mjs` enforces this on every build.
+
+   The class names below mirror the reference markup on purpose — `.hero`,
+   `.section-title`, `.product-item` — because they only ever resolve inside
+   `.lv`, and matching names keep the markup readable against the design.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes lv-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* The opening curtain lifts on a CSS timeline, not a React one.
+   It covers the entire viewport at z-index 9999, so if the client bundle ever
+   fails to run — a hydration error, a blocked script, a dev server in a bad
+   state — a JS-driven exit would leave the visitor staring at a locked panel
+   forever. Driving it from CSS means the page frees itself no matter what. */
+@keyframes lv-preloader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* The WhatsApp pulse — expands and fades outward from behind the button. */
+@keyframes lv-ping {
+  75%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes lv-drop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.lv {
+  /* ── Palette ─────────────────────────────────────────────────────────────
+     The reference's layout, Karmo's colours.
+
+     What came from the reference was the *structure* — an 80px headline over a
+     15px body, cards on a warm panel, one accent doing all the emphasis. What
+     could not stay was the brass-and-ivory scheme, which belongs to a European
+     furniture brand and shares nothing with the rest of this site. So each
+     reference token is remapped onto the token Home 01 already uses:
+
+       #161616 ink    → #161c24  the cool slate Home 01 puts under photographs
+       #b08d57 brass  → #e60000  Karmo red
+       #f8f5ef ivory  → #f2eeea  Home 01's linen panel
+       #585858 grey   → #5b6470  the same grey, pulled cool to sit on slate
+
+     Declared here rather than in the shared @theme so Home 01/03 never see
+     them. Values are duplicated from globals.css on purpose — see the
+     isolation contract at the top of this file. */
+  --primary-color: #161c24;
+  --accent-color: #e60000;
+  --accent-deep: #cc0000;
+
+  /* Cool and desaturated. The reference's linen (#f2eeea) was hue 30° —
+     orange — against a dark band at hue 214°, so the two sat opposite each
+     other on the wheel and the panel read as a yellow cast next to white.
+     This is the exact tone Home 01 settled on for the same problem, so the two
+     pages now share one neutral rather than each inventing its own. */
+  --secondary-color: #f1f3f6;
+
+  /* A second, lighter neutral for whole sections. Cards use
+     --secondary-color, so a section painted in the same tone would swallow
+     them; this sits between it and white, which keeps the cards reading as
+     cards while staying quiet enough to pass for white at a glance. */
+  --surface-color: #f8fafb;
+
+  --bg-color: #ffffff;
+  --text-color: #5b6470;
+  --white-color: #ffffff;
+  --divider-color: #161c2426;
+  --dark-divider-color: #ffffff1f;
+
+  /* ── Corner radius ───────────────────────────────────────────────────────
+     Two tokens rather than a radius typed at each of the thirty places that
+     needs one, so the whole page can be tuned from here in one edit.
+
+     The reference sat at 20px outer / 10px inner. That reads soft and consumer
+     — right for a furniture catalogue, too soft for a sixty-year manufacturer
+     that also sells foam by the container. 12/7 keeps the corner from being a
+     hard industrial square while letting the cards look engineered rather than
+     cushioned. Home 01's own product grid uses no radius at all, so this also
+     moves the two pages closer together.
+
+     Pills, circles and the badge cut-out are deliberately NOT on these tokens
+     — they are shapes, not corners, and must stay fully round. */
+  --radius-card: 12px;
+  --radius-inner: 7px;
+
+  /* The reference sets a 15px body against an 80px h1. That 5.3× ratio is
+     most of why the page reads as a catalogue cover rather than a web page,
+     so it is kept exactly. */
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.75em;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+
+  & p {
+    font-family: var(--font-body);
+    margin: 0 0 20px;
+  }
+
+  & p:last-child {
+    margin-bottom: 0;
+  }
+
+  & h1,
+  & h2,
+  & h3,
+  & h4,
+  & h5,
+  & h6 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    line-height: 1.4em;
+    color: var(--primary-color);
+    margin: 0;
+  }
+
+  & a {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.4s ease-in-out;
+  }
+
+  & figure {
+    margin: 0;
+  }
+
+  & img {
+    max-width: 100%;
+  }
+
+  & ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ── Section rhythm ──────────────────────────────────────────────────────
+     Nine of the ten sections had no background at all, so the page ran as one
+     unbroken sheet of white between the two dark bands. These three take the
+     light surface tone, which alternates the page:
+
+       hero (dark) · categories (tint) · offers · products · film (dark)
+       · spotlight (tint) · gallery · heritage (dark) · reels (tint) · blog
+
+     Chosen so no two tinted bands touch and each dark band is approached from
+     a tinted section rather than out of flat white. */
+  & .our-categories,
+  & .our-spotlight,
+  & .our-stories {
+    background: var(--surface-color);
+  }
+
+  /* ── Layout ──────────────────────────────────────────────────────────────
+     Wider than the reference's 1300px. That figure was set for a five-item
+     menu and three-up card rows; Karmo runs four-up grids and an eight-item
+     menu, both of which want more room. 1440 with a 20px gutter gives 1400px
+     of content — 130px more than before — and still leaves the header's
+     1272px of chrome fitting above the 1320px breakpoint, so the menu does
+     not collapse any earlier than it did. Home 01's shell is 1600px, so this
+     also moves the two pages closer together. */
+  & .container {
+    width: 100%;
+    max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────────
+     Brass pill with a white disc pinned to the right edge. The disc holds the
+     arrow and spins 45° on hover; underneath, an ink panel wipes across from
+     the left. Two motions, one gesture. */
+  & .btn-default {
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1em;
+    text-transform: capitalize;
+    background: var(--accent-color);
+    color: var(--white-color);
+    border-radius: 100px;
+    padding: 17px 55px 17px 24px;
+    border: none;
+    overflow: hidden;
+    transition: all 0.4s ease-in-out;
+    z-index: 0;
+  }
+
+  & .btn-default::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    transform: translateY(-50%);
+    background-color: var(--white-color);
+    background-image: url("/home2/arrow-brand.svg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 22px auto;
+    border-radius: var(--radius-card);
+    transition: all 0.4s ease-in-out;
+  }
+
+  & .btn-default:hover::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  & .btn-default::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 0;
+    height: 100%;
+    background: var(--primary-color);
+    transition: all 0.4s ease-in-out;
+    z-index: -1;
+  }
+
+  & .btn-default:hover::after {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+
+  /* On the dark hero the fill is white and the label flips to ink. */
+  & .btn-default.btn-highlighted::after {
+    background-color: var(--white-color);
+  }
+
+  & .btn-default.btn-highlighted:hover {
+    color: var(--primary-color);
+  }
+
+  & .btn-default.btn-highlighted:hover::before {
+    background-color: var(--accent-color);
+    background-image: url("/home2/arrow-white.svg");
+  }
+
+  & .btn-default.btn-accent {
+    padding: 17px 24px;
+  }
+
+  & .btn-default.btn-accent::before {
+    display: none;
+  }
+
+  /* Text link with a disc that slides on hover. */
+  & .readmore-btn {
+    position: relative;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1.45em;
+    text-transform: capitalize;
+    font-weight: 600;
+    color: var(--primary-color);
+    padding-right: 34px;
+  }
+
+  & .readmore-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    background-color: var(--accent-color);
+    background-image: url("/home2/arrow-white.svg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 14px auto;
+    border-radius: 50%;
+    transition: all 0.4s ease-in-out;
+  }
+
+  & .readmore-btn:hover::before {
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  /* ── Section titles ──────────────────────────────────────────────────────
+     The eyebrow is a bordered pill with a 6px brass dot inside its left
+     padding — not a rule-and-caps label. It is the most repeated element on
+     the page, so getting it wrong reads everywhere. */
+  & .section-title {
+    margin-bottom: 40px;
+  }
+
+  /* Home 01's marker: a short red rule, then small caps in the brand colour.
+     Replaces the reference's bordered pill — a pill reads as a chip you could
+     click, which is wrong for a label, and Home 01 already had a device for
+     exactly this job.
+
+     Declared standalone rather than under `.section-title`, because the
+     mattress deep-dive reuses the marker outside a heading block. */
+  & .section-sub-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    line-height: normal;
+    color: var(--accent-color);
+    margin-bottom: 18px;
+  }
+
+  & .section-sub-title::before {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: var(--accent-color);
+  }
+
+  /* Centred headings get a rule either side so the label stays symmetrical. */
+  & .section-title-center .section-sub-title::after {
+    content: "";
+    width: 40px;
+    height: 1px;
+    background: var(--accent-color);
+  }
+
+  /* Two-weight heading. The light clause sets up, the bold one lands. */
+  & .section-heading {
+    font-size: 36px;
+    line-height: 1.4em;
+    letter-spacing: -0.03em;
+    color: var(--primary-color);
+  }
+
+  & .heading-light {
+    font-weight: 300;
+  }
+
+  & .heading-bold {
+    font-weight: 700;
+  }
+
+  & .section-title h1 {
+    font-size: 80px;
+    line-height: 1.2em;
+    letter-spacing: -0.03em;
+    font-weight: 900;
+  }
+
+  & .section-title h2 {
+    font-size: 36px;
+    line-height: 1.4em;
+    letter-spacing: -0.03em;
+  }
+
+  & .section-title p {
+    margin-top: 15px;
+    margin-bottom: 0;
+  }
+
+  & .section-title-center {
+    text-align: center;
+  }
+
+  & .section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0 40px;
+  }
+
+  & .section-row .section-title {
+    max-width: 640px;
+  }
+
+  & .section-row .section-title-content {
+    max-width: 500px;
+    margin-bottom: 40px;
+  }
+
+  & .dark-section .section-sub-title {
+    border-color: var(--dark-divider-color);
+    color: var(--white-color);
+  }
+
+  & .dark-section .section-title h1,
+  & .dark-section .section-title h2,
+  & .dark-section .section-title p,
+  & .dark-section .section-title-content p {
+    color: var(--white-color);
+  }
+
+  /* Centred closing line under a grid: brass pill, sentence, underlined link. */
+  & .section-footer-text {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  & .section-footer-text p {
+    color: var(--primary-color);
+    margin: 0;
+  }
+
+  & .section-footer-text p span {
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 700;
+    background: var(--accent-color);
+    color: var(--white-color);
+    line-height: 1em;
+    padding: 4px 10px;
+    border-radius: 14px;
+    margin-right: 10px;
+  }
+
+  & .section-footer-text p a {
+    display: inline-block;
+    font-weight: 700;
+    text-transform: capitalize;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    color: var(--accent-color);
+  }
+
+  & .section-footer-text p a:hover {
+    color: var(--primary-color);
+  }
+
+  /* ── Header ──────────────────────────────────────────────────────────────
+     Two rows, not one.
+
+     Karmo's menu is eight items and two of them are long ("Chemicals &
+     Polymers", "HomeTex / Bedding"). Squeezed beside a 232px wordmark and four
+     tool icons, the row only fitted at 12.5px type with 7px gutters — which is
+     why it read as thin and cramped rather than considered.
+
+     Splitting it gives the navigation the full container: 14px type with 18px
+     gutters needs ~1084px, against 1400px available, so the row breathes and
+     the breakpoint drops from 1320px to 1180px — the full menu now survives on
+     more screens than the cramped version did.
+
+     Once the bar sticks, the upper row is dropped and a compact wordmark takes
+     its place at the left of the nav row, so the fixed header costs 56px
+     instead of 144px. */
+  & .main-header {
+    position: relative;
+    background: var(--white-color);
+    z-index: 100;
+  }
+
+  & .header-sticky {
+    position: relative;
+    box-shadow: 0 1px 0 0 rgb(22 28 36 / 0.07);
+  }
+
+  & .header-sticky.active {
+    position: fixed;
+    inset: 0 0 auto 0;
+    background: var(--white-color);
+    animation: lv-drop 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 10px 34px -22px rgb(22 28 36 / 0.55);
+    z-index: 100;
+  }
+
+  /* ── Row 1: wordmark and tools ──────────────────────────────────────── */
+  & .header-top {
+    border-bottom: 1px solid var(--divider-color);
+  }
+
+  /* 76px, not 88. The tallest thing in this row is a 44px control, so 88 left
+     22px of air above and below it — more than the row needed and enough to
+     read as slack. 16px either side keeps the touch targets honest while
+     tightening the bar. */
+  & .header-wrapper {
+    height: 76px;
+  }
+
+  /* Stands in for the whole bar, both rows — 76 + 56. Sizing it to one row
+     would drop the page 56px the instant the header goes fixed. */
+  & .header-spacer {
+    height: 132px;
+  }
+
+  & .header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  & .header-logo {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  /* Contact details, the icon row and the CTA all sit in one group on the
+     right. They used to live in a strip above the bar; folding them in here is
+     what removed a whole third row without losing anything. */
+  & .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  & .header-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--text-color);
+  }
+
+  & .header-contact:hover {
+    color: var(--primary-color);
+  }
+
+  & .header-contact i {
+    display: inline-flex;
+    font-size: 15px;
+    color: var(--accent-color);
+  }
+
+  & .header-divider {
+    width: 1px;
+    height: 26px;
+    background: var(--divider-color);
+  }
+
+  & .header-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 44px;
+    padding: 0 22px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white-color);
+    background: var(--accent-color);
+    border-radius: var(--radius-inner);
+    white-space: nowrap;
+  }
+
+  & .header-cta:hover {
+    background: var(--accent-deep);
+  }
+
+  & .header-cta i {
+    display: inline-flex;
+    font-size: 14px;
+    transition: transform 0.35s ease-in-out;
+  }
+
+  & .header-cta:hover i {
+    transform: translateX(3px);
+  }
+
+  & .header-tools {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  /* 44px targets. The previous 38px buttons around a 17px glyph were below the
+     size a finger reliably hits and made the icons look like afterthoughts. */
+  & .header-tools button {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    color: var(--primary-color);
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition:
+      color 0.3s ease-in-out,
+      background-color 0.3s ease-in-out;
+  }
+
+  & .header-tools button:hover {
+    color: var(--accent-color);
+    background: var(--secondary-color);
+  }
+
+  & .header-tools button:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+  }
+
+  & .header-tools .cart-count {
+    position: absolute;
+    top: 5px;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--white-color);
+    background: var(--accent-color);
+    border: 2px solid var(--white-color);
+    border-radius: 20px;
+  }
+
+  /* ── Row 2: navigation ──────────────────────────────────────────────── */
+  & .header-nav > .container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+  }
+
+  /* Only appears once the upper row is gone. Absolute so the menu stays
+     optically centred in both states rather than jumping sideways. */
+  & .header-logo-compact {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+  }
+
+  & .header-sticky.active .header-top {
+    display: none;
+  }
+
+  & .header-sticky.active .header-logo-compact {
+    display: inline-flex;
+  }
+
+  & .main-menu {
+    display: flex;
+    align-items: center;
+  }
+
+  & .main-menu > li {
+    position: relative;
+  }
+
+  & .main-menu > li > a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 56px;
+    padding: 0 18px;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: capitalize;
+    white-space: nowrap;
+    color: var(--primary-color);
+  }
+
+  & .main-menu > li:hover > a {
+    color: var(--accent-color);
+  }
+
+  /* Sits on the bar's own bottom edge, so the indicator reads as part of the
+     header rather than as an underline floating under a word. */
+  & .main-menu > li > a::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 0;
+    height: 2px;
+    background: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.35s ease-in-out;
+  }
+
+  & .main-menu > li:hover > a::after {
+    transform: scaleX(1);
+  }
+
+  & .main-menu > li > a svg {
+    opacity: 0.5;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  & .main-menu > li:hover > a svg {
+    transform: rotate(180deg);
+  }
+
+  /* Dark panel under a light bar — Home 01's treatment. A white-on-white
+     dropdown needs a border to exist at all; this one reads instantly. */
+  & .sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    min-width: 250px;
+    background: color-mix(in srgb, var(--primary-color) 97%, transparent);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 30px 70px -35px rgb(22 28 36 / 0.8);
+    padding: 12px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.35s ease-in-out;
+    z-index: 20;
+  }
+
+  /* The last two items sit close to the right gutter; their panels open
+     leftwards so they cannot push the document wider. */
+  & .main-menu > li:nth-last-child(-n + 2) .sub-menu {
+    left: auto;
+    right: 8px;
+  }
+
+  & .main-menu > li:hover .sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  & .sub-menu a {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgb(255 255 255 / 0.72);
+    border-left: 2px solid transparent;
+    padding: 10px 22px;
+  }
+
+  & .sub-menu a:hover {
+    border-left-color: var(--accent-color);
+    background: rgb(255 255 255 / 0.06);
+    color: var(--white-color);
+  }
+
+  /* Scoped to `.header-tools` on purpose. The toggle is itself a button inside
+     that container, so a bare `.menu-toggle { display: none }` loses to
+     `.header-tools button { display: grid }` on specificity — which left the
+     hamburger sitting beside the cart on desktop, next to a full menu bar. */
+  & .header-tools .menu-toggle {
+    display: none;
+  }
+
+  /* ── Hero ────────────────────────────────────────────────────────────────
+     The reference's composition — full-bleed photograph, everything centred,
+     one enormous headline — carrying Home 01's typography.
+
+     Home 01 splits its headline into two registers: a light lead-in at 0.56em
+     and an extra-bold statement under it. That contrast is what stops a large
+     headline from reading as merely big, and it is the most portable piece of
+     Home 01's identity, so it comes across intact. What stays from the
+     reference is the centring and the flat wash.
+
+     Height follows Home 01's formula rather than the reference's flat 800px:
+     56.25vw is 16:9, so a widescreen photograph fills the frame without being
+     cropped at the sides, capped at the viewport and floored for small phones. */
+  & .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* Home 01's hero runs *under* a fixed bar, so it can take the full 100svh.
+       Here the strip and the bar sit above it in the flow, so their combined
+       height has to come off the top — otherwise the fold lands 144px below
+       the screen and the buttons are never visible on load. */
+    --chrome-h: 132px;
+    height: max(620px, min(calc(100svh - var(--chrome-h)), 56.25vw));
+    padding: 90px 0 100px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  & .hero-bg {
+    position: absolute;
+    inset: -8% 0;
+    height: 116%;
+    z-index: 0;
+  }
+
+  & .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* TRIAL — the three Home 01 photographs stacked and cross-faded. All three
+     stay mounted; only opacity moves, so there is no reflow and no reload on
+     each turn. Long and linear: a hero this large looks like a fault if the
+     picture snaps, and an eased fade dips the combined brightness mid-way. */
+  & .hero-slide {
+    transition: opacity 1.6s linear;
+  }
+
+  /* Two layers, not one. A flat 50% wash over a photograph with a bright sky
+     leaves the top of the headline fighting for contrast while the bottom sits
+     on nothing; grading it deeper towards the floor holds the type and lets the
+     middle of the picture stay open. */
+  & .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgb(22 28 36 / 0.62) 0%,
+        rgb(22 28 36 / 0.44) 38%,
+        rgb(22 28 36 / 0.58) 78%,
+        rgb(22 28 36 / 0.82) 100%
+      );
+    z-index: 1;
+  }
+
+  & .hero .container {
+    position: relative;
+    width: 100%;
+    z-index: 2;
+  }
+
+  & .hero-content-box {
+    max-width: 1120px;
+    margin-inline: auto;
+  }
+
+  /* Rule, label, rule — the centred counterpart of Home 01's single left rule.
+     The reference's dotted pill belongs to the section headings; a hero this
+     large needs something quieter above it. */
+  & .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  & .hero-eyebrow::before,
+  & .hero-eyebrow::after {
+    content: "";
+    width: 44px;
+    height: 1px;
+    background: var(--accent-color);
+  }
+
+  /* 4.25rem, down from 5.5rem.
+
+     Home 01 can carry 5.5rem because its headline is two or three short words
+     ("Where comfort / settles in"). This one is "Crafted comfort for / every
+     Bangladeshi home" — at 88px the bold line overran its box and broke across
+     two lines, which is what made it read as an oversized slab rather than a
+     statement. Sized so each register lands on a single line, with the box
+     widened to 1120px to give it the room. */
+  & .hero-title {
+    margin-top: 34px;
+    font-size: clamp(2.35rem, 1.1rem + 4.3vw, 4.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    /* Title Case, set in CSS rather than baked into the copy, so the wording
+       stays plain sentence text for editors and screen readers. Home 01 puts
+       `capitalize` on its bold line only; here it runs across both registers
+       so the headline reads as one deliberately cased statement instead of
+       changing convention halfway through. */
+    text-transform: capitalize;
+    color: var(--white-color);
+  }
+
+  /* Sized in em so the two registers hold the same proportion at every
+     breakpoint instead of needing a media-query ladder. */
+  /* 0.62, up from Home 01's 0.56. A wider gap between the two registers works
+     when the lead-in is two words; across a full clause it reads as two
+     unrelated headlines rather than one sentence changing gear. */
+  & .hero-title .title-light {
+    display: block;
+    font-size: 0.62em;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  /* 700, not 800. At this width extra-bold stops being emphasis and starts
+     closing up the counters — the line goes solid and loses its shape. */
+  & .hero-title .title-bold {
+    display: block;
+    font-weight: 700;
+  }
+
+  & .hero-lead {
+    max-width: 620px;
+    margin: 32px auto 0;
+    font-size: 16px;
+    line-height: 1.75;
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  & .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 44px;
+  }
+
+  /* Outlined counterpart to `.btn-default`, lifted from Home 01: the label
+     sits in the pill and a red disc rides flush inside its right edge, turning
+     45° on hover. Asymmetric padding is what keeps the disc flush while the
+     button still matches the primary's height. */
+  & .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 6px 6px 6px 28px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: capitalize;
+    color: var(--white-color);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: 100px;
+    transition: all 0.4s ease-in-out;
+  }
+
+  & .btn-outline:hover {
+    border-color: var(--white-color);
+    background: rgb(255 255 255 / 0.08);
+  }
+
+  & .btn-outline .icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    transition: transform 0.4s ease-in-out;
+  }
+
+  & .btn-outline:hover .icon {
+    transform: rotate(45deg);
+  }
+
+  /* Sits on the hero's floor, centred, nudging downwards. */
+  & .hero-scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 34px;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.6);
+    z-index: 2;
+  }
+
+  & .hero-scroll i {
+    display: inline-flex;
+    font-size: 14px;
+  }
+
+  /* ── Categories ──────────────────────────────────────────────────────── */
+  & .our-categories {
+    padding: 100px 0 50px;
+  }
+
+  /* A grid, not the reference's scrolling rail. The rail existed because that
+     design had seven-plus categories to get through; Karmo has four, and four
+     tiles in a row need no paging, no arrows and no hidden overflow. */
+  & .category-item-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  /* Square tiles, not the reference's circles.
+
+     A circle crops a product photograph to its centre and throws away the
+     corners, which is why every one of those tiles had to be a tight studio
+     shot. A square keeps the whole frame, sits on the same grid as the product
+     cards further down, and gives the count and the name a
+     real edge to align to. It is also the shape Home 01 uses for every card it
+     has, so the two pages finally share one card language. */
+  & .category-item > a {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--secondary-color);
+    border: 1px solid transparent;
+    border-radius: var(--radius-card);
+    padding: 10px;
+    transition: all 0.45s ease-in-out;
+  }
+
+  /* Lifts onto white with a hairline and a shadow — the card comes forward
+     rather than the picture simply getting darker. */
+  & .category-item:hover > a {
+    background: var(--white-color);
+    border-color: var(--divider-color);
+    box-shadow: 0 26px 50px -32px rgb(22 28 36 / 0.45);
+    transform: translateY(-6px);
+  }
+
+  & .category-item-image {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-inner);
+    overflow: hidden;
+    background: var(--white-color);
+  }
+
+  & .category-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .category-item:hover .category-item-image img {
+    transform: scale(1.07);
+  }
+
+  /* Count sits on the photograph rather than waiting for a hover, so the
+     information is there for touch users too. */
+  & .category-item-count {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--primary-color);
+    background: rgb(255 255 255 / 0.92);
+    backdrop-filter: blur(4px);
+    border-radius: 40px;
+    padding: 6px 11px;
+    z-index: 2;
+  }
+
+  /* Home 01's rotating red disc, at tile scale. */
+  & .category-item-arrow {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+    color: var(--white-color);
+    background: var(--accent-color);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  & .category-item:hover .category-item-arrow {
+    opacity: 1;
+    transform: translateY(0) rotate(45deg);
+  }
+
+  & .category-item-content {
+    padding: 18px 6px 8px;
+  }
+
+  & .category-item-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  & .category-item-index {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--accent-color);
+  }
+
+  & .category-item-content h3 {
+    font-size: 20px;
+    line-height: 1.3em;
+    letter-spacing: -0.02em;
+  }
+
+  & .category-item:hover .category-item-content h3 {
+    color: var(--accent-color);
+  }
+
+  /* The division's own line, straight from Home 01 — it turns a decorative
+     tile into one that says what is actually inside the category. */
+  & .category-item-content p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ── Offer banners ───────────────────────────────────────────────────── */
+  & .our-offers {
+    padding: 50px 0;
+  }
+
+  & .offer-item-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  & .offer-item {
+    position: relative;
+    width: calc(50% - 10px);
+    min-height: 465px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  & .offer-item-image {
+    position: absolute;
+    inset: 0;
+  }
+
+  & .offer-item-image figure {
+    position: relative;
+    display: block;
+    height: 100%;
+  }
+
+  & .offer-item-image figure::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(22 22 22 / 0.8) 0%,
+      rgb(22 22 22 / 0.36) 39.52%,
+      rgb(22 22 22 / 0) 50.11%
+    );
+    z-index: 1;
+  }
+
+  & .offer-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.6s ease-in-out;
+  }
+
+  & .offer-item:hover .offer-item-image img {
+    transform: scale(1.04);
+  }
+
+  & .offer-item-content-box {
+    position: relative;
+    height: 100%;
+    padding: 50px;
+    z-index: 2;
+  }
+
+  & .offer-item-content {
+    margin-bottom: 40px;
+  }
+
+  & .offer-item-content p {
+    font-weight: 500;
+    color: var(--white-color);
+    margin: 0 0 10px;
+  }
+
+  & .offer-item-content h3 {
+    font-size: 30px;
+    color: var(--white-color);
+    line-height: 1.4em;
+  }
+
+  & .offer-item-readmore-btn .readmore-btn {
+    color: var(--white-color);
+  }
+
+  & .offer-item-readmore-btn .readmore-btn::before {
+    background-color: var(--white-color);
+    background-image: url("/home2/arrow-brand.svg");
+  }
+
+  /* ── Product grid ────────────────────────────────────────────────────────
+     Home 01's Popular Products layout, in Home 02's card language.
+
+     Four cards across the top; below them a promo tile two columns wide with
+     two more products beside it. One grid, so every gutter lines up rather
+     than the banner being a separate band bolted underneath.
+
+     The hover is the point of the section: each card stacks two photographs —
+     a plain cut-out over a room scene — and fades the cut-out out on hover, so
+     the product is understood on its own first and then seen in use. Cards
+     with no scene shot fall back to a slow zoom rather than sitting inert. */
+  & .our-products {
+    padding: 50px 0 100px;
+  }
+
+  & .product-item-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  & .product-item > a {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--secondary-color);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    transition: background-color 0.5s ease-in-out;
+  }
+
+  & .product-item:hover > a {
+    background: #eae4de;
+  }
+
+  & .product-item-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+
+  & .product-item-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The scene sits underneath and is revealed, rather than being faded in on
+     top — cross-fading both layers at once dips the whole tile darker in the
+     middle of the transition. */
+  & .product-item-scene {
+    position: absolute;
+    inset: 0;
+  }
+
+  & .product-item-plain {
+    position: relative;
+    z-index: 1;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .product-item.has-scene:hover .product-item-plain {
+    opacity: 0;
+  }
+
+  & .product-item:not(.has-scene):hover .product-item-plain {
+    transform: scale(1.05);
+  }
+
+  & .product-item-badge {
+    position: absolute;
+    right: 14px;
+    top: 14px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white-color);
+    background: var(--accent-color);
+    border-radius: 50%;
+    z-index: 2;
+  }
+
+  & .product-item-badge.is-new {
+    background: #0e9f6e;
+  }
+
+  & .product-item-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 18px 20px 20px;
+  }
+
+  & .product-item-title {
+    font-size: 15px;
+    line-height: 1.35em;
+    letter-spacing: -0.01em;
+  }
+
+  & .product-item:hover .product-item-title {
+    color: var(--accent-color);
+  }
+
+  & .product-item-cat {
+    margin: 5px 0 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+  }
+
+  /* `margin-top: auto` pins the price to the floor of the card, so a two-line
+     product name never leaves one tile's price sitting higher than its
+     neighbour's. */
+  & .product-item-price {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 14px;
+  }
+
+  & .product-item-price .was {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    color: var(--text-color);
+    text-decoration: line-through;
+  }
+
+  & .product-item-price .now {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary-color);
+  }
+
+  & .product-item-price .note {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    color: var(--text-color);
+  }
+
+  /* ── Promo tile ──────────────────────────────────────────────────────── */
+  & .product-promo {
+    grid-column: span 2;
+  }
+
+  & .product-promo > a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    min-height: 19rem;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  & .product-promo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .product-promo:hover img {
+    transform: scale(1.05);
+  }
+
+  /* Light enough that the room still reads as a photograph — the button
+     carries its own backdrop, so the wash does not have to do that job. */
+  & .product-promo-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.82) 0%,
+      rgb(255 255 255 / 0.4) 45%,
+      rgb(255 255 255 / 0) 85%
+    );
+  }
+
+  & .product-promo-content {
+    position: relative;
+    max-width: 62%;
+    padding: 40px;
+    z-index: 1;
+  }
+
+  & .product-promo-eyebrow {
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-color);
+  }
+
+  & .product-promo-content h3 {
+    margin-top: 12px;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  & .product-promo-content h3 span {
+    display: block;
+  }
+
+  & .product-promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    padding: 13px 24px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    background: rgb(255 255 255 / 0.85);
+    border: 1px solid var(--divider-color);
+    backdrop-filter: blur(4px);
+    transition: all 0.5s ease-in-out;
+  }
+
+  & .product-promo:hover .product-promo-btn {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+
+  & .product-promo-btn i {
+    display: inline-flex;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  & .product-promo:hover .product-promo-btn i {
+    transform: translateX(4px);
+  }
+
+  /* ── Film section ────────────────────────────────────────────────────── */
+  /* Centred, not bottom-left.
+
+     The reference parks its copy in one corner and the play badge in the
+     opposite one — which works when the background is a still, but once the
+     band is actually playing a film the badge is the whole point of the
+     section and was sitting as far from the headline as the layout allowed.
+     Stacked in the middle, the disc reads as the thing to press and the
+     heading explains what pressing it gets you. */
+  & .intro-video {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 780px;
+    padding: 100px 0;
+    overflow: hidden;
+  }
+
+  & .intro-video-bg {
+    position: absolute;
+    inset: -8% 0;
+    height: 116%;
+    z-index: 0;
+  }
+
+  & .intro-video-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* The loop sits directly over the still and fades in only once it is really
+     playing, so a slow connection shows the photograph rather than a black
+     hole. The still is never removed — it is the fallback for a failed load
+     and for reduced-motion visitors, who get no video element at all. */
+  /* Two copies of the loop stack here. The transition duration is what the
+     crossfade actually is, so it must stay in step with CROSSFADE in
+     VideoFeature.jsx — 0.7s there, 700ms here. Linear, because an eased
+     crossfade dips the combined brightness in the middle and the seam shows
+     as a flicker. */
+  & .intro-video-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 700ms linear;
+  }
+
+  & .intro-video-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(22 28 36 / 0.25) 0%,
+      rgb(22 28 36 / 0.1) 45%,
+      rgb(22 28 36 / 0.85) 100%
+    );
+    z-index: 1;
+  }
+
+  & .intro-video .container {
+    position: relative;
+    width: 100%;
+    z-index: 2;
+  }
+
+  & .intro-video-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  & .intro-video .section-title {
+    margin: 0;
+    max-width: 820px;
+  }
+
+  & .intro-video .section-title h2 {
+    font-size: 48px;
+  }
+
+  & .intro-video-circle button {
+    display: block;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+
+  & .intro-video-circle button:focus-visible {
+    outline: 2px solid var(--white-color);
+    outline-offset: 6px;
+  }
+
+  & .intro-video-circle img {
+    max-width: 140px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    animation: lv-rotate 20s infinite linear;
+  }
+
+  /* Stops turning under the pointer, so the label can actually be read. */
+  & .intro-video-circle button:hover img {
+    animation-play-state: paused;
+  }
+
+  /* ── Video lightbox (film band + reels row) ───────────────────────────────────────────────────────────────────────────────
+     The reference used a jQuery popup plugin. This is the same idea without
+     the dependency: a backdrop that is its own button, so a click anywhere
+     outside the frame closes without the video swallowing the event. */
+  & .media-lightbox {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    z-index: 9990;
+  }
+
+  & .media-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(10 13 17 / 0.88);
+    backdrop-filter: blur(6px);
+    border: none;
+    cursor: pointer;
+  }
+
+  & .media-lightbox-frame {
+    position: relative;
+    width: min(1100px, 100%);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: 0 40px 90px -40px rgb(0 0 0 / 0.8);
+  }
+
+  & .media-lightbox-frame video {
+    display: block;
+    width: 100%;
+    max-height: 80vh;
+    background: #000;
+  }
+
+  & .media-lightbox-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+    color: var(--white-color);
+    background: rgb(22 28 36 / 0.7);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background-color 0.3s ease-in-out;
+    z-index: 2;
+  }
+
+  & .media-lightbox-close:hover {
+    background: var(--accent-color);
+  }
+
+  /* ── Mattress deep-dive ──────────────────────────────────────────────────
+     Home 01 runs this row on bare white with the picture floating beside the
+     copy. Here it sits on the linen panel every other card on this page uses,
+     so it reads as part of the same set rather than as a page from elsewhere.
+     Same content, this page's dress. */
+  & .our-spotlight {
+    padding: 100px 0;
+  }
+
+  & .spotlight-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: var(--secondary-color);
+    border-radius: var(--radius-card);
+    padding: 10px;
+  }
+
+  & .spotlight-item-image {
+    position: relative;
+    width: calc(50% - 5px);
+    border-radius: var(--radius-inner);
+    overflow: hidden;
+  }
+
+  & .spotlight-item-image figure {
+    display: block;
+    height: 100%;
+  }
+
+  & .spotlight-item-image img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-inner);
+  }
+
+  /* Division name down the outer edge — the marking Karmo uses on its own
+     division pages, and the same device the categories row uses. */
+  & .spotlight-item-edge {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.65);
+    z-index: 2;
+  }
+
+  & .spotlight-item-content {
+    width: calc(50% - 5px);
+    padding: 50px;
+  }
+
+  & .spotlight-lead {
+    margin: 20px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  & .spotlight-body {
+    margin: 14px 0 0;
+    max-width: 34rem;
+    font-size: 14px;
+    line-height: 1.9;
+  }
+
+  & .spotlight-points {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 32px;
+    margin-top: 36px;
+    padding-top: 32px;
+    border-top: 1px solid var(--divider-color);
+  }
+
+  & .spotlight-points li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 7rem;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    color: var(--primary-color);
+  }
+
+  & .spotlight-points .icon-box {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    font-size: 19px;
+    color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 7%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-color) 18%, transparent);
+    border-radius: 50%;
+    transition: background-color 0.5s ease-in-out;
+  }
+
+  & .spotlight-points li:hover .icon-box {
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  }
+
+  & .spotlight-quote {
+    margin: 32px 0 0;
+    padding-left: 16px;
+    border-left: 2px solid color-mix(in srgb, var(--accent-color) 45%, transparent);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-style: italic;
+    line-height: 1.75;
+  }
+
+  /* The hero's outline button is drawn for a dark photograph. On the linen
+     panel it needs ink borders and ink type, or it disappears. */
+  & .btn-outline.is-ink {
+    margin-top: 32px;
+    color: var(--primary-color);
+    border-color: var(--divider-color);
+  }
+
+  & .btn-outline.is-ink:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    background: transparent;
+  }
+
+  /* ── Gallery mosaic ──────────────────────────────────────────────────────
+     Home 01's block. The grid is declared here but the per-tile spans stay as
+     Tailwind `lg:col-span-*` utilities on the markup, because that is where
+     Home 01 keeps them and matching makes the two easy to diff.
+
+     Nothing in here may set `grid-column` on `.gallery-tile`: rules in this
+     file are unlayered and would beat Tailwind's utilities layer, silently
+     collapsing every span to one column. */
+  & .our-gallery {
+    position: relative;
+    padding: 100px 0;
+    overflow: hidden;
+  }
+
+  & .gallery-watermark {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13vw;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: color-mix(in srgb, var(--primary-color) 5%, transparent);
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  & .our-gallery .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Full bleed — the heading above keeps the page gutter, the pictures do not.
+     A fixed row height on wide screens is what drives the mosaic; the per-tile
+     aspect ratio is dropped there so a tile fills its cell exactly. Keeping the
+     ratio would leave gaps inside the block. */
+  & .gallery-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    margin-top: 50px;
+    z-index: 1;
+  }
+
+  & .gallery-tile {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    background: var(--secondary-color);
+    overflow: hidden;
+  }
+
+  & .gallery-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .gallery-tile:hover img {
+    transform: scale(1.05);
+  }
+
+  @media (width >= 40rem) {
+    & .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width >= 64rem) {
+    & .gallery-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-auto-rows: 19rem;
+    }
+
+    & .gallery-tile {
+      aspect-ratio: auto;
+    }
+  }
+
+  /* ── Heritage band ───────────────────────────────────────────────────────
+     Was the reference's flat-discount block. Every measurement is kept — the
+     100px padding, the 55/45 split, the 50px gutter, the 38px figures, the
+     masked photograph — because the shape was the part worth keeping. What
+     changed is what it says: invented seasonal percentages became the group's
+     own published numbers.
+
+     The one deletion is the colon between boxes. A countdown reads "157 : 16 :
+     03"; four unrelated statistics do not, and the punctuation would imply a
+     relationship between them that is not there. */
+  & .our-heritage {
+    padding: 100px 0;
+    background: var(--primary-color);
+  }
+
+  & .heritage-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 50px;
+  }
+
+  & .heritage-content {
+    width: calc(55% - 25px);
+  }
+
+  & .heritage-image {
+    position: relative;
+    width: calc(45% - 25px);
+  }
+
+  & .heritage-body {
+    margin-top: 80px;
+  }
+
+  & .heritage-figures {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 30px 60px;
+  }
+
+  & .heritage-figures .figure-box span {
+    display: block;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.1em;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--white-color);
+  }
+
+  & .heritage-figures .figure-box p {
+    max-width: 9rem;
+    color: var(--white-color);
+    text-transform: capitalize;
+    margin: 15px 0 0;
+  }
+
+  & .heritage-btn {
+    margin-top: 60px;
+  }
+
+  /* The reference masks the photograph into an arched blob. Same asset. */
+  & .heritage-image figure {
+    position: relative;
+    mask-image: url("/livora/discount-image-mask.svg");
+    mask-position: center center;
+    mask-repeat: no-repeat;
+    mask-size: cover;
+  }
+
+  & .heritage-image img {
+    width: 100%;
+    aspect-ratio: 1 / 0.962;
+    object-fit: cover;
+  }
+
+  /* Sits where the discount flash used to. A founding year is a fact the badge
+     can carry indefinitely; a percentage was only true until the campaign
+     ended. */
+  & .heritage-badge {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 20px 24px;
+    text-align: center;
+    color: var(--white-color);
+    background: var(--accent-color);
+    z-index: 2;
+  }
+
+  & .heritage-badge strong {
+    display: block;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  & .heritage-badge span {
+    display: block;
+    margin-top: 6px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.8);
+  }
+
+  /* ── Reels row ───────────────────────────────────────────────────────────
+     Three across, two rows — six clips, evenly. The reference ran four tall
+     tiles because it had four; forcing six into a four-column row leaves a
+     two-card orphan on the second line.
+
+     4:3 frames, not the 9:16 Home 01 uses. Its portrait crop suits a phone
+     reel; this footage is landscape (1536×1152 and 1280×720), so a portrait
+     frame would throw away most of every shot. */
+  & .our-stories {
+    padding: 100px 0;
+  }
+
+  & .story-item-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  & .story-item > button {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: 0;
+    text-align: left;
+    background: var(--primary-color);
+    border: none;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    cursor: pointer;
+    transition:
+      transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .story-item > button:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 36px 64px -34px rgb(22 28 36 / 0.6);
+  }
+
+  & .story-item > button:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 4px;
+  }
+
+  & .story-item video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.4s ease-out;
+  }
+
+  & .story-item > button:hover video {
+    transform: scale(1.06);
+  }
+
+  /* Deepens on hover, because the blurb unfolds into that space and needs a
+     footing that does not depend on what the footage happens to be doing. */
+  & .story-item-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(22 28 36 / 0.35) 0%,
+      rgb(22 28 36 / 0.08) 40%,
+      rgb(22 28 36 / 0.85) 100%
+    );
+    transition: opacity 0.7s ease-in-out;
+  }
+
+  & .story-item > button:hover .story-item-veil {
+    background: linear-gradient(
+      180deg,
+      rgb(22 28 36 / 0.45) 0%,
+      rgb(22 28 36 / 0.3) 40%,
+      rgb(22 28 36 / 0.94) 100%
+    );
+  }
+
+  & .story-item-meta {
+    position: absolute;
+    inset: 18px 18px auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 2;
+  }
+
+  & .story-item-tag {
+    padding: 6px 12px;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--white-color);
+    background: rgb(255 255 255 / 0.16);
+    backdrop-filter: blur(6px);
+    border-radius: 40px;
+  }
+
+  & .story-item-length {
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  /* Grows and dissolves as the preview takes over — the glyph has done its job
+     the moment the footage starts moving. */
+  & .story-item-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    font-size: 21px;
+    color: var(--white-color);
+    background: rgb(255 255 255 / 0.16);
+    border: 1px solid rgb(255 255 255 / 0.4);
+    border-radius: 50%;
+    backdrop-filter: blur(6px);
+    transform: translate(-50%, -50%);
+    transition: all 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 2;
+  }
+
+  & .story-item-play svg {
+    margin-left: 3px;
+  }
+
+  & .story-item > button:hover .story-item-play {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+
+  & .story-item-caption {
+    position: absolute;
+    inset: auto 20px 20px 20px;
+    z-index: 2;
+  }
+
+  & .story-item-title {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--white-color);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .story-item > button:hover .story-item-title {
+    transform: translateY(-4px);
+  }
+
+  /* grid-template-rows animates from nothing to content height without anyone
+     having to guess what that height is. */
+  & .story-item-blurb {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .story-item-blurb > span {
+    display: block;
+    overflow: hidden;
+    padding-top: 8px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  & .story-item > button:hover .story-item-blurb {
+    grid-template-rows: 1fr;
+  }
+
+  & .story-item-rule {
+    display: block;
+    width: 0;
+    height: 1px;
+    margin-top: 12px;
+    background: var(--accent-color);
+    transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .story-item > button:hover .story-item-rule {
+    width: 100%;
+  }
+
+  & .our-stories .section-footer-text {
+    margin-top: 50px;
+  }
+
+  /* ── Blog ────────────────────────────────────────────────────────────────
+     Home 01's Journal, mirrored: its standing panel sits to the right of a
+     carousel; here it leads on the left and the posts follow.
+
+     No carousel. Home 01 needs one because it holds four posts in a two-card
+     window; two posts beside a panel fit the row outright, and a rail that
+     never has anything to scroll to is a moving part with no job. */
+  & .our-blog {
+    padding: 100px 0;
+  }
+
+  & .blog-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+  }
+
+  /* ── Standing panel ─────────────────────────────────────────────────── */
+  & .blog-panel {
+    position: relative;
+    min-height: 420px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
+
+  & .blog-panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Weighted to the floor, where the copy sits. */
+  & .blog-panel-veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      0deg,
+      var(--primary-color) 0%,
+      color-mix(in srgb, var(--primary-color) 45%, transparent) 45%,
+      color-mix(in srgb, var(--primary-color) 10%, transparent) 100%
+    );
+  }
+
+  & .blog-panel-content {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 30px;
+    z-index: 1;
+  }
+
+  & .blog-panel-content h3 {
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--white-color);
+  }
+
+  & .blog-panel-content h3 span {
+    display: block;
+  }
+
+  /* ── Posts ──────────────────────────────────────────────────────────── */
+  & .blog-post-image {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    border-radius: var(--radius-inner);
+    overflow: hidden;
+    background: var(--secondary-color);
+  }
+
+  & .blog-post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s ease-out;
+  }
+
+  & .blog-post:hover .blog-post-image img {
+    transform: scale(1.06);
+  }
+
+  & .blog-post h3 {
+    margin-top: 20px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  & .blog-post:hover h3 {
+    color: var(--accent-color);
+  }
+
+  & .blog-post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin-top: 10px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--text-color);
+  }
+
+  & .blog-post-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  & .blog-post-meta i {
+    display: inline-flex;
+    color: var(--accent-color);
+  }
+
+  & .blog-post-meta strong {
+    font-weight: 600;
+    color: var(--primary-color);
+  }
+
+  & .blog-post-meta .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--divider-color);
+  }
+
+  & .blog-post p {
+    margin: 14px 0 0;
+    font-size: 13.5px;
+    line-height: 1.75;
+    /* Two lines, so a long excerpt never pushes one card's "Read more" out of
+       line with its neighbour's. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Underlined link, shared by the panel and the posts ─────────────── */
+  & .blog-underline-btn {
+    display: inline-flex;
+    flex-direction: column;
+    width: fit-content;
+    margin-top: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary-color);
+  }
+
+  & .blog-panel-content .blog-underline-btn {
+    color: var(--white-color);
+  }
+
+  /* A brand rule that draws itself across a static baseline, rather than the
+     baseline itself appearing on hover — the link keeps its footprint either
+     way, so nothing below it shifts. */
+  & .blog-underline-btn .rule {
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin-top: 5px;
+    background: var(--divider-color);
+  }
+
+  & .blog-panel-content .blog-underline-btn .rule {
+    background: rgb(255 255 255 / 0.45);
+  }
+
+  & .blog-underline-btn .rule span {
+    display: block;
+    width: 0;
+    height: 1px;
+    background: var(--accent-color);
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  & .blog-post:hover .blog-underline-btn .rule span,
+  & .blog-underline-btn:hover .rule span {
+    width: 100%;
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────────────────
+     Matched to Home 01: a closing call to action over a texture photograph,
+     then a five-column block — brand and contact details, three link columns,
+     newsletter — and a copyright rule.
+
+     Same content, this page's palette. The address is Karmo's real head
+     office, so it must read identically to the shared footer; if one changes,
+     change both. */
+  & .main-footer {
+    position: relative;
+    background: var(--primary-color);
+    overflow: hidden;
+  }
+
+  & .footer-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  & .footer-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.28;
+  }
+
+  /* Dropped back far enough that the photograph reads as texture, and graded
+     so the link columns lower down never have to fight a bright patch. */
+  & .footer-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--primary-color) 72%, transparent) 0%,
+      color-mix(in srgb, var(--primary-color) 84%, transparent) 45%,
+      color-mix(in srgb, var(--primary-color) 94%, transparent) 100%
+    );
+  }
+
+  & .footer-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Closing call to action ─────────────────────────────────────────── */
+  & .footer-cta {
+    border-bottom: 1px solid var(--dark-divider-color);
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  & .footer-cta .section-sub-title {
+    justify-content: center;
+  }
+
+  & .footer-cta h2 {
+    max-width: 42rem;
+    margin: 0 auto 40px;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--white-color);
+  }
+
+  /* ── Columns ────────────────────────────────────────────────────────── */
+  & .footer-row {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, 1fr) 1.3fr;
+    gap: 48px;
+    padding: 64px 0;
+  }
+
+  & .footer-about p {
+    margin: 20px 0 0;
+    max-width: 20rem;
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  & .footer-hotline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  & .footer-hotline i {
+    display: inline-flex;
+    font-size: 24px;
+    color: var(--accent-color);
+  }
+
+  & .footer-hotline strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white-color);
+  }
+
+  & .footer-hotline small {
+    display: block;
+    font-size: 12px;
+    color: var(--accent-color);
+  }
+
+  & .footer-contact {
+    margin-top: 24px;
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  & .footer-contact li {
+    display: flex;
+    gap: 12px;
+    line-height: 1.65;
+  }
+
+  & .footer-contact i {
+    display: inline-flex;
+    margin-top: 3px;
+    flex: 0 0 auto;
+    font-size: 16px;
+    color: var(--accent-color);
+  }
+
+  & .footer-contact a:hover {
+    color: var(--white-color);
+  }
+
+  & .footer-social {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  & .footer-social a {
+    display: inline-flex;
+    font-size: 15px;
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  & .footer-social a:hover {
+    color: var(--accent-color);
+  }
+
+  & .footer-links h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white-color);
+  }
+
+  & .footer-links ul {
+    margin-top: 20px;
+    display: grid;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  & .footer-links ul a {
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  & .footer-links ul a:hover {
+    color: var(--accent-color);
+  }
+
+  & .footer-newsletter p {
+    margin: 20px 0 0;
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  /* Square-edged and flush, the way Home 01 sets it — a pill here would be the
+     only rounded control in the whole footer. */
+  & .footer-newsletter form {
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+    background: rgb(255 255 255 / 0.1);
+    backdrop-filter: blur(4px);
+  }
+
+  & .footer-newsletter input {
+    width: 100%;
+    min-width: 0;
+    padding: 14px 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--white-color);
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+  & .footer-newsletter input::placeholder {
+    color: rgb(255 255 255 / 0.45);
+  }
+
+  & .footer-newsletter button {
+    flex: 0 0 auto;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-color);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out;
+  }
+
+  & .footer-newsletter button:hover {
+    color: var(--white-color);
+  }
+
+  & .footer-copyright {
+    border-top: 1px solid var(--dark-divider-color);
+    padding: 20px 0;
+    font-family: var(--font-body);
+    font-size: 12px;
+    text-align: center;
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  /* Visually hidden, still read aloud — the newsletter input needs a label and
+     the design has no room to print one. */
+  & .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Floating action rail ────────────────────────────────────────────────
+     WhatsApp, message and back-to-top, pinned bottom-right. Home 01's set, in
+     this page's colours.
+
+     Sits under the lightbox (9990) and the drawer (9500) but above everything
+     else, so it never covers a dialog it cannot be reached behind. */
+  & .fab-rail {
+    position: fixed;
+    right: 20px;
+    bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    z-index: 1000;
+  }
+
+  & .fab {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    font-size: 21px;
+    color: var(--white-color);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.45);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+
+  & .fab:hover {
+    box-shadow: 0 16px 44px -10px rgb(0 0 0 / 0.55);
+  }
+
+  & .fab:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 3px;
+  }
+
+  & .fab-top {
+    background: var(--primary-color);
+  }
+
+  & .fab-top svg {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  & .fab-top:hover svg {
+    transform: translateY(-2px);
+  }
+
+  & .fab-message {
+    background: var(--accent-color);
+  }
+
+  & .fab-whatsapp {
+    background: #25d366;
+    font-size: 24px;
+  }
+
+  /* Behind the button, not over it — an outward pulse that never dims the
+     glyph. */
+  & .fab-pulse {
+    position: absolute;
+    inset: 0;
+    background: #25d366;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: lv-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+    z-index: -1;
+  }
+
+  /* Slides out on hover. Hidden on small screens, where there is no hover and
+     no room for it. */
+  & .fab-label {
+    position: absolute;
+    right: 100%;
+    margin-right: 12px;
+    display: none;
+    padding: 6px 12px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--white-color);
+    background: var(--primary-color);
+    border-radius: 8px;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: all 0.3s ease-in-out;
+    pointer-events: none;
+  }
+
+  & .fab:hover .fab-label {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  @media (width >= 40rem) {
+    & .fab-label {
+      display: block;
+    }
+  }
+
+  @media (width >= 48rem) {
+    & .fab-rail {
+      right: 28px;
+      bottom: 32px;
+    }
+
+    & .fab {
+      width: 52px;
+      height: 52px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & .fab-pulse {
+      animation: none;
+    }
+  }
+
+  /* ── Preloader & cursor ──────────────────────────────────────────────── */
+  & .preloader {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: var(--primary-color);
+    z-index: 9999;
+    /* `forwards` holds the hidden state; visibility:hidden also drops it out
+       of hit-testing, so nothing underneath stays blocked. */
+    animation: lv-preloader-out 600ms ease 1100ms forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    & .preloader {
+      animation-delay: 0ms;
+      animation-duration: 1ms;
+    }
+  }
+
+  & .preloader-mark {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--white-color);
+  }
+
+  & .preloader-rule {
+    display: block;
+    width: 160px;
+    height: 1px;
+    background: var(--accent-color);
+    margin: 20px auto 0;
+  }
+
+  & .preloader-note {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.4);
+    margin-top: 18px;
+  }
+
+  /* ══ Responsive ═══════════════════════════════════════════════════════ */
+
+  /* 1320, not the more usual 1200. The bar needs 1302px to seat a full-size
+     232px wordmark, the eight-item menu (806px) and the tools (206px) without
+     overlap; below that the drawer takes over. A 1366px laptop still gets the
+     full menu. */
+  /* 1180, down from 1320. Splitting the header into two rows freed the whole
+     container for the menu, so the full eight items now survive on screens
+     that previously fell back to the drawer. Below this the nav row is
+     dropped and the toggle takes over. */
+  @media (width < 1180px) {
+    & .header-wrapper,
+    & .header-spacer {
+      height: 72px;
+    }
+
+    /* One 72px row, since the nav row is gone. */
+    & .hero {
+      --chrome-h: 72px;
+    }
+
+    /* Contact text and the CTA go first — the icons carry the same actions in
+       less room, and the drawer carries the rest. */
+    & .header-contact,
+    & .header-divider,
+    & .header-cta {
+      display: none;
+    }
+
+    & .header-nav {
+      display: none;
+    }
+
+    & .header-top {
+      border-bottom: none;
+    }
+
+    & .header-tools .menu-toggle {
+      display: grid;
+    }
+
+    & .header-tools .tool-secondary {
+      display: none;
+    }
+
+    & .header-wrapper {
+      gap: 16px;
+    }
+
+
+    & .section-title h1 {
+      font-size: 56px;
+    }
+
+    /* Four across already; the grid only needs to fold lower down. */
+    & .category-item-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    & .story-item-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (width < 992px) {
+    /* Four square tiles plus their copy get cramped below a tablet; two rows
+       of two keeps the picture large enough to read. */
+    & .category-item-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Two-up, which leaves the promo tile spanning the full width — the room
+       scene needs the room. */
+    & .product-item-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Panel above, two posts below it. */
+    & .blog-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Brand block across the top, then the link columns two-up under it. */
+    & .footer-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px;
+    }
+
+    & .footer-about {
+      grid-column: span 2;
+    }
+
+    & .footer-cta h2 {
+      font-size: 34px;
+    }
+
+    & .blog-panel {
+      grid-column: span 2;
+      min-height: 320px;
+    }
+
+    & .our-categories,
+    & .our-heritage,
+    & .our-stories,
+    & .our-blog,
+    & .main-footer {
+      padding-top: 70px;
+      padding-bottom: 70px;
+    }
+
+    & .offer-item,
+    & .heritage-content,
+    & .heritage-image,
+    & .spotlight-item-image,
+    & .spotlight-item-content {
+      width: 100%;
+    }
+
+    & .spotlight-item-content {
+      padding: 30px;
+    }
+
+    & .spotlight-item-edge {
+      display: none;
+    }
+
+    & .intro-video {
+      min-height: 620px;
+    }
+
+  }
+
+  @media (width < 768px) {
+    & .section-title h1 {
+      font-size: 40px;
+    }
+
+    & .section-title h2 {
+      font-size: 28px;
+    }
+
+    /* 16:9 collapses to a letterbox on a phone, so the hero switches back to a
+       plain minimum height and lets the copy set the rest. */
+    & .hero {
+      height: auto;
+      min-height: 600px;
+      padding: 100px 0 90px;
+    }
+
+    & .hero-eyebrow {
+      gap: 12px;
+      font-size: 10px;
+      letter-spacing: 0.26em;
+    }
+
+    & .hero-eyebrow::before,
+    & .hero-eyebrow::after {
+      width: 24px;
+    }
+
+    & .hero-lead {
+      font-size: 15px;
+      margin-top: 26px;
+    }
+
+    & .hero-actions {
+      margin-top: 34px;
+    }
+
+    /* Full-width stacked buttons beat two cramped pills sharing a line. */
+    & .hero-actions .btn-default,
+    & .hero-actions .btn-outline {
+      width: 100%;
+      justify-content: center;
+    }
+
+    & .hero-actions .btn-default {
+      text-align: center;
+      padding: 17px 55px 17px 40px;
+    }
+
+    & .hero-scroll {
+      display: none;
+    }
+
+    & .category-item-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    & .story-item-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    & .product-item-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    & .blog-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    & .footer-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    & .footer-about {
+      grid-column: span 1;
+    }
+
+    & .footer-cta {
+      padding: 60px 0;
+    }
+
+    & .footer-cta h2 {
+      font-size: 27px;
+      margin-bottom: 32px;
+    }
+
+    & .blog-panel {
+      grid-column: span 1;
+    }
+
+    & .product-promo {
+      grid-column: span 1;
+    }
+
+    & .product-promo-content {
+      max-width: 100%;
+      padding: 30px;
+    }
+
+    & .product-promo-content h3 {
+      font-size: 32px;
+    }
+
+    & .offer-item {
+      min-height: 380px;
+    }
+
+    & .offer-item-content-box {
+      padding: 30px;
+    }
+
+    & .offer-item-content h3 {
+      font-size: 24px;
+    }
+
+    & .heritage-figures .figure-box span {
+      font-size: 30px;
+    }
+  }
+}

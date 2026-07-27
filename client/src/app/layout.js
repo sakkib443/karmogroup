@@ -1,6 +1,7 @@
 import { Plus_Jakarta_Sans, Poppins, Hind_Siliguri } from "next/font/google";
 import "./globals.css";
 import ReduxProviderWrapper from "@/components/ReduxProviderWrapper";
+import DemoGuard from "@/components/DemoGuard";
 import { LanguageProvider } from "@/context/LanguageContext";
 
 // Primary face for headings, navigation and UI.
@@ -10,6 +11,11 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
 });
 
+// Display face for the hero headline. A warm, soft-terminalled serif rather
+// than another geometric sans — a group that has been making comfort since
+// 1965 should read as crafted, not as a startup. `opsz` is pinned to the
+// display end of the optical-size axis, which is what makes the thin strokes
+// and tight joins read correctly at 5rem+.
 // Poppins stays on running copy, so just the weights body text actually uses.
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,6 +43,10 @@ export default function RootLayout({ children }) {
       className={`${jakarta.variable} ${poppins.variable} ${hindSiliguri.variable}`}
     >
       <body className="antialiased">
+        {/* Blocks every link and form while the site is being shown to the
+            client, so nothing can land on one of the pages that is still
+            empty. See the component for how to switch it off at launch. */}
+        <DemoGuard />
         <ReduxProviderWrapper>
           <LanguageProvider>{children}</LanguageProvider>
         </ReduxProviderWrapper>

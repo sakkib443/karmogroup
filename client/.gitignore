@@ -33,3 +33,15 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# ── Large asset staging, deliberately not versioned ────────────────────────
+# Neither folder is referenced by any component on Home 01 or Home 02, and
+# together they are ~291 MB. Git keeps binaries forever, so committing them
+# would make every future clone carry them whether or not they are ever used.
+# The files stay on disk — this only keeps them out of history.
+#
+# public/new image/  raw drops and AI-generated staging (444.png, hero222.png,
+#                    Gemini_Generated_Image_*.png, duplicates of placed art)
+# public/images/_archive/  photographs already retired and replaced
+/public/new image/
+/public/images/_archive/

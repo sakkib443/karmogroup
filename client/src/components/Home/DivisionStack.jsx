@@ -18,6 +18,10 @@ import { FiArrowUpRight } from "react-icons/fi";
  *
  * Counts come from "Site Reference Final.xlsx"; the copy is condensed from the
  * division wording the site already used.
+ *
+ * All four pictures now show what their card sells — the chemicals card carried
+ * a plain interior shot for a long time, which was the one place on the page
+ * where the image and the label disagreed.
  */
 const divisions = [
   {
@@ -27,8 +31,8 @@ const divisions = [
     line: "Furniture, footwear, automotive and acoustic",
     body: "Poured, cured and cut in our own plants. Sheet sizes, densities and grades are cut to the specification you send us — by the piece or by the container.",
     href: "/foam",
-    image: "/images/foam-sofa-1965.jpg",
-    alt: "Sofa beside a stack of Karmo 1965 foam blocks",
+    image: "/images/divisions/foam-workshop.png",
+    alt: "Stacked upholstery foam blocks beside a Karmo linen cushion on an upholstery workbench",
   },
   {
     index: "02",
@@ -37,8 +41,8 @@ const divisions = [
     line: "Bonnell, pocket spring, euro top and orthopaedic",
     body: "Quilted on US machinery and edged on European automatic lines, so the mattress holds its thickness. Every batch is sampled before it leaves the floor.",
     href: "/mattress",
-    image: "/images/mattress-prestige.jpg",
-    alt: "Karmo Prestige mattress on a low timber platform bed",
+    image: "/images/divisions/mattress-euro-top.png",
+    alt: "Karmo euro-top mattress with its brand label, dressed on a bed",
   },
   {
     index: "03",
@@ -47,8 +51,8 @@ const divisions = [
     line: "Pillows, cushions, bed sheets and comforters",
     body: "Classic cotton twills through to sateen weaves, and the country's largest comforter range by distribution. Bedding that finishes the room the foam started.",
     href: "/hometex",
-    image: "/images/comforter-red-stripe.jpg",
-    alt: "Karmo Red Stripe comforter, rolled",
+    image: "/images/divisions/hometex-bedding.png",
+    alt: "Layered Karmo bedding — quilted comforter, floral bed sheet and pillows",
   },
   {
     index: "04",
@@ -57,8 +61,8 @@ const divisions = [
     line: "Adhesives, polymers and sodium silicate",
     body: "The least visible division and the one in almost every room it touches — shoe adhesives, contact adhesives, sealants and the polymers industry runs on.",
     href: "/chemicals",
-    image: "/image10.jpg",
-    alt: "Interior finished with materials bonded by Karmo adhesives",
+    image: "/images/divisions/chemicals-insoles.png",
+    alt: "Moulded polyurethane insoles beside a cut foam block showing its cell structure",
   },
 ];
 
@@ -82,8 +86,9 @@ const TONES = {
     name: "text-white",
     body: "text-white/55",
     button: "btn-secondary border-white/20 text-white",
-    scrimY: "from-shade-deep/70",
-    scrimX: "lg:from-shade-deep lg:via-shade-deep/20",
+    // The edge mark sits on the card itself now, not over the photograph, so
+    // it is toned against the card surface rather than the image.
+    edgeMark: "text-white/30",
   },
   light: {
     section: "bg-linen",
@@ -95,33 +100,38 @@ const TONES = {
     // No btn-secondary here: its hover fills white and turns the border white
     // too, which on a white card leaves nothing to see.
     button: "border-ink/15 text-ink hover:border-brand hover:text-brand",
-    scrimY: "from-white/75",
-    scrimX: "lg:from-white lg:via-white/25",
+    edgeMark: "text-ink/30",
   },
 };
 
-export default function DivisionStack({ tone = "dark" }) {
+export default function DivisionStack({ tone = "dark", heading }) {
   const reduceMotion = useReducedMotion();
   const t = TONES[tone] ?? TONES.dark;
 
   return (
     <section className={`${t.section} py-20 md:py-28`}>
-      <motion.div
-        initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.8, ease: SETTLE }}
-        className="shell"
-      >
-        <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-          <span className="h-px w-10 bg-brand" />
-          Four divisions
-        </span>
-        <h2 className={`display mt-5 max-w-2xl text-[1.9rem] font-light leading-[1.1] sm:text-[2.6rem] ${t.heading}`}>
-          One group, one standard,
-          <span className="font-bold"> four things to sell</span>
-        </h2>
-      </motion.div>
+      {/* Home 03 passes a unified SectionHeading; both homepages otherwise keep
+          this block's own line-and-caps header. */}
+      {heading ? (
+        <div className="shell">{heading}</div>
+      ) : (
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.8, ease: SETTLE }}
+          className="shell"
+        >
+          <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
+            <span className="h-px w-10 bg-brand" />
+            Four divisions
+          </span>
+          <h2 className={`display mt-5 max-w-2xl text-[1.9rem] font-light leading-[1.1] sm:text-[2.6rem] ${t.heading}`}>
+            One group, one standard,
+            <span className="font-bold"> four things to sell</span>
+          </h2>
+        </motion.div>
+      )}
 
       {/* Each card is its own sticky context. The top offset grows with the
           index so the cards land staggered rather than perfectly on top of one
@@ -176,20 +186,34 @@ export default function DivisionStack({ tone = "dark" }) {
                   </Link>
                 </div>
 
-                <div className="relative order-1 aspect-[4/3] overflow-hidden lg:order-2 lg:aspect-auto lg:min-h-[26rem]">
-                  <Image
-                    src={division.image}
-                    alt={division.alt}
-                    fill
-                    sizes="(min-width: 1024px) 46vw, 100vw"
-                    className="object-cover"
-                  />
-                  {/* Ties the photograph back into the card on the side it
-                      meets the copy, so the two halves read as one panel. */}
+                {/* The photograph is left completely alone — no wash, no
+                    gradient over it. Instead it sits inset in the card as a
+                    framed plate, with the division name running down a slim
+                    strip of card beside it. That keeps Karmo's own edge-marking
+                    device from the company profile without putting anything on
+                    top of the picture. */}
+                <div className="order-1 flex lg:order-2 lg:min-h-[26rem] lg:p-3">
                   <span
                     aria-hidden="true"
-                    className={`absolute inset-0 bg-gradient-to-t to-transparent lg:bg-gradient-to-r lg:to-transparent ${t.scrimY} ${t.scrimX}`}
-                  />
+                    className={`hidden shrink-0 items-center justify-center pr-1 lg:flex ${t.edgeMark}`}
+                  >
+                    <span
+                      className="display select-none whitespace-nowrap text-[0.68rem] font-bold uppercase tracking-[0.32em]"
+                      style={{ writingMode: "vertical-rl" }}
+                    >
+                      {division.name}
+                    </span>
+                  </span>
+
+                  <div className="group/pic relative aspect-[4/3] w-full overflow-hidden lg:aspect-auto lg:rounded-2xl">
+                    <Image
+                      src={division.image}
+                      alt={division.alt}
+                      fill
+                      sizes="(min-width: 1024px) 46vw, 100vw"
+                      className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/pic:scale-[1.04]"
+                    />
+                  </div>
                 </div>
               </div>
             </motion.article>

@@ -62,7 +62,7 @@ export default function Footer() {
           rather than a picture. The wash on top keeps every link legible no
           matter which part of the photo falls behind it. */}
       <Image
-        src="/images/mattress-suite.jpg"
+        src="/images/mattress/suite-interior.jpg"
         alt=""
         aria-hidden="true"
         fill

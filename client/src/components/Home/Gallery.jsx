@@ -4,76 +4,93 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 /**
- * A mix of Karmo's own studio product shots and the rooms those products end
- * up in. Heights vary so the rows read as a scattered wall rather than a
- * filmstrip, which is what the staggered look in the reference relies on.
+ * The mosaic from the client's reference: a tall tile at each end, and between
+ * them a wide-then-narrow row sitting over a narrow-then-wide one, so the
+ * vertical seams never line up.
+ *
+ * Both rows add to exactly twelve columns, and the two tall tiles span both
+ * rows — so the block is a solid rectangle with no empty cell and a flush top
+ * and bottom edge. Nothing is laid over the pictures.
+ *
+ * The two tall slots take hero photographs: they are the only frames with
+ * enough going on in the centre to survive a portrait crop. The four wide and
+ * narrow slots take Karmo's own event photography, which is all landscape at
+ * roughly 3:2 and would have been cropped to slivers in a tall tile.
+ *
+ * `span` holds complete utility strings — Tailwind scans this file for
+ * literals, so a class assembled at runtime would never reach the stylesheet.
  */
-const topRow = [
-  { src: "/images/FurnitureFoam1.png", alt: "Karmo 180 foam sheets", h: "h-44" },
-  { src: "/images/foam-sofa-1965.jpg", alt: "Sofa beside Karmo 1965 foam blocks", h: "h-64" },
-  { src: "/images/FurnitureFoam2.png", alt: "Karmo 2001 foam sheets", h: "h-48" },
-  { src: "/images/mattress-suite.jpg", alt: "Karmo mattress in a chandelier-lit suite", h: "h-60" },
-  { src: "/images/FurnitureFoam4.png", alt: "Karmo Poly foam sheets", h: "h-44" },
-  { src: "/images/mattress-family.jpg", alt: "Children playing on a Karmo mattress", h: "h-56" },
-];
+const tiles = [
+  {
+    src: "/images/hero/slide-1-hometex-couple.png",
+    alt: "Couple reading together in a bedroom dressed with Karmo bedding",
+    span: "lg:col-span-3 lg:row-span-2",
+  },
+  {
+    src: "/images/gallery/award-ceremony.jpg",
+    alt: "Karmo Group team at an award ceremony",
+    span: "lg:col-span-4",
+  },
+  {
+    src: "/images/gallery/mou-meeting.jpg",
+    alt: "Karmo Group meeting around the boardroom table",
+    span: "lg:col-span-2",
+  },
+  {
+    src: "/images/hero/slide-2-mattress-suite.png",
+    alt: "Karmo mattress dressed in a sunlit bedroom suite",
+    span: "lg:col-span-3 lg:row-span-2",
+  },
+  {
+    src: "/images/gallery/jute-bag-handover.jpg",
+    alt: "A Karmo Group eco-friendly jute bag being handed over",
+    span: "lg:col-span-2",
+  },
+  {
+    src: "/images/gallery/agreement-signing.jpg",
+    alt: "Karmo Group representatives at an agreement signing",
+    span: "lg:col-span-4",
+  },
 
-const bottomRow = [
-  { src: "/images/comforter-red-stripe.jpg", alt: "Karmo Red Stripe comforter", h: "h-60" },
-  { src: "/images/FurnitureFoam5.png", alt: "Karmo foam sheet range", h: "h-44" },
-  { src: "/images/mattress-detail.jpg", alt: "Quilted top of a Karmo mattress", h: "h-52" },
-  { src: "/images/fabric-alpona.jpg", alt: "Alpona printed cotton bed sheet fabric", h: "h-48" },
-  { src: "/image10.jpg", alt: "Interior finished with Karmo materials", h: "h-64" },
-  { src: "/images/foam-karmo-280.jpg", alt: "Stack of Karmo 280 foam blocks", h: "h-48" },
+  // Third row — 3 + 6 + 3. A different split again, so the seams keep moving
+  // down the block rather than stacking into a column.
+  {
+    src: "/images/divisions/foam-workshop.png",
+    alt: "Foam blocks and a Karmo cushion on an upholstery workbench",
+    span: "lg:col-span-3",
+  },
+  {
+    src: "/images/products/banner-foam.png",
+    alt: "Living-room corner with a sofa built on Karmo upholstery foam",
+    span: "lg:col-span-6",
+  },
+  {
+    src: "/images/products/whykarmo-family.jpg",
+    alt: "A Bangladeshi family together on a sofa built on Karmo foam",
+    span: "lg:col-span-3",
+  },
 ];
 
 const SETTLE = [0.22, 1, 0.36, 1];
 
 const group = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
 };
 
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
+const tile = {
+  hidden: { opacity: 0, y: 28 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
 };
 
-function Row({ items }) {
-  // The list is rendered twice back to back. The track travels exactly half
-  // its width, so the second copy lands where the first started and the loop
-  // has no seam.
-  const doubled = [...items, ...items];
-
-  return (
-    <div className="flex w-max gap-4">
-      {doubled.map((item, index) => (
-        <div
-          key={`${item.src}-${index}`}
-          className={`relative ${item.h} w-[clamp(150px,17vw,260px)] shrink-0 overflow-hidden rounded-xl bg-black/5`}
-        >
-          <Image
-            src={item.src}
-            alt={index < items.length ? item.alt : ""}
-            aria-hidden={index >= items.length}
-            fill
-            sizes="(min-width: 1024px) 17vw, 45vw"
-            className="object-cover"
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-export default function Gallery() {
+export default function Gallery({ heading }) {
   const reduceMotion = useReducedMotion();
-
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.15 };
+  const once = { once: true, amount: 0.12 };
 
   return (
-    <section className="relative overflow-hidden bg-white py-16 md:py-20">
-      {/* Oversized word behind the rows, the way the reference sets it. */}
+    <section className="relative overflow-hidden bg-white py-20 md:py-24">
+      {/* Oversized word behind the mosaic, the way the reference sets it. */}
       <span
         aria-hidden="true"
         className="display pointer-events-none absolute left-1/2 top-10 -translate-x-1/2 select-none text-[13vw] font-extrabold leading-none tracking-tighter text-ink/[0.045]"
@@ -81,48 +98,55 @@ export default function Gallery() {
         gallery
       </span>
 
+      {/* The heading keeps the page gutter so it lines up with every other
+          section; the pictures below deliberately do not. */}
       <div className="shell relative">
-        <motion.div variants={group} {...reveal} viewport={once}>
-          <span className="block overflow-hidden">
-            <motion.span
-              variants={line}
-              className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
-            >
+        {heading ?? (
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.7, ease: SETTLE }}
+          >
+            <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
               <span className="h-px w-10 bg-brand" />
               Gallery
-            </motion.span>
-          </span>
-
-          <h2 className="display mt-5 max-w-xl text-[1.75rem] font-light leading-[1.15] text-ink sm:text-[2.15rem]">
-            <span className="block overflow-hidden pb-[0.06em]">
-              <motion.span variants={line} className="block">
-                From the block
-                <span className="font-bold"> to the bedroom</span>
-              </motion.span>
             </span>
-          </h2>
-        </motion.div>
+            <h2 className="display mt-5 max-w-xl text-[1.9rem] font-light leading-[1.1] text-ink sm:text-[2.5rem]">
+              The group
+              <span className="font-bold"> at work</span>
+            </h2>
+          </motion.div>
+        )}
       </div>
 
-      {/* Rows run past both edges and are masked at the sides so images fade
-          out rather than being chopped by a hard border. */}
-      <div className="marquee-rows relative mt-12 space-y-4 overflow-hidden">
-        <div
-          className={
-            reduceMotion ? "flex gap-4 overflow-x-auto" : "marquee marquee-left"
-          }
-        >
-          <Row items={topRow} />
-        </div>
-
-        <div
-          className={
-            reduceMotion ? "flex gap-4 overflow-x-auto" : "marquee marquee-right"
-          }
-        >
-          <Row items={bottomRow} />
-        </div>
-      </div>
+      {/* Full bleed, and on lg a fixed row height drives the mosaic — the
+          per-tile aspect ratio is dropped there so a tile fills its cell
+          exactly. Keeping the ratio would leave gaps inside the block.
+          `auto-rows` rather than a fixed grid height, so adding a row of
+          pictures needs nothing but another entry in the list above. */}
+      <motion.div
+        variants={group}
+        {...reveal}
+        viewport={once}
+        className="relative mt-12 grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-12 lg:auto-rows-[19rem]"
+      >
+        {tiles.map((item) => (
+          <motion.div
+            key={item.src}
+            variants={tile}
+            className={`group/tile relative aspect-[3/2] overflow-hidden bg-black/5 lg:aspect-auto ${item.span}`}
+          >
+            <Image
+              src={item.src}
+              alt={item.alt}
+              fill
+              sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/tile:scale-[1.05]"
+            />
+          </motion.div>
+        ))}
+      </motion.div>
     </section>
   );
 }

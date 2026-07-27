@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001 --turbopack",
+    "check:luxe": "node scripts/check-luxe-isolation.mjs && node scripts/check-home2-assets.mjs",
+    "prebuild": "npm run check:luxe",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"

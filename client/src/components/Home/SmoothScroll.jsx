@@ -1,0 +1,142 @@
+"use client";
+
+import { useEffect } from "react";
+
+/**
+ * Eased wheel scrolling, so the page glides to a stop instead of jumping the
+ * notch the mouse asked for. It also gives the scroll-triggered reveals a
+ * moment to run: the section arrives a fraction after the wheel does, which is
+ * the "animate, then scroll" feel rather than content snapping into place.
+ *
+ * It drives the REAL scroll position with window.scrollTo each frame. The
+ * usual approach — pinning the body and translating a wrapper — would be
+ * smoother still, but it destroys `position: sticky`, and the four-division
+ * deck is built entirely on sticky. It would also confuse every
+ * IntersectionObserver on the page, which is what all the reveals use.
+ *
+ * Wheel only. Touch has its own momentum that is better than anything this
+ * could impose, and trackpad users get the same easing through wheel events.
+ */
+
+// Share of the remaining distance covered per frame at 60fps. The lower this
+// is, the longer the page keeps drifting after the wheel stops. At 0.11 it
+// arrived too quickly and read as an ordinary scroll with a little slide on the
+// end; 0.07 covers about 90% of the distance in the first half second and then
+// eases the rest out over another second, which is the long settle.
+const EASE = 0.07;
+
+// How far one notch of the wheel travels, as a multiple of what the browser
+// asked for. Was 1.5, which sent the page further than the hand expected on
+// every notch. Just above 1 keeps the distance close to a native scroll and
+// lets the easing, not the reach, do the work.
+const REACH = 1.15;
+
+export default function SmoothScroll() {
+  useEffect(() => {
+    const fine = window.matchMedia(
+      "(pointer: fine) and (prefers-reduced-motion: no-preference)",
+    );
+    if (!fine.matches) return;
+
+    let target = window.scrollY;
+    let running = false;
+    let last = 0;
+    let frame = 0;
+
+    const limit = () =>
+      document.documentElement.scrollHeight - window.innerHeight;
+
+    // A scroller under the pointer keeps its own wheel — the playlist strip and
+    // the lightbox both rely on this. Only counts if it can still move the way
+    // the wheel is pushing, so reaching its end hands the page back.
+    const nestedScroller = (node, delta) => {
+      // Only an Element can be measured. A wheel event can carry the document
+      // or the window as its target, and getComputedStyle throws on those —
+      // which would abort this handler before it ever called preventDefault,
+      // silently taking the easing with it.
+      let el = node instanceof Element ? node : null;
+      while (el && el !== document.body && el !== document.documentElement) {
+        const style = getComputedStyle(el);
+        if (
+          /(auto|scroll|overlay)/.test(style.overflowY) &&
+          el.scrollHeight > el.clientHeight
+        ) {
+          const atTop = el.scrollTop <= 0;
+          const atEnd =
+            el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+          if (!((delta < 0 && atTop) || (delta > 0 && atEnd))) return true;
+        }
+        el = el.parentElement;
+      }
+      return false;
+    };
+
+    const tick = (now) => {
+      if (!last) last = now;
+      // Frames elapsed rather than a fixed step, so the easing lands the same
+      // on a 144Hz screen as on a 60Hz one. Capped so a backgrounded tab does
+      // not resume with one enormous jump.
+      const elapsed = Math.min((now - last) / 16.667, 3);
+      last = now;
+
+      const current = window.scrollY;
+      const gap = target - current;
+
+      if (Math.abs(gap) < 0.4) {
+        window.scrollTo(0, target);
+        running = false;
+        return;
+      }
+
+      window.scrollTo(0, current + gap * (1 - Math.pow(1 - EASE, elapsed)));
+      frame = requestAnimationFrame(tick);
+    };
+
+    const onWheel = (event) => {
+      if (event.ctrlKey) return; // pinch zoom
+      if (document.body.style.overflow === "hidden") return; // lightbox is up
+      if (nestedScroller(event.target, event.deltaY)) return;
+
+      event.preventDefault();
+
+      // Firefox reports lines, and some setups report pages.
+      const unit =
+        event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+
+      target = Math.max(
+        0,
+        Math.min(limit(), target + event.deltaY * unit * REACH),
+      );
+
+      if (!running) {
+        running = true;
+        last = 0;
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    // Anything that moves the page by other means — keyboard, the scrollbar,
+    // back to top, an anchor — has to re-seed the target, or the next notch of
+    // the wheel would drag the page back to where this thought it was.
+    const onScroll = () => {
+      if (!running) target = window.scrollY;
+    };
+
+    const onResize = () => {
+      target = Math.min(target, limit());
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return null;
+}
