@@ -17,12 +17,13 @@ import {
 } from "react-icons/fi";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { SETTLE } from "./motion";
+
 /* The slate-ink wordmark. Every surface in this header is white, and the
    default artwork sets "GROUP", "Since 1965" and the ® in white — on a white
    bar just over half the mark vanishes. The footer stays on the default,
    because that panel is dark and the reversed artwork is drawn for it. */
 const LOGO_INK = "/home2/logo-ink.png";
-import { SETTLE } from "./motion";
 
 /**
  * Navigation is the same tree Home 01 carries â same labels, same order, same
