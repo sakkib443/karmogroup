@@ -249,44 +249,59 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ââ Mobile drawer âââââââââââââââââââââââââââââââââââââââââââââââ */}
+
+      {/* ── Mobile drawer ─────────────────────────────────────────────────
+          Matched to Home 01: dark slate panel sliding in from the left, the
+          wordmark and close beside each other at the top, one row per menu
+          entry with a chevron that folds its sub-menu open, then Find Store
+          and the contact details on a divider.
+
+          A sibling of <header>, never a child. The header can carry a
+          backdrop-filter, and that creates a containing block for fixed
+          descendants — nested inside, this panel would resolve `inset-0`
+          against the bar instead of the viewport and collapse to its height.
+          That is exactly the bug Home 01's drawer had. */}
       <AnimatePresence>
         {drawer && (
-          <div className="fixed inset-0 z-[9500]">
+          <div className="fixed inset-0 z-[9500] xl:hidden">
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               onClick={() => setDrawer(false)}
               aria-label="Close menu"
               className="absolute inset-0 bg-black/60"
             />
+
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.45, ease: SETTLE }}
-              className="absolute inset-y-0 left-0 flex w-[85vw] max-w-sm flex-col overflow-y-auto bg-white"
+              className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-[#161c24] p-5"
             >
-              <div className="flex items-center justify-between border-b border-[#1616161a] px-5 py-4">
-                <Logo src={LOGO_INK} className="h-7 w-auto" />
+              <div className="mb-6 flex items-center justify-between">
+                {/* The reversed wordmark, because this panel is dark — the
+                    ink variant the header uses would vanish here. */}
+                <Logo className="h-7 w-auto" />
                 <button
                   onClick={() => setDrawer(false)}
                   aria-label="Close menu"
-                  className="text-2xl text-[#161616]"
+                  className="text-2xl text-white"
                 >
                   <FiX />
                 </button>
               </div>
 
-              <ul className="px-5 py-3">
+              <ul className="space-y-1">
                 {NAV.map((entry) => (
-                  <li key={entry.name} className="border-b border-[#1616161a]">
+                  <li key={entry.name}>
                     <div className="flex items-center">
                       <Link
                         href={entry.href}
                         onClick={() => setDrawer(false)}
-                        className="flex-1 py-3.5 text-[15px] font-semibold text-[#161616]"
+                        className="flex-1 py-2.5 text-sm font-semibold text-white"
                       >
                         {entry.name}
                       </Link>
@@ -299,10 +314,10 @@ export default function Header() {
                           }
                           aria-label={`Toggle ${entry.name}`}
                           aria-expanded={openGroup === entry.name}
-                          className="p-2 text-[#585858]"
+                          className="p-2 text-white/70"
                         >
                           <FiChevronDown
-                            className={`transition-transform duration-300 ${
+                            className={`transition ${
                               openGroup === entry.name ? "rotate-180" : ""
                             }`}
                           />
@@ -311,13 +326,13 @@ export default function Header() {
                     </div>
 
                     {entry.submenu && openGroup === entry.name && (
-                      <ul className="mb-3 border-l border-[#1616161a] pl-4">
+                      <ul className="mb-2 border-l border-white/15 pl-4">
                         {entry.submenu.map((sub) => (
                           <li key={sub.href}>
                             <Link
                               href={sub.href}
                               onClick={() => setDrawer(false)}
-                              className="block py-2 text-[14px] text-[#585858]"
+                              className="block py-2 text-sm text-white/75"
                             >
                               {sub.name}
                             </Link>
@@ -329,14 +344,26 @@ export default function Header() {
                 ))}
               </ul>
 
-              <div className="mt-auto bg-[#f8f5ef] px-5 py-6">
-                <Link
-                  href="/contact"
-                  onClick={() => setDrawer(false)}
-                  className="btn-default"
+              <Link
+                href="/find-store"
+                onClick={() => setDrawer(false)}
+                className="mt-5 block rounded bg-[#e60000] px-5 py-3 text-center text-sm font-bold text-white transition-colors duration-300 hover:bg-[#cc0000]"
+              >
+                Find Store
+              </Link>
+
+              <div className="body-copy mt-6 space-y-3 border-t border-white/10 pt-6 text-sm text-white/60">
+                <a
+                  href="mailto:info@karmogroup.com"
+                  className="flex items-center gap-2.5"
                 >
-                  Book a Showroom Visit
-                </Link>
+                  <FiMail className="text-[13px]" />
+                  info@karmogroup.com
+                </a>
+                <a href="tel:+8801713483284" className="flex items-center gap-2.5">
+                  <FiPhone className="text-[13px]" />
+                  +88 01713483284
+                </a>
               </div>
             </motion.div>
           </div>
