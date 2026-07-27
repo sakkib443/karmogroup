@@ -1,11 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowLeft, FiArrowRight, FiCalendar } from "react-icons/fi";
-import { SWEEP } from "./motion";
+// SWEEP is pulled out on its own because the rail is moved by a plain CSS
+// transition, not a framer variant, so it needs the raw curve.
+import {
+  group,
+  line,
+  rise as fade,
+  zoomOut,
+  curtainUp,
+  SWEEP,
+  VIEWPORT,
+} from "./motion";
 
 const posts = [
   {
@@ -60,16 +70,9 @@ const GAP_REM = 1.25;
 const AUTOPLAY_MS = 2000;
 const SLIDE_MS = 550;
 
-// The carousel keeps its own SWEEP reference for the track transition below,
-// which is a plain CSS transition rather than a framer variant.
-import {
-  group,
-  line,
-  rise as fade,
-  zoomOut,
-  curtainUp,
-  VIEWPORT,
-} from "./motion";
+// How far a thumb has to travel before it counts as a swipe rather than a tap
+// that wandered. Below this the card underneath simply opens.
+const SWIPE_MIN = 45;
 
 export default function Journal({ heading }) {
   const reduceMotion = useReducedMotion();
@@ -96,7 +99,36 @@ export default function Journal({ heading }) {
   // first card simply follows the last, round and round.
   const index = rawIndex;
 
-  const go = useCallback((step) => setIndex((current) => current + step), []);
+  // The rail's position is mirrored into a ref so `go` can look at where it
+  // currently is without a functional updater — it needs to decide whether this
+  // step runs off the front before it touches any state.
+  const indexRef = useRef(0);
+  const owedBack = useRef(false);
+
+  // Assigning to a ref is not a state update, so this is safe in an effect and
+  // costs no extra render.
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
+
+  const go = useCallback((step) => {
+    const next = indexRef.current + step;
+
+    // Going back from the first card would run the rail off its own left edge
+    // and leave a blank column where the card should be — the left arrow has
+    // always done this, and a swipe makes it easy to hit. So it becomes the
+    // forward wrap in reverse: hop silently onto the identical card in the
+    // second copy, then take the step back from there on the next frame, which
+    // reads as one ordinary slide.
+    if (next < 0) {
+      owedBack.current = true;
+      setAnimate(false);
+      setIndex(posts.length);
+      return;
+    }
+
+    setIndex(next);
+  }, []);
 
   useEffect(() => {
     if (reduceMotion || paused) return;
@@ -114,12 +146,56 @@ export default function Journal({ heading }) {
     return () => clearTimeout(timer);
   }, [index]);
 
-  // Re-arm on the frame after the silent snap.
+  // Re-arm on the frame after a silent snap, and pay back the step owed by a
+  // backward wrap.
   useEffect(() => {
     if (animate) return;
-    const raf = requestAnimationFrame(() => setAnimate(true));
+    const raf = requestAnimationFrame(() => {
+      setAnimate(true);
+      if (owedBack.current) {
+        owedBack.current = false;
+        setIndex((current) => current - 1);
+      }
+    });
     return () => cancelAnimationFrame(raf);
   }, [animate]);
+
+  // Swipe. On a phone the arrows are the only way through the posts, and a
+  // carousel that will not take a thumb reads as broken — so touch and pen
+  // drag the rail. Mouse is deliberately left out: dragging would fight text
+  // selection, and a mouse already has the arrows and the hover pause.
+  const swipe = useRef({ from: 0, tracking: false, dragged: false });
+
+  const onPointerDown = (event) => {
+    if (event.pointerType === "mouse") return;
+    swipe.current = { from: event.clientX, tracking: true, dragged: false };
+    setPaused(true); // stop the rail sliding out from under the thumb
+  };
+
+  const onPointerMove = (event) => {
+    if (!swipe.current.tracking) return;
+    if (Math.abs(event.clientX - swipe.current.from) > 8) {
+      swipe.current.dragged = true;
+    }
+  };
+
+  const onPointerUp = (event) => {
+    if (!swipe.current.tracking) return;
+    const travelled = event.clientX - swipe.current.from;
+    swipe.current.tracking = false;
+
+    if (Math.abs(travelled) > SWIPE_MIN) go(travelled < 0 ? 1 : -1);
+    setPaused(false);
+  };
+
+  // A swipe ends over a card, so without this every swipe would also open the
+  // post underneath it.
+  const onClickCapture = (event) => {
+    if (!swipe.current.dragged) return;
+    swipe.current.dragged = false;
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const once = VIEWPORT;
@@ -139,8 +215,12 @@ export default function Journal({ heading }) {
       <div className="shell">
         <div className="mx-auto grid w-full max-w-[1180px] gap-9 lg:grid-cols-3 lg:gap-10 lg:px-10">
         {/* Carousel — two cards in view, advancing one at a time. */}
+        {/* min-w-0 is load-bearing. A grid item defaults to min-width:auto, so
+            without it this column refuses to shrink below the full width of all
+            eight cards laid end to end, and the section runs off the side of a
+            phone. */}
         <div
-          className="lg:col-span-2"
+          className="min-w-0 lg:col-span-2"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
@@ -175,12 +255,18 @@ export default function Journal({ heading }) {
               </div>
             )}
 
-            <motion.div variants={fade} className="flex items-center gap-3">
+            {/* ml-auto keeps these on the right once the heading takes the
+                whole line to itself and they wrap onto their own row, which is
+                what happens on any phone. */}
+            <motion.div
+              variants={fade}
+              className="ml-auto flex items-center gap-3"
+            >
               <button
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="Previous posts"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white sm:h-9 sm:w-9"
               >
                 <FiArrowLeft className="text-[15px]" />
               </button>
@@ -188,7 +274,7 @@ export default function Journal({ heading }) {
                 type="button"
                 onClick={() => go(1)}
                 aria-label="Next posts"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors duration-500 hover:border-brand hover:bg-brand hover:text-white sm:h-9 sm:w-9"
               >
                 <FiArrowRight className="text-[15px]" />
               </button>
@@ -200,6 +286,15 @@ export default function Journal({ heading }) {
             {...reveal}
             viewport={once}
             className="mt-9 overflow-hidden"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            onClickCapture={onClickCapture}
+            // pan-y lets the page still scroll vertically through the carousel;
+            // without it the browser claims the horizontal gesture too and the
+            // swipe never reaches these handlers.
+            style={{ touchAction: "pan-y" }}
           >
             <div
               className="flex"

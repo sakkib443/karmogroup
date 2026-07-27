@@ -15,7 +15,12 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(process.argv[2] || ".");
-const port = Number(process.argv[3]) || 5501;
+
+// PORT first, so the runner can hand this server a free port when 5501 is
+// already taken — nothing here needs a fixed port, there are no callbacks or
+// CORS origins pointing at it. The argument and the 5501 default stay for
+// running it by hand.
+const port = Number(process.env.PORT) || Number(process.argv[3]) || 5501;
 
 const MIME = {
   ".html": "text/html; charset=utf-8",

@@ -6,17 +6,14 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "client"],
       "port": 3001,
-      "autoPort": false
+      "autoPort": true
     },
     {
       "name": "karmo-reference",
       "runtimeExecutable": "node",
-      "runtimeArgs": [
-        ".claude/static-server.js",
-        "recource/Karmo Website",
-        "5501"
-      ],
-      "port": 5501
+      "runtimeArgs": [".claude/static-server.js", "recource/Karmo Website"],
+      "port": 5501,
+      "autoPort": true
     }
   ]
 }
