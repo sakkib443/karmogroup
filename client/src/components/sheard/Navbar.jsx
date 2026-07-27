@@ -131,6 +131,7 @@ export default function Navbar() {
   }, []);
 
   return (
+    <>
     <motion.header
       {...entrance}
       className={`fixed inset-x-0 top-0 z-[10000] transition-colors duration-500 ${
@@ -278,7 +279,17 @@ export default function Navbar() {
         </motion.div>
       </div>
 
-      {/* Mobile drawer */}
+    </motion.header>
+
+      {/* Mobile drawer.
+
+          Deliberately a sibling of the header rather than a child. The header
+          carries `backdrop-blur-md` whenever the page is scrolled or the drawer
+          is open, and a backdrop-filter creates a containing block for fixed
+          descendants — exactly as transform does. Nested inside it, this panel
+          resolved its `inset-0` against the 80px bar instead of the viewport,
+          so it collapsed to that height and every menu link was clipped out of
+          sight. */}
       {drawerOpen && (
         <div className="fixed inset-0 z-[10001] xl:hidden">
           <button
@@ -373,6 +384,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </motion.header>
+    </>
   );
 }
