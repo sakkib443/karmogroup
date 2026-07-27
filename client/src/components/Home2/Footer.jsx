@@ -11,7 +11,7 @@ import {
   FiSmartphone,
 } from "react-icons/fi";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
-import { FadeUp } from "./motion";
+import { FadeUp, Stagger, StaggerItem } from "./motion";
 
 /**
  * The footer, matched to Home 01.
@@ -96,8 +96,8 @@ export default function Footer() {
         </div>
 
         <div className="container">
-          <FadeUp className="footer-row">
-            <div className="footer-about">
+          <Stagger className="footer-row" gap={0.08}>
+            <StaggerItem className="footer-about">
               <Logo className="h-8 w-auto" />
 
               <p>
@@ -147,10 +147,10 @@ export default function Footer() {
                   </a>
                 ))}
               </div>
-            </div>
+            </StaggerItem>
 
             {COLUMNS.map((column) => (
-              <div className="footer-links" key={column.heading}>
+              <StaggerItem className="footer-links" key={column.heading}>
                 <h3>{column.heading}</h3>
                 <ul>
                   {column.links.map((link) => (
@@ -159,10 +159,10 @@ export default function Footer() {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </StaggerItem>
             ))}
 
-            <div className="footer-links footer-newsletter">
+            <StaggerItem className="footer-links footer-newsletter">
               <h3>Subscribe to our newsletter</h3>
               <p>
                 Product news, catalogues and dealership updates, straight to
@@ -181,8 +181,8 @@ export default function Footer() {
                 />
                 <button type="submit">Subscribe</button>
               </form>
-            </div>
-          </FadeUp>
+            </StaggerItem>
+          </Stagger>
         </div>
 
         <div className="footer-copyright">

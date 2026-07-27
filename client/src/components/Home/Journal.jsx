@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowLeft, FiArrowRight, FiCalendar } from "react-icons/fi";
+import { SWEEP } from "./motion";
 
 const posts = [
   {
@@ -49,10 +50,6 @@ const posts = [
   },
 ];
 
-// Same curves the rest of the page moves on.
-const SWEEP = [0.76, 0, 0.24, 1];
-const SETTLE = [0.22, 1, 0.36, 1];
-
 // Slide geometry lives here because both the basis and the transform have to
 // agree on it — change the gap in one place only.
 const GAP_REM = 1.25;
@@ -63,20 +60,16 @@ const GAP_REM = 1.25;
 const AUTOPLAY_MS = 2000;
 const SLIDE_MS = 550;
 
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
-};
+// The carousel keeps its own SWEEP reference for the track transition below,
+// which is a plain CSS transition rather than a framer variant.
+import {
+  group,
+  line,
+  rise as fade,
+  zoomOut,
+  curtainUp,
+  VIEWPORT,
+} from "./motion";
 
 export default function Journal({ heading }) {
   const reduceMotion = useReducedMotion();
@@ -129,7 +122,7 @@ export default function Journal({ heading }) {
   }, [animate]);
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.2 };
+  const once = VIEWPORT;
 
   // A slide is an even share of the viewport once the gaps are taken out, and
   // one step moves the track by exactly one slide plus one gap.
@@ -292,13 +285,7 @@ export default function Journal({ heading }) {
           viewport={once}
           className="relative min-h-[320px] overflow-hidden lg:min-h-full"
         >
-          <motion.div
-            variants={{
-              hidden: { scale: 1.16 },
-              show: { scale: 1, transition: { duration: 1.5, ease: SWEEP } },
-            }}
-            className="absolute inset-0"
-          >
+          <motion.div variants={zoomOut} className="absolute inset-0">
             <Image
               src="/images/products/journal-panel.jpg"
               alt="Living-room corner with a linen sofa, cushions and a carved side table"
@@ -331,10 +318,7 @@ export default function Journal({ heading }) {
 
           <motion.span
             aria-hidden="true"
-            variants={{
-              hidden: { y: "0%" },
-              show: { y: "-101%", transition: { duration: 1.15, ease: SWEEP } },
-            }}
+            variants={curtainUp}
             className="absolute inset-0 z-10 bg-white"
           />
           </motion.aside>

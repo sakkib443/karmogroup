@@ -12,31 +12,22 @@ const points = [
   "Nationwide dealers",
 ];
 
-// Same curves the hero and About use, so the page keeps one movement
-// vocabulary rather than three competing ones.
-const SWEEP = [0.76, 0, 0.24, 1];
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.12 } },
-};
-
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: SETTLE } },
-};
+// Curves, timings and trigger point all come from the shared system, so this
+// section keeps step with the rest of the page.
+import {
+  group,
+  line,
+  rise as fade,
+  zoomOut,
+  curtainRight,
+  VIEWPORT,
+} from "./motion";
 
 export default function WhyKarmo({ heading }) {
   const reduceMotion = useReducedMotion();
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.25 };
+  const once = VIEWPORT;
 
   return (
     <section className="relative overflow-hidden bg-shade-deep py-20 md:py-28">
@@ -147,13 +138,7 @@ export default function WhyKarmo({ heading }) {
           viewport={once}
           className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl"
         >
-          <motion.div
-            variants={{
-              hidden: { scale: 1.16 },
-              show: { scale: 1, transition: { duration: 1.5, ease: SWEEP } },
-            }}
-            className="absolute inset-0"
-          >
+          <motion.div variants={zoomOut} className="absolute inset-0">
             <Image
               src="/images/products/whykarmo-family.jpg"
               alt="A Bangladeshi family together on a sofa built on Karmo upholstery foam"
@@ -165,10 +150,7 @@ export default function WhyKarmo({ heading }) {
 
           <motion.span
             aria-hidden="true"
-            variants={{
-              hidden: { x: "0%" },
-              show: { x: "101%", transition: { duration: 1.15, ease: SWEEP } },
-            }}
+            variants={curtainRight}
             className="absolute inset-0 z-10 bg-shade-deep"
           />
         </motion.div>

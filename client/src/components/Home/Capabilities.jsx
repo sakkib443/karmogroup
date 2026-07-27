@@ -55,18 +55,7 @@ const trustPoints = [
   },
 ];
 
-// The two curves the rest of the page moves on.
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
-};
-
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
+import { group, line, rise, VIEWPORT } from "./motion";
 
 // Trust-strip carousel timings. The slide has to finish well inside the
 // autoplay gap, or the seamless snap-back would collide with the next step.
@@ -113,7 +102,7 @@ export default function Capabilities({ heading }) {
   const reduceMotion = useReducedMotion();
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.15 };
+  const once = VIEWPORT;
 
   // Four in view on a desktop — the four main points the client asked to lead
   // with — and the remaining two arrive one at a time as the rail advances.
@@ -285,10 +274,9 @@ export default function Capabilities({ heading }) {
           </div>
         ) : (
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={rise.hidden}
+            whileInView={rise.show}
             viewport={once}
-            transition={{ duration: 0.7, ease: SETTLE }}
             className="mt-14 overflow-hidden"
             onMouseEnter={() => setPaused(true)}
             onMouseLeave={() => setPaused(false)}

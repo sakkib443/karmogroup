@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
+import { rise, VIEWPORT } from "./motion";
 
 /**
  * The four divisions, dealt as a deck. Each card sticks a little lower than
@@ -66,8 +67,6 @@ const divisions = [
   },
 ];
 
-const SETTLE = [0.22, 1, 0.36, 1];
-
 /**
  * Two palettes, one layout. Home 02 is dark the whole way down; Home 01 is
  * editorial and light, and a slate panel dropped into it reads as a section
@@ -116,10 +115,9 @@ export default function DivisionStack({ tone = "dark", heading }) {
         <div className="shell">{heading}</div>
       ) : (
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.8, ease: SETTLE }}
+          initial={reduceMotion ? false : rise.hidden}
+          whileInView={rise.show}
+          viewport={VIEWPORT}
           className="shell"
         >
           <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
@@ -144,10 +142,11 @@ export default function DivisionStack({ tone = "dark", heading }) {
             style={{ top: `${7 + index * 1.6}rem` }}
           >
             <motion.article
-              initial={reduceMotion ? false : { opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.85, ease: SETTLE }}
+              // Was a 60px throw, which on a card this size read as being
+              // dragged into place rather than settling into it.
+              initial={reduceMotion ? false : rise.hidden}
+              whileInView={rise.show}
+              viewport={VIEWPORT}
               className={`overflow-hidden rounded-3xl border ${t.card}`}
             >
               <div className="grid gap-0 lg:grid-cols-[1.05fr_1fr]">

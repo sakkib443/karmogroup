@@ -44,28 +44,14 @@ const spotlights = [
   },
 ];
 
-const SWEEP = [0.76, 0, 0.24, 1];
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09, delayChildren: 0.12 } },
-};
-
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: SETTLE } },
-};
-
-const curtain = {
-  hidden: { y: "0%" },
-  show: { y: "-101%", transition: { duration: 1.05, ease: SWEEP } },
-};
+import {
+  group,
+  line,
+  rise as fade,
+  zoomOut,
+  curtainUp as curtain,
+  VIEWPORT,
+} from "./motion";
 
 function Spotlight({ item, flipped, reveal, once, curtainColour }) {
   return (
@@ -79,13 +65,7 @@ function Spotlight({ item, flipped, reveal, once, curtainColour }) {
           three rows read as a rhythm rather than a list. */}
       <div className={flipped ? "lg:order-2" : ""}>
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-black/5">
-          <motion.div
-            variants={{
-              hidden: { scale: 1.14 },
-              show: { scale: 1, transition: { duration: 1.5, ease: SWEEP } },
-            }}
-            className="absolute inset-0"
-          >
+          <motion.div variants={zoomOut} className="absolute inset-0">
             <Image
               src={item.image}
               alt={item.alt}
@@ -206,7 +186,7 @@ export default function Spotlights({ heading }) {
   const reduceMotion = useReducedMotion();
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.2 };
+  const once = VIEWPORT;
 
   return (
     <section className="bg-white py-20 md:py-24">

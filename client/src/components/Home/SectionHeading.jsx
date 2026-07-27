@@ -2,36 +2,23 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+// Titles are uncovered from behind their own edge; the eyebrow and the lead
+// fade and lift. Both come from the shared system, so every section heading on
+// the page starts at the same point and moves at the same speed.
+import { group, line as lineReveal, rise as fade, VIEWPORT } from "./motion";
+
 /**
- * One heading for every section on Home 03.
+ * One heading for every section on the homepage.
  *
- * Home 01 grew its section headers one at a time, so they drifted: two eyebrow
+ * The page grew its section headers one at a time, so they drifted: two eyebrow
  * styles (a pill badge and a line-and-caps), five different title sizes, no
- * numbering. This is the single treatment they all share on Home 03 — a
- * numbered index, one eyebrow style, one type scale — so the page reads as one
- * system rather than nine.
+ * numbering. This is the single treatment they all share — a numbered index,
+ * one eyebrow style, one type scale — so the page reads as one system rather
+ * than nine.
  *
  * The words are unchanged; only the presentation is unified. Pass `title` as an
  * array to mask each line on its own (a two-line title needs two masks).
  */
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-};
-
-// Titles are uncovered from behind their own edge, the reveal the rest of the
-// site already uses.
-const lineReveal = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: SETTLE } },
-};
 
 const TONES = {
   light: { index: "text-ink/25", title: "text-ink", lead: "text-ink/60" },
@@ -56,7 +43,7 @@ export default function SectionHeading({
     <motion.div
       variants={group}
       {...reveal}
-      viewport={{ once: true, amount: 0.5 }}
+      viewport={VIEWPORT}
       className={`max-w-2xl ${className}`}
     >
       <motion.div variants={fade} className="flex items-center gap-4">

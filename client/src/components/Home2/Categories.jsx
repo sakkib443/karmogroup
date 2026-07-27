@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiArrowUpRight } from "react-icons/fi";
 import SectionTitle from "./SectionTitle";
-import { FadeUp } from "./motion";
+import { Stagger, StaggerItem } from "./motion";
 
 /**
  * The four divisions — the only product categories the site actually has.
@@ -60,9 +60,9 @@ export default function Categories() {
           bold="four divisions"
         />
 
-        <div className="category-item-list">
+        <Stagger className="category-item-list">
           {CATEGORIES.map((cat, i) => (
-            <FadeUp key={cat.name} delay={i * 0.09} className="category-item">
+            <StaggerItem key={cat.name} className="category-item">
               <Link href={cat.href}>
                 <div className="category-item-image">
                   <Image
@@ -87,9 +87,9 @@ export default function Categories() {
                   <p>{cat.line}</p>
                 </div>
               </Link>
-            </FadeUp>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </div>
   );

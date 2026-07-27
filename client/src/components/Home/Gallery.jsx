@@ -71,22 +71,12 @@ const tiles = [
   },
 ];
 
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-};
-
-const tile = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
-};
+import { group, rise as tile, VIEWPORT } from "./motion";
 
 export default function Gallery({ heading }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.12 };
+  const once = VIEWPORT;
 
   return (
     <section className="relative overflow-hidden bg-white py-20 md:py-24">
@@ -103,10 +93,9 @@ export default function Gallery({ heading }) {
       <div className="shell relative">
         {heading ?? (
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.7, ease: SETTLE }}
+            initial={reduceMotion ? false : tile.hidden}
+            whileInView={tile.show}
+            viewport={once}
           >
             <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
               <span className="h-px w-10 bg-brand" />

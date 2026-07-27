@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import SectionTitle from "./SectionTitle";
-import { FadeUp } from "./motion";
+import { Stagger, StaggerItem } from "./motion";
 
 /**
  * The gallery mosaic — Home 01's block, in this page's dress.
@@ -83,18 +83,18 @@ export default function Gallery() {
 
       {/* Full bleed on purpose: the heading above keeps the page gutter, the
           pictures deliberately do not. */}
-      <FadeUp className="gallery-grid" amount={0.08}>
+      <Stagger className="gallery-grid" gap={0.07} amount={0.08}>
         {TILES.map((tile) => (
-          <div key={tile.src} className={`gallery-tile ${tile.span}`}>
+          <StaggerItem key={tile.src} className={`gallery-tile ${tile.span}`}>
             <Image
               src={tile.src}
               alt={tile.alt}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             />
-          </div>
+          </StaggerItem>
         ))}
-      </FadeUp>
+      </Stagger>
     </div>
   );
 }

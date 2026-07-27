@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 import { FiMessageCircle, FiArrowUp } from "react-icons/fi";
+import { SETTLE } from "./motion";
 
 /**
  * The floating action rail — WhatsApp, message and a back-to-top button, fixed
@@ -15,7 +16,6 @@ import { FiMessageCircle, FiArrowUp } from "react-icons/fi";
  * number; swap it if the client keeps a separate WhatsApp line.
  */
 const WHATSAPP_NUMBER = "8801713483284";
-const SETTLE = [0.22, 1, 0.36, 1];
 
 // One pill of shared styling. Colour is added per button.
 const BTN =

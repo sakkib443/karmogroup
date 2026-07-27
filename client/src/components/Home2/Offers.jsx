@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FadeUp } from "./motion";
+import { Stagger, StaggerItem } from "./motion";
 
 /**
  * The two offer banners.
@@ -43,9 +43,9 @@ export default function Offers() {
   return (
     <div className="our-offers">
       <div className="container">
-        <div className="offer-item-list">
-          {BANNERS.map((banner, i) => (
-            <FadeUp key={banner.title} delay={i * 0.12} className="offer-item">
+        <Stagger className="offer-item-list" gap={0.12}>
+          {BANNERS.map((banner) => (
+            <StaggerItem key={banner.title} className="offer-item">
               <div className="offer-item-image">
                 <figure>
                   <Image
@@ -70,9 +70,9 @@ export default function Offers() {
                   </Link>
                 </div>
               </div>
-            </FadeUp>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiArrowRight } from "react-icons/fi";
 import SectionTitle from "./SectionTitle";
-import { FadeUp } from "./motion";
+import { FadeUp, Stagger, StaggerItem } from "./motion";
 
 /**
  * Popular products — the same section Home 01 runs, rebuilt in Home 02's card
@@ -102,12 +102,9 @@ const PROMO = {
 
 const SIZES = "(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw";
 
-function ProductCard({ item, delay }) {
+function ProductCard({ item }) {
   return (
-    <FadeUp
-      delay={delay}
-      className={`product-item${item.scene ? " has-scene" : ""}`}
-    >
+    <StaggerItem className={`product-item${item.scene ? " has-scene" : ""}`}>
       <Link href={item.href}>
         <div className="product-item-media">
           {item.scene && (
@@ -154,7 +151,7 @@ function ProductCard({ item, delay }) {
           </div>
         </div>
       </Link>
-    </FadeUp>
+    </StaggerItem>
   );
 }
 
@@ -168,13 +165,13 @@ export default function Products() {
           bold="buy most"
         />
 
-        <div className="product-item-list">
-          {TOP_ROW.map((item, i) => (
-            <ProductCard key={item.name} item={item} delay={i * 0.07} />
+        <Stagger className="product-item-list">
+          {TOP_ROW.map((item) => (
+            <ProductCard key={item.name} item={item} />
           ))}
 
           {/* Two columns wide, sitting at the left of the lower row. */}
-          <FadeUp className="product-promo">
+          <StaggerItem className="product-promo">
             <Link href={PROMO.href}>
               <Image
                 src={PROMO.image}
@@ -199,16 +196,12 @@ export default function Products() {
                 </span>
               </div>
             </Link>
-          </FadeUp>
+          </StaggerItem>
 
-          {BOTTOM_ROW.map((item, i) => (
-            <ProductCard
-              key={item.name}
-              item={item}
-              delay={0.1 + i * 0.07}
-            />
+          {BOTTOM_ROW.map((item) => (
+            <ProductCard key={item.name} item={item} />
           ))}
-        </div>
+        </Stagger>
 
         <FadeUp className="section-footer-text">
           <p>

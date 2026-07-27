@@ -98,17 +98,7 @@ const promo = {
   alt: "Living-room corner with a linen sofa built on Karmo upholstery foam",
 };
 
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
-};
-
-const card = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: SETTLE } },
-};
+import { group, rise as card, VIEWPORT } from "./motion";
 
 function Badge({ kind }) {
   if (!kind) return null;
@@ -197,17 +187,16 @@ function ProductCard({ item }) {
 export default function PopularProducts({ heading }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.15 };
+  const once = VIEWPORT;
 
   return (
     <section className="bg-white py-20 md:py-24">
       <div className="shell">
         {heading ?? (
           <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.7, ease: SETTLE }}
+            initial={reduceMotion ? false : card.hidden}
+            whileInView={card.show}
+            viewport={once}
           >
             <span className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
               <span className="h-px w-10 bg-brand" />

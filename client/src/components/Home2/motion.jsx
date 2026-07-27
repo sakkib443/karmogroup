@@ -25,6 +25,26 @@ export const SETTLE = [0.22, 1, 0.36, 1];
 /** Slightly flatter — used where an image slides rather than a card lifts. */
 export const GLIDE = [0.25, 0.46, 0.45, 0.94];
 
+/**
+ * One viewport rule for the whole page.
+ *
+ * `amount: 0.15` fires as soon as a sliver is in view, and the negative bottom
+ * margin pulls the trigger line 90px up from the fold — so an element has
+ * already begun moving by the time it is properly on screen. Waiting until it
+ * is fully visible is what makes a reveal read as late: you see the thing
+ * arrive, then see it animate.
+ */
+export const VIEWPORT = { once: true, amount: 0.15, margin: "0px 0px -90px 0px" };
+
+/**
+ * Shared timing. 28px of travel over 0.9s, not the 42px/0.85s this page ran
+ * before — a shorter distance across a slightly longer time reads as a settle
+ * rather than a jump, which is the whole difference between a page that feels
+ * considered and one that feels twitchy.
+ */
+const RISE = 28;
+const DURATION = 0.9;
+
 /* ────────────────────────────────────────────────────────────────────────────
    FadeUp — the WOW.js `fadeInUp` replacement.
    Every card, banner and rail item in the reference carries it; here it is one
@@ -34,9 +54,9 @@ export function FadeUp({
   children,
   className,
   delay = 0,
-  y = 42,
-  duration = 0.85,
-  amount = 0.2,
+  y = RISE,
+  duration = DURATION,
+  amount = VIEWPORT.amount,
   ...rest
 }) {
   const reduce = useReducedMotion();
@@ -54,8 +74,87 @@ export function FadeUp({
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount }}
+      viewport={{ ...VIEWPORT, amount }}
       transition={{ duration, delay, ease: SETTLE }}
+      {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Stagger — one trigger for a whole grid.
+
+   Rows used to be built from individual FadeUps carrying `delay={i * 0.09}`.
+   That compounds two independent things: every card watched the viewport for
+   itself *and* held a fixed delay. Scrolled at any speed, a card low in the
+   grid could reach its trigger before one above it had finished, so the
+   cascade arrived out of order — the reason the page read as unsettled rather
+   than smooth.
+
+   Here the container is the only thing watching. Children inherit the state
+   and framer spaces them out, so the order is always top-left to bottom-right
+   no matter how fast the page moves.
+   ──────────────────────────────────────────────────────────────────────────── */
+export function Stagger({
+  children,
+  className,
+  gap = 0.09,
+  delay = 0,
+  amount = VIEWPORT.amount,
+  ...rest
+}) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return (
+      <div className={className} {...rest}>
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ ...VIEWPORT, amount }}
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: gap, delayChildren: delay } },
+      }}
+      {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** A child of Stagger. Carries no viewport of its own — that is the point. */
+export function StaggerItem({ children, className, y = RISE, ...rest }) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    return (
+      <div className={className} {...rest}>
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      className={className}
+      variants={{
+        hidden: { opacity: 0, y },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: DURATION, ease: SETTLE },
+        },
+      }}
       {...rest}
     >
       {children}
@@ -208,7 +307,7 @@ export function Reveal({
 }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  const inView = useInView(ref, { once: true, amount: 0.15, margin: "0px 0px -90px 0px" });
 
   if (reduce) {
     return (

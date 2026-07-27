@@ -93,22 +93,7 @@ const films = [
   },
 ];
 
-const SETTLE = [0.22, 1, 0.36, 1];
-
-const group = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
-};
-
-const line = {
-  hidden: { y: "115%" },
-  show: { y: "0%", transition: { duration: 0.9, ease: SETTLE } },
-};
-
-const fade = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: SETTLE } },
-};
+import { group, line, rise as fade, SETTLE, VIEWPORT } from "./motion";
 
 export default function Reels({ heading }) {
   const reduceMotion = useReducedMotion();
@@ -128,7 +113,7 @@ export default function Reels({ heading }) {
   // Pressing play arms it too. Without that second route the section is one
   // failed IntersectionObserver away from a dead black rectangle with a play
   // button that does nothing — the exact state a zero-height viewport produces.
-  const inView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const inView = useInView(sectionRef, VIEWPORT);
   const [forced, setForced] = useState(false);
   const armed = inView || forced;
 
@@ -240,7 +225,7 @@ export default function Reels({ heading }) {
   }, [expanded]);
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = { once: true, amount: 0.15 };
+  const once = VIEWPORT;
 
   return (
     <section

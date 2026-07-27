@@ -6,7 +6,7 @@ import { FiPlay } from "react-icons/fi";
 import { useReducedMotion } from "framer-motion";
 import SectionTitle from "./SectionTitle";
 import Lightbox from "./Lightbox";
-import { FadeUp } from "./motion";
+import { FadeUp, Stagger, StaggerItem } from "./motion";
 
 /**
  * The reels row — Home 01's videos, this page's dress.
@@ -68,7 +68,7 @@ const REELS = [
   },
 ];
 
-function ReelCard({ reel, onOpen, openerRef, reduce, delay }) {
+function ReelCard({ reel, onOpen, openerRef, reduce }) {
   const videoRef = useRef(null);
 
   // Silent preview on hover, rewound on the way out.
@@ -84,7 +84,7 @@ function ReelCard({ reel, onOpen, openerRef, reduce, delay }) {
   };
 
   return (
-    <FadeUp delay={delay} className="story-item">
+    <StaggerItem className="story-item">
       <button
         type="button"
         ref={openerRef}
@@ -131,7 +131,7 @@ function ReelCard({ reel, onOpen, openerRef, reduce, delay }) {
           <span className="story-item-rule" />
         </span>
       </button>
-    </FadeUp>
+    </StaggerItem>
   );
 }
 
@@ -157,18 +157,17 @@ export default function Stories() {
           bold="film"
         />
 
-        <div className="story-item-list">
+        <Stagger className="story-item-list">
           {REELS.map((reel, i) => (
             <ReelCard
               key={reel.src}
               reel={reel}
-              delay={(i % 3) * 0.09}
               reduce={reduce}
               openerRef={(el) => (openers.current[i] = el)}
               onOpen={() => setActive(i)}
             />
           ))}
-        </div>
+        </Stagger>
 
         <FadeUp className="section-footer-text">
           <p>

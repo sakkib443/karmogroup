@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiCalendar } from "react-icons/fi";
 import SectionTitle from "./SectionTitle";
-import { FadeUp, Reveal } from "./motion";
+import { Reveal, Stagger, StaggerItem } from "./motion";
 
 /**
  * The blog band — Home 01's Journal, mirrored.
@@ -56,7 +56,7 @@ export default function Journal() {
       <div className="container">
         <SectionTitle sub="Our blog" title="Follow the" bold="latest news" />
 
-        <div className="blog-row">
+        <Stagger className="blog-row" gap={0.1}>
           {/* Standing panel. Does not scroll, does not link to a post — it is
               the section's call to action, sized like a card so the row reads
               as one set. */}
@@ -84,8 +84,8 @@ export default function Journal() {
             </div>
           </Reveal>
 
-          {POSTS.map((post, i) => (
-            <FadeUp key={post.href} delay={0.1 + i * 0.1} className="blog-post">
+          {POSTS.map((post) => (
+            <StaggerItem key={post.href} className="blog-post">
               <Link href={post.href}>
                 <div className="blog-post-image">
                   <Image
@@ -120,9 +120,9 @@ export default function Journal() {
                   </span>
                 </span>
               </Link>
-            </FadeUp>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </div>
   );
