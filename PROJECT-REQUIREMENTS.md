@@ -1,145 +1,219 @@
-# Karmo Group — E-Commerce Platform
-## Project Requirements Specification
+# Karmo Group
+## Website & Online Store — Proposal
 
 | | |
 |---|---|
-| **Client** | Karmo Group (foam, mattress, HomeTex, chemicals — manufacturing since 1965) |
+| **Client** | Karmo Group |
 | **Prepared by** | *[Your company name]* |
-| **Version** | 1.0 — Draft for client review |
-| **Status** | Awaiting client sign-off |
-| **Language of site** | English only |
-
-> **How to read this document.** Everything listed under *Functional Requirements* is
-> what will be built. Everything under *Out of Scope* will not be, unless it is added
-> later in writing as a change request. Everything under *Client Responsibilities* is
-> what Karmo Group must supply, and by when — the delivery date moves if those are late.
-> Section 15 lists decisions that must be made before development can begin.
+| **Date** | *[Date]* |
+| **Version** | 1.0 |
 
 ---
 
-## 1. Project Overview
+# Our Promise
 
-Karmo Group manufactures foam, mattresses, HomeTex bedding and chemicals, and sells
-through dealers and outlets. This project delivers a complete website and e-commerce
-platform: a public site covering every division and product, an online store serving two
-distinct types of buyer, and a back office run day to day by a staff team with separate,
-restricted roles.
+Karmo Group has been manufacturing in Bangladesh since 1965. Foam, mattresses,
+HomeTex, chemicals — four divisions, more than sixty products, and a name built
+over six decades.
 
-**Three things are being delivered:**
+That name sits at the top of its market. **But online, a brand is judged in three
+seconds.** The first image someone sees when the page opens decides whether they
+stay or leave. Sixty years of trust does not help at that moment. What is on the
+screen is all there is.
 
-1. **A complete public website** — every division, every product, company pages, media.
-2. **An e-commerce store** — serving both retail customers and wholesale buyers, with
-   separate pricing for each.
-3. **An operations back office** — a multi-role admin panel where Karmo staff manage
-   products, confirm orders, process them, and record delivery, with each person seeing
-   and doing only what their role allows.
+**Our aim is simple: Karmo's brand is number one in Bangladesh, and the website
+should be too.**
 
-### 1.1 Objectives
-
-- Sell directly to retail customers online, nationwide.
-- Take wholesale orders online, at wholesale pricing, from approved trade buyers.
-- Give Karmo staff a controlled system to run orders end to end.
-- Present ~60 products with professional, consistent imagery and motion.
+Not an ordinary website. Not a bought template with the colours changed. A site
+that tells anyone who opens it, in the first few seconds — this company is
+serious, this company takes care, these products are good.
 
 ---
 
-## 2. Scope Summary
+# What We Are Building
 
-### 2.1 In Scope
+Three things, together:
 
-| # | Area | Summary |
-|---|---|---|
-| 1 | Public website | Homepage, 4 division sections, ~15 sub-pages, company pages, media, blog |
-| 2 | Product catalogue | ~60 products, categories, variants, search, filtering |
-| 3 | Accounts | Retail self-registration; wholesale registration with admin approval |
-| 4 | Pricing | Separate retail and wholesale price lists, quantity tiers, minimum order quantity |
-| 5 | Cart and checkout | Cart, address book, delivery charge, order placement |
-| 6 | Payments | Online payment gateway plus cash on delivery |
-| 7 | Order workflow | Multi-stage order lifecycle with separate staff roles per stage |
-| 8 | Admin panel | Products, orders, customers, staff, roles, reports |
-| 9 | Notifications | Email and SMS at defined order stages |
-| 10 | Creative | 1,000 images and 60 product motion videos |
-| 11 | Launch | Deployment, testing, staff training, documentation |
+### 1. A beautiful website
+All four divisions, every product, the company's history, its awards, its dealer
+network — organised and worth looking at.
 
-### 2.2 Out of Scope
+### 2. An online shop
+Customers can buy Karmo products from home. Retail customers at one price,
+wholesale buyers at their own.
 
-The following are **not** included and will be quoted separately if required:
-
-- Mobile applications (iOS / Android)
-- Bengali or any second language (site is English only — see 7.6)
-- Integration with any existing ERP, accounting or inventory system
-- Barcode / warehouse scanning hardware
-- Multi-warehouse or branch-level stock management
-- Automated courier / delivery-partner API integration (delivery is recorded manually)
-- Loyalty points, referral schemes, gift cards, subscriptions
-- Live chat or chatbot
-- SEO campaigns, paid advertising, social media management
-- Content writing beyond what is listed in Client Responsibilities
-- Product photography of physical goods (images are digitally produced — see 6.1)
-- Migration of data from any existing system
-- Ongoing hosting fees, gateway transaction fees, SMS credits (see section 9)
+### 3. Your own control room
+Your staff run everything from one panel — adding products, seeing orders,
+confirming them, sending them out. Each person sees only their own work, and
+nothing else.
 
 ---
 
-## 3. User Roles
+# Design Is the Heart of This Project
 
-Nine roles in total. Three are customer-facing, six are staff.
+This is where most of the effort goes, and this is where the difference is made.
 
-### 3.1 Customer-facing roles
+## 1,000 images — every one made for Karmo
 
-| Role | Who | How they get access |
-|---|---|---|
-| **Guest** | Anyone browsing | No account needed |
-| **Retail Customer** | General public | Self-registration, instant |
-| **Wholesale Customer** | Trade buyers, dealers, project buyers | Registration + **manual admin approval** |
+Most websites in Bangladesh pull images off the internet and drop them in. That
+is why they all look alike, and why none of them feels like it belongs to the
+company whose name is on it.
 
-### 3.2 Staff roles
+We will not do that. **One thousand images will be made specifically for Karmo.**
 
-| Role | Purpose |
+| Where | How many |
 |---|---|
-| **Super Admin** | Full control including staff, roles and system settings. Karmo's owner/IT lead. |
-| **Admin** | Everything operational — products, orders, customers, reports. Cannot change roles or system settings. |
-| **Manager** | Oversight — sees all orders and reports, can intervene, but does not run day-to-day stages. |
-| **Order Confirmer** | Reviews new orders and confirms or cancels them. |
-| **Order Processor** | Picks, packs and prepares confirmed orders for dispatch. |
-| **Delivery Agent** | Records dispatch and delivery outcome. |
+| For every product | **10 images each** × 60 products = **600** |
+| For every page | Home, About, Contact, division pages, blog — around 10 per page ≈ **400** |
+| | **1,000 in total** |
 
-> Roles are **assignable per person**. One employee may hold more than one role — for
-> example a small branch where the same person confirms and processes orders.
+Ten images for a product means: from an angle, up close, placed in a real room,
+shown at a size the eye can judge. So a customer understands what they are buying
+without holding it.
 
-### 3.3 Permission Matrix
+Every image will share **the same light, the same colour language, the same
+mood.** Wherever you land on the site, it will look like one hand made it — not
+a collection of parts.
 
-`✔` = allowed  ·  `—` = not allowed  ·  `👁` = view only
+## 60 motion videos — one for every product
 
-| Capability | Super Admin | Admin | Manager | Confirmer | Processor | Delivery |
+A still image shows what something looks like. **Movement shows what it feels
+like.**
+
+Every product gets a short motion video. How foam compresses and springs back,
+how many layers are inside a mattress, how a fabric is woven — the things a
+photograph cannot say.
+
+Very few websites in Bangladesh do this. It is what will set Karmo apart.
+
+## Every page designed individually
+
+On many websites the homepage is beautiful and everything behind it is empty and
+plain. We will design **every page** — every division, every product, even the
+contact page.
+
+## Mobile first, desktop second
+
+In Bangladesh, eight people in ten browse on a phone. So we design for the phone
+first and the desktop second. Done the other way round, everything ends up
+cramped and awkward on mobile — which is exactly what happens on most sites.
+
+---
+
+# Making Sure People Find It
+
+A beautiful website nobody sees is worth nothing. Getting it in front of people
+is part of this project.
+
+**It will open fast.** However good the images are, people leave if the page is
+slow. Our target is **under three seconds** on an ordinary mobile connection —
+with a thousand images on the site, because every one of them will be optimised.
+
+**It will be found on Google.** When someone searches "foam mattress price" or
+"Karmo foam", Karmo should be near the top. Every product page will be built so
+Google can read and rank it.
+
+**It will look right when shared on Facebook.** The image and text that appear
+when a link is shared will be designed too, not left to chance.
+
+**It will work on any phone.** New and old, expensive and cheap — tested across
+all of them.
+
+---
+
+# How Customers Will Buy
+
+Keeping it simple is the real work here. Every extra step loses customers.
+
+**Browse →** They find products by division or category. Price, size, whether it
+is in stock — all visible at a glance, with search and filters to narrow down.
+
+**Choose →** The product page carries 10 images, the motion video, a full
+description, sizes and specifications, and suggestions for related products.
+
+**Add to cart →** The cart follows them. Logged in, it stays with them from phone
+to computer.
+
+**Order →** Enter the address, see the delivery charge, choose how to pay —
+bKash, Nagad, card, or cash on delivery.
+
+**Wait →** An SMS and email go out immediately. They can track the order on the
+site: confirmed, being packed, or on its way.
+
+---
+
+# A Separate System for Wholesale Buyers
+
+Karmo has two kinds of customer — the general public, and dealers, wholesalers
+and project buyers. They pay different prices, so the site treats them
+differently.
+
+- Wholesale buyers register separately — business name, trade licence, address.
+- **Their account only opens after you approve it.** Not everyone can see
+  wholesale prices just by asking.
+- Once approved, they log in and see **their own prices**.
+- Bigger quantities cost less — 10–49 pieces at one rate, 50 and above at
+  another.
+- You can set a minimum order quantity on each product.
+
+---
+
+# How Your Team Will Run It
+
+An online shop is not just a website. Every day someone has to look at orders,
+confirm them, pack them, send them. So your staff get a panel of their own.
+
+**The most important part: each person sees only their own work.** The person
+delivering cannot change prices. The person packing cannot create staff
+accounts. Fewer mistakes, and it stays clear who did what.
+
+## Who does what
+
+| Role | Job |
+|---|---|
+| **Super Admin** | Owns everything. Adds staff, decides who can do what, controls system settings. Usually the owner or the IT lead. |
+| **Admin** | Everything day to day — products, prices, orders, customers, reports. Cannot add staff or change anyone's permissions. |
+| **Manager** | Sees everything and steps in when needed, but does not run the daily stages. |
+| **Order Confirmer** | Checks each new order, calls the customer, then confirms or cancels. |
+| **Order Processor** | Takes confirmed orders, pulls the goods from the warehouse and packs them. |
+| **Delivery Agent** | Takes the goods out, delivers, collects the money. |
+
+> One person can hold more than one job. In a small branch the same person might
+> confirm and pack — that works too.
+
+## Who can do what
+
+`✔` allowed · `—` not allowed · `👁` can only look
+
+| Task | Super Admin | Admin | Manager | Confirmer | Processor | Delivery |
 |---|:--:|:--:|:--:|:--:|:--:|:--:|
 | **Products** | | | | | | |
-| Create / edit / delete product | ✔ | ✔ | 👁 | — | 👁 | — |
-| Manage categories | ✔ | ✔ | 👁 | — | — | — |
-| Update stock quantity | ✔ | ✔ | ✔ | — | ✔ | — |
+| Add / change / delete a product | ✔ | ✔ | 👁 | — | 👁 | — |
+| Organise categories | ✔ | ✔ | 👁 | — | — | — |
+| Update stock numbers | ✔ | ✔ | ✔ | — | ✔ | — |
 | Set retail price | ✔ | ✔ | — | — | — | — |
-| Set wholesale price / tiers | ✔ | ✔ | — | — | — | — |
+| Set wholesale price | ✔ | ✔ | — | — | — | — |
 | **Orders** | | | | | | |
-| View all orders | ✔ | ✔ | ✔ | ✔ | ✔ | 👁 own assigned |
+| See all orders | ✔ | ✔ | ✔ | ✔ | ✔ | 👁 own only |
 | Confirm an order | ✔ | ✔ | ✔ | ✔ | — | — |
 | Cancel an order | ✔ | ✔ | ✔ | ✔ | — | — |
-| Move to Processing / Packed | ✔ | ✔ | ✔ | — | ✔ | — |
-| Mark Dispatched | ✔ | ✔ | ✔ | — | ✔ | ✔ |
-| Mark Delivered / Failed | ✔ | ✔ | ✔ | — | — | ✔ |
-| Record payment received | ✔ | ✔ | ✔ | — | — | ✔ (COD only) |
-| Approve refund / return | ✔ | ✔ | — | — | — | — |
-| Edit order contents | ✔ | ✔ | — | — | — | — |
+| Start packing | ✔ | ✔ | ✔ | — | ✔ | — |
+| Mark as sent | ✔ | ✔ | ✔ | — | ✔ | ✔ |
+| Mark delivered / not delivered | ✔ | ✔ | ✔ | — | — | ✔ |
+| Record money received | ✔ | ✔ | ✔ | — | — | ✔ (cash on delivery) |
+| Approve a refund | ✔ | ✔ | — | — | — | — |
+| Change what is in an order | ✔ | ✔ | — | — | — | — |
 | **Customers** | | | | | | |
-| View customer list | ✔ | ✔ | ✔ | 👁 | — | — |
-| **Approve wholesale account** | ✔ | ✔ | ✔ | — | — | — |
+| See the customer list | ✔ | ✔ | ✔ | 👁 | — | — |
+| **Approve a wholesale account** | ✔ | ✔ | ✔ | — | — | — |
 | Suspend a customer | ✔ | ✔ | — | — | — | — |
-| **Content** | | | | | | |
-| Edit site pages / banners | ✔ | ✔ | — | — | — | — |
-| Publish blog posts | ✔ | ✔ | ✔ | — | — | — |
+| **Site content** | | | | | | |
+| Change page images / banners | ✔ | ✔ | — | — | — | — |
+| Write and publish blog posts | ✔ | ✔ | ✔ | — | — | — |
 | **Staff and system** | | | | | | |
-| Create staff account | ✔ | — | — | — | — | — |
-| Assign / change roles | ✔ | — | — | — | — | — |
-| View activity / audit log | ✔ | ✔ | 👁 | — | — | — |
+| Add a staff member | ✔ | — | — | — | — | — |
+| Change anyone's permissions | ✔ | — | — | — | — | — |
+| See the activity log | ✔ | ✔ | 👁 | — | — | — |
 | Change system settings | ✔ | — | — | — | — | — |
 | **Reports** | | | | | | |
 | Sales reports | ✔ | ✔ | ✔ | — | — | — |
@@ -147,355 +221,295 @@ Nine roles in total. Three are customer-facing, six are staff.
 
 ---
 
-## 4. Order Lifecycle
+# How an Order Moves
 
-Every order moves through defined stages. Only the roles listed may make each move, and
-**every change is recorded with who did it and when** (audit log).
+Every order moves through set stages, and **every stage records who did what and
+when.** If anything is ever disputed, it can be traced.
 
 ```
-                 ┌──────────────┐
-   Customer ───► │   PENDING    │  order placed, awaiting review
-                 └──────┬───────┘
-                        │  Order Confirmer
-            ┌───────────┴───────────┐
-            ▼                       ▼
-     ┌─────────────┐         ┌─────────────┐
-     │  CONFIRMED  │         │  CANCELLED  │ ◄── stock released
-     └──────┬──────┘         └─────────────┘
-            │  Order Processor
+   Customer places an order
+            │
             ▼
-     ┌─────────────┐
-     │ PROCESSING  │  picking and packing
-     └──────┬──────┘
-            │  Order Processor
-            ▼
-     ┌──────────────────┐
-     │ READY FOR        │
-     │ DISPATCH         │
-     └──────┬───────────┘
-            │  Delivery Agent
-            ▼
-     ┌──────────────────┐
-     │ OUT FOR DELIVERY │
-     └──────┬───────────┘
-            │  Delivery Agent
-   ┌────────┴────────┐
-   ▼                 ▼
-┌───────────┐  ┌──────────────────┐
-│ DELIVERED │  │ DELIVERY FAILED  │ ──► retry or return
-└─────┬─────┘  └──────────────────┘
-      │  Customer requests, Admin approves
+   ┌─────────────────┐
+   │   NEW ORDER     │  the Confirmer is notified
+   └────────┬────────┘
+            │  Confirmer calls the customer and checks
+     ┌──────┴──────┐
+     ▼             ▼
+┌───────────┐  ┌───────────┐
+│ CONFIRMED │  │ CANCELLED │ ◄── stock goes back
+└─────┬─────┘  └───────────┘
+      │  the Processor is notified
       ▼
-┌──────────────────┐     ┌──────────┐
-│ RETURN REQUESTED │ ──► │ REFUNDED │
-└──────────────────┘     └──────────┘
+┌──────────────┐
+│   PACKING    │
+└──────┬───────┘
+       ▼
+┌──────────────────┐
+│ READY TO SEND    │
+└──────┬───────────┘
+       │  the Delivery Agent is notified
+       ▼
+┌──────────────┐
+│  ON THE WAY  │
+└──────┬───────┘
+   ┌───┴────┐
+   ▼        ▼
+┌───────────┐ ┌───────────────┐
+│ DELIVERED │ │ NOT DELIVERED │ → try again or return
+└─────┬─────┘ └───────────────┘
+      │  customer asks, Admin approves
+      ▼
+┌──────────────┐
+│   REFUNDED   │
+└──────────────┘
 ```
 
-### 4.1 Rules
-
-- Stock is **reserved** when an order is placed and **deducted** when confirmed.
-- A cancelled order releases its reserved stock automatically.
-- An order cannot skip a stage. Backward moves are allowed only for Admin and above.
-- Cash-on-delivery payment is recorded by the Delivery Agent at the Delivered step.
-- Online payments are recorded automatically by the gateway callback.
-- Every stage change writes to the audit log: order, old stage, new stage, user, timestamp.
+**A few rules:**
+- Stock is held the moment an order arrives, and deducted when it is confirmed.
+- Cancelling puts the stock straight back.
+- No stage can be skipped. Only an Admin can move an order backwards.
+- Cash on delivery is recorded by the Delivery Agent at the "delivered" step.
 
 ---
 
-## 5. Functional Requirements
+# The Full List of Features
 
-### 5.1 Public Website
+The sections above explain it simply. Below is the detail — this is exactly what
+gets built.
 
-| Ref | Requirement |
+## Website pages
+
+| Ref | What it includes |
 |---|---|
 | PW-01 | Homepage — hero, featured products, divisions, company story, gallery, video, blog |
-| PW-02 | Four division landing pages: Foam, Mattress, HomeTex, Chemicals |
-| PW-03 | Division sub-pages — Foam (5), HomeTex (4), Chemicals (3), Mattress (1) |
-| PW-04 | Company pages: About, History, Board, Awards, Partners |
-| PW-05 | Contact pages: Contact, Address, FAQs, Catalogues, Bulk Order enquiry |
-| PW-06 | Media: Blog listing and post pages, Video ads, Static ads, Memories |
-| PW-07 | Store locator listing Karmo dealers and outlets |
-| PW-08 | All pages responsive: mobile, tablet, desktop |
-| PW-09 | Contact and enquiry forms with validation, stored in admin and emailed |
+| PW-02 | Four division pages: Foam, Mattress, HomeTex, Chemicals |
+| PW-03 | Pages within divisions — Foam (5), HomeTex (4), Chemicals (3), Mattress (1) |
+| PW-04 | Company: About, History, Board, Awards, Partners |
+| PW-05 | Contact: address, FAQs, catalogues, bulk order enquiry |
+| PW-06 | Media: blog, video ads, static ads, memories |
+| PW-07 | Dealer and outlet list with addresses |
+| PW-08 | Every page works properly on mobile, tablet and desktop |
+| PW-09 | Contact and enquiry forms — saved in the panel and emailed |
 
-### 5.2 Product Catalogue
+## Products
 
-| Ref | Requirement |
+| Ref | What it includes |
 |---|---|
 | PC-01 | ~60 products across four divisions |
-| PC-02 | Category and sub-category structure, products can sit in multiple categories |
-| PC-03 | Product variants — size, thickness, density, colour as applicable |
-| PC-04 | Each product: name, description, full specification table, up to 10 images, 1 motion video, price, stock, SKU |
-| PC-05 | Listing pages with filters: division, category, price range, size, availability |
+| PC-02 | Categories and sub-categories; a product can sit in more than one |
+| PC-03 | Variants — size, thickness, density, colour where relevant |
+| PC-04 | Per product: name, description, full specification, 10 images, 1 motion video, price, stock |
+| PC-05 | Filters: division, category, price range, size, in stock |
 | PC-06 | Sorting: newest, price low→high, price high→low, best selling |
-| PC-07 | Keyword search across product name, SKU and description |
-| PC-08 | Related / recommended products on the product page |
-| PC-09 | Stock states: in stock, low stock, out of stock, made to order |
+| PC-07 | Search by name, code and description |
+| PC-08 | Related product suggestions |
+| PC-09 | Stock states: in stock, low, out of stock, made to order |
 
-### 5.3 Accounts and Registration
+## Accounts
 
-| Ref | Requirement |
+| Ref | What it includes |
 |---|---|
-| AC-01 | Retail registration: name, mobile, email, password — active immediately |
-| AC-02 | Wholesale registration: business name, trade licence number, address, contact person — **held for admin approval** |
-| AC-03 | Wholesale applicant sees "pending approval" and cannot see wholesale prices until approved |
-| AC-04 | Login by email or mobile number, with password reset |
-| AC-05 | Customer account area: profile, address book, order history, order tracking, downloadable invoices |
-| AC-06 | Guest checkout permitted for retail only — wholesale requires an approved login |
+| AC-01 | Retail registration — name, mobile, email; active immediately |
+| AC-02 | Wholesale registration — business name, trade licence, address; **needs approval** |
+| AC-03 | Wholesale prices stay hidden until the account is approved |
+| AC-04 | Login by email or mobile, with password recovery |
+| AC-05 | Customer area: profile, addresses, order history, tracking, invoices |
+| AC-06 | Buying without an account is for retail only; wholesale must log in |
 
-### 5.4 Pricing
+## Pricing
 
-| Ref | Requirement |
+| Ref | What it includes |
 |---|---|
-| PR-01 | Every product carries a retail price and a separate wholesale price |
-| PR-02 | Wholesale prices are visible only to logged-in, approved wholesale customers |
-| PR-03 | Quantity tiers for wholesale — e.g. 10–49 units at one rate, 50+ at another |
-| PR-04 | Minimum order quantity (MOQ) settable per product for wholesale buyers |
-| PR-05 | Discounts: percentage or fixed amount, per product or per category, with start and end dates |
-| PR-06 | Delivery charge rules by area — configurable in admin, free above a set order value |
-| PR-07 | VAT / tax shown as a separate line if required *(see open decision OD-04)* |
+| PR-01 | Separate retail and wholesale price on every product |
+| PR-02 | Wholesale prices visible only to approved wholesale customers |
+| PR-03 | Price tiers by quantity |
+| PR-04 | Minimum order quantity per product |
+| PR-05 | Discounts — percentage or fixed, by product or category, with dates |
+| PR-06 | Delivery charge by area; free above a set order value |
+| PR-07 | VAT shown separately if needed *(see Decision 4)* |
 
-### 5.5 Cart and Checkout
+## Cart, orders and payment
 
-| Ref | Requirement |
+| Ref | What it includes |
 |---|---|
-| CO-01 | Cart persists for logged-in users across devices |
-| CO-02 | Cart shows per-line price, quantity, subtotal, delivery, total |
-| CO-03 | MOQ enforced at cart level for wholesale buyers |
-| CO-04 | Checkout: delivery address, billing address, delivery method, payment method, order review |
-| CO-05 | Order confirmation page and confirmation email/SMS |
-| CO-06 | Stock re-validated at the moment of payment; clear message if an item ran out |
+| CO-01 | The cart follows a logged-in customer across devices |
+| CO-02 | Cart shows each item's price, quantity, delivery charge and total |
+| CO-03 | Minimum wholesale quantity is checked in the cart |
+| CO-04 | Checkout: address → delivery → payment → final review |
+| CO-05 | Confirmation page, email and SMS after ordering |
+| CO-06 | Stock re-checked at the moment of payment |
+| PY-01 | Online payment — bKash / Nagad / card *(see Decision 2)* |
+| PY-02 | Cash on delivery, restrictable by area or order value |
+| PY-03 | Wholesale credit terms — only if agreed *(see Decision 3)* |
+| PY-04 | Payment status per order: unpaid, paid, partly paid, refunded |
+| PY-05 | A failed payment does not lose the order |
 
-### 5.6 Payments
+## Your control panel
 
-| Ref | Requirement |
-|---|---|
-| PY-01 | Online payment gateway — bKash / Nagad / cards via a single aggregator *(see OD-02)* |
-| PY-02 | Cash on delivery, with the option to restrict it by area or order value |
-| PY-03 | Wholesale credit terms — **only if decided** *(see OD-03)* |
-| PY-04 | Payment status recorded against every order: unpaid, paid, partially paid, refunded |
-| PY-05 | Failed payments leave the order recoverable, not lost |
-
-### 5.7 Admin Panel
-
-| Ref | Module | Contents |
+| Ref | Section | What it includes |
 |---|---|---|
-| AD-01 | Dashboard | Today's orders, revenue, pending confirmations, low stock, recent activity |
-| AD-02 | Products | List, create, edit, bulk stock update, image and video upload, category management |
-| AD-03 | Orders | Filterable list, order detail, stage actions, printable invoice and packing slip |
-| AD-04 | Customers | Retail and wholesale lists, wholesale approval queue, customer order history |
-| AD-05 | Staff & Roles | Create staff, assign roles, deactivate — Super Admin only |
-| AD-06 | Content | Edit page banners, homepage sections, blog posts, FAQs |
-| AD-07 | Enquiries | Contact form and bulk-order enquiry inbox |
-| AD-08 | Reports | Sales by period, by product, by division, by customer type; stock report |
-| AD-09 | Settings | Delivery charges, tax, payment methods, notification templates — Super Admin only |
-| AD-10 | Audit log | Every staff action with user and timestamp |
+| AD-01 | Dashboard | Today's orders, sales, waiting for confirmation, low stock |
+| AD-02 | Products | Add, edit, bulk stock update, image and video upload |
+| AD-03 | Orders | List, detail, stage changes, printable invoice and packing slip |
+| AD-04 | Customers | Retail and wholesale lists, approval queue, order history |
+| AD-05 | Staff & permissions | Add staff, assign jobs, deactivate — Super Admin only |
+| AD-06 | Content | Page banners, homepage sections, blog, FAQs |
+| AD-07 | Enquiries | Contact form and bulk order enquiries |
+| AD-08 | Reports | Sales by period, product, division, customer type; stock |
+| AD-09 | Settings | Delivery charges, VAT, payment methods, message templates |
+| AD-10 | Activity log | Who did what, and when |
 
-### 5.8 Notifications
+## Messages and alerts
 
-| Event | Customer | Staff |
+| When | Customer gets | Staff get |
 |---|---|---|
-| Order placed | Email + SMS | Order Confirmer notified |
-| Order confirmed | Email + SMS | Order Processor notified |
-| Order dispatched | Email + SMS | Delivery Agent notified |
-| Order delivered | Email + SMS | — |
-| Order cancelled | Email + SMS | Manager notified |
+| Order placed | Email + SMS | Confirmer |
+| Order confirmed | Email + SMS | Processor |
+| Goods sent | Email + SMS | Delivery Agent |
+| Goods delivered | Email + SMS | — |
+| Order cancelled | Email + SMS | Manager |
 | Wholesale account approved | Email + SMS | — |
-| Low stock reached | — | Admin notified |
+| Stock running low | — | Admin |
 
----
+## Technical standards
 
-## 6. Creative Deliverables
-
-### 6.1 Images — 1,000 total
-
-| Group | Count | Notes |
-|---|---|---|
-| Product images | 600 | 10 per product × 60 products |
-| Page images | ~400 | Homepage, About, Contact, division pages, blog, banners — approx. 10 per page |
-
-- All images are **digitally produced and composited** — this is not photography of
-  physical goods. Karmo Group must confirm they accept digitally produced imagery
-  representing their products (see CR-06).
-- Delivered web-optimised in modern formats, correctly sized for each placement.
-- **Revisions: two rounds per image.** Further revisions are chargeable.
-
-### 6.2 Motion — 60 videos
-
-- One motion video per product.
-- Consistent treatment across the range, built from a template established on the first
-  few, so the set reads as one family.
-- Delivered web-optimised, muted-autoplay safe, with a poster frame.
-- **Revisions: two rounds per video.**
-
-### 6.3 UI/UX Design
-
-- Storefront screens: catalogue, filters, product detail, cart, checkout, account,
-  order tracking, wholesale-specific views — approx. 18 screens.
-- Admin panel screens: approx. 20 screens.
-- All delivered as responsive designs working to a single design system, so the store
-  and the back office feel like one product.
-
----
-
-## 7. Non-Functional Requirements
-
-| Ref | Requirement |
+| Ref | What we guarantee |
 |---|---|
-| NF-01 | **Performance** — product and listing pages load within 3 seconds on a normal Bangladeshi mobile connection |
-| NF-02 | **Responsive** — fully usable on mobile, tablet and desktop |
-| NF-03 | **Browsers** — latest two versions of Chrome, Firefox, Safari, Edge; Android Chrome; iOS Safari |
-| NF-04 | **Security** — passwords hashed, HTTPS throughout, role checks enforced on the server not just in the interface, protection against common web attacks |
-| NF-05 | **Payment security** — no card details ever stored on Karmo's servers; all handled by the gateway |
-| NF-06 | **SEO** — clean URLs, page titles and descriptions, sitemap, structured data for products |
-| NF-07 | **Backups** — automated daily database backup |
-| NF-08 | **Availability** — target 99% uptime, excluding scheduled maintenance |
-| NF-09 | **Audit** — all staff actions on orders and products logged and viewable |
+| NF-01 | Pages open within 3 seconds on an ordinary mobile connection |
+| NF-02 | Fully usable on mobile, tablet and desktop |
+| NF-03 | Chrome, Firefox, Safari, Edge — latest two versions; Android and iPhone |
+| NF-04 | Passwords encrypted, HTTPS throughout, permissions checked on the server too |
+| NF-05 | Card details never stored on our servers |
+| NF-06 | Built to be found on Google — sitemap, structured product data |
+| NF-07 | Automatic daily backups |
+| NF-08 | Target 99% uptime |
+| NF-09 | A record kept of every staff action |
 
-### 7.6 Language
-
-The site is **English only**. Bengali is not included. Adding Bengali later means
-translating every page, product description and email template, and is a separate project.
+**Language:** the site is in English only. Adding Bengali would mean translating
+every page, product description and message — that is separate work.
 
 ---
 
-## 8. Technical Approach
+# What We Need From You
 
-- **Frontend:** Next.js (App Router) with React and Tailwind CSS.
-- **Backend:** REST API with a relational database. *Final stack in OD-01.*
-- **Hosting:** cloud hosting with a CDN for images and video.
-- **Media:** object storage plus CDN. 1,000 images and 60 videos is substantial —
-  storage and bandwidth are ongoing costs (see section 10).
+Work cannot move without these. **However many days something is late, the
+delivery date moves by the same number of days.**
 
----
-
-## 9. Third-Party Services — Paid Directly by Karmo Group
-
-These are **not** included in the project price and are billed to Karmo Group directly,
-either as their own accounts or passed through at cost:
-
-| Service | Notes |
-|---|---|
-| Domain name | Annual |
-| Hosting / server | Monthly or annual |
-| SSL certificate | Often included with hosting |
-| Media storage and CDN | Scales with traffic — significant with 1,000 images and 60 videos |
-| Payment gateway | Setup fee plus a percentage of every transaction |
-| SMS gateway | Per-message credits |
-| Transactional email | Monthly, based on volume |
-
----
-
-## 10. Client Responsibilities
-
-The project cannot proceed without these. **Each item has a deadline, and the delivery
-date moves by the same number of days that any item is late.**
-
-| Ref | Karmo Group must supply | Needed by |
+| Ref | What you supply | By when |
 |---|---|---|
-| CR-01 | Final list of ~60 products with names, categories and variants | Before design starts |
-| CR-02 | Complete specification for every product — size, density, material, warranty | Week 2 |
-| CR-03 | Retail price and wholesale price (with tiers and MOQ) for every product | Week 3 |
-| CR-04 | Official logo files in vector format | Week 1 |
-| CR-05 | Dealer and outlet list for the store locator | Week 4 |
-| CR-06 | **Written confirmation that digitally produced imagery is acceptable** | Before design starts |
-| CR-07 | Payment gateway merchant account — approved and credentials issued. *This can take several weeks and is outside our control.* | Week 4 |
-| CR-08 | SMS gateway account and sender ID | Week 5 |
-| CR-09 | Company content — history, board, awards, partners | Week 4 |
-| CR-10 | Delivery charge rules by area, and return/refund policy text | Week 5 |
-| CR-11 | Named staff members and which role each should hold | Week 8 |
-| CR-12 | A single named person empowered to approve work and sign off each stage | Immediately |
+| CR-01 | Final list of ~60 products with names and categories | Before work starts |
+| CR-02 | Full specification for each product — size, density, material, warranty | Week 2 |
+| CR-03 | Retail and wholesale price for each product (with tiers and minimums) | Week 3 |
+| CR-04 | Original logo files (vector) | Week 1 |
+| CR-05 | Dealer and outlet list | Week 4 |
+| CR-06 | Written agreement that digitally produced images are acceptable | Before work starts |
+| CR-07 | Payment gateway account approved, with credentials. *This can take several weeks and is not in our hands.* | Week 4 |
+| CR-08 | SMS gateway account | Week 5 |
+| CR-09 | Company text — history, board, awards, partners | Week 4 |
+| CR-10 | Delivery charges by area, and the return / refund policy | Week 5 |
+| CR-11 | Which staff member gets which job, by name | Week 8 |
+| CR-12 | One named person who reviews and approves work | Immediately |
 
-### 10.1 Items requiring Karmo Group's written confirmation
+## A few things we need you to confirm
 
-The following arise from materials supplied by Karmo Group and must be settled in
-writing, because Karmo Group is responsible for the accuracy and legality of its own
-claims:
+Going through the material you supplied, some things came up. Since Karmo Group
+is responsible for what appears on its own website, these need settling first:
 
 | Ref | Issue |
 |---|---|
-| CR-13 | A video supplied in Karmo's own materials (`reel-2.mp4`) shows equipment branded **"durfi"**, a competing mattress brand. It has been removed. A replacement is needed, or the slot stays empty. |
-| CR-14 | A supplied video presents the **CertiGuard** antimicrobial certification mark. Karmo Group must confirm it genuinely holds this certification before it appears on the site. |
-| CR-15 | Trust claims in the supplied materials — *"Market leader in foam"*, *"Recommended by doctors"*, *"Trusted by families"* — came from a layout originally belonging to another company. Karmo Group must confirm each claim it wishes to keep, and supply evidence where a regulator could ask for it. |
-| CR-16 | Several supplied product photographs have promotional overlays burned in (prices, "20% off", hotline numbers). Clean versions are required. |
-| CR-17 | The archive foam commercial is 352×288 pixels and will look poor at any usable size. A higher-resolution master is needed, or it is dropped. |
-| CR-18 | Two different WhatsApp numbers appear in Karmo's materials (…3254 and …3284). One must be confirmed. |
-| CR-19 | Karmo Group is responsible for the accuracy of all product specifications, prices and claims published on the store. |
+| CR-13 | One of your videos shows equipment branded **"durfi"** — a competing mattress company. The video has been left out. A replacement is needed. |
+| CR-14 | One video carries the **CertiGuard** certification mark. We need confirmation that Karmo genuinely holds it. |
+| CR-15 | Some claims — *"Market leader in foam"*, *"Recommended by doctors"* — have no clear source. Tell us which ones to keep, and hold evidence where it may be asked for. |
+| CR-16 | Several product photographs have prices, "20% off" and hotline numbers printed into them. Clean versions are needed. |
+| CR-17 | The archive foam advertisement is 352×288 pixels and will look blurred at any usable size. A better master is needed, or it is dropped. |
+| CR-18 | Two different WhatsApp numbers appear in your material (…3254 and …3284). Which is correct? |
+| CR-19 | Karmo Group is responsible for the accuracy of every specification, price and claim published on the site. |
 
 ---
 
-## 11. Acceptance Criteria
+# What Is Not Included
 
-Each stage is accepted when:
+Worth stating plainly so there is no misunderstanding later. Any of these can be
+done separately:
 
-1. Every requirement in the relevant section performs as written.
-2. It works correctly on mobile, tablet and desktop, on the browsers in NF-03.
-3. Role permissions behave exactly as the matrix in 3.3 states, tested per role.
-4. The full order lifecycle runs end to end, including a live test payment and refund.
-5. No known defect remains that blocks a customer from completing a purchase.
-6. Karmo's named approver (CR-12) signs off in writing within **5 working days** of
-   delivery. If no response is received in that time, the stage is treated as accepted.
+- Mobile apps (Android / iPhone)
+- Bengali language
+- Connecting to existing software or accounting systems
+- Barcode or warehouse scanners
+- Multiple warehouses or branch-level stock
+- Automatic connection to courier company systems
+- Loyalty points, gift cards, referrals
+- Live chat
+- Facebook ads, Google ads, running social media
+- Writing content beyond what is listed above
+- Photography of physical goods (images are produced digitally)
+- Moving data across from an old website
 
----
-
-## 12. Assumptions
-
-1. Product count is approximately 60. A material increase changes image count, timeline and price.
-2. Ten images per product, one motion video per product — as requested by the client.
-3. English only.
-4. One currency: Bangladeshi Taka.
-5. Delivery is within Bangladesh only.
-6. Stock is managed at a single location, not per branch.
-7. Karmo Group has, or will obtain, its own hosting and gateway accounts.
+**Paid directly by Karmo Group:** domain, hosting, SSL, image and video storage,
+payment gateway fees, SMS credits, email service.
 
 ---
 
-## 13. Risks
+# How the Work Will Run
 
-| Risk | Impact | How it is handled |
+Delivered in stages, so you can start earning before everything is finished.
+
+| Stage | What you get | Result |
 |---|---|---|
-| Payment gateway approval delayed | Launch slips | Flagged as CR-07, with the delivery date moving day for day |
-| Product data arrives late or incomplete | Everything downstream stalls | CR-01 to CR-03 have dated deadlines |
-| Image revisions exceed the agreed rounds | Cost and time overrun | Two rounds per image are included; further rounds are chargeable |
-| Scope grows during build | Cost and time overrun | Anything not in section 6 is a written change request |
-| Wholesale rules turn out to be more complex than described | Rework | Settled before build via OD-03 |
+| **Stage 1** | Full design, the complete website, product browsing, all images for the first 20 products | **Website live** — people can see it and get in touch |
+| **Stage 2** | Customer accounts, cart, orders, payment, the next 20 products | **Selling online** |
+| **Stage 3** | Wholesale system, full control panel, remaining 20 products, all motion videos, staff training | **Complete handover** |
+
+## Accepting the work
+
+Each stage is complete when —
+
+1. Everything listed above works
+2. It runs properly on mobile, tablet and desktop
+3. Each role's permissions have been checked
+4. A real order runs start to finish, including a refund
+5. Nothing remains that stops a customer buying
+6. Your named person approves it **within 5 working days.** If we hear nothing
+   in that time, the stage is treated as accepted.
+
+**Image and video revisions:** two rounds per image and two per video are
+included. Beyond that is charged separately.
 
 ---
 
-## 14. Delivery Approach
+# Decisions Needed Before We Start
 
-Work is delivered in three stages so Karmo Group can start selling before everything
-is finished, rather than waiting for the whole platform.
+Once these are answered, we can begin.
 
-| Stage | Contents | Outcome |
+| # | What we need to know | Why |
 |---|---|---|
-| **Stage 1** | UI/UX design, public website complete, product catalogue browsable, first 20 products fully imaged | Full website live, products visible, enquiries working |
-| **Stage 2** | Retail accounts, cart, checkout, payments, order placement, next 20 products | **Karmo can take and be paid for retail orders online** |
-| **Stage 3** | Wholesale accounts and pricing, full multi-role admin panel, order workflow, remaining 20 products, all motion videos, staff training | Complete platform handed over |
+| **1** | Backend technology and where it will be hosted | The whole structure and future maintenance depend on it |
+| **2** | Which payment gateway — bKash, Nagad, SSLCommerz, or one that covers several | Each is separate work; one that covers several is cheaper |
+| **3** | **Exactly how wholesale works** — does every account need approval? Fixed tiers by quantity, or a negotiated price per buyer? Is buying on credit allowed? | This is the most important question. The wholesale side cannot be built without it. |
+| **4** | Is VAT charged? Shown separately? Is a BIN number needed? | Affects checkout, invoices and reports |
+| **5** | Return and refund policy — how many days, who pays | Changes the order stages and the wording |
+| **6** | Do customers see exact stock numbers, or just "in stock / out of stock"? | Affects the product page |
+| **7** | Who approves on your side? | Without one named person, every stage is delayed |
 
 ---
 
-## 15. Open Decisions — Required Before Development Starts
+# Finally
 
-Development cannot begin until these are answered. Each one changes what gets built.
+Karmo Group has spent sixty years making products with care. We want to build
+the website with exactly the same care.
 
-| Ref | Decision needed | Why it matters |
-|---|---|---|
-| **OD-01** | Backend technology stack and hosting provider | Determines architecture, cost and who can maintain it later |
-| **OD-02** | Which payment gateway — bKash, Nagad, SSLCommerz, or an aggregator covering several | Each is separate integration work; an aggregator is usually cheaper overall |
-| **OD-03** | **How wholesale actually works:** Is approval required for every trade account? Are there fixed quantity tiers, or negotiated per-customer prices? Is there credit / pay-later? Is there a minimum order value as well as MOQ? | This is the single largest source of scope disagreement in e-commerce projects. It must be written down before build. |
-| **OD-04** | Is VAT charged, and shown separately? Is a BIN number to be displayed? | Affects checkout, invoices and reports |
-| **OD-05** | Return and refund policy — window, who pays return delivery, refund method | Affects order states and customer-facing text |
-| **OD-06** | Does Karmo want customers to see live stock numbers, or only in/out of stock? | Affects the product page and stock handling |
-| **OD-07** | Who at Karmo Group is the single approver (CR-12)? | Without one named person, sign-off stalls |
+A thousand images, sixty motion videos, every page designed on its own — very
+few websites in Bangladesh are given that much work. We will, because anything
+less would not sit right next to Karmo's name.
 
 ---
 
-## 16. Sign-Off
+## Signatures
 
-By signing, Karmo Group confirms that this document describes the system to be built,
-that anything not listed in section 5 is outside the agreed scope, and that the
-responsibilities in section 10 are accepted.
+By signing, both parties confirm that the work described in this document is
+what will be done, that anything not in it falls outside this project, and that
+Karmo Group accepts the responsibilities set out under "What We Need From You".
 
 | | Karmo Group | *[Your company]* |
 |---|---|---|
