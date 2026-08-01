@@ -60,11 +60,15 @@ export default function SectionHeading({
         </span>
       </motion.div>
 
+      {/* All-caps, matching the hero and every label on the page. Caps read
+          larger at the same size, so this comes down about 15% from the mixed
+          case it replaced, opens the tracking (caps need the air) and tightens
+          the leading (no descenders left to clear). */}
       <h2
-        className={`display mt-5 text-[1.9rem] font-light leading-[1.12] tracking-[-0.01em] sm:text-[2.5rem] lg:text-[2.9rem] ${t.title}`}
+        className={`display mt-5 text-[1.6rem] font-light uppercase leading-[1.02] tracking-[0.01em] sm:text-[2.1rem] lg:text-[2.45rem] ${t.title}`}
       >
         {lines.map((ln, i) => (
-          <span key={i} className="block overflow-hidden pb-[0.08em]">
+          <span key={i} className="block overflow-hidden pb-[0.04em]">
             <motion.span variants={lineReveal} className="block">
               {ln}
             </motion.span>

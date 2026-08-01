@@ -1,7 +1,8 @@
 import Hero from "@/components/Home/Hero";
+import DivisionPanels from "@/components/Home/DivisionPanels";
 import Capabilities from "@/components/Home/Capabilities";
-import DivisionStack from "@/components/Home/DivisionStack";
 import PopularProducts from "@/components/Home/PopularProducts";
+import FilmBand from "@/components/Home/FilmBand";
 import Spotlights from "@/components/Home/Spotlights";
 import WhyKarmo from "@/components/Home/WhyKarmo";
 import Gallery from "@/components/Home/Gallery";
@@ -27,37 +28,35 @@ export default function HomePage() {
     <>
       <Hero />
 
-      <Capabilities
-        heading={
-          <SectionHeading
-            index="01"
-            eyebrow="Who we are"
-            title={["Built On Six Decades", <Accent key="a">Of Making Comfort</Accent>]}
-            lead="Karmo has manufactured in Bangladesh since 1965. From the foam inside a sofa to the mattress on the bed and the adhesive holding it together, it is made in our own plants — and held to one standard."
-          />
-        }
-      />
+      {/* The trust strip sits straight under the hero, where a retail page
+          usually puts it — six reasons to stay, read in a glance on the way
+          down. It carries no section heading on purpose: a numbered header
+          this high would be a second headline competing with the hero, and
+          the strip is meant to be scanned, not read. Outside the numbered run
+          for the same reason as DivisionPanels and Spotlights. */}
+      <Capabilities />
+
+      {/* Full-bleed, one screen tall — what the group makes before the page
+          starts explaining it. Also outside the numbered run, so 01–05 below
+          stay in sequence. It replaced the old numbered divisions deck, which
+          said the same thing a second time further down the page. */}
+      <DivisionPanels />
 
       <PopularProducts
         heading={
           <SectionHeading
-            index="02"
+            index="01"
             eyebrow="Popular products"
             title={["What people", <Accent key="a">buy most</Accent>]}
           />
         }
       />
 
-      <DivisionStack
-        tone="light"
-        heading={
-          <SectionHeading
-            index="03"
-            eyebrow="Four divisions"
-            title={["One group, one standard,", <Accent key="a">four things to sell</Accent>]}
-          />
-        }
-      />
+      {/* Brought over from Home 02, straight off the product grid. Outside the
+          numbered run like the other full-bleed bands — it carries its own
+          centred label and headline, so a numbered header above it would be a
+          second heading for one picture. */}
+      <FilmBand />
 
       {/* No section heading: the row carries its own tag and headline, and a
           numbered header above a single row just repeated it. */}
@@ -66,7 +65,7 @@ export default function HomePage() {
       <WhyKarmo
         heading={
           <SectionHeading
-            index="04"
+            index="02"
             eyebrow="Started in 1965"
             tone="dark"
             title={[
@@ -82,7 +81,7 @@ export default function HomePage() {
       <Gallery
         heading={
           <SectionHeading
-            index="05"
+            index="03"
             eyebrow="Gallery"
             title={["The group", <Accent key="a">at work</Accent>]}
           />
@@ -92,7 +91,7 @@ export default function HomePage() {
       <Reels
         heading={
           <SectionHeading
-            index="06"
+            index="04"
             eyebrow="Karmo on screen"
             title={["See what", <Accent key="a">comfort is made of</Accent>]}
           />
@@ -102,7 +101,7 @@ export default function HomePage() {
       <Journal
         heading={
           <SectionHeading
-            index="07"
+            index="05"
             eyebrow="Our blog"
             title={["Follow the", <Accent key="a">latest news</Accent>]}
           />

@@ -260,33 +260,42 @@ export default function Hero() {
 
           {/* Two registers rather than one: a quiet lead-in line, then the
               statement. The first line is sized in `em` so it stays at the same
-              proportion of the headline across all three breakpoints. */}
-          <h1 className="display mt-8 text-[3rem] leading-[0.98] tracking-[-0.02em] text-white sm:text-[4.25rem] lg:text-[5.5rem]">
-            <span className="block overflow-hidden pb-[0.1em]">
+              proportion of the headline across all three breakpoints.
+
+              Set all-caps, like every other label in the hero. Caps fill the
+              line box in a way mixed case does not, so three things are pulled
+              back to keep the block the same visual weight it had in title
+              case: the size drops about a tenth, the near-negative tracking
+              opens up (caps need air between letters where lowercase does
+              not), and the leading tightens — with no descenders to clear,
+              0.98 left the two lines looking loose. */}
+          <h1 className="display mt-8 text-[2.7rem] uppercase leading-[0.92] tracking-[-0.005em] text-white sm:text-[3.8rem] lg:text-[4.9rem]">
+            <span className="block overflow-hidden pb-[0.05em]">
               <motion.span
                 variants={lineRise}
-                className="block text-[0.56em] font-light leading-[1.1] tracking-[-0.01em] text-white/85"
+                className="block text-[0.56em] font-light leading-[1.05] tracking-[0.015em] text-white/85"
               >
                 {slide.titleLight}
               </motion.span>
             </span>
-            {/* Title case rather than all-caps: the slide titles are written
-                lowercase in the data, so `capitalize` sets them without the
-                copy having to carry the styling. */}
-            <span className="block overflow-hidden pb-[0.08em]">
+            <span className="block overflow-hidden pb-[0.04em]">
               <motion.span
                 variants={lineRise}
-                className="block font-extrabold capitalize"
+                className="block font-extrabold"
               >
                 {slide.titleBold}
               </motion.span>
             </span>
           </h1>
 
+          {/* Caps again, so the hero has no mixed-case type left in it. A
+              running sentence set this way needs more help than a label does:
+              smaller, tracked out, and on looser leading, or the line turns
+              into an unbroken wall of rectangles. */}
           <span className="mt-8 block max-w-lg overflow-hidden">
             <motion.span
               variants={lineRise}
-              className="body-copy block text-[15px] leading-[1.75] text-white/70 md:text-base"
+              className="body-copy block text-[12.5px] uppercase leading-[1.95] tracking-[0.07em] text-white/70 md:text-[13.5px]"
             >
               {slide.subtitle}
             </motion.span>

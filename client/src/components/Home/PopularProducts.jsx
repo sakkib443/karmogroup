@@ -135,7 +135,7 @@ function ProductCard({ item }) {
               alt=""
               aria-hidden="true"
               fill
-              sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
               className="object-cover opacity-0 transition-opacity duration-[600ms] ease-out group-hover:opacity-100"
             />
           )}
@@ -144,7 +144,7 @@ function ProductCard({ item }) {
             src={item.image}
             alt={item.alt}
             fill
-            sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
             className={`object-cover transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
               item.scene
                 ? "group-hover:opacity-0"
@@ -153,27 +153,40 @@ function ProductCard({ item }) {
           />
         </div>
 
-        {/* Caption strip. Deliberately quiet — the picture is doing the work. */}
-        <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
-          <h3 className="display text-[0.9rem] font-bold leading-tight text-ink">
-            {item.name}
-          </h3>
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/40">
-            {item.category}
-          </p>
+        {/* Caption strip. Deliberately quiet — the picture is doing the work.
+            Two columns rather than a stack: the price sits on the same line as
+            the name and the struck price under it, opposite the category. That
+            takes a whole row out of every card, and because the picture above
+            is a fixed ratio, the names and prices line up straight across the
+            row without the old mt-auto floor holding them there. */}
+        <div className="flex flex-1 items-baseline justify-between gap-4 px-5 pb-5 pt-4">
+          <div className="min-w-0">
+            <h3 className="display text-[0.82rem] font-bold uppercase leading-[1.3] tracking-[0.02em] text-ink">
+              {item.name}
+            </h3>
+            <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/40">
+              {item.category}
+            </p>
+          </div>
 
-          <div className="mt-auto flex items-baseline gap-2.5 pt-3">
-            {item.was && (
-              <span className="text-[12px] text-ink/35 line-through">
-                {item.was}
-              </span>
-            )}
+          {/* Prices are short enough to stay on one line, so they never shrink.
+              A note runs long, so that one is allowed to take space back. */}
+          <div
+            className={`text-right ${item.price ? "shrink-0" : "max-w-[45%]"}`}
+          >
             {item.price ? (
-              <span className="text-[13.5px] font-semibold text-ink">
-                {item.price}
-              </span>
+              <>
+                <span className="block text-[13.5px] font-semibold leading-[1.3] text-ink">
+                  {item.price}
+                </span>
+                {item.was && (
+                  <span className="mt-1 block text-[11px] leading-none text-ink/35 line-through">
+                    {item.was}
+                  </span>
+                )}
+              </>
             ) : (
-              <span className="text-[12px] font-medium text-ink/55">
+              <span className="block text-[10.5px] font-semibold uppercase leading-[1.4] tracking-[0.12em] text-ink/55">
                 {item.note}
               </span>
             )}
@@ -208,71 +221,77 @@ export default function PopularProducts({ heading }) {
             </h2>
           </motion.div>
         )}
-
-        {/* Four across the top; below it a promo tile two columns wide with two
-            more products beside it. One grid so every gutter lines up. */}
-        <motion.div
-          variants={group}
-          {...reveal}
-          viewport={once}
-          className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {products.map((item) => (
-            <ProductCard key={item.name} item={item} />
-          ))}
-
-          {/* Promo tile */}
-          <motion.div variants={card} className="sm:col-span-2">
-            <Link
-              href={promo.href}
-              className="group relative flex h-full min-h-[19rem] flex-col justify-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-            >
-              {/* Full-bleed room scene. The banner's picture fills the tile —
-                  it is a scene the copy sits on, not a product floating in a
-                  frame like the cards beside it. */}
-              <Image
-                src={promo.image}
-                alt={promo.alt}
-                fill
-                sizes="(min-width: 1024px) 46vw, 100vw"
-                className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
-              />
-
-              {/* Keeps the type legible over whatever the photograph is doing.
-                  Kept deliberately light — enough contrast under the headline,
-                  but the wall and the sofa still read as a photograph rather
-                  than something behind frosted glass. The button below carries
-                  its own backdrop, so the wash does not have to do that job. */}
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/25 to-transparent"
-              />
-
-              <div className="relative z-10 max-w-[62%] p-8 sm:p-10">
-                <span className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-ink/55">
-                  {promo.eyebrow}
-                </span>
-                <h3 className="display mt-3 text-[2rem] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-ink sm:text-[2.6rem]">
-                  {promo.title.map((word) => (
-                    <span key={word} className="block">
-                      {word}
-                    </span>
-                  ))}
-                </h3>
-
-                <span className="mt-7 inline-flex w-fit items-center gap-3 border border-ink/25 bg-white/80 px-6 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-ink backdrop-blur-sm transition-colors duration-500 group-hover:border-brand group-hover:text-brand">
-                  From {promo.price}
-                  <FiArrowRight className="transition-transform duration-500 group-hover:translate-x-1" />
-                </span>
-              </div>
-            </Link>
-          </motion.div>
-
-          {secondary.map((item) => (
-            <ProductCard key={item.name} item={item} />
-          ))}
-        </motion.div>
       </div>
+
+      {/* Four across the top; below it a promo tile two columns wide with two
+          more products beside it. One grid so every gutter lines up.
+
+          Full bleed, like the division wall further up the page: the grid sits
+          outside the shell so the cards run to both screen edges instead of
+          stopping at the page gutter. On a 1920 monitor that is the whole
+          width rather than the shell's 1440. The heading stays inside the
+          shell, lined up with every other section heading on the page. */}
+      <motion.div
+        variants={group}
+        {...reveal}
+        viewport={once}
+        className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        {products.map((item) => (
+          <ProductCard key={item.name} item={item} />
+        ))}
+
+        {/* Promo tile */}
+        <motion.div variants={card} className="sm:col-span-2">
+          <Link
+            href={promo.href}
+            className="group relative flex h-full min-h-[19rem] flex-col justify-center overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+          >
+            {/* Full-bleed room scene. The banner's picture fills the tile —
+                it is a scene the copy sits on, not a product floating in a
+                frame like the cards beside it. */}
+            <Image
+              src={promo.image}
+              alt={promo.alt}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+            />
+
+            {/* Keeps the type legible over whatever the photograph is doing.
+                Kept deliberately light — enough contrast under the headline,
+                but the wall and the sofa still read as a photograph rather
+                than something behind frosted glass. The button below carries
+                its own backdrop, so the wash does not have to do that job. */}
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/25 to-transparent"
+            />
+
+            <div className="relative z-10 max-w-[62%] p-8 sm:p-10">
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-ink/55">
+                {promo.eyebrow}
+              </span>
+              <h3 className="display mt-3 text-[2rem] font-extrabold uppercase leading-[0.95] tracking-[-0.02em] text-ink sm:text-[2.6rem]">
+                {promo.title.map((word) => (
+                  <span key={word} className="block">
+                    {word}
+                  </span>
+                ))}
+              </h3>
+
+              <span className="mt-7 inline-flex w-fit items-center gap-3 border border-ink/25 bg-white/80 px-6 py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-ink backdrop-blur-sm transition-colors duration-500 group-hover:border-brand group-hover:text-brand">
+                From {promo.price}
+                <FiArrowRight className="transition-transform duration-500 group-hover:translate-x-1" />
+              </span>
+            </div>
+          </Link>
+        </motion.div>
+
+        {secondary.map((item) => (
+          <ProductCard key={item.name} item={item} />
+        ))}
+      </motion.div>
     </section>
   );
 }

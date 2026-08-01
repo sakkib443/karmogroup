@@ -40,6 +40,7 @@ files back and they get placed and optimised in the site.
 | Best Sellers product cards | 3:4 (portrait) | `--ar 3:4` |
 | Journal / blog thumbnails | 3:2 | `--ar 3:2` |
 | Gallery tiles | mixed 3:4 and 4:3 | `--ar 3:4` / `--ar 4:3` |
+| Division wall (under the hero) | four different ratios — see section 2 | |
 
 Leave the **left third empty** on every hero slide — the headline sits there.
 
@@ -82,7 +83,67 @@ to complete the four divisions)
 
 ---
 
-## 2. Divisions — four cards (4:3)
+## 2. Division wall — four plates (homepage, straight under the hero)
+
+The picture wall that fills the screen below the hero. Two columns of two: the
+left column is wider and splits 58/42, the right splits 40/60, so the four
+plates are four different shapes and the seams do not line up. **Each plate
+needs its own ratio** — this is the one place on the site where a single ratio
+will not do.
+
+| Plate | Position | Slot at 1920×1080 | Generate at | Midjourney |
+|---|---|---|---|---|
+| Foam | left, top (widest, tall) | 1091 × 564 | 2:1 — 2048×1024 | `--ar 2:1` |
+| HomeTex | left, bottom (wide strip) | 1091 × 408 | 8:3 — 2048×768 | `--ar 8:3` |
+| Mattress | right, top | 823 × 389 | 2:1 — 1664×832 | `--ar 2:1` |
+| Chemicals | right, bottom (tallest) | 823 × 583 | 7:5 — 1680×1200 | `--ar 7:5` |
+
+The plate sizes move a little with the window — Foam runs 1.78:1 to 1.99:1
+across common laptop and desktop widths, HomeTex 2.46:1 to 2.74:1. The ratios
+above are the middle of each range.
+
+**Two things to respect on every plate**
+
+- The plate crops to fill (`object-cover`, centred). Keep the subject inside
+  the **middle 80%** of the frame — anything near an edge can be cut.
+- A small caption — number, division name, one line of trade — sits **bottom
+  left** over a dark gradient covering the lower half. Keep the **bottom third
+  calm and free of detail**, or the label lands on top of something.
+
+Simple over lavish, on all four: one subject, a real room or bench behind it,
+even daylight, nothing styled to within an inch of its life.
+
+**Plate 1 · Foam** (2:1)
+> A plain workshop bench in even daylight, three cleanly cut blocks of pale
+> upholstery foam stacked square on it, one linen cushion leaning against the
+> stack, a bare warm-grey wall behind with nothing hanging on it, one small
+> deep-red detail low in the frame — a thread spool or a scrap of red leather,
+> simple and still, uncrowded, the bottom third of the frame calm and free of
+> detail.
+
+**Plate 2 · HomeTex** (8:3, a long strip — compose it left to right)
+> A wide unhurried flat lay across a pale linen surface, a folded quilted
+> comforter, a folded bed sheet and two plain pillows laid in a row with space
+> between them, soft even daylight from one side, fabric texture visible but no
+> busy pattern, one narrow deep-red stripe on a single folded edge, plenty of
+> empty surface around the pieces, the bottom of the frame quiet.
+
+**Plate 3 · Mattress** (2:1)
+> A simple bedroom corner in soft daylight, one thick quilted mattress on a low
+> plain bed frame, crisp white bedding folded back once, a bare wall and a
+> single small bedside lamp, nothing decorative in the room, calm and restful
+> rather than luxurious, the bottom third of the frame plain.
+
+**Plate 4 · Chemicals** (7:5, the squarest of the four)
+> A clean plant bench in cool even daylight, a short stack of pale polyurethane
+> foam sheets, two plain brushed-steel sample tins and a glass beaker of clear
+> resin arranged simply on a stainless surface, the machinery behind soft and
+> out of focus, precise and technical but not cold, no clutter, the bottom of
+> the frame kept simple.
+
+---
+
+## 3. Divisions — four cards (4:3)
 
 **Foam**
 > Stacked blocks of high-density upholstery foam in a clean, bright workshop
@@ -106,7 +167,7 @@ to complete the four divisions)
 
 ---
 
-## 3. Spotlights — three rows (4:3)
+## 4. Spotlights — three rows (4:3)
 
 **Mattress — "We test every mattress"**
 > Close-up of a hand pressing gently into the quilted surface of a premium
@@ -124,7 +185,7 @@ to complete the four divisions)
 
 ---
 
-## 4. WhyKarmo — "Where comfort begins" (4:3)
+## 5. WhyKarmo — "Where comfort begins" (4:3)
 
 **Feature image**
 > A warm family moment in a comfortable bedroom — soft focus, two children
@@ -137,7 +198,7 @@ to complete the four divisions)
 
 ---
 
-## 5. Best Sellers — product cards (3:4, portrait)
+## 6. Best Sellers — product cards (3:4, portrait)
 
 > Real product photos are strongly preferred here. If AI stand-ins are needed
 > while real shots are arranged:
@@ -145,13 +206,50 @@ to complete the four divisions)
 > wall, centred, even studio-daylight, catalogue style, lots of clean space
 > around the product, one soft shadow.
 
-## 6. Journal — blog thumbnails (3:2)
+## 7. Journal — blog thumbnails (3:2)
 
 > Editorial lifestyle images matching each article topic — e.g. for a foam
 > article: a detail of foam layers in warm light; for summer bedding: light
 > breathable sheets by an open window; for plant/testing: a clean workshop
 > detail. Same warm-neutral house style throughout so the carousel reads as one
 > set.
+
+---
+
+## 8. Trust strip — four tiles (4:3, homepage, straight under the hero)
+
+The four claim tiles. The reference the client sent is a different art
+direction from the rest of this document: a **product cut out on a flat pastel
+field**, with the type in the empty half — not a room photographed with text
+laid over it. Both work; they do not mix. Pick one for all four.
+
+**Option A — match the reference** (flat field, what the tiles are built for)
+
+Paste this instead of the house style, and keep the four fields distinct but
+adjacent — a set, not four unrelated colours.
+
+> studio product photograph on a flat single-colour background, soft even
+> light, one long soft shadow, the subject placed to one side leaving a clean
+> empty half for text, calm premium retail styling, no props, no text, no logo,
+> no watermark
+
+| Tile | Field | Subject |
+|---|---|---|
+| 01 · A legacy of 60 years | warm blush `#f6ece6` | a single upholstered armchair, three-quarter view, left of frame |
+| 02 · Trusted by families | pale sage `#dfe7e2` | a stack of two folded comforters and one pillow, right of frame |
+| 03 · Market leader in foam | soft oat `#ece7e0` | three cleanly cut blocks of pale foam stacked square, left of frame |
+| 04 · Stockists nationwide | dusty blue `#dfe4ec` | one rolled mattress standing upright, right of frame |
+
+**Option B — keep the house style** (what is on the page now)
+
+Use the house style at the top of this file, 4:3, and add: *the subject held to
+one half of the frame, the other half quiet wall or floor, the bottom third
+free of detail* — the claim sits bottom right over a dark scrim, so it needs
+somewhere calm to land.
+
+Whichever is chosen, the four must be **shot the same way** — same light, same
+distance, same field. The current stand-ins are four different interiors and
+that is the main reason the strip does not yet read as one row.
 
 ---
 

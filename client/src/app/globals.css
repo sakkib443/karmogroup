@@ -48,21 +48,6 @@
     font-family: var(--font-body);
   }
 
-  /* The arrow is only taken away once the custom cursor has actually started —
-     the class is added by the component itself, so a script that fails to run
-     can never leave the page with no pointer at all. Text fields keep the
-     caret they need to be usable. */
-  html.has-custom-cursor,
-  html.has-custom-cursor * {
-    cursor: none;
-  }
-
-  html.has-custom-cursor input,
-  html.has-custom-cursor textarea,
-  html.has-custom-cursor select,
-  html.has-custom-cursor [contenteditable="true"] {
-    cursor: auto;
-  }
 }
 
 /* For running copy that is not a <p> — the hero subtitle sits in a span so
@@ -91,6 +76,20 @@
   }
   to {
     transform: translateX(0);
+  }
+}
+
+/* Film band. The circular label around the play mark turns slowly and pauses
+   under the pointer. Declared here rather than reached for as Tailwind's own
+   `spin`, whose keyframes are only emitted when the `animate-spin` utility is
+   actually used somewhere — an arbitrary duration referencing it would compile
+   to an animation with nothing to play. */
+@keyframes film-badge-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 
