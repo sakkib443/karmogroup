@@ -8,9 +8,8 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { FiX } from "react-icons/fi";
-
 import { group, line, rise, VIEWPORT } from "./motion";
+import VideoModal from "./VideoModal";
 
 const FILM = "/videos/product-film.mp4";
 const STILL = "/livora/page-header-bg-image.jpg";
@@ -213,78 +212,8 @@ export default function FilmBand() {
       </motion.div>
 
       {open && (
-        <FilmLightbox src={FILM} label="Karmo product film" onClose={close} />
+        <VideoModal src={FILM} label="Karmo product film" onClose={close} />
       )}
     </section>
-  );
-}
-
-/**
- * The overlay the badge opens.
- *
- * Home 02's Lightbox is the same idea, but its styling lives in livora.css
- * behind `.lv`, so this page needs its own. The parts that are easy to get
- * wrong — returning focus to the opener, closing on Escape, locking the page
- * behind it — are kept identical. `onClose` is expected to restore focus; the
- * caller owns that reference, so it is not guessed at here.
- */
-function FilmLightbox({ src, label, onClose }) {
-  const dialogRef = useRef(null);
-
-  const close = useCallback(() => onClose(), [onClose]);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    dialogRef.current?.focus();
-
-    const onKey = (e) => {
-      if (e.key === "Escape") close();
-    };
-    document.addEventListener("keydown", onKey);
-
-    return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [close]);
-
-  return (
-    <div
-      className="fixed inset-0 z-[9990] grid place-items-center p-6"
-      role="dialog"
-      aria-modal="true"
-      aria-label={label}
-      ref={dialogRef}
-      tabIndex={-1}
-    >
-      {/* The backdrop is its own button so a click anywhere outside the frame
-          closes, without the video swallowing the event. */}
-      <button
-        type="button"
-        onClick={close}
-        aria-label="Close the video"
-        className="absolute inset-0 h-full w-full cursor-pointer bg-[rgb(10_13_17/0.88)] backdrop-blur-[6px]"
-      />
-
-      <div className="relative w-[min(1100px,100%)] overflow-hidden rounded-2xl shadow-[0_40px_90px_-40px_rgba(0,0,0,0.8)]">
-        <button
-          type="button"
-          onClick={close}
-          aria-label="Close the video"
-          className="absolute right-3.5 top-3.5 z-10 grid h-[42px] w-[42px] place-items-center rounded-full bg-black/40 text-xl text-white transition-colors duration-300 hover:bg-brand"
-        >
-          <FiX />
-        </button>
-
-        {/* Not muted — this one the visitor asked for. */}
-        <video
-          src={src}
-          controls
-          autoPlay
-          playsInline
-          className="block max-h-[80vh] w-full bg-black"
-        />
-      </div>
-    </div>
   );
 }

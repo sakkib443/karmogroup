@@ -1,11 +1,10 @@
 import Hero from "@/components/Home/Hero";
 import DivisionPanels from "@/components/Home/DivisionPanels";
 import Capabilities from "@/components/Home/Capabilities";
-import PopularProducts from "@/components/Home/PopularProducts";
+import Collections from "@/components/Home/Collections";
 import FilmBand from "@/components/Home/FilmBand";
 import Spotlights from "@/components/Home/Spotlights";
 import WhyKarmo from "@/components/Home/WhyKarmo";
-import Gallery from "@/components/Home/Gallery";
 import Reels from "@/components/Home/Reels";
 import Journal from "@/components/Home/Journal";
 import FloatingActions from "@/components/Home/FloatingActions";
@@ -37,17 +36,20 @@ export default function HomePage() {
       <Capabilities />
 
       {/* Full-bleed, one screen tall — what the group makes before the page
-          starts explaining it. Also outside the numbered run, so 01–05 below
+          starts explaining it. Also outside the numbered run, so 01–04 below
           stay in sequence. It replaced the old numbered divisions deck, which
           said the same thing a second time further down the page. */}
       <DivisionPanels />
 
-      <PopularProducts
+      {/* Three ways into the catalogue rather than six products with prices on
+          them. "Popular products" is one of the three now, so the heading has
+          to sit above all of them instead of naming one. */}
+      <Collections
         heading={
           <SectionHeading
             index="01"
-            eyebrow="Popular products"
-            title={["What people", <Accent key="a">buy most</Accent>]}
+            eyebrow="Shop"
+            title={["Three ways", <Accent key="a">to start</Accent>]}
           />
         }
       />
@@ -78,20 +80,10 @@ export default function HomePage() {
         }
       />
 
-      <Gallery
-        heading={
-          <SectionHeading
-            index="03"
-            eyebrow="Gallery"
-            title={["The group", <Accent key="a">at work</Accent>]}
-          />
-        }
-      />
-
       <Reels
         heading={
           <SectionHeading
-            index="04"
+            index="03"
             eyebrow="Karmo on screen"
             title={["See what", <Accent key="a">comfort is made of</Accent>]}
           />
@@ -101,7 +93,7 @@ export default function HomePage() {
       <Journal
         heading={
           <SectionHeading
-            index="05"
+            index="04"
             eyebrow="Our blog"
             title={["Follow the", <Accent key="a">latest news</Accent>]}
           />

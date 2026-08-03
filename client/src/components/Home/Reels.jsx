@@ -1,34 +1,40 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import {
-  FiPlay,
-  FiPause,
-  FiX,
-  FiVolume2,
-  FiVolumeX,
-  FiMaximize2,
-} from "react-icons/fi";
+import { FiPlay } from "react-icons/fi";
+
+import VideoModal from "./VideoModal";
 
 /**
- * Karmo on screen — a screening room rather than a carousel.
+ * Karmo on screen — a running strip rather than a player.
  *
- * This section used to run the clips as 9:16 phone-style cards. Every file was
- * checked on 27 July 2026 and not one of them is vertical:
+ * This was a screening room: one big stage, a playlist beside it, sound, a
+ * lightbox, transport controls. It is now the plain version — the clips run
+ * one after another across the page, every one of them playing, all of them
+ * silent, and the row never stops moving. Nothing to press, nothing to choose.
  *
- *   tvc-mattress  1280x720   16:9   1:02
- *   product-film  2560x1440  16:9   0:05
- *   reel-1..4     1536x1152  4:3    0:04 - 0:06
- *   tvc-foam       352x288   4:3    0:20
+ * The strip is the shared marquee: the list is rendered twice and the track
+ * travels exactly half its own width, so the second copy lands where the first
+ * began and the loop repeats with no visible jump. It holds still while the
+ * pointer is over it, so a clip can actually be watched.
  *
- * A 4:3 frame forced into a 9:16 card loses about two thirds of its width, so
- * the old treatment was throwing away most of the picture. The stage below is
- * 16:9 and the video is contained, not cropped — the 4:3 clips sit pillarboxed
- * on black, the way a real player shows them, and nothing is lost.
+ * Every file was checked on 27 July 2026 and not one is vertical:
  *
- * Captions were written from the actual frames, not from the old reference
- * build. Two things need the client's word before launch:
+ *   tvc-mattress  1280x720   16:9   1:02   8.9 MB
+ *   product-film  2560x1440  16:9   0:05   2.5 MB
+ *   reel-1..4     1536x1152  4:3    0:04 - 0:06   4.1 - 6.2 MB
+ *   tvc-foam       352x288   4:3    0:20   7.4 MB
+ *
+ * The tiles are 2:3 — reel-shaped, a little wider than a phone reel, which is
+ * what the client asked for. It is worth being clear about what that costs:
+ * every clip is landscape, so a portrait tile keeps only the middle strip of
+ * each one. At 2:3 a 16:9 clip shows 37% of its width and a 4:3 clip shows
+ * 50%. The subject is centred in all six, so nothing essential is lost, but
+ * more than half of every frame is. Landscape tiles, or footage actually shot
+ * vertically, are the two ways to stop paying that.
+ *
+ * Three things need the client's word before launch:
  *
  *   - reel-2.mp4 is deliberately NOT in this list. Its compression rig carries
  *     "durfi" branding on screen — a competing mattress brand — so it is not
@@ -39,210 +45,162 @@ import {
  *   - tvc-foam.mp4 is 352x288. It is genuine archive footage and is labelled as
  *     such, but a higher-resolution master would help.
  *
- * `at` is the second the playlist thumbnail is pulled from, passed as a media
- * fragment so the browser paints that frame instead of a black opening one.
+ * On weight: six clips is 35 MB, and the doubled track means twelve elements
+ * decoding at once. Nothing is fetched until the section is actually reached,
+ * so a visitor who never scrolls this far pays nothing — but the masters are
+ * far heavier than a small silent loop needs (reel-4 is 6.2 MB for six
+ * seconds, roughly 8 Mbps). Re-encoding them for this strip is the single
+ * biggest win available on this page.
  */
 const films = [
   {
     src: "/videos/tvc-mattress.mp4",
     title: "Karmo Mattress, the commercial",
     tag: "Commercial",
-    blurb: "The full television spot, start to finish.",
-    length: "1:02",
-    at: 3,
   },
   {
     src: "/videos/product-film.mp4",
     title: "A room built on Karmo",
     tag: "Interiors",
-    blurb: "Foam, cushioning and bedding, seen where they end up.",
-    length: "0:05",
-    at: 2.2,
   },
   {
     src: "/videos/reel-4.mp4",
     title: "Pocketed spring array",
     tag: "Inside the product",
-    blurb: "Every spring answers on its own, so weight stays where it lands.",
-    length: "0:06",
-    at: 2.7,
   },
   {
     src: "/videos/reel-3.mp4",
     title: "Rebound on the quilted top",
     tag: "Inside the product",
-    blurb: "A steel ball dropped on the sleeping surface, over and over.",
-    length: "0:06",
-    at: 2.6,
   },
   {
     src: "/videos/reel-1.mp4",
     title: "CertiGuard germ protection",
     tag: "Certification",
-    blurb: "The antimicrobial mark carried on the mattress range.",
-    length: "0:04",
-    at: 1.9,
   },
   {
     src: "/videos/tvc-foam.mp4",
     title: "Karmo Foam, from the archive",
     tag: "Archive",
-    blurb: "Where the group started, on film.",
-    length: "0:20",
-    at: 3,
   },
 ];
 
-import { group, line, rise as fade, SETTLE, VIEWPORT } from "./motion";
+import { group, line, rise as fade, VIEWPORT } from "./motion";
+
+/**
+ * One clip in the strip. `copy` marks the duplicated half of the track, which
+ * is scenery — it carries the same picture as a tile already announced, so it
+ * is hidden from assistive tech rather than read out a second time.
+ */
+function FilmTile({ film, armed, still, copy, onOpen }) {
+  return (
+    // A button, because clicking it does something. The strip holds still
+    // while the pointer is over it, so by the time a tile can be aimed at it
+    // has already stopped moving.
+    //
+    // The gap rides on the tile rather than on the track. `gap` would leave
+    // the track 12 tiles and 11 gaps wide, so travelling 50% of it lands half
+    // a gap short of where the second copy begins and the loop jumps every
+    // lap. As a margin every tile is the same width including its gap, and
+    // half the track is exactly six of them.
+    //
+    // Height comes from the strip, width from the ratio — so the tiles grow
+    // with the screen instead of sitting at a fixed size on it. Square
+    // corners: the client does not want them rounded.
+    <button
+      type="button"
+      onClick={(event) => onOpen(film, event.currentTarget)}
+      aria-label={`Play ${film.title} full size`}
+      aria-hidden={copy || undefined}
+      tabIndex={copy ? -1 : undefined}
+      className="group/tile relative mr-4 aspect-[2/3] h-full shrink-0 cursor-pointer overflow-hidden bg-black text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+    >
+      {armed && (
+        <video
+          src={film.src}
+          // Silent, endless and unattended: the three attributes together are
+          // what every browser requires before it will start a video without
+          // being asked. Drop `muted` and none of them play at all.
+          autoPlay={!still}
+          loop
+          muted
+          playsInline
+          preload="auto"
+          tabIndex={-1}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
+      />
+
+      {/* Rests over the middle and lifts on hover, so it is clear the tile is
+          a way in rather than decoration. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-white/40 bg-black/35 opacity-0 backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/tile:border-brand group-hover/tile:bg-brand group-hover/tile:opacity-100"
+      >
+        <FiPlay className="ml-0.5 text-xl text-white" />
+      </span>
+
+      <div className="absolute inset-x-0 bottom-0 p-5 lg:p-6">
+        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand">
+          {film.tag}
+        </span>
+        <p className="display mt-1.5 truncate text-[15px] font-semibold text-white lg:text-[17px]">
+          {film.title}
+        </p>
+      </div>
+    </button>
+  );
+}
 
 export default function Reels({ heading }) {
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef(null);
-  const stageRef = useRef(null);
-  const barRef = useRef(null);
-  const lightboxRef = useRef(null);
 
-  const [active, setActive] = useState(0);
-  const [muted, setMuted] = useState(true);
-  const [playing, setPlaying] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  // Nothing is fetched until the section is reached. Six clips is 35 MB, so
+  // this gate is the difference between a homepage that costs nothing to
+  // scroll past and one that does not.
+  const armed = useInView(sectionRef, VIEWPORT);
 
-  // The flagship film is 8.5MB. Nothing is fetched until the section is
-  // actually reached, so a visitor who never scrolls this far pays nothing.
-  //
-  // Pressing play arms it too. Without that second route the section is one
-  // failed IntersectionObserver away from a dead black rectangle with a play
-  // button that does nothing — the exact state a zero-height viewport produces.
-  const inView = useInView(sectionRef, VIEWPORT);
-  const [forced, setForced] = useState(false);
-  const armed = inView || forced;
+  // The clip the modal is showing, and the tile it was opened from — focus has
+  // to go back there on close or the reader is dropped at the top of the
+  // document with no idea what just happened. Both copies of a clip are their
+  // own tile, so the element is captured rather than looked up by source.
+  const [open, setOpen] = useState(null);
+  const openerRef = useRef(null);
 
-  const current = films[active];
-
-  // Sound is wanted by default. It cannot simply be switched on, though:
-  // every current browser refuses to start a video that has audio until the
-  // visitor has interacted with the page, and a blocked play() means nothing
-  // plays at all. So the clip always starts muted — which is never blocked —
-  // and the sound is turned on the moment it is allowed.
-  //
-  // `soundWanted` is a ref, not state: it is the visitor's standing preference
-  // and must survive the video remounting on every clip change without
-  // re-running any of this.
-  const soundWanted = useRef(true);
-
-  const tryUnmute = useCallback(() => {
-    const video = stageRef.current;
-    if (!video || !soundWanted.current || !video.muted) return;
-
-    video.muted = false;
-    // Unmuting can make the browser reject playback outright, so the promise
-    // is checked and the clip put back to muted rather than left stalled.
-    const started = video.play();
-    if (started) started.catch(() => { video.muted = true; });
+  const openFilm = useCallback((film, element) => {
+    openerRef.current = element;
+    setOpen(film);
   }, []);
 
-  // First touch, click or key anywhere on the page counts as the gesture the
-  // browser is waiting for, so the sound comes on then even if the attempt
-  // above was refused.
-  useEffect(() => {
-    const events = ["pointerdown", "keydown", "touchstart"];
-    const onGesture = () => tryUnmute();
-
-    events.forEach((name) =>
-      window.addEventListener(name, onGesture, { passive: true }),
-    );
-    return () =>
-      events.forEach((name) => window.removeEventListener(name, onGesture));
-  }, [tryUnmute]);
-
-  const step = useCallback((delta) => {
-    setActive((index) => (index + delta + films.length) % films.length);
+  const closeFilm = useCallback(() => {
+    setOpen(null);
+    openerRef.current?.focus();
   }, []);
-
-  // Progress is written straight to the node. Through state it would re-render
-  // the whole section several times a second for a bar nobody interacts with.
-  const onTime = (event) => {
-    const video = event.currentTarget;
-    if (barRef.current && video.duration) {
-      barRef.current.style.width = `${(video.currentTime / video.duration) * 100}%`;
-    }
-  };
-
-  const toggle = () => {
-    const video = stageRef.current;
-
-    // Not mounted yet: mount it. It carries autoPlay, so it starts on its own.
-    if (!video) {
-      setForced(true);
-      return;
-    }
-
-    if (video.paused) video.play().catch(() => {});
-    else video.pause();
-  };
-
-  // A click is the gesture the browser wants, so unmuting from here always
-  // takes. Muting is recorded as a standing choice and respected from then on.
-  const toggleSound = () => {
-    const video = stageRef.current;
-    soundWanted.current = !soundWanted.current;
-    if (!video) return;
-
-    video.muted = !soundWanted.current;
-    if (soundWanted.current) video.play().catch(() => {});
-  };
-
-  const open = () => {
-    stageRef.current?.pause();
-    setExpanded(true);
-  };
-
-  const close = useCallback(() => setExpanded(false), []);
-
-  // Keyboard control while the lightbox is up, and the page held still behind
-  // it so scrolling does not run on underneath.
-  useEffect(() => {
-    if (!expanded) return;
-
-    const onKey = (event) => {
-      if (event.key === "Escape") close();
-      if (event.key === "ArrowRight") step(1);
-      if (event.key === "ArrowLeft") step(-1);
-    };
-
-    const { overflow } = document.body.style;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      document.body.style.overflow = overflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [expanded, close, step]);
-
-  useEffect(() => {
-    if (expanded) lightboxRef.current?.focus();
-  }, [expanded]);
 
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const once = VIEWPORT;
+  const track = [...films, ...films];
 
   return (
+    // One screen tall from md up, so the strip takes as much of the window as
+    // it can. A definite height, not a floor: the strip below is told to fill
+    // whatever is left after the heading, and `min-height` alone would leave
+    // it nothing to fill. The floor is a separate guard for short windows.
     <section
       ref={sectionRef}
-      className="relative overflow-hidden bg-linen py-20 md:py-28"
+      className="relative flex flex-col overflow-hidden bg-linen py-16 md:h-[100svh] md:min-h-[38rem] md:py-0"
     >
       {/* Deliberately a light section. The page runs light the whole way down
-          apart from 04, and a second dark band this close to it broke that. The
-          only dark thing here is the stage itself, which has to be black for
-          the video to letterbox against. */}
-      <div className="shell relative">
-        <motion.div
-          variants={group}
-          {...reveal}
-          viewport={once}
-          className="flex flex-wrap items-end justify-between gap-6"
-        >
+          apart from one band, and a second dark one this close to it broke
+          that. The only dark things here are the tiles, which have to be black
+          for the picture to sit against. */}
+      <div className="shell relative shrink-0 md:py-9">
+        <motion.div variants={group} {...reveal} viewport={VIEWPORT}>
           {heading ?? (
             <div>
               <span className="block overflow-hidden">
@@ -255,8 +213,8 @@ export default function Reels({ heading }) {
                 </motion.span>
               </span>
 
-              <h2 className="display mt-6 max-w-xl text-[2rem] font-light leading-[1.15] text-ink sm:text-[2.5rem]">
-                <span className="block overflow-hidden pb-[0.06em]">
+              <h2 className="display mt-6 max-w-xl text-[1.6rem] font-light uppercase leading-[1.02] tracking-[0.01em] text-ink sm:text-[2.1rem]">
+                <span className="block overflow-hidden pb-[0.04em]">
                   <motion.span variants={line} className="block">
                     See what
                     <span className="font-bold text-brand">
@@ -268,315 +226,53 @@ export default function Reels({ heading }) {
               </h2>
             </div>
           )}
-
-          <motion.span
-            variants={fade}
-            className="display hidden text-[12px] font-bold tabular-nums tracking-[0.1em] text-ink/35 sm:block"
-          >
-            {String(active + 1).padStart(2, "0")}
-            <span className="mx-2 text-ink/20">/</span>
-            {String(films.length).padStart(2, "0")}
-          </motion.span>
-        </motion.div>
-
-        <motion.div
-          variants={fade}
-          {...reveal}
-          viewport={once}
-          className="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8"
-        >
-          {/* Stage. Fixed at 16:9 so the layout never jumps between clips, with
-              the picture contained inside it — a 4:3 clip is pillarboxed on
-              black instead of being cropped to fit. */}
-          <div className="min-w-0 lg:col-span-8">
-            <div className="group/stage relative aspect-video overflow-hidden rounded-2xl bg-black shadow-[0_40px_80px_-40px_rgba(34,34,34,0.55)] ring-1 ring-ink/10">
-              {armed && (
-                <video
-                  // Keyed on the source: switching clips remounts the element
-                  // rather than leaving the previous one running underneath.
-                  key={current.src}
-                  ref={stageRef}
-                  src={current.src}
-                  // Held back under reduced motion, unless the visitor pressed
-                  // play themselves — an explicit request outranks the setting.
-                  autoPlay={!reduceMotion || forced}
-                  muted
-                  playsInline
-                  preload="auto"
-                  onTimeUpdate={onTime}
-                  onEnded={() => step(1)}
-                  onPlay={() => {
-                    setPlaying(true);
-                    tryUnmute();
-                  }}
-                  onPause={() => setPlaying(false)}
-                  // The element is the single source of truth for sound: it can
-                  // be muted by a refused play() as well as by the button.
-                  onVolumeChange={(event) =>
-                    setMuted(event.currentTarget.muted)
-                  }
-                  className="absolute inset-0 h-full w-full object-contain"
-                />
-              )}
-
-              {/* Click anywhere on the picture to stop and start. Sits under
-                  the controls, which stop the event. */}
-              <button
-                type="button"
-                onClick={toggle}
-                aria-label={playing ? "Pause video" : "Play video"}
-                className="absolute inset-0 z-10 cursor-pointer"
-              />
-
-              <span className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-2/5 bg-gradient-to-t from-black/85 to-transparent" />
-
-              <span className="pointer-events-none absolute left-5 top-5 z-20 rounded-full bg-white/12 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-md">
-                {current.tag}
-              </span>
-
-              {/* Shown only while the browser is still holding the sound back,
-                  so the silence reads as "one tap away" rather than broken. */}
-              {playing && muted && (
-                <button
-                  type="button"
-                  onClick={toggleSound}
-                  className="absolute right-5 top-5 z-30 flex items-center gap-2 rounded-full bg-brand px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-lg transition-transform duration-300 hover:scale-105"
-                >
-                  <FiVolumeX className="text-[13px]" />
-                  Tap for sound
-                </button>
-              )}
-
-              {/* Rests over the middle while paused and clears out of the way
-                  once the clip is running. */}
-              <span
-                className={`pointer-events-none absolute left-1/2 top-1/2 z-20 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/35 bg-black/35 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                  playing
-                    ? "scale-125 opacity-0"
-                    : "scale-100 opacity-100 group-hover/stage:bg-brand group-hover/stage:border-brand"
-                }`}
-              >
-                <FiPlay className="ml-1 text-2xl text-white" />
-              </span>
-
-              <div className="absolute inset-x-0 bottom-0 z-20 p-5 sm:p-7">
-                <div className="flex items-end justify-between gap-6">
-                  <div className="min-w-0">
-                    <p className="display truncate text-[1.15rem] font-bold text-white sm:text-[1.4rem]">
-                      {current.title}
-                    </p>
-                    <p className="mt-1.5 hidden text-[13px] text-white/60 sm:block">
-                      {current.blurb}
-                    </p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={toggle}
-                      aria-label={playing ? "Pause video" : "Play video"}
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
-                    >
-                      {playing ? <FiPause /> : <FiPlay className="ml-0.5" />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={toggleSound}
-                      aria-label={muted ? "Unmute video" : "Mute video"}
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
-                    >
-                      {muted ? <FiVolumeX /> : <FiVolume2 />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={open}
-                      aria-label="Open video full size"
-                      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white backdrop-blur-md transition-colors duration-300 hover:border-brand hover:bg-brand"
-                    >
-                      <FiMaximize2 />
-                    </button>
-                  </div>
-                </div>
-
-                <span className="mt-5 block h-[3px] w-full overflow-hidden rounded-full bg-white/15">
-                  <span ref={barRef} className="block h-full w-0 bg-brand" />
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Playlist. On wide screens it is pinned to the stage's height and
-              scrolls inside it, so the two columns always end level; below
-              that it lies down into a horizontal strip. */}
-          {/* min-w-0 is load-bearing. A grid item defaults to min-width:auto,
-              so without it this column refuses to shrink below the full width
-              of the six cards inside — the strip stops scrolling and the
-              section's overflow-hidden simply cuts the rest off. */}
-          <div className="relative min-w-0 lg:col-span-4">
-            {/* Below lg this is a horizontal strip that scrolls. From lg it is
-                pinned over the stage's own box, and the rows divide that height
-                between them — so the two columns finish level at every width
-                instead of the rail running short under a taller stage. */}
-            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-3 lg:absolute lg:inset-0 lg:mx-0 lg:flex-col lg:overflow-hidden lg:px-0 lg:pb-0 [scrollbar-color:rgba(34,34,34,0.22)_transparent] [scrollbar-width:thin]">
-              {films.map((film, index) => {
-                const on = index === active;
-
-                return (
-                  <button
-                    key={film.src}
-                    type="button"
-                    onClick={() => setActive(index)}
-                    aria-current={on}
-                    className={`group/row flex w-60 shrink-0 items-center gap-3.5 rounded-xl p-2 text-left transition-all duration-500 lg:w-full lg:flex-1 lg:min-h-0 ${
-                      on
-                        ? "bg-white shadow-[0_14px_34px_-22px_rgba(34,34,34,0.55)]"
-                        : "bg-white/55 hover:bg-white"
-                    }`}
-                  >
-                    {/* Fixed width in the mobile strip; from lg it takes the
-                        row's height and lets the 16:9 ratio set its width, so
-                        the thumbnails grow and shrink with the rows. */}
-                    <span className="relative block aspect-video w-24 shrink-0 overflow-hidden rounded-lg bg-black lg:h-full lg:w-auto">
-                      {armed && (
-                        <video
-                          // Media fragment, so the strip shows a real frame
-                          // from the middle of the clip rather than whatever
-                          // the first one happens to be.
-                          src={`${film.src}#t=${film.at}`}
-                          muted
-                          playsInline
-                          preload="metadata"
-                          tabIndex={-1}
-                          aria-hidden="true"
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      )}
-
-                      <span
-                        className={`absolute inset-0 transition-colors duration-500 ${
-                          on
-                            ? "bg-transparent"
-                            : "bg-white/45 group-hover/row:bg-white/10"
-                        }`}
-                      />
-
-                      {on && (
-                        <span className="absolute inset-0 rounded-lg ring-2 ring-inset ring-brand" />
-                      )}
-                    </span>
-
-                    {/* Tag and running time share a line — on their own rows
-                        the six entries no longer fit beside the stage. */}
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-2">
-                        <span
-                          className={`truncate text-[9.5px] font-bold uppercase tracking-[0.16em] transition-colors duration-500 ${
-                            on ? "text-brand" : "text-ink/45"
-                          }`}
-                        >
-                          {film.tag}
-                        </span>
-                        <span className="h-[3px] w-[3px] shrink-0 rounded-full bg-ink/25" />
-                        <span className="shrink-0 text-[10.5px] tabular-nums text-ink/40">
-                          {film.length}
-                        </span>
-                      </span>
-
-                      <span
-                        className={`display mt-1.5 block truncate text-[13px] font-semibold transition-colors duration-500 ${
-                          on ? "text-ink" : "text-ink/65"
-                        }`}
-                      >
-                        {film.title}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </motion.div>
       </div>
 
-      {/* Lightbox.
-          Rendered conditionally rather than through AnimatePresence: the exit
-          animation completed but the node was never unmounted, leaving an
-          invisible full-screen backdrop that swallowed every click on the page
-          afterwards. */}
-      {expanded && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35 }}
-          className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
-          onClick={close}
+      {/* Full bleed and edge-masked, so the row reads as passing through the
+          page rather than starting and stopping inside it.
+
+          `min-h-0` is load-bearing on the md-and-up branch: a flex child
+          defaults to min-height:auto, so without it this refuses to shrink
+          below the natural height of the tiles inside and pushes the section
+          past one screen instead of fitting into it. */}
+      <motion.div
+        variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
+        className="marquee-rows mt-10 h-[62svh] overflow-hidden md:mt-0 md:h-auto md:min-h-0 md:flex-1 md:pb-9"
+      >
+        {/* Under reduced motion the track stops and becomes an ordinary
+            scrolling strip, and the clips hold on their first frame — a row of
+            things moving on their own is the whole of what that setting is
+            asking not to see. */}
+        <div
+          className={
+            reduceMotion
+              ? "flex h-full overflow-x-auto px-6"
+              : "marquee marquee-left h-full"
+          }
         >
-          <motion.div
-            ref={lightboxRef}
-            tabIndex={-1}
-            role="dialog"
-            aria-modal="true"
-            aria-label={current.title}
-            initial={
-              reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 20 }
-            }
-            animate={
-              reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }
-            }
-            transition={{ duration: 0.5, ease: SETTLE }}
-            onClick={(event) => event.stopPropagation()}
-            className="relative w-full max-w-5xl outline-none"
-          >
-            <video
-              key={current.src}
-              src={current.src}
-              controls
-              autoPlay
-              playsInline
-              className="max-h-[76vh] w-full rounded-xl bg-black"
+          {track.map((film, index) => (
+            <FilmTile
+              key={`${film.src}-${index}`}
+              film={film}
+              armed={armed}
+              still={reduceMotion}
+              copy={index >= films.length}
+              onOpen={openFilm}
             />
+          ))}
+        </div>
+      </motion.div>
 
-            <div className="mt-4 flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="display truncate text-lg font-bold text-white">
-                  {current.title}
-                </p>
-                <p className="mt-1 flex items-center gap-2 text-xs text-white/55">
-                  <FiVolume2 />
-                  {current.tag} · {current.length}
-                </p>
-              </div>
-
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => step(-1)}
-                  aria-label="Previous video"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
-                >
-                  <FiPlay className="rotate-180" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => step(1)}
-                  aria-label="Next video"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
-                >
-                  <FiPlay className="ml-0.5" />
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close video"
-              className="absolute -top-3 right-0 flex h-10 w-10 -translate-y-full items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-brand hover:bg-brand"
-            >
-              <FiX />
-            </button>
-          </motion.div>
-        </motion.div>
+      {open && (
+        <VideoModal
+          src={open.src}
+          label={open.title}
+          caption={`${open.tag} · ${open.title}`}
+          onClose={closeFilm}
+        />
       )}
     </section>
   );
