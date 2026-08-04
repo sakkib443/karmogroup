@@ -4,12 +4,34 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Montserrat } from "next/font/google";
 import {
   FiArrowRight,
   FiArrowLeft,
   FiArrowDown,
   FiArrowUpRight,
 } from "react-icons/fi";
+
+/**
+ * TRIAL — the hero headline only, so Montserrat can be judged against the
+ * Plus Jakarta Sans every other heading on the page still uses.
+ *
+ * Montserrat is the closest free face to the Gotham in the company profile:
+ * the same geometric build and much the same width, and it carries nine
+ * weights, so the thin setting the client's screenshot shows is available.
+ * Gotham itself is licensed by Monotype, and a web licence is sold separately
+ * from the desktop one the profile was designed with.
+ *
+ * To adopt it for the whole site, delete this and set BRAND_FONT_HEADING in
+ * src/config/brand.ts instead — that is the one place a typeface should be
+ * named. To drop it, remove this and the `font-trial` class below.
+ */
+const trial = Montserrat({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "600", "800"],
+  variable: "--font-trial",
+  display: "swap",
+});
 
 const slides = [
   {
@@ -269,20 +291,30 @@ export default function Hero() {
               opens up (caps need air between letters where lowercase does
               not), and the leading tightens — with no descenders to clear,
               0.98 left the two lines looking loose. */}
-          <h1 className="display mt-8 text-[2.7rem] uppercase leading-[0.92] tracking-[-0.005em] text-white sm:text-[3.8rem] lg:text-[4.9rem]">
+          {/* One weight for both lines, with size doing the work — the two
+              registers are a small line over a big one, not a thin line over a
+              fat one. That is how the face is set in the company profile the
+              client sent, and light caps at this size need the extra tracking
+              or the letters close up on each other.
+
+              Both the family and the weight carry `!`. globals.css sets
+              `* { font-family: … !important }` and `h1 { font-weight: 600 }`
+              outside any cascade layer, and unlayered rules beat layered ones
+              — so a plain Tailwind utility loses to both no matter how
+              specific it looks. */}
+          <h1
+            className={`display ${trial.variable} [font-family:var(--font-trial),sans-serif]! mt-8 text-[2.7rem] font-light! uppercase leading-[1.02] tracking-[0.03em] text-white sm:text-[3.8rem] lg:text-[4.9rem]`}
+          >
             <span className="block overflow-hidden pb-[0.05em]">
               <motion.span
                 variants={lineRise}
-                className="block text-[0.56em] font-light leading-[1.05] tracking-[0.015em] text-white/85"
+                className="block text-[0.6em] leading-[1.1] tracking-[0.05em] text-white/85"
               >
                 {slide.titleLight}
               </motion.span>
             </span>
             <span className="block overflow-hidden pb-[0.04em]">
-              <motion.span
-                variants={lineRise}
-                className="block font-extrabold"
-              >
+              <motion.span variants={lineRise} className="block">
                 {slide.titleBold}
               </motion.span>
             </span>

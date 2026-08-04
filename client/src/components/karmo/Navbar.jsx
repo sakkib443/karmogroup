@@ -38,14 +38,6 @@ const drop = {
  */
 const menu = [
   {
-    name: "Home",
-    href: "/",
-    submenu: [
-      { name: "Home 01 — Organized", href: "/" },
-      { name: "Home 02 — Luxe Retail", href: "/home-2" },
-    ],
-  },
-  {
     name: "Foam",
     href: "/foam",
     submenu: [
@@ -134,9 +126,13 @@ export default function Navbar() {
     <>
     <motion.header
       {...entrance}
+      // Pure black once it has a background of its own, not the cool slate the
+      // rest of the page uses for dark surfaces. The slate at 95% behind a blur
+      // read as a washed grey, and the dropdown hangs directly off this bar —
+      // the two have to be the same black or the seam shows.
       className={`fixed inset-x-0 top-0 z-[10000] transition-colors duration-500 ${
         scrolled || drawerOpen
-          ? "bg-shade/95 shadow-lg backdrop-blur-md"
+          ? "bg-black shadow-lg"
           : "bg-gradient-to-b from-black/60 to-transparent"
       }`}
     >
@@ -176,6 +172,22 @@ export default function Navbar() {
           {/* Contact details sit beside the button on the right. They drop
               out first when the bar gets tight. */}
           <div className="flex shrink-0 items-center gap-6">
+            {/* Career and Dealership Apply belong up here, beside Find Store —
+                the three the existing site keeps out of the product bar. The
+                comment above claimed they were already here; they were not. */}
+            <Link
+              href="/career"
+              className="body-copy hidden whitespace-nowrap transition-colors duration-300 hover:text-white lg:block"
+            >
+              Career
+            </Link>
+            <Link
+              href="/dealership"
+              className="body-copy hidden whitespace-nowrap transition-colors duration-300 hover:text-white lg:block"
+            >
+              Dealership Apply
+            </Link>
+
             <a
               href="mailto:info@karmogroup.com"
               className="body-copy hidden items-center gap-2 whitespace-nowrap transition-colors duration-300 hover:text-white xl:flex"
@@ -235,19 +247,24 @@ export default function Navbar() {
                 {/* Underline: always shown on the current page, otherwise
                     grows out from the centre on hover. */}
                 <span
-                  className={`absolute inset-x-3.5 bottom-3 h-px origin-center bg-brand transition-transform duration-300 group-hover:scale-x-100 ${
+                  className={`absolute inset-x-3.5 bottom-3 h-px origin-center bg-white transition-transform duration-300 group-hover:scale-x-100 ${
                     active ? "scale-x-100" : "scale-x-0"
                   }`}
                 />
               </Link>
 
+              {/* A white panel under a black bar. The bar stays dark because
+                  it sits over the hero photograph and the wordmark is drawn to
+                  be read on dark; the panel that drops out of it is a sheet of
+                  paper. The marker on the left of a row is ink rather than red
+                  — red on white would pull harder than the row it marks. */}
               {entry.submenu && (
-                <ul className="invisible absolute left-0 top-full z-[1100] min-w-60 translate-y-1 bg-shade/95 py-2 opacity-0 shadow-xl backdrop-blur-md transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                <ul className="invisible absolute left-0 top-full z-[1100] min-w-60 translate-y-1 bg-white py-2 opacity-0 shadow-[0_24px_50px_-18px_rgba(0,0,0,0.45)] transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
                   {entry.submenu.map((sub) => (
                     <li key={sub.href}>
                       <Link
                         href={sub.href}
-                        className="block whitespace-nowrap border-l-2 border-transparent px-4 py-2.5 text-[12.5px] font-normal text-white/75 transition-all duration-200 hover:border-brand hover:bg-white/5 hover:text-white"
+                        className="block whitespace-nowrap border-l-2 border-transparent px-4 py-2.5 text-[12.5px] font-normal text-ink/75 transition-all duration-200 hover:border-ink hover:bg-ink/5 hover:text-ink"
                       >
                         {sub.name}
                       </Link>
@@ -297,13 +314,15 @@ export default function Navbar() {
             aria-label="Close menu"
             className="absolute inset-0 bg-black/60"
           />
-          <div className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-shade p-5">
+          {/* Same black as the bar and the dropdowns — this is the same menu,
+              just on a small screen. */}
+          <div className="absolute inset-y-0 left-0 w-80 max-w-[85vw] overflow-y-auto bg-white p-5">
             <div className="mb-6 flex items-center justify-between">
               <Logo className="h-7 w-auto" />
               <button
                 onClick={() => setDrawerOpen(false)}
                 aria-label="Close menu"
-                className="text-2xl text-white"
+                className="text-2xl text-ink"
               >
                 <FiX />
               </button>
@@ -316,7 +335,7 @@ export default function Navbar() {
                     <Link
                       href={item.href}
                       onClick={() => setDrawerOpen(false)}
-                      className="flex-1 py-2.5 text-sm font-semibold text-white"
+                      className="flex-1 py-2.5 text-sm font-semibold text-ink"
                     >
                       {item.name}
                     </Link>
@@ -327,7 +346,7 @@ export default function Navbar() {
                         }
                         aria-label={`Toggle ${item.name}`}
                         aria-expanded={openGroup === item.href}
-                        className="p-2 text-white/70"
+                        className="p-2 text-ink/60"
                       >
                         <FiChevronDown
                           className={`transition ${
@@ -339,13 +358,13 @@ export default function Navbar() {
                   </div>
 
                   {item.submenu && openGroup === item.href && (
-                    <ul className="mb-2 border-l border-white/15 pl-4">
+                    <ul className="mb-2 border-l border-ink/15 pl-4">
                       {item.submenu.map((sub) => (
                         <li key={sub.href}>
                           <Link
                             href={sub.href}
                             onClick={() => setDrawerOpen(false)}
-                            className="block py-2 text-sm text-white/75"
+                            className="block py-2 text-sm text-ink/70"
                           >
                             {sub.name}
                           </Link>
@@ -365,7 +384,7 @@ export default function Navbar() {
               Find Store
             </Link>
 
-            <div className="body-copy mt-6 space-y-3 border-t border-white/10 pt-6 text-sm text-white/60">
+            <div className="body-copy mt-6 space-y-3 border-t border-ink/10 pt-6 text-sm text-ink/60">
               <a
                 href="mailto:info@karmogroup.com"
                 className="flex items-center gap-2.5"
