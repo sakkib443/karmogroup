@@ -155,11 +155,11 @@ export default function DivisionsStrip() {
           </Link>
         </motion.div>
 
-        {/* 16px is the page's one gutter figure — the same value separates the
+        {/* 12px is the page's one gutter figure — the same value separates the
             three cards in `CollectionsShowcase` below and holds those cards
             off the scene under them. Changing it here means changing it in
             both places. */}
-        <div className="grid grid-cols-2 gap-4 md:h-full md:grid-rows-2">
+        <div className="grid grid-cols-2 gap-3 md:h-full md:grid-rows-2">
           {divisions.map((division) => (
             <DivisionCard key={division.name} division={division} />
           ))}

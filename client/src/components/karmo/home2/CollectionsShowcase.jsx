@@ -74,7 +74,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *
  * ── Full bleed ─────────────────────────────────────────────────────────────
  * No `.shell` and no side padding: the outer cards run into both edges of the
- * window, and the only white on the row is the 16px between the three — the
+ * window, and the only white on the row is the 12px between the three — the
  * same gutter `DivisionsStrip` puts between its four picture cards above. That
  * same figure is the section's bottom padding, so `ShoppableScene` below sits
  * exactly one gutter away and the two sections read as one block rather than
@@ -208,10 +208,10 @@ export default function CollectionsShowcase() {
     // between the three cards themselves — and the scene, being full-bleed
     // too, lines up with them on both edges.
     //
-    // 16px is not arbitrary: it is also the gap `DivisionsStrip` puts between
+    // 12px is not arbitrary: it is also the gap `DivisionsStrip` puts between
     // its four picture cards just above. One gutter figure runs down the page,
     // so all three groups of pictures read as one grid.
-    <section className="bg-white pb-4 pt-0">
+    <section className="bg-white pb-3 pt-0">
       {/* No band heading. This carried an eyebrow, "Redefining / everyday
           comfort" and a "View all products" link across the top; the client
           asked for all of it out, so the three cards now speak for the section
@@ -224,7 +224,7 @@ export default function CollectionsShowcase() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start"
+        className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start"
       >
         {collections.map((item) => (
           <CollectionCard key={item.index} item={item} />
