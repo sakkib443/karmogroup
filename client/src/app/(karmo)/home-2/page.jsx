@@ -10,11 +10,23 @@ import Journal from "@/components/karmo/Journal";
 import FloatingActions from "@/components/karmo/FloatingActions";
 import SectionHeading, { Accent } from "@/components/karmo/SectionHeading";
 
+export const metadata = {
+  title: "Home 02 — Karmo Group",
+  description: "Second homepage design, under review.",
+};
+
 /**
- * Home 01 — the organized homepage, promoted here from /home-3 on 25 July 2026
- * at the client's request. The editorial treatment it replaced was kept at
- * /home-3 for a while; that route and its Home3 components were removed on
- * 27 July 2026, so this is now the only version of the organized page.
+ * Home 02 — the design that used to be the homepage.
+ *
+ * It was promoted to `/` from /home-3 on 25 July 2026, and moved back off it
+ * on 5 August 2026 when the client chose the other design for the front page.
+ * The two swapped route segments; nothing inside either had to change, because
+ * each carries its own layout and therefore its own header and spacing.
+ *
+ * The menu still reads Home 01 / Home 02 / Home 03 by position — so this one
+ * now answers to "Home 02" even though its components are the `karmo/` set
+ * rather than the `karmo/home2/` set. The folder names record which design a
+ * component belongs to, not which slot it is showing in this week.
  *
  * Every section runs through the same numbered SectionHeading — one index, one
  * eyebrow style, one type scale — instead of the nine slightly different
@@ -22,7 +34,7 @@ import SectionHeading, { Accent } from "@/components/karmo/SectionHeading";
  * screening room, the journal rail) are the shared components, driven by their
  * `heading` prop.
  */
-export default function HomePage() {
+export default function HomeTwo() {
   return (
     <>
       <Hero />

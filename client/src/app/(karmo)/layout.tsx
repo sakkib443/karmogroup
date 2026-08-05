@@ -5,13 +5,17 @@ import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 
 /**
- * The homepage runs on its own chrome.
+ * The dark-bar homepage design runs on its own chrome.
  *
- * It is the brand's front door, so it carries the Karmo bar — the utility
- * strip, the wordmark, the division menu — rather than the storefront header,
- * which is built around search, cart and wishlist and belongs on the pages
- * where someone is actually shopping. Everything else stays in (main) with
- * that header; only `/` lives here.
+ * It carries the Karmo bar — the utility strip, the wordmark, the division
+ * menu — rather than the storefront header, which is built around search, cart
+ * and wishlist and belongs on the pages where someone is actually shopping.
+ * Everything else stays in (main) with that header.
+ *
+ * This group served `/` until 5 August 2026 and now serves `/home-2`; the
+ * design in (karmo-2) took the front page. The swap was a rename of the route
+ * segment in each group, so both designs kept the header and spacing their own
+ * layout gives them.
  *
  * The footer is the same one on both, so it is imported in each layout rather
  * than lifted to the root: the root layout also wraps the dashboard and the

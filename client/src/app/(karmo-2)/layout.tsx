@@ -3,16 +3,20 @@ import SmoothScroll from "@/components/karmo/SmoothScroll";
 import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
 
 /**
- * Home 02 runs on its own chrome.
+ * The homepage runs on its own chrome.
  *
- * The three homepage designs share a footer and nothing above it. Home 01 sits
- * in (karmo) under the dark bar that floats over its hero; this group exists so
- * Home 02 can carry the light three-row retail header instead. A nested layout
- * would not have done it — layouts nest rather than replace, so Home 01's bar
- * would still have rendered above this one.
+ * The three homepage designs share a footer and nothing above it. The other
+ * two sit in (karmo) and (karmo-3) under their own bars; this group exists so
+ * this design can carry the light three-row retail header instead. A nested
+ * layout would not have done it — layouts nest rather than replace, so another
+ * design's bar would still have rendered above this one.
  *
- * When one of the three designs wins, the losing groups go and the winner's
- * layout moves up to serve `/`.
+ * This group serves `/` as of 5 August 2026, when the client picked this design
+ * for the front page; it served `/home-2` before that. Because each design's
+ * chrome lives in its own layout, promoting one is a rename of a route segment
+ * and nothing else.
+ *
+ * When the choice is final, the losing groups go.
  */
 export default function KarmoTwoLayout({
   children,

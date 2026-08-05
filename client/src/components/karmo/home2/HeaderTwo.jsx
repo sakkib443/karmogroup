@@ -249,7 +249,10 @@ export default function HeaderTwo() {
           reads as more established the further down the page it has
           followed, never as a bar that shrank to make room. */}
       <div className="shell flex h-[74px] items-center justify-between gap-8">
-        <Link href="/home-2" aria-label="Karmo Group, home" className="shrink-0">
+        {/* `/`, not `/home-2`. This header used to be the chrome for the
+            /home-2 route and pointed its logo back at it; that route now
+            carries the other design, and this one is the front page. */}
+        <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
           <Logo
             src="/karmo/logo-ink.png"
             className={`w-auto transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
