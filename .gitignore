@@ -23,3 +23,8 @@ client/public/images/MoneyReceipt*
 .DS_Store
 Thumbs.db
 *.log
+
+# Client reference material — the agency's 32-page company profile, a single
+# 549 MB Illustrator file. Past GitHub's 100 MB per-file limit outright, and
+# once in the history the repo carries the weight even after a delete.
+Company profile 1-32 page for agency.ai

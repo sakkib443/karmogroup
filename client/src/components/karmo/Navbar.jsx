@@ -35,8 +35,22 @@ const drop = {
 /**
  * Menu structure comes from "Site Reference Final.xlsx" (Menu / Sub Menu
  * columns). Product-level entries live on the section pages, not up here.
+ *
+ * `hidden` keeps an entry in this list but off the bar. Three sections are
+ * parked that way while the homepage is being built — the pages behind them do
+ * not exist yet, and a menu that leads to a 404 is worse than no menu. Delete
+ * the flag to bring one back; nothing else has to change.
+ *
+ * The three homepages at the top are temporary in a different way. They are
+ * side by side rather than inside one Home dropdown so each is a single click
+ * while the three designs are being compared. Once one is chosen, the other
+ * two routes and these entries go, and Home stops being a menu item at all —
+ * the wordmark is the way home.
  */
 const menu = [
+  { name: "Home 01", href: "/" },
+  { name: "Home 02", href: "/home-2" },
+  { name: "Home 03", href: "/home-3" },
   {
     name: "Foam",
     href: "/foam",
@@ -70,6 +84,7 @@ const menu = [
   },
   {
     name: "About Us",
+    hidden: true,
     href: "/about",
     submenu: [
       { name: "Company History / Mission & Vision", href: "/about/history" },
@@ -80,6 +95,7 @@ const menu = [
   },
   {
     name: "Media Center",
+    hidden: true,
     href: "/media",
     submenu: [
       { name: "Blogs", href: "/media/blogs" },
@@ -90,6 +106,7 @@ const menu = [
   },
   {
     name: "Contact Us",
+    hidden: true,
     href: "/contact",
     submenu: [
       { name: "Catalogues", href: "/contact/catalogues" },
@@ -226,7 +243,7 @@ export default function Navbar() {
 
         {/* Desktop menu */}
         <ul className="ml-auto hidden shrink-0 items-center xl:flex">
-          {menu.map((entry) => {
+          {menu.filter((entry) => !entry.hidden).map((entry) => {
             // "/" is a prefix of every route, so the home entry has to match
             // exactly or it would sit lit up on every page of the site.
             const active =
@@ -329,7 +346,7 @@ export default function Navbar() {
             </div>
 
             <ul className="space-y-1">
-              {menu.map((item) => (
+              {menu.filter((item) => !item.hidden).map((item) => (
                 <li key={item.href}>
                   <div className="flex items-center">
                     <Link

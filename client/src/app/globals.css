@@ -979,6 +979,10 @@ svg.app-icon[fill="none"] {
      --shade-deep is the same hue pushed darker, for scrims under text. */
   --color-shade: #2b333c;
   --color-shade-deep: #161c24;
+  /* A softer, lifted slate between the two above — a "sweet" dark for chrome
+     that sits next to the brand red (the header bar and its buttons), where
+     the deep near-black reads harsh. Still ~13:1 under white text. */
+  --color-shade-soft: #232b36;
 
   /* Quiet off-white for the panelled sections between the white ones — the
      same cool hue as the darks, at the top of the scale, so the page runs on
@@ -1018,6 +1022,31 @@ svg.app-icon[fill="none"] {
 @keyframes film-badge-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* The shoppable scene's markers. A ring expands out of the dot and fades —
+   the whole job of the animation is to say "this is a control", on a
+   photograph where a small white circle would otherwise read as a highlight.
+   It runs on a ring *behind* the dot, never on the dot itself, so the hit
+   target never moves under a finger mid-tap. */
+@keyframes hotspot-ping {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  70%  { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+.hotspot-ping {
+  animation: hotspot-ping 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Anyone who has asked their system for less movement gets a still ring
+   instead. It stays visible at the dot's own size, so the marker is no less
+   findable — it simply does not move. */
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-ping {
+    animation: none;
+    opacity: 0.4;
+  }
 }
 
 .marquee {

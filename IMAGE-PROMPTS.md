@@ -253,6 +253,189 @@ that is the main reason the strip does not yet read as one row.
 
 ---
 
+## 9. Home 02 — hero background (one image, 16:9)
+
+One picture behind the whole hero, with the headline set over its left side.
+
+### The size, and why
+
+Home 02's header is opaque and holds 182px of its own, so the hero is what is
+left of the window under it. That box is wider than it is tall, and it changes
+shape with the screen:
+
+| Screen | Hero box | Ratio |
+|---|---|---|
+| 1920 × 1080 | 1920 × 898 | 2.14 : 1 |
+| 1600 × 900 | 1600 × 718 | 2.23 : 1 |
+| 1536 × 864 | 1536 × 682 | 2.25 : 1 |
+| 1440 × 900 | 1440 × 718 | 2.01 : 1 |
+| 1366 × 768 | 1366 × 586 | 2.33 : 1 |
+
+**Generate at 16:9 — 2560 × 1440.** That is 1.78:1, narrower than the
+narrowest box in the table, which is the whole point: `object-cover` then
+trims **only the top and bottom** and never the sides. The composition here is
+left-to-right — plants one end, sofa the other — so losing the sides would lose
+the picture.
+
+**Keep everything that matters inside the middle 75% of the height.** Between
+76% and 89% of the frame's height survives depending on the screen, cropped
+from the centre. The top and bottom bands are wall and floor, and they are
+meant to be sacrificial.
+
+**Leave the left third quiet.** The headline sits there. Plants are welcome —
+they are soft and read as texture behind type — but nothing with hard edges or
+high contrast.
+
+### The prompt
+
+Paste the house style from the top of this file first, then this. Ask for
+**no text, no logo, no watermark, no brand names**.
+
+> A wide, well-appointed living room in warm afternoon light, the wall behind
+> painted a soft pale butter yellow with a chalky matt finish. On the **right
+> half of the frame**, a low three-seat sofa in oatmeal linen seen at a slight
+> angle, deep and generously cushioned, dressed with a stack of linen and
+> bouclé cushions and one small deep-red velvet cushion as the only strong
+> colour; beside it a walnut side table carrying a ceramic lamp and a stoneware
+> vase, and behind it a low walnut sideboard with a few books and a shallow
+> bowl. On the **left**, two potted plants — one tall fiddle-leaf in a raw
+> terracotta pot on the floor, one smaller trailing plant on a low stool — with
+> plenty of empty wall between them and the sofa. A flat-weave wool rug on a
+> pale oak floor. Tall window out of frame to the left casting long soft
+> daylight across the room, gentle shadows, no direct sun patch. Richly and
+> deliberately decorated but not cluttered — every object placed, nothing
+> stacked. The **left third of the frame is open wall and plant, free of any
+> hard-edged object**, and the top and bottom eighth of the frame carry nothing
+> but wall and floor. Warm neutral palette — linen, oatmeal, walnut, pale oak,
+> soft butter yellow — with the single deep-red cushion. Shot on a 35mm lens at
+> eye level, wide and calm, editorial interior photography, photorealistic,
+> fine detail.
+
+`--ar 16:9` for Midjourney; 2560 × 1440 elsewhere.
+
+### After it arrives
+
+Hand it over and it gets cropped, compressed and wired in. Expect roughly
+250–400 KB as AVIF or WebP at 2560 wide — a raw PNG export of this size runs
+8–10 MB, which is the single biggest thing slowing this site down.
+
+**One thing this image cannot do:** on a phone the hero box turns portrait,
+and a 16:9 picture cropped to that keeps only its middle third — the sofa or
+the plants, not both. A second, upright version of the same room is the fix
+when the time comes. One image is fine while the design is being settled.
+
+---
+
+## 10. Home 02 — collections cutouts (3 images, transparent background)
+
+Three product cutouts for the collections showcase under the hero — Best
+Selling, Popular, New Arrival. The slot currently holds Home 01's lifestyle
+photography as a stand-in; what it actually wants is the product alone, the
+way a catalogue tile shows it, not a room around it.
+
+**This is a different kind of shot from everything else in this file.** Every
+other prompt here is a full scene — a room, a workshop bench, daylight from a
+window. This one is the opposite: **one product, isolated, nothing behind
+it.** Ask explicitly for a transparent background (PNG) or, if the tool cannot
+do transparency, a flat pure-white or pure-black seamless studio background
+that is trivial to key out afterwards — either works, transparency just saves
+a step.
+
+**Keep the house style's palette and light even in isolation** — the same
+warm-neutral fabrics and walnut tones, the same soft directional light, so the
+three cutouts still look like they belong to the same set as the rest of the
+site once they are dropped onto a card.
+
+**No text, no logo, no watermark, no brand names, no mannequin or hand
+holding the product** — product only.
+
+### The prompt (paste the fragment for each slot after this shared opening)
+
+> Studio product photography of {PRODUCT}, isolated on a seamless pure white
+> background, shot straight-on at a slight three-quarter angle, soft
+> diffused daylight-balanced studio light from the upper left, one soft
+> contact shadow directly beneath the product and no other shadow, warm
+> neutral fabric tones (linen, oatmeal, wine-red), fine fabric texture and
+> stitching detail visible, catalogue-quality, photorealistic, no props, no
+> surface, no reflection, no text, no logo, no watermark, no brand names.
+
+| Slot | {PRODUCT} | Aspect |
+|---|---|---|
+| Best Selling | *A folded wine-red quilted comforter, corner peeled back to show the quilting pattern and the cream underside* | 4:5 |
+| Popular | *A neatly folded stack of soft grey bedding — a fitted sheet, a duvet cover and two pillows — with one deep-red embroidered cushion resting on top* | 4:5 |
+| New Arrival | *A folded floral block-print bed sheet, one corner unfolded and draped forward to show the print and the drape of the fabric* | 4:5 |
+
+`--ar 4:5` for Midjourney; roughly 1600 × 2000px elsewhere. Portrait, because
+the tile it lands in is portrait on every screen narrower than `lg`.
+
+### After it arrives
+
+Three PNGs, ideally with real alpha transparency. Handing them over gets them
+cropped tight to the product (a wide margin of transparent canvas around a
+small product just wastes file size), compressed, and wired into
+`CollectionsShowcase.jsx` — at which point the tile itself changes too: a
+flat field colour behind the product instead of `object-cover`, matching the
+flat-card style the client's own reference uses. That swap is roughly six
+lines once the files exist; there is no point making it before they do, since
+`object-contain` on today's full-room photographs would just float a
+rectangular photo in a coloured box, which looks like a mistake rather than a
+product.
+
+---
+
+## 11. Home 02 — collections centrepiece (sofa + foam, flat field)
+
+The middle column of the collections showcase, rebuilt from Karmo's own
+campaign poster: the modular sofa above, a stack of Karmo 2001 foam blocks
+below and to the right, on one flat colour.
+
+### Two things to get right before the prompt
+
+**Ask for the background in `#F8FAFC`, not white.** That is the exact colour
+of the section this lands in. Match it and the picture stops looking like a
+photograph pasted into a card and starts looking like a product floating on
+the page — the same effect as a transparent cutout, with none of the work.
+Any flat colour will do if it is *exactly* the tile's; a near-miss is worse
+than white, because a faint rectangle edge is more obvious than an honest one.
+
+**Ask for no lettering at all.** The poster has "KARMO 2001" embossed into
+every foam block. Image generators cannot spell — the last family shot came
+back with `NOW PLIVIS FEOR / ASC PREKRR` across a t-shirt. Order the foam
+plain; if the embossing is wanted it gets added in design afterwards, where it
+will be legible and correctly spelled.
+
+### The prompt
+
+> A studio product composition on a completely flat, seamless, single-colour
+> background in soft off-white `#F8FAFC`, no gradient and no vignette. In the
+> upper half, a low modular three-seat sofa seen straight on: three separate
+> seat cushions in soft lavender-purple upholstery foam, a continuous
+> oatmeal-linen backrest and two thick rolled oatmeal-linen arms, carried on a
+> slim matte-black tubular steel frame with thin straight legs. Below it and to
+> the right, a neat staggered stack of five rectangular lavender-purple foam
+> blocks, each with a plain smooth face and softly rounded edges, offset like a
+> flight of steps so every block's depth is visible. Even, soft studio light
+> from the upper left; one gentle contact shadow under the sofa and one under
+> the foam stack, nothing else. Nothing else in the frame — no floor line, no
+> wall, no props, no plants, no reflections. Photorealistic product
+> photography, crisp fabric and foam texture, catalogue quality. **No text, no
+> lettering, no numbers, no logo, no watermark, no branding of any kind on the
+> foam or the fabric.**
+
+`--ar 4:5` for Midjourney; roughly 1600 × 2000px elsewhere. Portrait, because
+the tile it sits in is taller than it is wide at every screen size.
+
+### After it arrives
+
+Hand it over and it gets compressed, and the centre tile switches from
+`object-cover` to `object-contain` with `#F8FAFC` behind it — at which point
+the product sits on the page rather than inside a frame, which is the whole
+point of the reference layout. If the generator gives a transparent PNG
+instead of a flat field, better still: the same swap works and the tile colour
+can then be changed at any time without touching the image.
+
+---
+
 ## After you generate
 
 Hand the files over (or drop them in `client/public/images/`) and say which

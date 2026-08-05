@@ -19,17 +19,21 @@ import { useEffect } from "react";
  */
 
 // Share of the remaining distance covered per frame at 60fps. The lower this
-// is, the longer the page keeps drifting after the wheel stops. At 0.11 it
-// arrived too quickly and read as an ordinary scroll with a little slide on the
-// end; 0.07 covers about 90% of the distance in the first half second and then
-// eases the rest out over another second, which is the long settle.
-const EASE = 0.07;
+// is, the longer the page keeps drifting after the wheel stops.
+//
+// This was 0.07 — about a second and a half of drift after the last notch.
+// That is a lovely long settle to watch and a bad one to aim with: you cannot
+// stop on a section, because the page is still moving when you stop turning
+// the wheel. 0.18 settles in roughly a third of a second, which still reads as
+// eased rather than stepped but puts the page where the hand stopped.
+const EASE = 0.18;
 
 // How far one notch of the wheel travels, as a multiple of what the browser
-// asked for. Was 1.5, which sent the page further than the hand expected on
-// every notch. Just above 1 keeps the distance close to a native scroll and
-// lets the easing, not the reach, do the work.
-const REACH = 1.15;
+// asked for. Was 1.5, then 1.15 — both sent the page further than the hand
+// expected on every notch, which is the other half of not being able to aim.
+// At 1 a notch travels exactly what the operating system asked for, and the
+// easing alone does the smoothing.
+const REACH = 1;
 
 export default function SmoothScroll() {
   useEffect(() => {
@@ -56,6 +60,16 @@ export default function SmoothScroll() {
     let running = false;
     let last = 0;
     let frame = 0;
+    // The last position this component itself wrote. Anything that arrives at
+    // a different one came from somewhere else — see `onScroll`.
+    let written = null;
+
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      running = false;
+      written = null;
+      target = window.scrollY;
+    };
 
     const limit = () =>
       document.documentElement.scrollHeight - window.innerHeight;
@@ -98,11 +112,13 @@ export default function SmoothScroll() {
 
       if (Math.abs(gap) < 0.4) {
         window.scrollTo(0, target);
+        written = Math.round(target);
         running = false;
         return;
       }
 
       window.scrollTo(0, current + gap * (1 - Math.pow(1 - EASE, elapsed)));
+      written = Math.round(window.scrollY);
       frame = requestAnimationFrame(tick);
     };
 
@@ -125,15 +141,41 @@ export default function SmoothScroll() {
       if (!running) {
         running = true;
         last = 0;
+        written = null;
         frame = requestAnimationFrame(tick);
       }
     };
 
-    // Anything that moves the page by other means — keyboard, the scrollbar,
-    // back to top, an anchor — has to re-seed the target, or the next notch of
-    // the wheel would drag the page back to where this thought it was.
+    /**
+     * Anything that moves the page by other means — the scrollbar, the
+     * keyboard, back-to-top, an anchor — has to be handed control.
+     *
+     * The old version only re-seeded `target` when the loop was idle, which
+     * left a hole: for as long as a wheel scroll was still easing out, a drag
+     * on the scrollbar was ignored, and every frame the loop pulled the page
+     * back toward the position the wheel had asked for. Dropping the thumb
+     * halfway down the page put you somewhere else entirely, because the two
+     * were writing `scrollY` against each other.
+     *
+     * So the test is not "is the loop running" but "did *this* put the page
+     * here": the tick records every position it writes, and a scroll event
+     * that reports something else came from the reader. That gives the page
+     * straight back to them — mid-easing or not.
+     */
     const onScroll = () => {
+      if (running && written !== null) {
+        if (Math.abs(Math.round(window.scrollY) - written) > 2) stop();
+        return;
+      }
       if (!running) target = window.scrollY;
+    };
+
+    // Grabbing the scrollbar, or a middle-click autoscroll, moves the page
+    // without a wheel event. Stopping on the press means the easing is already
+    // out of the way before the drag starts, rather than being caught by
+    // `onScroll` a frame later.
+    const onPointerDown = () => {
+      if (running) stop();
     };
 
     const onResize = () => {
@@ -142,11 +184,13 @@ export default function SmoothScroll() {
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("pointerdown", onPointerDown, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(frame);
       root.style.scrollBehavior = inlineBehavior;

@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Montserrat } from "next/font/google";
 import {
   FiArrowRight,
   FiArrowLeft,
@@ -13,25 +12,31 @@ import {
 } from "react-icons/fi";
 
 /**
- * TRIAL — the hero headline only, so Montserrat can be judged against the
- * Plus Jakarta Sans every other heading on the page still uses.
+ * The hero headline is set in Arial, on the client's word.
  *
- * Montserrat is the closest free face to the Gotham in the company profile:
- * the same geometric build and much the same width, and it carries nine
- * weights, so the thin setting the client's screenshot shows is available.
- * Gotham itself is licensed by Monotype, and a web licence is sold separately
- * from the desktop one the profile was designed with.
+ * It is what they already use: the existing site's stylesheet declares
+ * `font-family: Arial, sans-serif` on the body and nothing overrides it, and
+ * the company profile lists ArialMT and Arial-BoldMT among its faces. So this
+ * is not a substitute for anything — it is the actual face.
  *
- * To adopt it for the whole site, delete this and set BRAND_FONT_HEADING in
- * src/config/brand.ts instead — that is the one place a typeface should be
- * named. To drop it, remove this and the `font-trial` class below.
+ * No webfont is loaded for it. Arial ships with Windows and macOS, Helvetica
+ * stands in on older Apple systems, and Liberation Sans is the metric-
+ * compatible clone on Linux — so the stack below resolves everywhere without
+ * a single byte downloaded. Hind Siliguri stays in it because browsers fall
+ * back per glyph and Arial carries no বাংলা.
+ *
+ * Earlier trials here were Montserrat and Questrial, chosen as free stand-ins
+ * for the Gotham the profile also uses. Neither is needed now.
+ *
+ * To put Arial on the whole site rather than this one headline, set
+ * BRAND_FONT in src/config/brand.ts and delete this — that file is the one
+ * place a typeface should ever be named.
+ *
+ * Written as a Tailwind arbitrary utility rather than a stack, because it has
+ * to arrive as a whole class name: Tailwind reads these files as text, and the
+ * underscore is how a space is spelt inside one.
  */
-const trial = Montserrat({
-  subsets: ["latin"],
-  weight: ["200", "300", "400", "600", "800"],
-  variable: "--font-trial",
-  display: "swap",
-});
+const HERO_FACE = "[font-family:Arial,Helvetica,'Hind_Siliguri',sans-serif]!";
 
 const slides = [
   {
@@ -299,11 +304,12 @@ export default function Hero() {
 
               Both the family and the weight carry `!`. globals.css sets
               `* { font-family: … !important }` and `h1 { font-weight: 600 }`
-              outside any cascade layer, and unlayered rules beat layered ones
-              — so a plain Tailwind utility loses to both no matter how
-              specific it looks. */}
+              outside any cascade layer, and an unlayered rule beats a layered
+              utility whatever its specificity. The style attribute is not an
+              option either — React drops a value carrying `!important`,
+              because the CSSOM refuses it on a direct property assignment. */}
           <h1
-            className={`display ${trial.variable} [font-family:var(--font-trial),sans-serif]! mt-8 text-[2.7rem] font-light! uppercase leading-[1.02] tracking-[0.03em] text-white sm:text-[3.8rem] lg:text-[4.9rem]`}
+            className={`display ${HERO_FACE} mt-8 text-[2.7rem] font-normal! uppercase leading-[1.02] tracking-[0.03em] text-white sm:text-[3.8rem] lg:text-[4.9rem]`}
           >
             <span className="block overflow-hidden pb-[0.05em]">
               <motion.span
