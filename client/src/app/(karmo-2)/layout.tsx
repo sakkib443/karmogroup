@@ -25,10 +25,14 @@ export default function KarmoTwoLayout({
     <>
       <SmoothScroll />
       <HeaderTwo />
-      {/* Clears the fixed header exactly: 32px announcement + 74px identity
-          row, plus 68px of navigation from lg up. All three are fixed heights
-          in HeaderTwo for this reason — if a row grew with its contents, every
-          page would start that far underneath the bar.
+      {/* Clears the fixed header exactly: 3px brand rule + 32px announcement +
+          74px identity row = 109, plus 68px of navigation and the 1px rule
+          above it from lg up = 178. All of them are fixed heights in HeaderTwo
+          for this reason — if a row grew with its contents, every page would
+          start that far underneath the bar.
+          That 1px was missed when these figures were first written, so the top
+          of every page sat a hair under the bar from lg up; measuring the bar
+          to add the brand rule is what turned it up.
           The announcement rolls away on scroll but the offset does not follow
           it; the page would jump under the reader if it did. A hero that wants
           to sit beneath the bar cancels this itself. */}
@@ -38,7 +42,7 @@ export default function KarmoTwoLayout({
           trust strip, as a pale band between the hero and the sections under
           it. Set here rather than on `body` so the other 68 storefront pages
           keep the background they were built on. */}
-      <main className="min-h-screen bg-white pt-[106px] lg:pt-[174px]">
+      <main className="min-h-screen bg-white pt-[109px] lg:pt-[178px]">
         {children}
       </main>
       <Footer />
