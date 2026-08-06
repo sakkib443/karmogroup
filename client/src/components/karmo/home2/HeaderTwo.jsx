@@ -196,7 +196,18 @@ export default function HeaderTwo() {
       // nothing behind it but page content, so it earns a real shadow and a
       // wash of blur — the same lift a glass panel gets over whatever passes
       // beneath it, rather than a flat white slab dropped on the page.
-      className={`fixed inset-x-0 top-0 z-[10000] transition-[background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      //
+      // The 3px brand rule on top is always there, not switched on at the
+      // scroll threshold, and that is the point: at rest it sits directly above
+      // the red announcement band and disappears into it, so nothing changes
+      // where nothing needed changing. Once the band rolls away it is the only
+      // red left at the top of the screen, and it caps the white bar instead of
+      // letting it float edge-to-edge against the page. Conditional would have
+      // meant a line appearing out of nothing at 40px of scroll; unconditional
+      // means one rule that is simply revealed. It is a real `border-t` rather
+      // than an overlay, so the bar honestly measures 3px taller and the
+      // layout's offset below accounts for it.
+      className={`fixed inset-x-0 top-0 z-[10000] border-t-[3px] border-brand transition-[background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         scrolled
           ? "bg-white/95 shadow-[0_18px_36px_-20px_rgba(15,23,42,0.45)] backdrop-blur-md"
           : "bg-white shadow-[0_1px_0_rgba(34,34,34,0.08)]"
