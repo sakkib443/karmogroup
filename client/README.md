@@ -1,51 +1,16 @@
-# Karmo — Client
+# S Kawsar Sunnah Mart (Client)
 
-Next.js 16 (App Router) frontend, JavaScript, Tailwind CSS v4, Redux Toolkit.
+Frontend for **S Kawsar Sunnah Mart** — a variety-products online marketplace in Bangladesh.
 
-## Getting started
+Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, and **Redux Toolkit / RTK Query**.
+
+## Getting Started
 
 ```bash
 npm install
-npm run dev
+npm run dev -- -p 3005
 ```
 
-Open http://localhost:3000
+Open [http://localhost:3005](http://localhost:3005) in your browser.
 
-## Scripts
-
-| Script | Description |
-| --- | --- |
-| `npm run dev` | Dev server on port 3000 (Turbopack) |
-| `npm run build` | Production build |
-| `npm start` | Production server on port 5005 |
-| `npm run lint` | ESLint |
-
-## Structure
-
-```
-src/
-  app/
-    (mainLayout)/       public pages — navbar + footer
-    (auth)/             login, register — centered card layout
-    (dashboardLayout)/  dashboard — sidebar layout
-    layout.js           root: fonts + providers
-    globals.css         Tailwind + brand tokens
-  components/
-    sheard/             Navbar, Footer, Sidebar
-    Home/               Hero, Features
-    ReduxProviderWrapper.jsx
-  config/api.js         API base URL
-  context/              React contexts
-  lib/                  helpers
-  redux/                store + slices
-```
-
-## Environment
-
-`.env.local`:
-
-```
-NEXT_PUBLIC_API_URL=http://localhost:5000
-```
-
-`@/*` is aliased to `src/*` (see `jsconfig.json`).
+> Configure the API base URL in `.env.local` (`NEXT_PUBLIC_API_URL` — e.g. `http://localhost:5001/api`).
