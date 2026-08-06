@@ -3,6 +3,7 @@ import StandardStrip from "@/components/karmo/home2/StandardStrip";
 import CollectionsShowcase from "@/components/karmo/home2/CollectionsShowcase";
 import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
+import FoamStory from "@/components/karmo/home2/FoamStory";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -32,6 +33,7 @@ export default function HomePage() {
       <DivisionsStrip />
       <CollectionsShowcase />
       <ShoppableScene />
+      <FoamStory />
     </>
   );
 }
