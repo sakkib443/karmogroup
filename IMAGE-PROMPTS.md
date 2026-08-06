@@ -253,78 +253,196 @@ that is the main reason the strip does not yet read as one row.
 
 ---
 
-## 9. Home 02 — hero background (one image, 16:9)
+## 9. Home 02 — hero background  ★ THE BRAND REFERENCE
 
-One picture behind the whole hero, with the headline set over its left side.
+**`home-02/hero/karmo-family-white-outfits.webp` is the one to match.** The
+client approved it as the brand's own look — the palette in it *is* the
+identity, not an interpretation of it. Every image generated for this site from
+now on should be checked against it, not against this description.
 
-### The size, and why
+Everything below is written *from* that picture, by measuring it, so a
+generator can be pointed at the same place.
 
-Home 02's header is opaque and holds 182px of its own, so the hero is what is
-left of the window under it. That box is wider than it is tall, and it changes
-shape with the screen:
+### The palette, read off the approved image
 
-| Screen | Hero box | Ratio |
+| | Hex | Where |
 |---|---|---|
-| 1920 × 1080 | 1920 × 898 | 2.14 : 1 |
-| 1600 × 900 | 1600 × 718 | 2.23 : 1 |
-| 1536 × 864 | 1536 × 682 | 2.25 : 1 |
-| 1440 × 900 | 1440 × 718 | 2.01 : 1 |
-| 1366 × 768 | 1366 × 586 | 2.33 : 1 |
+| **Karmo yellow** | `#F4B02E` | the whole left wall, flat and matt |
+| **Karmo red** | `#CD1F1D` | the panel on the right |
+| Sofa upholstery | `#DFCEC6` | warm oatmeal, almost no pattern |
+| Coffee table | `#E3CCBF` | pale travertine |
+| Floor | `#C0A692` | polished warm concrete |
+| Wall art, mustard arc | `#E4A03B` | |
+| Wall art, red arc | `#C52121` | |
 
-**Generate at 16:9 — 2560 × 1440.** That is 1.78:1, narrower than the
-narrowest box in the table, which is the whole point: `object-cover` then
-trims **only the top and bottom** and never the sides. The composition here is
-left-to-right — plants one end, sofa the other — so losing the sides would lose
-the picture.
+Note the reds: the *site's* brand red is `#E60000`, the picture's is `#CD1F1D`.
+They are not the same and they are not meant to be — the painted wall is a
+deeper, slightly cooler red than the screen colour, and matching them exactly
+made the photograph look like a swatch. Ask for the wall red, not the UI red.
 
-**Keep everything that matters inside the middle 75% of the height.** Between
-76% and 89% of the frame's height survives depending on the screen, cropped
-from the centre. The top and bottom bands are wall and floor, and they are
-meant to be sacrificial.
+### The composition, and what is not negotiable
 
-**Leave the left third quiet.** The headline sits there. Plants are welcome —
-they are soft and read as texture behind type — but nothing with hard edges or
-high contrast.
+**Aspect 2.33:1 (21:9), generated at 2688 × 1152.** The hero box is capped at
+`43vw`, which is that same ratio, so a 2.33:1 picture is cropped by about 13px
+horizontally and nothing vertically. Narrower and `object-cover` starts eating
+the sides, where the composition lives.
+
+**The left 54% is flat colour.** Measured: the wall runs unbroken from the left
+edge to 54% of the frame before the sofa arm begins. The headline sits there.
+This is the constraint that kills most otherwise-good images — see below.
+
+**The room, left to right:** flat yellow wall → framed abstract print (mustard
+half-circle over a red half-circle) → a cream three-seat sofa whose tufted back
+spells KARMO → the family seated at its right end → a straight red wall panel →
+an olive tree in a pale cylindrical planter → a window edge. In front: a round
+travertine coffee table on a jute rug, a stoneware vase of greenery, one red
+bowl.
+
+**Light:** flat, even, no cast shadows across the wall. Four earlier versions of
+this room came back with a diagonal shadow over the left wall, and every one of
+them failed the contrast check underneath the headline.
 
 ### The prompt
 
-Paste the house style from the top of this file first, then this. Ask for
-**no text, no logo, no watermark, no brand names**.
+Paste the house style from the top of this file first, then this. Ask for **no
+text, no logo, no watermark, no brand names** — the KARMO on the sofa back is
+tufting in the upholstery, not printed type, and generators cannot spell.
 
-> A wide, well-appointed living room in warm afternoon light, the wall behind
-> painted a soft pale butter yellow with a chalky matt finish. On the **right
-> half of the frame**, a low three-seat sofa in oatmeal linen seen at a slight
-> angle, deep and generously cushioned, dressed with a stack of linen and
-> bouclé cushions and one small deep-red velvet cushion as the only strong
-> colour; beside it a walnut side table carrying a ceramic lamp and a stoneware
-> vase, and behind it a low walnut sideboard with a few books and a shallow
-> bowl. On the **left**, two potted plants — one tall fiddle-leaf in a raw
-> terracotta pot on the floor, one smaller trailing plant on a low stool — with
-> plenty of empty wall between them and the sofa. A flat-weave wool rug on a
-> pale oak floor. Tall window out of frame to the left casting long soft
-> daylight across the room, gentle shadows, no direct sun patch. Richly and
-> deliberately decorated but not cluttered — every object placed, nothing
-> stacked. The **left third of the frame is open wall and plant, free of any
-> hard-edged object**, and the top and bottom eighth of the frame carry nothing
-> but wall and floor. Warm neutral palette — linen, oatmeal, walnut, pale oak,
-> soft butter yellow — with the single deep-red cushion. Shot on a 35mm lens at
-> eye level, wide and calm, editorial interior photography, photorealistic,
-> fine detail.
+> A wide editorial interior photograph of a Bangladeshi family of three —
+> father, mother and a toddler — seated together at the right-hand end of a
+> long cream three-seat sofa, the parents in white and marigold-yellow
+> traditional dress, all of them relaxed and looking at each other rather than
+> at the camera. The wall behind is a flat matt marigold yellow (#F4B02E) with
+> no shadow across it, meeting a straight-edged deep red panel (#CD1F1D) at the
+> right. Above the sofa hangs one framed abstract print: a mustard half-circle
+> over a red half-circle on cream. To the right of the red panel stands a small
+> olive tree in a pale ribbed cylindrical planter, and beyond it the edge of a
+> tall window. In front of the sofa, a round travertine coffee table on a jute
+> rug carries a stoneware vase of green foliage and one small red bowl. Warm
+> polished concrete floor. **The left 55% of the frame is bare yellow wall with
+> nothing in it at all** — no furniture, no plant, no shadow, no object. Flat
+> even daylight, no cast shadows, no sun patch. Photorealistic, fine fabric
+> detail, shot on a 35mm lens at seated eye level.
 
-`--ar 16:9` for Midjourney; 2560 × 1440 elsewhere.
+`--ar 21:9` for Midjourney; 2688 × 1152 elsewhere.
 
 ### After it arrives
 
-Hand it over and it gets cropped, compressed and wired in. Expect roughly
-250–400 KB as AVIF or WebP at 2560 wide — a raw PNG export of this size runs
-8–10 MB, which is the single biggest thing slowing this site down.
+Hand it over. It gets resized to 2000 wide and converted to WebP — the approved
+one came out **150 KB from a 4.4 MB PNG**.
 
-**One thing this image cannot do:** on a phone the hero box turns portrait,
-and a 16:9 picture cropped to that keeps only its middle third — the sofa or
-the plants, not both. A second, upright version of the same room is the fix
-when the time comes. One image is fine while the design is being settled.
+Then two things get **measured, not eyeballed**:
+
+1. **The empty left.** If furniture starts before ~50% of the width, the
+   headline lands on it.
+2. **Contrast under every line of the hero copy.** The type is white over a
+   flat dark veil, and the veil's opacity is set from the *lightest* pixel
+   under each line. Two grades of this same room wanted different numbers —
+   45% and 48% — so it is re-measured for each picture, never assumed.
+
+**One thing this image cannot do:** on a phone the hero box turns portrait, and
+a 21:9 picture cropped to that keeps only its middle. An upright version of the
+same room is the fix when the time comes.
+
+
+## 9b. Home 02 — division cards (product on a plain field)
+
+The four cards in the divisions strip. **01 Foam, 02 HomeTex and 03 Mattress
+are approved and in place.** 04 Chemicals still runs Home 01's old photograph
+and is the last one — it loses 66% of itself to the crop, so it is now the
+weakest card in the row.
+
+### The size, and it is not negotiable
+
+**2688 × 1152 — 21:9.** The card is built to that ratio, so a picture at that
+size is placed whole and **nothing is cropped, ever**.
+
+This was learned the hard way. The card used to be 1.287:1, and fitting the
+client's 21:9 pictures into it meant either padding them out or cutting them —
+the mattress lost 30% of its width, both ends of the product, before the card
+was reshaped to the picture instead. Send 21:9 and none of that happens.
+
+### Leave room around the product
+
+**The product should fill about the middle two-thirds of the frame, no more.**
+Keep a clear margin all the way round it — roughly a sixth of the width free at
+each end and a tenth of the height at top and bottom.
+
+Two reasons. It stops the product touching an edge, which always looks like an
+accident. And it means a future layout change can crop a little without taking
+anything off the product.
+
+### The other three rules, measured off the approved foam card
+
+| | Hex |
+|---|---|
+| Field | `#E8DCD8` at the top, `#EDE2DD` at the foot |
+| Foam / cushions | `#5B4D68` lavender |
+| Upholstery | `#AEA098` warm cream |
+| The one red accent | `#9D3A3D` |
+
+1. **One flat field.** No room, no wall, no floor line, no horizon. The field
+   may drift a few points top to bottom — that is what gives it depth — but
+   there is no edge anywhere in it.
+2. **A soft contact shadow and nothing else.** Short, diffuse, directly under
+   the product. No cast shadow across the field, no light you could point at.
+3. **One small red accent, and only one.** In the foam card it is a band on a
+   plant pot. Red anywhere else and it stops being a product shot.
+4. **Karmo branding embossed, never printed.** The KARMO ZUTI on the foam is
+   pressed into the material, same colour, raised. Ask for debossed or
+   tone-on-tone. **Never ask a generator to render words** — it cannot spell,
+   and printed type is the commonest reason one of these is thrown away.
 
 ---
+
+### 02 HomeTex — the prompt (used; shot approved)
+
+HomeTex is bed sheets, comforters and pillows (company profile, p.9–10). Soft
+goods, so the shape has to come from folding and stacking. Keep it plain: a few
+objects, well made, with air around them.
+
+Paste the house style from the top of this file first, then this. Ask for **no
+text, no logo, no watermark, no brand names**.
+
+> A wide, simple studio product photograph on one flat warm off-white field
+> (#E8DCD8) — no room, no wall, no floor line, no horizon, no props beyond
+> what is listed. Centred in the frame and occupying only the middle two
+> thirds of it, with clear empty field all the way around: a neatly folded
+> Karmo HomeTex bedding set arranged as three simple pieces — a plump white
+> cotton pillow standing upright at the back, a soft dove-grey comforter
+> folded once into a clean rectangle in front of it, and two crisply folded
+> bed sheets stacked beside them, edges square. The comforter's border and the
+> pillow's piping carry a tone-on-tone debossed panel, pressed into the fabric
+> in the same colour, with no printed or coloured lettering anywhere. At the
+> right-hand end of the group, a small potted olive plant in a pale ribbed
+> stoneware pot with one narrow deep-red band (#9D3A3D) around its neck — the
+> only red in the picture. Soft, even, diffuse studio light from the front; a
+> short soft contact shadow directly beneath each object and nothing more; no
+> directional light, no cast shadows reaching across the field. Matt woven
+> fabric, fine texture, gentle folds. Calm, uncluttered, expensive, catalogue
+> product photography, photorealistic.
+
+`--ar 21:9` for Midjourney; **2688 × 1152** elsewhere.
+
+### 04 Chemicals — still to write
+
+Same four rules and the same 21:9. Drums, sample tins and poured resin on the
+same field. Worth doing at the same time as HomeTex so the row of four settles
+together — right now Chemicals is the weakest card, losing 66% of its old
+photograph to the crop.
+
+### After one arrives
+
+Resize to 1600 wide and convert to WebP — the approved foam card is 44 KB.
+
+**Give it a filename that has not been used before.** Overwriting an image at a
+path that is already live does not work: `next/image` and the browser both
+cache by URL, so the old picture keeps being served and the page looks
+unchanged. This bit twice in one session. Renaming is the fix, and it is why
+the two approved cards are called `…-sofa-olive` and `…-foam-room`.
+
+---
+
 
 ## 10. Home 02 — collections cutouts (3 images, transparent background)
 

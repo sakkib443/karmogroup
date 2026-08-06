@@ -5,7 +5,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
-  FiTruck,
+  FiPhone,
+  FiClock,
   FiMapPin,
   FiSearch,
   FiHeart,
@@ -204,26 +205,65 @@ export default function HeaderTwo() {
       {/* ── 1 · Announcement ─────────────────────────────────────────── */}
       <div
         aria-hidden={scrolled || undefined}
-        className={`overflow-hidden bg-shade-soft text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        // Brand red, not the slate this used to run on. White on #e60000
+        // measures 4.81:1, which clears the 4.5:1 bar for the 11px text in
+        // here — but only at full white. Every dimmed white on this row had to
+        // come up to solid for that reason: white/75 lands at 3.03:1, and the
+        // hours and the social icons were both set that way. Weight and size
+        // carry the hierarchy here instead of opacity.
+        className={`overflow-hidden bg-brand text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           scrolled ? "invisible max-h-0 opacity-0" : "visible max-h-14 opacity-100"
         }`}
       >
-        <div className="shell flex h-10 items-center justify-between gap-6">
-          <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.12em]">
-            <FiTruck className="shrink-0 text-[15px] text-brand" />
-            Free delivery on every order
+        <div className="shell flex h-8 items-center justify-between gap-6">
+          {/* The hotline, not a delivery promise. This band is the first line
+              on the page and the client wants it spent on how to reach them.
+              The number is a real `tel:` link — on a phone the top line of the
+              site is then one tap from a call, which is the whole point of
+              putting it here.
+
+              One face, one weight, one size across the whole band. The number
+              was set apart at first — the heading face at 13px, tracking near
+              zero, on the argument that letterspaced digits are harder to
+              reassemble than letterspaced words. Two typefaces and three
+              weights inside a 32px strip read as a mistake before they read as
+              emphasis, so the whole row is now the same 11px bold caps and the
+              `<p>` alone declares it. If the number needs to stand out again,
+              size can do it without breaking the face or the weight. */}
+          <p className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.12em]">
+            {/* The icon was brand red and the hover went to brand red — both
+                invisible now the band is that colour. The hover is a wash of
+                the bar's own white instead, which is the only move available
+                on a solid field. */}
+            <a
+              href="tel:+8801713483284"
+              className="flex items-center gap-2.5 transition-opacity duration-300 hover:opacity-75"
+            >
+              <FiPhone className="shrink-0 text-[13px]" />
+              01713 483 284
+            </a>
+
+            <span aria-hidden="true" className="h-3 w-px bg-white/40" />
+
+            <span className="flex items-center gap-2">
+              <FiClock className="shrink-0 text-[13px]" />
+              Everyday 9 AM &ndash; 10 PM
+            </span>
           </p>
 
           <div className="flex shrink-0 items-center gap-5">
+            {/* Same 11px bold caps as the left of the band — it was 11.5px
+                semibold in sentence case, which is a fourth setting inside one
+                strip. */}
             <Link
               href="/track"
-              className="hidden items-center gap-2 text-[11.5px] font-semibold transition-colors duration-300 hover:text-brand sm:flex"
+              className="hidden items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] transition-opacity duration-300 hover:opacity-75 sm:flex"
             >
               <FiMapPin className="text-[13px]" />
               Track Order
             </Link>
 
-            <span aria-hidden="true" className="hidden h-3 w-px bg-white/25 sm:block" />
+            <span aria-hidden="true" className="hidden h-3 w-px bg-white/40 sm:block" />
 
             <div className="flex items-center gap-3.5">
               {socials.map(({ Icon, label }) => (
@@ -231,7 +271,7 @@ export default function HeaderTwo() {
                   key={label}
                   href="#"
                   aria-label={`Karmo Group on ${label}`}
-                  className="text-white/75 transition-colors duration-300 hover:text-white"
+                  className="transition-opacity duration-300 hover:opacity-70"
                 >
                   <Icon className="text-[13px]" />
                 </a>
@@ -242,12 +282,16 @@ export default function HeaderTwo() {
       </div>
 
       {/* ── 2 · Identity and tools ───────────────────────────────────── */}
-      {/* On scroll this row absorbs the navigation row below it — the search
-          field steps aside for the same division links, inline, so logo and
-          menu end up sharing one bar instead of two stacked ones. The row
-          keeps its full height throughout; only the logo grows, so the bar
-          reads as more established the further down the page it has
-          followed, never as a bar that shrank to make room. */}
+      {/* This row used to absorb the navigation row below it on scroll — the
+          search field stepping aside for the division links, so logo and menu
+          shared one bar. The client wants the two rows kept apart, so it no
+          longer does: the search field stays where it is at every scroll
+          position, and row 3 stays put underneath. Only the announcement band
+          above rolls away.
+
+          What still changes on scroll is the logo, which grows — the bar reads
+          as more established the further down the page it has followed, rather
+          than as one that shrank to make room. */}
       <div className="shell flex h-[74px] items-center justify-between gap-8">
         {/* `/`, not `/home-2`. This header used to be the chrome for the
             /home-2 route and pointed its logo back at it; that route now
@@ -262,68 +306,35 @@ export default function HeaderTwo() {
           />
         </Link>
 
-        {scrolled ? (
-          <nav className="hidden h-full flex-1 items-center justify-center lg:flex">
-            {/* Drops in rather than snapping into place — the same fadeIn
-                the rest of the site uses for anything that appears on its
-                own, not as part of a page load. */}
-            <ul className="animate-fadeIn flex h-full items-center gap-0.5">
-              {nav.map((entry) => (
-                <li key={entry.name} className="relative h-full">
-                  <Link
-                    href={entry.href}
-                    onMouseEnter={() => openPanel(entry.name)}
-                    onFocus={() => openPanel(entry.name)}
-                    className={`flex h-full items-center gap-1.5 rounded-[3px] px-3.5 text-[11.5px] font-bold uppercase tracking-[0.09em] transition-colors duration-200 ${
-                      entry.accent
-                        ? "text-brand hover:bg-brand/5"
-                        : "text-ink hover:bg-ink/[0.04] hover:text-brand"
-                    }`}
-                  >
-                    {entry.name}
-                    {entry.submenu && (
-                      <FiChevronDown
-                        className={`text-[11px] text-ink/40 transition-transform duration-300 ${
-                          panel === entry.name ? "rotate-180" : ""
-                        }`}
-                      />
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : (
-          /* Given the middle of the bar because on a shop the search field is
-              the thing most people came for. Hidden below lg, where it moves
-              into the drawer. */
-          <form
-            role="search"
-            onSubmit={(e) => e.preventDefault()}
-            className="hidden h-[46px] max-w-[620px] flex-1 items-stretch overflow-hidden rounded-[4px] border border-ink/15 bg-cream/60 transition-colors duration-300 focus-within:border-brand/50 focus-within:bg-white lg:flex"
+        {/* Given the middle of the bar because on a shop the search field is
+            the thing most people came for. Hidden below lg, where it moves
+            into the drawer. */}
+        <form
+          role="search"
+          onSubmit={(e) => e.preventDefault()}
+          className="hidden h-[46px] max-w-[620px] flex-1 items-stretch overflow-hidden rounded-[4px] border border-ink/15 bg-cream/60 transition-colors duration-300 focus-within:border-brand/50 focus-within:bg-white lg:flex"
+        >
+          <input
+            type="search"
+            placeholder="Search foam grades, mattresses, bedding…"
+            aria-label="Search the Karmo range"
+            className="body-copy min-w-0 flex-1 bg-transparent pl-5 pr-3 text-[14px] text-ink outline-none placeholder:text-ink/45"
+          />
+          <button
+            type="submit"
+            aria-label="Search"
+            className="group relative flex shrink-0 items-center gap-2.5 overflow-hidden bg-brand px-6 text-white transition-colors duration-300 hover:bg-shade-deep"
           >
-            <input
-              type="search"
-              placeholder="Search foam grades, mattresses, bedding…"
-              aria-label="Search the Karmo range"
-              className="body-copy min-w-0 flex-1 bg-transparent pl-5 pr-3 text-[14px] text-ink outline-none placeholder:text-ink/45"
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 ease-out group-hover:translate-x-0"
             />
-            <button
-              type="submit"
-              aria-label="Search"
-              className="group relative flex shrink-0 items-center gap-2.5 overflow-hidden bg-brand px-6 text-white transition-colors duration-300 hover:bg-shade-deep"
-            >
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 ease-out group-hover:translate-x-0"
-              />
-              <FiSearch className="relative text-[17px] transition-transform duration-300 group-hover:scale-110" />
-              <span className="relative text-[12px] font-bold uppercase tracking-[0.12em]">
-                Search
-              </span>
-            </button>
-          </form>
-        )}
+            <FiSearch className="relative text-[17px] transition-transform duration-300 group-hover:scale-110" />
+            <span className="relative text-[12px] font-bold uppercase tracking-[0.12em]">
+              Search
+            </span>
+          </button>
+        </form>
 
         <div className="flex shrink-0 items-center gap-6 lg:gap-7">
           <span className="hidden sm:contents">
@@ -332,26 +343,10 @@ export default function HeaderTwo() {
           </span>
           <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
 
-          {/* Row 3's "Find a Store" button lives down there for the width to
-              carry its full pitch — but that whole row folds away on scroll,
-              and taking the one call-to-action on the bar with it left
-              nothing but icons on the right. This is the same button, sized
-              to match this row exactly, so scrolling never costs the page
-              its CTA. */}
-          {scrolled && (
-            <Link
-              href="/find-store"
-              className="group animate-fadeIn hidden h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade lg:flex"
-            >
-              <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(230,0,0,0.6)] transition-transform duration-300 group-hover:-translate-y-px">
-                <FiMapPin className="text-[16px]" />
-              </span>
-              <span className="whitespace-nowrap text-[11.5px] font-bold leading-none">
-                Find a Store
-              </span>
-            </Link>
-          )}
-
+          {/* The scroll-only "Find a Store" button stood here. It existed
+              because row 3 folded away on scroll and took the bar's only call
+              to action with it. Row 3 stays now, so its own button is always
+              on screen and this one was a duplicate. */}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -365,16 +360,12 @@ export default function HeaderTwo() {
       </div>
 
       {/* ── 3 · Navigation ───────────────────────────────────────────── */}
-      {/* Full height while the page sits at the top; rolled away the same way
-          the announcement is once it scrolls, because the row above has
-          already taken the menu on for itself — keeping this one too would be
-          the second bar the identity row was built to replace. */}
-      <div
-        aria-hidden={scrolled || undefined}
-        className={`hidden overflow-hidden border-t border-ink/8 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block ${
-          scrolled ? "invisible max-h-0 opacity-0" : "visible max-h-[68px] opacity-100"
-        }`}
-      >
+      {/* Always on, at every scroll position. It used to roll away the same
+          way the announcement does, on the argument that the row above had
+          taken the menu on for itself — but that turned the header into one
+          line, and the client wants the two rows kept. Only the announcement
+          band collapses now. */}
+      <div className="hidden overflow-hidden border-t border-ink/8 lg:block">
         <div className="shell flex h-[68px] items-center justify-between gap-6">
           <nav>
             <ul className="flex items-center">

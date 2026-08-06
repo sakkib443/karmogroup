@@ -10,7 +10,7 @@ import { rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Home 02's shoppable scene — one room photograph, edge to edge, with a marker
- * on each Karmo piece in it. Tapping a marker opens a small card: the product,
+ * on each Karmo piece in it. Hovering a marker opens a small card: the product,
  * its name, its price, and a way through to it. The arrangement is the
  * reference the client sent.
  *
@@ -55,49 +55,69 @@ import { rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * they drop straight in — only `thumb` changes.
  */
 const scene = {
-  src: "/karmo/images/home-02/shoppable/scene-living-room.webp",
+  src: "/karmo/images/home-02/shoppable/scene-yellow-room.webp",
   /** The painted size, for the cover maths above. */
   width: 2000,
-  height: 1113,
-  alt: "A living room in cream and sage — a rounded bouclé sofa with a tufted cushion, an oak coffee table laid with a tray, an armchair holding a round bouclé cushion, and an arc floor lamp",
+  height: 857,
+  alt: "A bedroom and sitting area against a marigold wall — a rattan bed made up in cream linen with an ochre throw, a bouclé armchair, and a rounded cream sofa with a tufted cushion",
 };
 
+/**
+ * Every `x`/`y` was checked by cropping the scene at that point and looking at
+ * what came out, not by reading them off the picture by eye. Two of the first
+ * four were wrong that way: the sofa marker landed on the coffee table in front
+ * of it, and the bed marker caught the armchair behind. Worth repeating for any
+ * new scene — it takes one pass and it is the difference between a dot on a
+ * product and a dot near one.
+ */
 const hotspots = [
   {
-    id: "round-cushion",
-    x: 15.5,
-    y: 63,
+    id: "pillows",
+    x: 34.5,
+    y: 46.7,
     open: "right",
-    name: "Bouclé Round Cushion",
+    name: "Karmo Comfort Pillow",
     division: "HomeTex",
-    price: "৳ 1,850",
+    price: "৳ 950",
     href: "/hometex",
-    thumb: "/karmo/images/home-02/shoppable/thumb-round-cushion.webp",
-    thumbAlt: "A round bouclé cushion in warm brown, resting on an armchair",
+    thumb: "/karmo/images/home-02/shoppable/thumb-pillows.webp",
+    thumbAlt: "White cotton pillows stacked against a rattan headboard with an ochre bolster in front",
+  },
+  {
+    id: "bed",
+    x: 26,
+    y: 58,
+    open: "right",
+    name: "Karmo Pro Foam Mattress",
+    division: "Mattress",
+    price: "৳ 28,500",
+    href: "/mattress",
+    thumb: "/karmo/images/home-02/shoppable/thumb-bed.webp",
+    thumbAlt: "A bed made up in cream linen with a folded ochre throw across the foot",
   },
   {
     id: "tufted-cushion",
-    x: 40,
-    y: 59,
+    x: 57,
+    y: 58.3,
     open: "right",
     name: "Tufted Cushion Cover",
     division: "HomeTex",
     price: "৳ 1,200",
     href: "/hometex",
-    thumb: "/karmo/images/home-02/shoppable/thumb-tufted-cushion.webp",
-    thumbAlt: "A cream cushion with a tufted sand-coloured wave pattern",
+    thumb: "/karmo/images/home-02/shoppable/thumb-tufted-cushion-yellow.webp",
+    thumbAlt: "A cream cushion with a tufted sand-coloured wave pattern on a bouclé sofa",
   },
   {
     id: "boucle-sofa",
-    x: 56,
-    y: 76,
+    x: 82.5,
+    y: 68.8,
     open: "left",
-    name: "Karmo 2001 Foam Sofa",
+    name: "Karmo Zuti Foam Sofa",
     division: "Foam",
     price: "৳ 62,000",
     href: "/foam",
-    thumb: "/karmo/images/home-02/shoppable/thumb-boucle-sofa.webp",
-    thumbAlt: "A rounded cream bouclé sofa behind an oak coffee table",
+    thumb: "/karmo/images/home-02/shoppable/thumb-boucle-sofa-yellow.webp",
+    thumbAlt: "The rolled arm of a rounded cream bouclé sofa",
   },
 ];
 
@@ -129,10 +149,37 @@ export default function ShoppableScene() {
 
   const [openId, setOpenId] = useState(null);
   const frameRef = useRef(null);
+  const leaveTimer = useRef(null);
 
   const active = hotspots.find((s) => s.id === openId) ?? null;
 
-  const close = useCallback(() => setOpenId(null), []);
+  /**
+   * Hover opens the card and leaving closes it — but not immediately.
+   *
+   * The card sits *beside* its marker with a 20px gap, so a pointer travelling
+   * from one to the other leaves the marker before it arrives. Closing on the
+   * bare `mouseleave` makes the card vanish in that gap and the whole thing
+   * unusable. A short grace period covers the crossing: leaving arms a timer,
+   * arriving anywhere that counts (the marker again, or the card) cancels it.
+   * 160ms is the same figure `HeaderTwo` uses for its mega panel, which has
+   * exactly this problem.
+   */
+  const open = useCallback((id) => {
+    clearTimeout(leaveTimer.current);
+    setOpenId(id);
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    clearTimeout(leaveTimer.current);
+    leaveTimer.current = setTimeout(() => setOpenId(null), 160);
+  }, []);
+
+  const close = useCallback(() => {
+    clearTimeout(leaveTimer.current);
+    setOpenId(null);
+  }, []);
+
+  useEffect(() => () => clearTimeout(leaveTimer.current), []);
 
   // Escape closes, and so does a click anywhere off the photograph. Without
   // the second one the only way out is to find the marker again, which on a
@@ -156,7 +203,7 @@ export default function ShoppableScene() {
       <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
         {/* Full-bleed: no `.shell`, no padding, straight into both edges.
             Height from lg is the screen less 9rem — 756px on a 900px window.
-            This was `100svh` less the 182px header less a little, which is the
+            This was `100svh` less the 174px header less a little, which is the
             arithmetic the brief asked for, but it read as too short: by the
             time the reader scrolls the scene under the bar, the header is no
             longer taking a bite out of it, so subtracting its height only left
@@ -183,11 +230,19 @@ export default function ShoppableScene() {
               border pointing at nothing. */}
           {hotspots.map((spot) => {
               const isOpen = spot.id === openId;
+              // Hover is the way in, and `focus` opens it too so the keyboard
+              // can reach every card. The click is kept for touch: a tap fires
+              // `mouseenter` on a phone but never `mouseleave`, so without it a
+              // card could open and never close — with it, a second tap on the
+              // same marker shuts it.
               return (
                 <button
                   key={spot.id}
                   type="button"
-                  onClick={() => setOpenId(isOpen ? null : spot.id)}
+                  onMouseEnter={() => open(spot.id)}
+                  onMouseLeave={scheduleClose}
+                  onFocus={() => open(spot.id)}
+                  onClick={() => (isOpen ? close() : open(spot.id))}
                   aria-expanded={isOpen}
                   aria-label={`${spot.name}, ${spot.price}`}
                   style={{ left: coverLeft(spot.x), top: coverTop(spot.y) }}
@@ -226,6 +281,12 @@ export default function ShoppableScene() {
           <AnimatePresence>
             {active && (
               <motion.div
+                /* The card counts as part of the marker for hover purposes:
+                   arriving on it cancels the pending close, leaving it starts
+                   one. Without this the card would close the moment the pointer
+                   crossed onto it, and nothing on it could ever be clicked. */
+                onMouseEnter={() => open(active.id)}
+                onMouseLeave={scheduleClose}
                 initial={reduceMotion ? false : { opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6 }}

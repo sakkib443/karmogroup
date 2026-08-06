@@ -25,7 +25,7 @@ export default function KarmoTwoLayout({
     <>
       <SmoothScroll />
       <HeaderTwo />
-      {/* Clears the fixed header exactly: 40px announcement + 74px identity
+      {/* Clears the fixed header exactly: 32px announcement + 74px identity
           row, plus 68px of navigation from lg up. All three are fixed heights
           in HeaderTwo for this reason — if a row grew with its contents, every
           page would start that far underneath the bar.
@@ -38,7 +38,7 @@ export default function KarmoTwoLayout({
           trust strip, as a pale band between the hero and the sections under
           it. Set here rather than on `body` so the other 68 storefront pages
           keep the background they were built on. */}
-      <main className="min-h-screen bg-white pt-[114px] lg:pt-[182px]">
+      <main className="min-h-screen bg-white pt-[106px] lg:pt-[174px]">
         {children}
       </main>
       <Footer />

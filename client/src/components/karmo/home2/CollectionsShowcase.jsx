@@ -211,6 +211,10 @@ export default function CollectionsShowcase() {
     // 12px is not arbitrary: it is also the gap `DivisionsStrip` puts between
     // its four picture cards just above. One gutter figure runs down the page,
     // so all three groups of pictures read as one grid.
+    // The top padding is back, and it is the gutter figure. It was zero while
+    // `DivisionsStrip` above still left ~60px of its own slack under its cards;
+    // that section now runs its grid to the full height of the screen, so
+    // without this the two rows of cards touch with no gap at all.
     <section className="bg-white pb-3 pt-0">
       {/* No band heading. This carried an eyebrow, "Redefining / everyday
           comfort" and a "View all products" link across the top; the client
