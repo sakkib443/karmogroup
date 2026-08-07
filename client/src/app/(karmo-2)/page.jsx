@@ -5,6 +5,7 @@ import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
+import FoamPromise from "@/components/karmo/home2/FoamPromise";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -35,6 +36,12 @@ export default function HomePage() {
       <CollectionsShowcase />
       <ShoppableScene />
       <FoamStory />
+
+      {/* Straight after the foam story, which is what it argues from: that
+          section says what the foam is, this one says what it does. It is also
+          the only dark section on a white page, so it wants a section either
+          side of it rather than sitting against the footer. */}
+      <FoamPromise />
 
       {/* Two Popular Products designs were built here to be chosen between —
           this quiet grid and an offer row of poster cards. The client picked
