@@ -19,26 +19,36 @@ import { popularProducts, discountPercent } from "@/components/karmo/home2/popul
  * deleted along with the marker bar above it; the data file stays.
  *
  * ── What this design is arguing ────────────────────────────────────────────
- * That the product should be the loudest thing in its tile and nothing else
- * should compete. So: no buttons, no ribbons, no discount maths. A pale field,
- * the photograph, and underneath it the four facts a buyer actually sorts on —
- * what it is, what it costs, what it is made of, and what it comes in.
+ * That the product should be the loudest thing in its tile, and that a buyer
+ * choosing between foam grades wants specification before persuasion. A pale
+ * field, the photograph, and underneath it the facts they actually sort on —
+ * what it is, what it is made of, what it comes in, what it costs — and then
+ * the way to buy it.
  *
  * It is the harder design to fill and the better one to live with. Harder,
  * because a tile with this much air only works if the photograph is cut out or
  * shot on a flat field, and Karmo has none of that yet. Better, because nothing
  * in it expires when a campaign ends.
  *
- * Read it against Option B on the two places they genuinely disagree, because
- * everything else is decoration:
+ * The two have converged since they were first built: the client asked for this
+ * one centred, with its copy stacked under the picture and an Order Now button,
+ * which is Option B's card treatment. What is still genuinely different, and is
+ * therefore what the choice now rests on:
  *
+ *   · **The specification.** This gives each product two lines of fact — the
+ *     grade and what comes with it. Option B gives it none, on the argument
+ *     that the poster already said everything.
  *   · **The saving.** Option B strikes the old price through and prints the
  *     percentage. This shows the price you pay and marks the tile SALE, and
  *     that is all. It is the weaker sell and the one that does not turn the row
  *     into a permanent clearance rack.
- *   · **The way out.** Option B ends in a button. Here the whole tile is the
- *     link, and the reader is expected to want the product before they want to
- *     order it.
+ *   · **The density.** Twelve pixels between these tiles against thirty-two
+ *     between B's cards, and a heading on the gutter with a "view all" against
+ *     B's centred title. One reads as a catalogue page, the other as four
+ *     offers.
+ *
+ * If those stop mattering too, the honest answer is that there is one design
+ * left and the other file should go.
  *
  * ── Where it departs from the reference ────────────────────────────────────
  * The reference repeats one line of poetry under every product — the same
@@ -66,8 +76,15 @@ function ProductTile({ item }) {
   const onOffer = discountPercent(item.was, item.now) !== null;
 
   return (
-    <motion.div variants={fade} className="bg-cream">
-      <Link href={item.href} className="group block">
+    /* `group` moved up here from the picture's link when the button arrived.
+       The tile used to be one `<Link>` around everything, which is the tidier
+       markup right up until something inside it has to be a link too — an `<a>`
+       inside an `<a>` is invalid, and React unpicks it at hydration. So the
+       card is now three separate links, the way Option B already did it, and
+       the hover state has to come from a wrapper they all sit inside rather
+       than from the one that used to contain them. */
+    <motion.div variants={fade} className="group flex flex-col bg-cream">
+      <Link href={item.href} className="block">
         <div className="relative aspect-square overflow-hidden">
           <Image
             src={item.image}
@@ -99,29 +116,53 @@ function ProductTile({ item }) {
             </span>
           )}
         </div>
-
-        {/* Name and price share a line and the price never wraps under the
-            name — `shrink-0` on the price, `min-w-0` on the name. A price that
-            drops to its own line breaks the scan down the right-hand edge,
-            which is the only reason to put it there at all. */}
-        <div className="px-5 pb-6 pt-5 lg:px-6">
-          <div className="flex items-baseline justify-between gap-4">
-            <h3 className="min-w-0 text-[15px] font-semibold leading-snug text-ink transition-colors duration-300 group-hover:text-brand">
-              {item.name}
-            </h3>
-            <span className="shrink-0 text-[15px] font-semibold tabular-nums text-ink">
-              {item.now}
-            </span>
-          </div>
-
-          <p className="body-copy mt-2 text-[13px] leading-[1.55] text-ink/55">
-            {item.spec}
-          </p>
-          <p className="body-copy mt-1 text-[13px] leading-[1.55] text-ink/40">
-            {item.variants}
-          </p>
-        </div>
       </Link>
+
+      {/* Centred and stacked under the picture, at the client's ask — this was
+          a name-left/price-right row before, which reads faster down a column
+          but cannot hold a centred button under it without looking lopsided.
+          Once the button was in, the whole block had to follow it.
+
+          The order is deliberate: what it is, then the two lines of fact, then
+          what it costs, then how to get it. The specification sits above the
+          price rather than below because it is what a buyer uses to decide
+          *which* grade — by the time they reach the number they should already
+          know what they are pricing.
+
+          `flex-1` here with `mt-auto` on the button holds all four buttons on
+          one line however the copy wraps, and the 24px above the button is
+          `mb-6` on the price, not `mt-6` on the button. An auto margin only
+          distributes slack, so on a row where every card happens to be the same
+          height it resolves to zero and the button lands hard against the price
+          — which is exactly the bug this row's twin shipped with once already. */}
+      <div className="flex flex-1 flex-col items-center px-5 pb-7 pt-6 text-center lg:px-6">
+        <Link href={item.href}>
+          <h3 className="text-[15px] font-semibold leading-snug text-ink transition-colors duration-300 group-hover:text-brand">
+            {item.name}
+          </h3>
+        </Link>
+
+        <p className="body-copy mt-2 text-[13px] leading-[1.55] text-ink/55">
+          {item.spec}
+        </p>
+        <p className="body-copy mt-1 text-[13px] leading-[1.55] text-ink/40">
+          {item.variants}
+        </p>
+
+        {/* One number, no struck price. That is the line this design still
+            holds against Option B: the badge says there is an offer, and the
+            price says what you pay. */}
+        <p className="mb-6 mt-4 text-[19px] font-bold tabular-nums text-ink">
+          {item.now}
+        </p>
+
+        <Link
+          href={item.href}
+          className="btn-primary mt-auto inline-flex h-[46px] items-center bg-brand px-8 text-[12px] font-bold uppercase tracking-[0.1em] text-white"
+        >
+          Order Now
+        </Link>
+      </div>
     </motion.div>
   );
 }
