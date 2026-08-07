@@ -6,6 +6,7 @@ import { LuX, LuSend, LuMessageCircle } from 'react-icons/lu';
 import { useRouter } from 'next/navigation';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import { useAppSelector } from '@/redux';
+import { API_CONFIGURED } from '@/config/api';
 
 const PRIMARY = 'var(--color-primary)';
 
@@ -22,7 +23,12 @@ const QUICK: Action[] = [
 ];
 
 const FloatingContact: React.FC = () => {
-    const { data: res } = useGetSiteContentQuery({});
+    // This one sits in the root layout, so it runs on every page for every
+    // visitor — which is why it, of all the API calls, is the one that made
+    // Chrome's local-network prompt appear on the deployed site. Skipped
+    // outright when there is no API: the fields it fills are all optional and
+    // the component already renders with them empty.
+    const { data: res } = useGetSiteContentQuery({}, { skip: !API_CONFIGURED });
     const router = useRouter();
     const { isAuthenticated } = useAppSelector((s) => s.auth);
 

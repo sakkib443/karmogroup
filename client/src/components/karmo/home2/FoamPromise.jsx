@@ -22,10 +22,11 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *     leftover. Here it is the thing being copied, so it comes back — drawn
  *     inline rather than sourced, because the section is not in the local
  *     reference copy and no leaf asset exists in the repo.
- *   · **The orange.** #E8892B, not the brand red. It is what the reference
- *     uses for the rules, the leaf and the two card borders, and swapping it
- *     for brand red would have been the one change that stopped this reading
- *     as the same section.
+ *   · **The orange.** A warm orange, not the brand red. It is what the
+ *     reference uses for the rules, the leaf and the two card borders, and
+ *     swapping it for brand red would have been the one change that stopped
+ *     this reading as the same section. The exact shade was later brightened
+ *     from the reference's #E8892B — see `ORANGE` below.
  *   · **The odd card out.** The middle card is solid white while its
  *     neighbours are transparent with an orange border. That is the
  *     reference's arrangement and it is doing real work — it lands on
@@ -38,7 +39,10 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * component wholesale rather than reimplemented — see the note on it below.
  */
 
-const ORANGE = "#E8892B";
+/* Brightened from the reference's muted #E8892B at the client's ask for a more
+   vivid border on the two side cards. The same token drives the leaf and the
+   two rules, so those lift with it and the section stays one colour. */
+const ORANGE = "#FF9A1F";
 
 const claims = [
   {
@@ -49,14 +53,14 @@ const claims = [
        because they are what makes the row recognisable as this section. */
     badge: "bg-[#E03131]",
     title: "No Filler",
-    body: "We use zero fillers in our foam. Manufactured with 100% pure rubber grade materials, Karmo foam ensures maximum density, pure quality, and long-lasting strength without crumbling or losing density over time.",
+    body: "Zero fillers, ever. Made from 100% pure rubber grade materials for maximum density and lasting strength that won't crumble.",
   },
   {
     id: "long-durability",
     icon: TbShieldCheck,
     badge: "bg-[#1C7ED6]",
     title: "Long Durability",
-    body: "Engineered to withstand heavy daily use without sagging or losing structural integrity. Our advanced polyurethane foam offers high resilience and retains its original shape and support for years.",
+    body: "Built to take heavy daily use without sagging. Our advanced polyurethane foam holds its shape and support for years.",
     /* The one solid card. See the note above on why it is the middle one. */
     solid: true,
   },
@@ -65,7 +69,7 @@ const claims = [
     icon: TbArrowBigDownLines,
     badge: "bg-[#2F9E44]",
     title: "More Resilient",
-    body: "Delivers superior bounce, flexible elasticity, and optimal air flow. Designed to respond dynamically to pressure, providing consistent body support, ergonomic comfort, and instant pressure relief.",
+    body: "Superior bounce, elasticity and air flow. Responds dynamically to pressure for steady support and instant relief.",
   },
 ];
 
@@ -107,26 +111,52 @@ const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
 
 /**
- * How far the film drifts from its resting position, in pixels, at each end of
- * the section's travel — so 40 means it moves 80px in total across the whole
- * pass, against roughly 1700px of scrolling. Slow enough to read as the
- * background breathing rather than sliding.
+ * How the background behaves as the section passes. Four treatments were built
+ * to be compared in one scroll; the client chose `fixed` — a viewport-anchored
+ * frame — and asked for its stillness eased off, so its drift now runs larger
+ * than a background pinned rigid, which had read as a photograph behind a hole.
+ * The other three are kept in code, unused by the homepage.
  *
- * The layer is overscanned by more than this at top and bottom (see
- * `-inset-y-[70px]` below), so the drift never pulls an edge into the clip
- * window. Raising this without raising the overscan is what would expose one.
+ *   fixed    · Anchored to the viewport, clipped to the section, with a gentle
+ *             drift over it so it eases along the scroll rather than sitting
+ *             dead still. The chosen treatment.
+ *   parallax · Travels with the section but lags behind it, so it appears to
+ *             move at roughly two thirds of the page's speed. The ordinary
+ *             answer, and the one most people mean by "scroll animation".
+ *   zoom     · Holds its position and scales slowly across the pass. Nothing
+ *             slides, so it never fights the direction of the scroll — the
+ *             frame just opens up.
+ *   drift    · Ignores scroll entirely and pans on its own clock, whether or
+ *             not the reader is moving. The only one that is still alive when
+ *             the page is standing still.
  */
-const DRIFT = 40;
+export const FILM_MODES = ["fixed", "parallax", "zoom", "drift"];
+
+/* Pixels the anchored film drifts each way across the section's whole pass.
+   Only used by `fixed`. Raised from 40 to soften how pinned the frame reads —
+   a larger drift eases it along the scroll instead of holding it dead still.
+   The layer is overscanned past this (see `-inset-y-[120px]`), so the drift
+   never pulls an edge into the clip window — raising one without the other is
+   what would expose one. */
+const DRIFT = 80;
+
+/* Pixels the parallax layer lags each way. Larger than DRIFT on purpose: this
+   one is supposed to be seen moving. Its own overscan is `-inset-y-[150px]`,
+   which has to stay clear of this figure for the same reason. */
+const PARALLAX = 120;
+
+/* Scale at the start and end of the pass for `zoom`. Both above 1 so the layer
+   always covers its box — a scale below 1 would show the section's own
+   background at the corners. */
+const ZOOM_FROM = 1.04;
+const ZOOM_TO = 1.18;
 
 /**
- * `fixedFilm` decides whether the background is anchored to the viewport, with
- * a slight drift over it, or simply travels with the section like any other
- * backdrop. Both were on the page at once to be compared; the client picked
- * anchored, and this now defaults to it. The other branch is kept because it
- * is three lines and is what any future section wanting a plain scrolling
- * backdrop would reuse.
+ * `filmMode` picks how the background answers to scroll — see `FILM_MODES`
+ * above for what each one does and why. Defaults to `fixed`, the treatment the
+ * client chose, so a caller that says nothing gets the one the homepage uses.
  */
-export default function FoamPromise({ fixedFilm = true }) {
+export default function FoamPromise({ filmMode = "fixed" }) {
   const reduce = useReducedMotion();
   const reveal = reduce ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -139,47 +169,51 @@ export default function FoamPromise({ fixedFilm = true }) {
   const [ready, setReady] = useState(false);
 
   /**
-   * The film is genuinely `position: fixed`, and clipped each frame to
-   * whatever slice of the section is currently on screen. That is what makes
-   * it read as anchored while the cards travel over it.
+   * One scroll loop serving three of the four modes. `drift` is not here at
+   * all — it runs on a CSS keyframe and never reads the scroll position, which
+   * is the whole point of it.
    *
-   * The two obvious answers both fail here, which is why this is done by hand:
+   * Everything is written straight to the node inside a rAF rather than held
+   * in state: this runs on every scroll frame, and a `setState` per frame would
+   * re-render the whole section — three cards and two videos — sixty times a
+   * second to move one CSS value.
+   *
+   * ── What `fixed` needs that the others do not ──────────────────────────────
+   * Only `fixed` clips. The film is genuinely `position: fixed`, so without a
+   * clip it would paint across the entire viewport; the clip is what cuts it
+   * back to the slice of the section currently on screen. The other modes sit
+   * inside an ordinary `overflow-hidden` box and are clipped by it for free.
+   *
+   * The two obvious ways to get a fixed background both fail here:
    *
    *   · `background-attachment: fixed` is a background-image property. There
    *     is no equivalent for a `<video>` element.
    *   · `position: sticky` sticks to the nearest scrollport, and an ancestor
-   *     with `overflow: hidden` becomes that scrollport — this section had one
-   *     to clip the film. Even without it, a sticky layer only has room to
-   *     travel when its container is taller than the layer, and this section
-   *     is shorter than the viewport, so it would have sat still and done
-   *     nothing.
+   *     with `overflow: hidden` becomes that scrollport — which is exactly what
+   *     clips the film in the other modes. Even without it, a sticky layer only
+   *     has room to travel when its container is taller than the layer, and
+   *     this section is shorter than the viewport, so it would have sat still.
    *
-   * So `overflow-hidden` is gone from the section and `clip-path` does the
-   * clipping instead. Written straight to the node inside a rAF rather than
-   * held in state: this runs on every scroll frame, and a `setState` per frame
-   * would re-render the whole section — three cards and two videos — sixty
-   * times a second to move one CSS value.
+   * And the clip and the movement have to be two separate elements. `clip-path`
+   * is resolved in the element's own coordinate space and the transform applies
+   * to the already-clipped result, so moving the clipped node would carry the
+   * window with it and leak the section's edges. The outer node only ever
+   * clips and never moves; the inner one only ever moves and never clips. That
+   * split costs the other modes nothing, so they use the same two nodes.
    *
-   * ── Why the clip and the drift are two elements ────────────────────────────
-   * Fixed but dead still read as a photograph behind a hole, so the film also
-   * drifts a little — DRIFT px each way across the section's whole pass.
-   *
-   * That drift cannot go on the same element as the clip. `clip-path` is
-   * resolved in the element's own coordinate space and the transform then
-   * applies to the already-clipped result, so translating this node would
-   * carry the clip window with it and the section's edges would leak. The
-   * outer node therefore only ever carries `clip-path` and never moves; the
-   * inner one only ever carries `transform` and never clips.
-   *
-   * The still underneath stays a plain absolute layer, so it needs none of
-   * this. Before hydration, and for a reader who asked for less motion, that
-   * one is the whole background and it behaves normally.
+   * The still underneath is a plain absolute layer in every mode, so it needs
+   * none of this. Before hydration, and for a reader who asked for less motion,
+   * it is the whole background and it behaves normally.
    */
   useEffect(() => {
-    if (reduce || !fixedFilm) return;
+    if (reduce || filmMode === "drift") return;
     const section = sectionRef.current;
+    const inner = driftRef.current;
+    if (!section || !inner) return;
+
+    const isFixed = filmMode === "fixed";
     const film = filmRef.current;
-    if (!section || !film) return;
+    if (isFixed && !film) return;
 
     let frame = 0;
     const measure = () => {
@@ -187,31 +221,47 @@ export default function FoamPromise({ fixedFilm = true }) {
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight;
 
-      // Off screen entirely — clip it away rather than leave a fixed,
-      // viewport-sized video painting over whatever section is actually in
-      // view. `inset(100% ...)` collapses it to nothing.
+      // Off screen entirely. For `fixed` that means clipping the layer away —
+      // a viewport-sized fixed video would otherwise paint over whatever
+      // section is actually in view. The other modes are inside the section
+      // and simply go with it, so there is nothing to do and no reason to keep
+      // recomputing a transform nobody can see.
       if (rect.bottom <= 0 || rect.top >= vh) {
-        film.style.clipPath = "inset(100% 0 0 0)";
+        if (isFixed) film.style.clipPath = "inset(100% 0 0 0)";
         return;
       }
 
-      const top = Math.max(0, rect.top);
-      const bottom = Math.max(0, vh - rect.bottom);
-      film.style.clipPath = `inset(${top}px 0px ${bottom}px 0px)`;
+      if (isFixed) {
+        const top = Math.max(0, rect.top);
+        const bottom = Math.max(0, vh - rect.bottom);
+        film.style.clipPath = `inset(${top}px 0px ${bottom}px 0px)`;
+      }
 
       // 0 as the section's top edge reaches the bottom of the window, 1 as its
       // bottom edge leaves the top — so the full pass is the section's height
-      // plus a viewport, and the drift is spread across all of it rather than
-      // spent in the first screenful.
+      // plus a viewport, and the movement is spread across all of it rather
+      // than spent in the first screenful.
       const travel = rect.height + vh;
       const progress = Math.min(1, Math.max(0, (vh - rect.top) / travel));
 
-      // Downward at the start, upward at the end: the film rises as the page
-      // scrolls down, which is the direction that reads as parallax rather
-      // than as the background fighting the scroll.
-      const offset = (0.5 - progress) * 2 * DRIFT;
-      if (driftRef.current) {
-        driftRef.current.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+      if (isFixed) {
+        // Rises as the page scrolls down. On a layer that is otherwise pinned,
+        // that is the direction that reads as the background easing along
+        // rather than fighting the scroll.
+        const offset = (0.5 - progress) * 2 * DRIFT;
+        inner.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+      } else if (filmMode === "parallax") {
+        // The opposite sign, and for the opposite reason. This layer is inside
+        // the section, so it is already travelling up with it; pushing it back
+        // *down* as the page scrolls is what makes it lag, and a lagging
+        // background is what reads as depth.
+        const offset = (progress - 0.5) * 2 * PARALLAX;
+        inner.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+      } else if (filmMode === "zoom") {
+        // No translation at all — this one is meant to hold still and open up,
+        // so it never competes with the direction of the scroll.
+        const scale = ZOOM_FROM + (ZOOM_TO - ZOOM_FROM) * progress;
+        inner.style.transform = `scale(${scale.toFixed(4)})`;
       }
     };
 
@@ -227,7 +277,7 @@ export default function FoamPromise({ fixedFilm = true }) {
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [reduce, fixedFilm]);
+  }, [reduce, filmMode]);
 
   /**
    * Two stacked copies of one clip, cross-faded at the seam.
@@ -311,45 +361,53 @@ export default function FoamPromise({ fixedFilm = true }) {
         <Image src={STILL} alt="" fill sizes="100vw" className="object-cover" priority={false} />
       </div>
 
-      {/* The film, in whichever of the two modes this instance was given.
-          One set of `<video>` elements either way — the branch only changes
-          the box they sit in, so the loop rig, the refs and the crossfade are
-          untouched by the choice.
+      {/* The film. One set of `<video>` elements in every mode — the mode only
+          decides the two boxes they sit in, so the loop rig, the refs and the
+          crossfade never change with it.
 
-          Fixed: `clip-path` starts fully closed so that the moment before the
-          first measurement — and for anyone whose JS never runs — this
-          viewport-sized fixed element is not painting over the rest of the
-          page. The still underneath is showing until it opens.
+          The outer box is either a viewport-sized `fixed` layer that has to be
+          clipped by hand, or an ordinary absolute one the section clips for
+          free. Its `clip-path` starts fully closed in the fixed case, so the
+          moment before the first measurement — and for anyone whose JS never
+          runs — it is not painting over the rest of the page. The still
+          underneath covers both.
 
-          Normal: an ordinary absolute layer clipped by its own
-          `overflow-hidden`, travelling with the section like the still does.
-          No scroll listener, no clip maths, nothing to keep in step. */}
-      {!reduce &&
-        (fixedFilm ? (
+          The inner box is what moves, and how much room it needs to move in
+          depends on the mode:
+            · parallax travels PARALLAX px each way, so it overscans furthest.
+            · fixed travels DRIFT px each way, so it needs less.
+            · zoom only scales, and a scale above 1 covers its own box.
+            · drift is a CSS keyframe and its own overscan is in that rule.
+          Each overscan has to stay clear of its figure above — raising one
+          without the other is exactly what pulls an edge into view. */}
+      {!reduce && (
+        <div
+          ref={filmRef}
+          aria-hidden
+          className={
+            filmMode === "fixed"
+              ? "pointer-events-none fixed inset-0 z-0"
+              : "pointer-events-none absolute inset-0 z-0 overflow-hidden"
+          }
+          style={filmMode === "fixed" ? { clipPath: "inset(100% 0 0 0)" } : undefined}
+        >
           <div
-            ref={filmRef}
-            aria-hidden
-            className="pointer-events-none fixed inset-0 z-0"
-            style={{ clipPath: "inset(100% 0 0 0)" }}
-          >
-            {/* Overscanned past the clip window at top and bottom so the
-                drift has somewhere to travel without ever pulling an edge
-                into view. 70px against DRIFT's 40 leaves real margin — the
-                two have to be changed together. */}
-            <div ref={driftRef} className="absolute -inset-y-[70px] inset-x-0">
-              <video {...layerProps(0)} autoPlay src={FILM} />
-              <video {...layerProps(1)} src={FILM} />
-            </div>
-          </div>
-        ) : (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+            ref={driftRef}
+            className={
+              filmMode === "parallax"
+                ? "absolute -inset-y-[150px] inset-x-0"
+                : filmMode === "fixed"
+                  ? "absolute -inset-y-[120px] inset-x-0"
+                  : filmMode === "drift"
+                    ? "foam-drift absolute inset-0"
+                    : "absolute inset-0"
+            }
           >
             <video {...layerProps(0)} autoPlay src={FILM} />
             <video {...layerProps(1)} src={FILM} />
           </div>
-        ))}
+        </div>
+      )}
 
       {/* The film is a light grey foam texture and the copy over it is white.
           Unveiled it measured 1.4:1 against the brightest frames — nowhere near
@@ -380,7 +438,7 @@ export default function FoamPromise({ fixedFilm = true }) {
             and the other two are transparent, so any height difference between
             them would read as the white card being misaligned rather than as
             three cards of unequal copy. */}
-        <div className="mt-12 grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-7">
+        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-7">
           {claims.map((claim) => (
             <motion.div
               key={claim.id}

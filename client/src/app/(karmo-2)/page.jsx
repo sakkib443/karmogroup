@@ -42,14 +42,12 @@ export default function HomePage() {
           the only dark section on a white page, so it wants a section either
           side of it rather than sitting against the footer.
 
-          It went up twice for a while — background anchored against background
-          scrolling with the section — and the client picked anchored, so the
-          second copy and the labels that separated them are gone. It keeps a
-          slight drift rather than sitting dead still; see `DRIFT` in the
-          component. The `fixedFilm` prop survives the choice because the other
-          branch is three lines and is what any future section wanting a plain
-          scrolling backdrop would reuse. */}
-      <FoamPromise />
+          The background is the product film, anchored to the viewport so the
+          copy scrolls over a held frame. The client chose this over the
+          alternatives (`FILM_MODES` in the component) and asked that it not sit
+          dead still — a fully pinned frame read as a photograph behind a hole —
+          so it drifts gently along the scroll; see `DRIFT` in the component. */}
+      <FoamPromise filmMode="fixed" />
 
       {/* Two Popular Products designs were built here to be chosen between —
           this quiet grid and an offer row of poster cards. The client picked

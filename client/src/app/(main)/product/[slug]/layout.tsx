@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { API_URL as API_BASE, API_CONFIGURED } from '@/config/api';
 
 async function getProduct(slug: string): Promise<any | null> {
+    // Same trap as the sitemap: with no API configured this would be a
+    // relative fetch on the server, which hangs rather than throwing, and the
+    // `catch` below would never run. See src/config/api.ts.
+    if (!API_CONFIGURED) return null;
+
     try {
         // Public product detail route — GET /api/products/slug/:slug
         const res = await fetch(`${API_BASE}/products/slug/${slug}`, {

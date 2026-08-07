@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next';
+import { API_URL, API_CONFIGURED } from '@/config/api';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE = API_URL;
 
 // Revalidate the sitemap hourly so new products/categories show up.
 export const revalidate = 3600;
@@ -18,6 +19,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     const dynamicRoutes: MetadataRoute.Sitemap = [];
+
+    // No API means no products and no categories to list. Returning early is
+    // not just tidiness: with an empty base the fetches below become relative
+    // URLs, and a relative fetch on the server does not fail fast — it hangs,
+    // which failed the production build outright (three 60-second attempts,
+    // then exit 1). The old localhost fallback masked this by refusing the
+    // connection immediately.
+    if (!API_CONFIGURED) return staticRoutes;
 
     // ── Products ─────────────────────────────────────────────────────
     try {

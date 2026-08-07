@@ -1035,6 +1035,41 @@ svg.app-icon[fill="none"] {
   100% { transform: scale(2.4); opacity: 0; }
 }
 
+/* The `drift` background mode on the foam-promise band: a slow pan on its own
+   clock rather than off the scroll position, so the section is still alive
+   while the page is standing still. The only one of that band's four modes
+   with no JavaScript behind it.
+
+   The 1.12 scale is what buys the room to pan — the layer is 12% larger than
+   its box, so 3% of travel each way never brings an edge into view. Move the
+   translate figure and the scale has to follow. `alternate` rather than
+   looping, so there is no jump at the end of a cycle; 30s because a pan you
+   can catch moving is a pan that competes with the copy over it.
+
+   Out here with the other keyframes rather than inside `@layer utilities`
+   below, which is only where the rest of them live — no more than that. It was
+   first written into that block and did not reach the stylesheet, which looked
+   like the layer eating it; it was not. Turbopack was serving a cached
+   `globals.css` that survived a full server restart — same byte count across
+   several edits — and the rule appeared the moment `.next` was deleted. Worth
+   knowing before spending time on a CSS rule here that "will not compile". */
+@keyframes foam-drift {
+  from { transform: scale(1.12) translate3d(0, -3%, 0); }
+  to   { transform: scale(1.12) translate3d(0, 3%, 0); }
+}
+
+.foam-drift {
+  animation: foam-drift 30s ease-in-out infinite alternate;
+}
+
+/* Held still, not stripped: the band keeps its film and its still, it simply
+   stops wandering. */
+@media (prefers-reduced-motion: reduce) {
+  .foam-drift {
+    animation: none;
+  }
+}
+
 .hotspot-ping {
   animation: hotspot-ping 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
@@ -1213,4 +1248,5 @@ svg.app-icon[fill="none"] {
       );
     }
   }
+
 }
