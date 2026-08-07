@@ -76,7 +76,20 @@ function ProductTile({ item }) {
        card is now three separate links, the way Option B already did it, and
        the hover state has to come from a wrapper they all sit inside rather
        than from the one that used to contain them. */
-    <motion.div variants={fade} className="group flex flex-col bg-cream">
+    /* `bg-cream/40`, not `bg-cream`, at the client's ask for a field that is
+       barely there. Cream is #F5F5F5 and the section behind it is white, so the
+       tile was ten units of grey off its own background; at 40% it composites
+       to #FBFBFB, four units off. Close to invisible, which is the brief.
+
+       An alpha on the token rather than a new colour, deliberately. Editing
+       `--color-cream` would have lightened the collections cards, the header's
+       search field and every other surface using it; a fifth token for one
+       shade of near-white is worse. This way the tile is still cream, just
+       almost none of it, and it stays tied to whatever cream becomes.
+
+       Option B keeps the full-strength cream. That was not asked for, and the
+       difference is now one of the few things left between the two designs. */
+    <motion.div variants={fade} className="group flex flex-col bg-cream/40">
       <Link href={item.href} className="block">
         <div className="relative aspect-square overflow-hidden">
           <Image
@@ -127,17 +140,23 @@ function ProductTile({ item }) {
           distributes slack, so on a row where every card happens to be the same
           height it resolves to zero and the button lands hard against the price
           — which is exactly the bug this row's twin shipped with once already. */}
-      <div className="flex flex-1 flex-col items-center px-5 pb-6 pt-5 text-center lg:px-6">
+      <div className="flex flex-1 flex-col items-center px-5 pb-4 pt-3.5 text-center lg:px-6">
         <Link href={item.href}>
           <h3 className="text-[15px] font-semibold leading-snug text-ink transition-colors duration-300 group-hover:text-brand">
             {item.name}
           </h3>
         </Link>
 
-        {/* The struck price is conditional, not empty-when-absent: the mattress
-            carries no `was`, and an `<s>` around nothing still renders its flex
-            gap, which pushes the lone price off centre. */}
-        <p className="mb-5 mt-3 flex items-baseline justify-center gap-3">
+        {/* `leading-none` is doing as much work here as the margins. The two
+            prices are 14px and 19px on default leading, which gave the line a
+            30px box for 19px of type — 11px of it invisible padding that read
+            as gap and could not be found by looking at the margins. Collapsed,
+            the line is the type.
+
+            The struck price stays conditional, not empty-when-absent: the
+            mattress carries no `was`, and an `<s>` around nothing still renders
+            its flex gap, which pushes the lone price off centre. */}
+        <p className="mb-3.5 mt-1.5 flex items-baseline justify-center gap-3 leading-none">
           {item.was && (
             <s className="text-[14px] tabular-nums text-ink/40">{item.was}</s>
           )}
@@ -146,6 +165,10 @@ function ProductTile({ item }) {
           </span>
         </p>
 
+        {/* 46px stays. It is the one measurement in this block that is not
+            free to shrink — a button under 44px is below the floor for a thumb,
+            and the height saved here would come out of whether the row works on
+            a phone. Everything above it gave up space instead. */}
         <Link
           href={item.href}
           className="btn-primary mt-auto inline-flex h-[46px] items-center bg-brand px-8 text-[12px] font-bold uppercase tracking-[0.1em] text-white"
