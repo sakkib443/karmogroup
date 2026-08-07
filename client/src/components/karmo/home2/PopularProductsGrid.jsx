@@ -9,34 +9,23 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { popularProducts, discountPercent } from "@/components/karmo/home2/popularProducts";
 
 /**
- * Popular Products — OPTION A of two, built to the first reference the client
- * sent: the quiet catalogue row.
+ * Popular Products — the four-up tile row at the foot of the homepage.
  *
- * Option B is `PopularProductsOffers`. Both are on the page at once, both read
- * the same four products out of `popularProducts`, and both carry the same
- * heading — the client asked for identical pictures across the two so that what
- * is being judged is the treatment and nothing else. Whichever loses gets
- * deleted along with the marker bar above it; the data file stays.
+ * Built as one of two candidates from the references the client sent, against
+ * an offer row of poster cards with struck prices and Order Now buttons. This
+ * is the one they picked; the other component is deleted. Both read from
+ * `popularProducts`, which stays where it is — it was always the shared source
+ * and is still what this reads.
  *
- * ── Read this before adding anything back ──────────────────────────────────
- * These two started far apart and the client has walked this one most of the
- * way to the other. It is now centred, stacked, struck-through-priced and
- * ended with an Order Now button — every one of those a step towards Option B,
- * each asked for. The card content is identical to B's.
- *
- * What is left between them is real but small, and it is worth knowing exactly
- * what it is so nobody spends another round rediscovering it:
- *
- *   · **Density.** 12px between these tiles against 32px between B's, so this
- *     row reads as one set and B's as four offers.
- *   · **The heading.** On the page gutter with a "view all products" link,
- *     against B's centred title and rule.
- *   · **The badge.** SALE here, the computed percentage there.
- *
- * That is the whole list. Nothing about the picture, the copy, the price or the
- * button differs any more. If those three stop mattering too, the honest answer
- * is that there is one design left and the other file should be deleted rather
- * than kept as a near-duplicate that has to be edited twice.
+ * Worth knowing, if this ever gets revisited: the two converged almost
+ * entirely before the choice was made. This started as a quiet catalogue row
+ * and was walked step by step towards the other one — centred, stacked,
+ * struck-through-priced, ended in a button, each change asked for. By the end
+ * the only differences left were the 12px gutters against 32px, the badge
+ * saying SALE rather than the computed percentage, and the near-white tile.
+ * So "the client chose the catalogue design over the offer design" would be
+ * the wrong lesson to draw from this file; what they chose was this density
+ * and this restraint applied to what had become the same card.
  *
  * ── What this design was arguing ───────────────────────────────────────────
  * That a buyer choosing between foam grades wants specification before
@@ -47,7 +36,8 @@ import { popularProducts, discountPercent } from "@/components/karmo/home2/popul
  *
  * What survives of that argument is the picture: a tile with this much air
  * only works if the photograph is cut out or shot on a flat field, and Karmo
- * has none of that yet. That is still the cost of choosing this one.
+ * has none of that yet. That is still the cost of this design, and it is now
+ * the only one on the page.
  *
  * ── Where it departs from the reference ────────────────────────────────────
  * Four across, at the client's ask and as the reference has it. The fourth
@@ -73,9 +63,9 @@ function ProductTile({ item }) {
        The tile used to be one `<Link>` around everything, which is the tidier
        markup right up until something inside it has to be a link too — an `<a>`
        inside an `<a>` is invalid, and React unpicks it at hydration. So the
-       card is now three separate links, the way Option B already did it, and
-       the hover state has to come from a wrapper they all sit inside rather
-       than from the one that used to contain them. */
+       card is now three separate links, and the hover state has to come from a
+       wrapper they all sit inside rather than from the one that used to
+       contain them. */
     /* `bg-cream/40`, not `bg-cream`, at the client's ask for a field that is
        barely there. Cream is #F5F5F5 and the section behind it is white, so the
        tile was ten units of grey off its own background; at 40% it composites
@@ -85,10 +75,7 @@ function ProductTile({ item }) {
        `--color-cream` would have lightened the collections cards, the header's
        search field and every other surface using it; a fifth token for one
        shade of near-white is worse. This way the tile is still cream, just
-       almost none of it, and it stays tied to whatever cream becomes.
-
-       Option B keeps the full-strength cream. That was not asked for, and the
-       difference is now one of the few things left between the two designs. */
+       almost none of it, and it stays tied to whatever cream becomes. */
     <motion.div variants={fade} className="group flex flex-col bg-cream/40">
       <Link href={item.href} className="block">
         <div className="relative aspect-square overflow-hidden">
@@ -111,11 +98,11 @@ function ProductTile({ item }) {
           {/* Over the picture, top-left, exactly where the reference puts it —
               and above the veil in DOM order so the wash never dulls it.
 
-              It says SALE rather than the percentage Option B prints. Same
-              source of truth, two readings of it: this design's whole argument
-              is that it does not do the arithmetic at the reader, so the badge
-              marks the tile and the price under it does the rest. White on
-              #e60000 measures 4.81:1, which clears the bar for bold 10px caps. */}
+              It says SALE rather than the percentage, though it is derived
+              from the same two prices: this design's argument is that it does
+              not do the arithmetic at the reader, so the badge marks the tile
+              and the price under it does the rest. White on #e60000 measures
+              4.81:1, which clears the bar for bold 10px caps. */}
           {onOffer && (
             <span className="absolute left-4 top-4 bg-brand px-2.5 py-1.5 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-white">
               Sale
@@ -125,10 +112,10 @@ function ProductTile({ item }) {
       </Link>
 
       {/* Name, prices, button — nothing else, at the client's ask. The two
-          lines of specification that were here are gone, and with them the last
-          argument this design was making that Option B was not: that a buyer
-          choosing between foam grades wants the grade before the price. The
-          client's call, and the row is shorter for it — 582px to about 510.
+          lines of specification that were here are gone, and with them the
+          argument that a buyer choosing between foam grades wants the grade
+          before the price. The client's call, and the row is shorter for it —
+          582px to about 510.
 
           The rest of the height came off the padding rather than the type,
           because the type is already at the smallest size that stays readable
@@ -186,8 +173,8 @@ export default function PopularProductsGrid() {
 
   return (
     <section className="bg-white pb-16 pt-16 lg:pb-24 lg:pt-24">
-      {/* Centred, and carrying the same two lines as Option B, at the client's
-          ask. It was left on the `.shell` gutter with a "view all" held to the
+      {/* Centred, and carrying these two lines, at the client's ask. It was
+          left on the `.shell` gutter with a "view all" held to the
           right — the arrangement `DivisionsStrip` uses — and centring it left
           that link nowhere to stand: a lone element pushed right beside a
           centred block reads as a layout that failed to finish. It moved below
@@ -214,9 +201,9 @@ export default function PopularProductsGrid() {
 
           {/* The ornament the client asked for, and it introduces no new shape
               to do the job. It is the page's two existing rules set on one line:
-              the 3px brand bar that sits under Option B's title and beneath the
-              foam story's eyebrow, extended either side by the 1px ink hairline
-              the division and collection eyebrows use. Two weights, one axis.
+              the 3px brand bar from beneath the foam story's eyebrow, extended
+              either side by the 1px ink hairline the division and collection
+              eyebrows use. Two weights, one axis.
 
               This is where the reference's leaf-and-gold device went, and why
               it did not come back: a leaf appears nowhere else on this page, so
@@ -236,32 +223,38 @@ export default function PopularProductsGrid() {
 
       {/* 12px between the tiles — the page's one gutter figure, the same value
           between the four division cards and the three collections cards above.
-          It is half of what separates this design from Option B, which sets its
-          four apart at 32px: tight makes a set to read across, loose makes
-          separate propositions to pick between.
+          Tight, so the four read as one set rather than as four separate
+          propositions to pick between — the rejected offer row set its cards
+          32px apart for exactly the opposite reason. The gaps have not moved
+          through any of this; only the margin around them has.
 
-          Down the sides it is 12px on a phone, 24 from md and 40 from lg — the
-          client asked twice for more, and the second ask is why the margin is
-          no longer tied to the gap.
+          On `.shell` now, at the client's third ask for a narrower row — 24px
+          on a phone, 56 from md, 80 from lg. That is the end of the line for
+          this, and deliberately so: it is the page's own gutter, so the row
+          finally sits on the same margin as the heading above it and the "view
+          all" below, and the section reads as one block rather than a heading
+          with a wider row bolted under it.
 
-          It was 12px on the argument that the frame should equal the gutters
-          inside it. That is a real principle for a row sitting almost flush to
-          the window, and the wrong one once a visible margin is wanted: an
-          outer margin larger than the internal gutter is the ordinary case in
-          any grid — `.shell` itself runs 80px margins against these 12px gaps.
-          So the gaps stay at 12 and only the margin grows. Keeping them locked
-          together would have loosened the row to 40px gutters and walked this
-          design's density straight into Option B's.
+          The three earlier figures each had a reason that has since expired.
+          12px matched the gaps, on the argument that the frame around a row
+          should equal the gutters inside it — true while the row sat nearly
+          flush to the window. 40px broke that tie once a visible margin was
+          wanted, which is ordinary: an outer margin exceeding the internal
+          gutter is the normal case in any grid. Both also kept the row wider
+          than the copy, which was `DivisionsStrip`'s asymmetry and worth
+          protecting while this heading was left-aligned on the gutter. It is
+          centred now, so there is no ragged edge for the cards to reach past
+          and nothing left for the asymmetry to do.
 
-          It still stops well short of `.shell`'s 80px, and that is the point:
-          the heading above sits on the shell gutter, so the cards go on
-          reaching past the copy — which is the asymmetry `DivisionsStrip`
-          established — just by less than they did. */}
+          `.shell` also caps at 1600px, which the bare padding never did. That
+          fixes something not asked about: the row used to run uncapped while
+          the heading capped, so past ~1760px they came apart and the heading
+          sat marooned in the middle of a much wider row. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 md:px-6 lg:grid-cols-4 lg:px-10"
+        className="shell grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         {popularProducts.map((item) => (
           <ProductTile key={item.id} item={item} />
@@ -269,9 +262,9 @@ export default function PopularProductsGrid() {
       </motion.div>
 
       {/* Below the row rather than beside the heading, since the heading became
-          centred. Kept, not dropped: it is the last thing this design says that
-          Option B does not — that the row is the front of a catalogue and there
-          is more behind it, rather than four offers and nothing else. */}
+          centred. Kept, not dropped: it is what says the row is the front of a
+          catalogue with more behind it, rather than four offers and nothing
+          else. */}
       <motion.div
         variants={group}
         {...reveal}

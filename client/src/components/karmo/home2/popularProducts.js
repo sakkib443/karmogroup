@@ -1,16 +1,17 @@
 /**
  * The three products both Popular Products designs show.
  *
- * `PopularProductsGrid` (Option A, the quiet grid) and `PopularProductsOffers`
- * (Option B, the offer row) read from here rather than each carrying its own
- * list. The client asked for the same pictures in both so the comparison is
- * about the treatment and nothing else — and a shared module is the only way
- * that stays true. Two copies of a list drift the first time one is edited, and
- * a drifted A/B is worse than no A/B: whichever looks better might just be the
- * one with the better photograph.
+ * `PopularProductsGrid` reads from here. This was split out when there were
+ * two candidate designs on the page and the client wanted identical pictures
+ * in both, so the comparison was about the treatment and nothing else — two
+ * copies of a list drift the first time one is edited, and a drifted A/B is
+ * worse than no A/B, since whichever looks better might just be the one with
+ * the better photograph.
  *
- * It also means the loser is cheap to delete. When one design is picked, this
- * file stays where it is and the other component goes.
+ * That paid off exactly as intended: the losing component was deleted and this
+ * file did not have to change. It stays separate now because product data with
+ * stand-in artwork and placeholder prices has a different lifetime from the
+ * layout that renders it — see the notes below on what still needs replacing.
  *
  * ── The products ───────────────────────────────────────────────────────────
  * Karmo's three real foam combos, with the prices their live site quotes. All
@@ -19,7 +20,7 @@
  * five free cushions per set, in two sizes — rather than being written for the
  * layout.
  *
- * The fourth is a mattress, and it is deliberately not an offer. Option A was
+ * The fourth is a mattress, and it is deliberately not an offer. The row was
  * asked for as a four-up and there is no fourth combo, so rather than invent a
  * price and a discount for one, this carries the figure `ShoppableScene`
  * already quotes for the same product and leaves `was` null. Two things fall
@@ -114,7 +115,8 @@ export const popularProducts = [
     href: "/mattress",
     /* Not a stand-in. The one genuine Karmo product photograph in the repo that
        is not a campaign poster, which is also why it is worth having in the row:
-       it is the closest thing here to what Option A actually wants. */
+       it is the closest thing here to the catalogue photography this design
+       actually wants. */
     image: "/karmo/images/mattress/suite-interior.jpg",
     alt: "A Karmo mattress in red floral ticking with white piping on an upholstered bed, lit by two bedside lamps beneath a chandelier",
     /* Centred, not topped. There is no printed headline to protect, and the

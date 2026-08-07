@@ -5,7 +5,6 @@ import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
-import PopularProductsOffers from "@/components/karmo/home2/PopularProductsOffers";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -37,35 +36,12 @@ export default function HomePage() {
       <ShoppableScene />
       <FoamStory />
 
-      {/* ── Popular Products: two designs, up at once to be chosen between ──
-          The client sent two references and asked for both built rather than
-          one recommended. They sit at the foot of the page so the sections
-          above keep the order they were signed off in, and one after the other
-          rather than side by side — a four-up product row squeezed into half a
-          window is not the design being judged.
-
-          Deleting the loser is three things: its `<Marker>` and section here,
-          its import above, and its file. Then drop the marker component too. */}
-      <Marker>Option A — the quiet grid</Marker>
+      {/* Two Popular Products designs were built here to be chosen between —
+          this quiet grid and an offer row of poster cards. The client picked
+          this one, so the other component and the scaffolding labels that
+          separated them are gone. The product data stays where it was, in
+          `popularProducts`, since it was always shared. */}
       <PopularProductsGrid />
-
-      <Marker>Option B — the offer row</Marker>
-      <PopularProductsOffers />
     </>
-  );
-}
-
-/**
- * A scaffolding label, and it is meant to look like one. Brand red on ink so it
- * cannot be mistaken for part of either design, and it goes when the choice
- * does.
- */
-function Marker({ children }) {
-  return (
-    <div className="bg-shade-deep py-2.5 text-center">
-      <span className="display text-[11px] font-bold uppercase tracking-[0.24em] text-white">
-        {children}
-      </span>
-    </div>
   );
 }
