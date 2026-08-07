@@ -56,22 +56,30 @@ import {
  *   · The announcement band stays exactly as it is — red, full height, every
  *     line of it. Earlier this rolled away past 40px of scroll; the client
  *     wants it kept, so it is no longer scroll-aware at all.
- *   · Rows 2 and 3 merge into one: the logo on the left, the division menu
- *     centred on the bar rather than left-hung under it, and the account
- *     icons plus the cart on the right. The search field and the "Find a
- *     Store" button drop out of this row — the client's ask names logo, menu,
- *     and the icons on the right, nothing else, and there is not room for six
- *     things in one 74px bar. The mobile drawer still carries its own search.
+ *   · Rows 2 and 3 merge into one: the logo on the left — cropped down to
+ *     just the mark, see `ScrolledLogo` — the division menu centred on the
+ *     bar, and the icons on the right, Find a Store now among them again once
+ *     the narrower logo freed the room for it. The search field is what
+ *     actually drops: even with that room back there is not space for six
+ *     things in one 74px bar, and it is the one the mobile drawer already
+ *     duplicates.
  *   · At rest, the two rows stay exactly as they were — separate, with the
  *     search field and the full navigation row. This merge is a scrolled-only
  *     state, not a redesign of the resting header.
  *
+ * The two shapes cross-fade into each other rather than one replacing the
+ * other outright — see the comment above the two `grid-template-rows`
+ * wrappers in the render for how, and why a plain conditional render could
+ * not have animated it.
+ *
  * `DivisionNav` and `FindStoreButton` below serve both the resting row 3 and
  * the merged row, so the menu behaves identically wherever it is standing.
  *
- * The wordmark is the ink cut, not the default. The default artwork sets
- * "GROUP", "Since 1965" and the ® in white so it can sit on a photograph;
- * on a light bar half of it would vanish.
+ * Two logos, two files, not one shrunk. At rest this uses `logo-ink.png`, the
+ * ink cut of the full wordmark — the default artwork sets "GROUP", "Since
+ * 1965" and the ® in white so it can sit on a photograph, and on a light bar
+ * half of it would vanish. Scrolled it uses `logo-mark.png`, the client's
+ * short mark: the black 1965 device and "KARMO", no "GROUP".
  *
  * Colour follows Karmo rather than the reference, whose deep green belongs to
  * another brand. The dark here is the same cool slate the rest of the site
@@ -241,6 +249,34 @@ function DivisionNav({ compact, panel, openPanel }) {
  * button is competing with the whole menu for width, and a second line of
  * 10.5px text is the cheapest thing in it to lose.
  */
+/**
+ * The short mark, for the merged bar — the client's own artwork, added as
+ * `/karmo/logo-mark.png`.
+ *
+ * This is a genuinely separate file rather than a crop of the full wordmark,
+ * and that matters: the black factory device carrying "Since 1965" is drawn
+ * in *black* here, where the wordmark's version of it is part of a lockup
+ * that reads differently. Trying to make the long logo behave as the short
+ * one by cropping and letting its white halves disappear against this bar
+ * lost that black device entirely and left the mark looking broken. There was
+ * no version of that trick worth keeping once the real file existed.
+ *
+ * 400x120, ink from x9 to x390 and y16 to y103 — padded evenly on all four
+ * sides, so it needs no `object-position` nudge and no crop box. Straight
+ * `Logo` with the file's own intrinsic size, height set by the caller.
+ */
+function ScrolledLogo({ className }) {
+  return (
+    <Logo
+      src="/karmo/logo-mark.png"
+      width={400}
+      height={120}
+      className={`w-auto ${className}`}
+      priority
+    />
+  );
+}
+
 function FindStoreButton({ compact }) {
   return (
     <Link
@@ -416,20 +452,47 @@ export default function HeaderTwo() {
       </div>
 
       {/* ── 2 + 3 · Identity, tools and navigation ───────────────────── */}
-      {/* Two shapes, one deciding whether the reader has scrolled. At rest
-          these are the original two rows, untouched. Scrolled, they collapse
-          into the single merged bar the client asked for — logo, centred menu,
-          icons. Rendered as a genuine either/or rather than both kept in the
-          DOM and toggled with classes, because the two layouts do not share a
-          structure to animate between: the merged row is a three-part flex
-          line with the menu occupying whatever room is left between the logo
-          and the icons, which the resting layout has no equivalent of, and
-          trying to cross-fade two different flex arrangements would fight
-          itself. The switch happens at the same 40px threshold `scrolled`
-          already uses, so it lands with the shadow and the logo's own resize
-          rather than as a separate, later snap. */}
-      {!scrolled && (
-        <>
+      {/* Two shapes, both always in the DOM now, cross-fading on `scrolled`
+          rather than one hard-swapped for the other. The client asked for the
+          merge to animate rather than snap, and a straight `{cond && <...>}`
+          toggle cannot do that — React unmounts one tree and mounts the other
+          on the same render, with nothing on screen for either to transition
+          from or to.
+
+          Each wrapper animates `max-height` and `opacity` together, the same
+          technique the announcement band already used before it was made
+          unconditional — chosen over a `grid-template-rows` 0fr/1fr collapse
+          (the more general modern answer, no pixel value required) because
+          that one measured unreliably here: identical fresh loads and a
+          single clean toggle sometimes settled at the right computed height
+          and sometimes visibly stuck at the pre-transition value, with no
+          difference in the applied class each time — a real animation bug in
+          this rendering path, not a fixed cost worth accepting for the more
+          elegant technique. `max-height` needs a real number, which is why it
+          is fine here and would not be for content of unknown height: both
+          rows are fixed by their own `h-[..px]` children: 74px for the merged
+          bar, and 143px for the resting pair from lg up, where the nav row is
+          not `hidden`. That 143 is 74 + 68 + the nav row's own 1px `border-t`
+          — it was written as 142 first, which clipped a pixel and left the
+          resting header measuring 177 against the layout's 178px offset. The
+          same border has now caught this file twice; if either row grows,
+          measure the rendered height rather than adding up the classes.
+
+          Both trees carry real `DivisionNav`s, `Tool`s and forms, so the one
+          currently collapsed is not merely hidden — `inert` disowns it: no
+          tab stops, no hover, no announcement to a screen reader, for as long
+          as it is collapsed, without needing a delayed unmount once the
+          animation finishes. */}
+      <div
+        aria-hidden={scrolled || undefined}
+        inert={scrolled || undefined}
+        className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled
+            ? "max-h-0 opacity-0"
+            : "max-h-[74px] opacity-100 lg:max-h-[143px]"
+        }`}
+      >
+        <div>
           <div className="shell flex h-[74px] items-center justify-between gap-8">
             {/* `/`, not `/home-2`. This header used to be the chrome for the
                 /home-2 route and pointed its logo back at it; that route now
@@ -493,57 +556,83 @@ export default function HeaderTwo() {
               <FindStoreButton />
             </div>
           </div>
-        </>
-      )}
+        </div>
+      </div>
 
-      {scrolled && (
-        <div className="shell flex h-[74px] items-center gap-4">
-          <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
-            <Logo src="/karmo/logo-ink.png" className="h-10 w-auto lg:h-11" priority />
-          </Link>
+      <div
+        aria-hidden={!scrolled || undefined}
+        inert={!scrolled || undefined}
+        className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled ? "max-h-[74px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div>
+          <div className="shell flex h-[74px] items-center gap-4">
+            {/* The short mark, not the full wordmark — see `ScrolledLogo`.
+                147px rendered against the resting logo's 319, so it hands 172px
+                back to the row.
 
-          {/* Centred in the space *left over* between the logo and the icons,
-              not on the bar as a whole — those two are unequal widths (the
-              wordmark alone is some 320px against the icon cluster's 190), and
-              centring against the full row put the menu a good 130px closer to
-              the logo than to the icons: measured, it read as crowding the
-              wordmark at every width tried, right up to the one where it
-              stopped short of touching. `flex-1` sidesteps the asymmetry
-              instead of compensating for it — the menu centres in whatever
-              room the logo and the icons actually leave, so it stays balanced
-              between them regardless of how wide either one is.
+                Worth being honest about where that went, because it did not go
+                to the menu: Find a Store, added to the right in the same pass,
+                costs 218px. The bar is a net ~46px tighter than before, not
+                looser, and the menu's breakpoint stayed where it was rather
+                than coming down. Dropping Find a Store again is what would
+                actually buy the menu room at 1280. */}
+            <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
+              <ScrolledLogo className="h-10 lg:h-11" />
+            </Link>
 
-              The breakpoint is its own, not `lg`. Even fully compact the menu
-              needs about 600px, and at 1024px — where the resting header's
-              nav has a full row to itself — the space left beside the logo and
-              icons here is under 350px. Measured the true minimum at exactly
-              1103px of bar content; `min-[1360px]` clears it with roughly 100px
-              to spare on each side rather than landing on the edge of
-              overflowing. Below that width this row shows logo and icons only,
-              and the hamburger stays available to reach the menu. */}
-          <div className="hidden min-[1360px]:flex min-[1360px]:flex-1 min-[1360px]:justify-center">
-            <DivisionNav compact panel={panel} openPanel={openPanel} />
-          </div>
+            {/* Centred in the space *left over* between the logo and the
+                icons, not on the bar as a whole — the two are unequal widths
+                even now, and centring against the full row measurably crowded
+                whichever side was wider. `flex-1` sidesteps the asymmetry
+                instead of compensating for it — the menu centres in whatever
+                room the logo and the icons actually leave, so it stays
+                balanced between them regardless of how wide either one is.
 
-          <div className="ml-auto flex shrink-0 items-center gap-6 lg:gap-7">
-            <span className="hidden sm:contents">
-              <Tool icon={FiHeart} label="Favourites" href="/wishlist" count={3} />
-              <Tool icon={FiUser} label="Account" href="/login" />
-            </span>
-            <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+                The breakpoint is its own, not `lg`, and it is tight rather
+                than cautious. Measured at this size: the menu is 593px
+                intrinsic, the logo 147 and the icons 409, which with the 32px
+                gap needs 1181px of content — 1341px of window once `.shell`
+                takes its 80px each side. `min-[1360px]` is the nearest round
+                number above that, and it lands at 47px of clearance either
+                side, not the ~100 an earlier note here claimed. At 1280 the
+                row has 524px free against the menu's 593 and genuinely does
+                not fit. Below the breakpoint this row is logo and icons only,
+                with the hamburger reaching the same drawer. */}
+            <div className="hidden min-[1360px]:flex min-[1360px]:flex-1 min-[1360px]:justify-center">
+              <DivisionNav compact panel={panel} openPanel={openPanel} />
+            </div>
 
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              className="text-[22px] text-ink min-[1360px]:hidden"
-            >
-              {open ? <FiX /> : <FiMenu />}
-            </button>
+            {/* Find a Store returns here, at the client's ask, spending the
+                room the narrower logo freed on the left. `sm:flex` rather
+                than always-on for the same reason Favourites/Account already
+                hide below that width: a phone-width merged bar has logo,
+                cart and the hamburger to fit and nothing to spare. */}
+            <div className="ml-auto flex shrink-0 items-center gap-6 lg:gap-7">
+              <span className="hidden sm:contents">
+                <Tool icon={FiHeart} label="Favourites" href="/wishlist" count={3} />
+                <Tool icon={FiUser} label="Account" href="/login" />
+              </span>
+              <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+
+              <span className="hidden sm:block">
+                <FindStoreButton compact />
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                className="text-[22px] text-ink min-[1360px]:hidden"
+              >
+                {open ? <FiX /> : <FiMenu />}
+              </button>
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* ── Division panel ───────────────────────────────────────────── */}
       {/* Home 03's shape exactly: description and "the whole division" on the
