@@ -225,6 +225,49 @@ export default function ShoppableScene() {
             className="object-cover"
           />
 
+          {/* The page's soft veil, and then a second wash into the top-right
+              corner where the line below sits. Two layers rather than one
+              stronger one, because they answer different questions: the veil is
+              the section's, shared with the three collection cards above so the
+              two sections read as one block, and the scrim is this line's
+              alone. Thickening the veil until the words held would have dragged
+              every other picture on the page down with it.
+
+              Both are `pointer-events-none` — they cover the whole frame, and
+              the markers underneath have to stay hoverable through them. */}
+          <span aria-hidden className="photo-veil pointer-events-none absolute inset-0" />
+          <span aria-hidden className="scene-type-scrim pointer-events-none absolute inset-0" />
+
+          {/* The client's line, in the corner the measurements chose.
+              Set small and letterspaced rather than as a headline: the room is
+              the subject and the markers are the point, so this is a caption on
+              the scene, not a title over it. The brand rule under it is the
+              same one the foam story uses beneath its eyebrow.
+
+              Ahead of the markers in the DOM and carrying no `z`, so the
+              markers (z-10) and any open card (z-20) both pass over it — a
+              product card should never open underneath a line of decoration.
+              `pointer-events-none` for the same reason: the sofa marker is the
+              nearest one to this corner and nothing here may intercept it.
+
+              The text-shadow is polish, not contrast. It softens the letters
+              against the busier parts of the wall, but it is worth nothing to a
+              contrast ratio, so the scrim behind is sized as though it were not
+              there. */}
+          <p className="display pointer-events-none absolute right-5 top-6 max-w-[13rem] text-right text-[10.5px] font-bold uppercase leading-[1.7] tracking-[0.2em] text-white [text-shadow:0_1px_18px_rgba(10,8,6,0.5)] lg:right-10 lg:top-10 lg:max-w-[15rem] lg:text-[12px]">
+            {/* Broken by hand rather than left to the max-width, so the line
+                lands the same way at every size instead of moving with the
+                column. The max-width stays as a guard for the smallest
+                screens. */}
+            Karmo is everywhere
+            <br />
+            in our lives
+            <span
+              aria-hidden
+              className="mt-3 ml-auto block h-[3px] w-10 bg-brand lg:w-12"
+            />
+          </p>
+
           {/* Anything the crop carries past an edge is clipped away by the
               frame's `overflow-hidden`, so no marker can end up stranded on a
               border pointing at nothing. */}

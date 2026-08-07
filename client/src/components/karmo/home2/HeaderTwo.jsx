@@ -43,7 +43,7 @@ import {
  * buyer reaches for them, which is only worth doing if there is something to
  * search and something to put in a basket.
  *
- * Three rows, each with one job:
+ * Three rows at rest, each with one job:
  *
  *   1. Announcement — the delivery promise, order tracking, the social row.
  *      The only dark band; it stops the light header floating off the page.
@@ -51,9 +51,35 @@ import {
  *   3. Navigation — a division per entry, each with an icon and a line of
  *      trade under it, and one call to action held to the right.
  *
- * The wordmark is the ink cut, not the default. The default artwork sets
- * "GROUP", "Since 1965" and the ® in white so it can sit on a photograph;
- * on a light bar half of it would vanish.
+ * Scrolled, two things change and the third deliberately does not:
+ *
+ *   · The announcement band stays exactly as it is — red, full height, every
+ *     line of it. Earlier this rolled away past 40px of scroll; the client
+ *     wants it kept, so it is no longer scroll-aware at all.
+ *   · Rows 2 and 3 merge into one: the logo on the left — cropped down to
+ *     just the mark, see `ScrolledLogo` — the division menu centred on the
+ *     bar, and the icons on the right, Find a Store now among them again once
+ *     the narrower logo freed the room for it. The search field is what
+ *     actually drops: even with that room back there is not space for six
+ *     things in one 74px bar, and it is the one the mobile drawer already
+ *     duplicates.
+ *   · At rest, the two rows stay exactly as they were — separate, with the
+ *     search field and the full navigation row. This merge is a scrolled-only
+ *     state, not a redesign of the resting header.
+ *
+ * The two shapes cross-fade into each other rather than one replacing the
+ * other outright — see the comment above the two `grid-template-rows`
+ * wrappers in the render for how, and why a plain conditional render could
+ * not have animated it.
+ *
+ * `DivisionNav` and `FindStoreButton` below serve both the resting row 3 and
+ * the merged row, so the menu behaves identically wherever it is standing.
+ *
+ * Two logos, two files, not one shrunk. At rest this uses `logo-ink.png`, the
+ * ink cut of the full wordmark — the default artwork sets "GROUP", "Since
+ * 1965" and the ® in white so it can sit on a photograph, and on a light bar
+ * half of it would vanish. Scrolled it uses `logo-mark.png`, the client's
+ * short mark: the black 1965 device and "KARMO", no "GROUP".
  *
  * Colour follows Karmo rather than the reference, whose deep green belongs to
  * another brand. The dark here is the same cool slate the rest of the site
@@ -148,12 +174,142 @@ function Tool({ icon: Icon, label, href, count }) {
   );
 }
 
+/**
+ * The division menu, in both the shapes it has to take.
+ *
+ * It lives in two rows now — its own at rest, and the identity row once the
+ * bar is scrolled and the two merge. Extracted rather than written twice
+ * because the hover handlers, the chevron state and the accent rule all have
+ * to behave identically in both, and two copies of that drift.
+ *
+ * Only one is ever *displayed*: the other row is `display: none` or collapsed
+ * to nothing, so screen readers are never offered two navigations even though
+ * both are in the markup.
+ *
+ * `compact` drops the line of trade under each name and tightens the padding.
+ * That is not a style preference — the full entry is two lines and 68px tall,
+ * and the row it merges into is 74px with a logo in it. Something had to give,
+ * and the sub-line is the part a reader who has already scrolled past the top
+ * of the page no longer needs.
+ */
+function DivisionNav({ compact, panel, openPanel }) {
+  return (
+    <nav aria-label="Divisions">
+      <ul className="flex items-center">
+        {nav.map((entry) => (
+          <li key={entry.name} className="relative">
+            <Link
+              href={entry.href}
+              onMouseEnter={() => openPanel(entry.name)}
+              onFocus={() => openPanel(entry.name)}
+              className={`flex items-center transition-colors duration-300 ${
+                compact ? "gap-2 px-3 py-2.5" : "gap-3 py-3.5 pr-8"
+              } ${entry.accent ? "text-brand" : "text-ink hover:text-brand"}`}
+            >
+              <entry.icon
+                className={`${compact ? "text-[17px]" : "text-[19px]"} ${
+                  entry.accent ? "text-brand" : "text-ink/55"
+                }`}
+              />
+              <span className="block">
+                <span
+                  className={`display block font-bold uppercase leading-none tracking-[0.1em] ${
+                    compact ? "text-[11.5px]" : "text-[12px]"
+                  }`}
+                >
+                  {entry.name}
+                </span>
+                {!compact && (
+                  <span className="mt-1 block text-[10.5px] leading-none text-ink/50">
+                    {entry.line}
+                  </span>
+                )}
+              </span>
+              {entry.submenu && (
+                <FiChevronDown
+                  className={`text-[13px] text-ink/40 transition-transform duration-300 ${
+                    panel === entry.name ? "rotate-180" : ""
+                  }`}
+                />
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * Black bar, red tile — the map pin sits on a solid brand square, the one spot
+ * of colour on a dark button. On hover the bar lifts to the lighter slate, the
+ * tile nudges up with a soft red glow, and the arrow warms to brand and follows.
+ *
+ * `compact` drops "Showrooms nationwide" and the arrow. In the merged row this
+ * button is competing with the whole menu for width, and a second line of
+ * 10.5px text is the cheapest thing in it to lose.
+ */
+/**
+ * The short mark, for the merged bar — the client's own artwork, added as
+ * `/karmo/logo-mark.png`.
+ *
+ * This is a genuinely separate file rather than a crop of the full wordmark,
+ * and that matters: the black factory device carrying "Since 1965" is drawn
+ * in *black* here, where the wordmark's version of it is part of a lockup
+ * that reads differently. Trying to make the long logo behave as the short
+ * one by cropping and letting its white halves disappear against this bar
+ * lost that black device entirely and left the mark looking broken. There was
+ * no version of that trick worth keeping once the real file existed.
+ *
+ * 400x120, ink from x9 to x390 and y16 to y103 — padded evenly on all four
+ * sides, so it needs no `object-position` nudge and no crop box. Straight
+ * `Logo` with the file's own intrinsic size, height set by the caller.
+ */
+function ScrolledLogo({ className }) {
+  return (
+    <Logo
+      src="/karmo/logo-mark.png"
+      width={400}
+      height={120}
+      className={`w-auto ${className}`}
+      priority
+    />
+  );
+}
+
+function FindStoreButton({ compact }) {
+  return (
+    <Link
+      href="/find-store"
+      className="group flex h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade"
+    >
+      <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(230,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-px group-hover:shadow-[0_6px_16px_-4px_rgba(230,0,0,0.75)]">
+        <FiMapPin className="text-[16px]" />
+      </span>
+      <span className="block text-left">
+        <span className="display block text-[12.5px] font-bold leading-tight">
+          Find a Store
+        </span>
+        {!compact && (
+          <span className="block text-[10.5px] leading-tight text-white/60">
+            Showrooms nationwide
+          </span>
+        )}
+      </span>
+      {!compact && (
+        <FiArrowRight className="text-[14px] text-white/55 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-brand" />
+      )}
+    </Link>
+  );
+}
+
 export default function HeaderTwo() {
   const [open, setOpen] = useState(false);
 
-  // The bar keeps its place at the top of the window, so the announcement row
-  // rolls away on scroll rather than the whole thing shrinking — the search
-  // field and the divisions stay reachable the entire way down the page.
+  // Still needed even though the announcement band no longer answers to it:
+  // `scrolled` is what switches rows 2 and 3 between their resting shape and
+  // the merged one, and what puts the shadow and blur on the bar once the
+  // page beneath it is no longer the hero.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -214,17 +370,20 @@ export default function HeaderTwo() {
       }`}
     >
       {/* ── 1 · Announcement ─────────────────────────────────────────── */}
+      {/* No longer scroll-aware. This used to collapse to nothing past 40px of
+          scroll, on the argument that a reader who has moved on does not need
+          the hotline repeated. The client wants it kept — red, full height, at
+          every scroll position — so the visibility toggle that lived here is
+          gone rather than disabled; there is nothing left for `scrolled` to
+          decide about this row. */}
       <div
-        aria-hidden={scrolled || undefined}
         // Brand red, not the slate this used to run on. White on #e60000
         // measures 4.81:1, which clears the 4.5:1 bar for the 11px text in
         // here — but only at full white. Every dimmed white on this row had to
         // come up to solid for that reason: white/75 lands at 3.03:1, and the
         // hours and the social icons were both set that way. Weight and size
         // carry the hierarchy here instead of opacity.
-        className={`overflow-hidden bg-brand text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          scrolled ? "invisible max-h-0 opacity-0" : "visible max-h-14 opacity-100"
-        }`}
+        className="bg-brand text-white"
       >
         <div className="shell flex h-8 items-center justify-between gap-6">
           {/* The hotline, not a delivery promise. This band is the first line
@@ -292,151 +451,186 @@ export default function HeaderTwo() {
         </div>
       </div>
 
-      {/* ── 2 · Identity and tools ───────────────────────────────────── */}
-      {/* This row used to absorb the navigation row below it on scroll — the
-          search field stepping aside for the division links, so logo and menu
-          shared one bar. The client wants the two rows kept apart, so it no
-          longer does: the search field stays where it is at every scroll
-          position, and row 3 stays put underneath. Only the announcement band
-          above rolls away.
+      {/* ── 2 + 3 · Identity, tools and navigation ───────────────────── */}
+      {/* Two shapes, both always in the DOM now, cross-fading on `scrolled`
+          rather than one hard-swapped for the other. The client asked for the
+          merge to animate rather than snap, and a straight `{cond && <...>}`
+          toggle cannot do that — React unmounts one tree and mounts the other
+          on the same render, with nothing on screen for either to transition
+          from or to.
 
-          What still changes on scroll is the logo, which grows — the bar reads
-          as more established the further down the page it has followed, rather
-          than as one that shrank to make room. */}
-      <div className="shell flex h-[74px] items-center justify-between gap-8">
-        {/* `/`, not `/home-2`. This header used to be the chrome for the
-            /home-2 route and pointed its logo back at it; that route now
-            carries the other design, and this one is the front page. */}
-        <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
-          <Logo
-            src="/karmo/logo-ink.png"
-            className={`w-auto transition-[height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              scrolled ? "h-10 lg:h-11" : "h-8 lg:h-9"
-            }`}
-            priority
-          />
-        </Link>
+          Each wrapper animates `max-height` and `opacity` together, the same
+          technique the announcement band already used before it was made
+          unconditional — chosen over a `grid-template-rows` 0fr/1fr collapse
+          (the more general modern answer, no pixel value required) because
+          that one measured unreliably here: identical fresh loads and a
+          single clean toggle sometimes settled at the right computed height
+          and sometimes visibly stuck at the pre-transition value, with no
+          difference in the applied class each time — a real animation bug in
+          this rendering path, not a fixed cost worth accepting for the more
+          elegant technique. `max-height` needs a real number, which is why it
+          is fine here and would not be for content of unknown height: both
+          rows are fixed by their own `h-[..px]` children: 74px for the merged
+          bar, and 143px for the resting pair from lg up, where the nav row is
+          not `hidden`. That 143 is 74 + 68 + the nav row's own 1px `border-t`
+          — it was written as 142 first, which clipped a pixel and left the
+          resting header measuring 177 against the layout's 178px offset. The
+          same border has now caught this file twice; if either row grows,
+          measure the rendered height rather than adding up the classes.
 
-        {/* Given the middle of the bar because on a shop the search field is
-            the thing most people came for. Hidden below lg, where it moves
-            into the drawer. */}
-        <form
-          role="search"
-          onSubmit={(e) => e.preventDefault()}
-          className="hidden h-[46px] max-w-[620px] flex-1 items-stretch overflow-hidden rounded-[4px] border border-ink/15 bg-cream/60 transition-colors duration-300 focus-within:border-brand/50 focus-within:bg-white lg:flex"
-        >
-          <input
-            type="search"
-            placeholder="Search foam grades, mattresses, bedding…"
-            aria-label="Search the Karmo range"
-            className="body-copy min-w-0 flex-1 bg-transparent pl-5 pr-3 text-[14px] text-ink outline-none placeholder:text-ink/45"
-          />
-          <button
-            type="submit"
-            aria-label="Search"
-            className="group relative flex shrink-0 items-center gap-2.5 overflow-hidden bg-brand px-6 text-white transition-colors duration-300 hover:bg-shade-deep"
-          >
-            <span
-              aria-hidden="true"
-              className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 ease-out group-hover:translate-x-0"
-            />
-            <FiSearch className="relative text-[17px] transition-transform duration-300 group-hover:scale-110" />
-            <span className="relative text-[12px] font-bold uppercase tracking-[0.12em]">
-              Search
-            </span>
-          </button>
-        </form>
+          Both trees carry real `DivisionNav`s, `Tool`s and forms, so the one
+          currently collapsed is not merely hidden — `inert` disowns it: no
+          tab stops, no hover, no announcement to a screen reader, for as long
+          as it is collapsed, without needing a delayed unmount once the
+          animation finishes. */}
+      <div
+        aria-hidden={scrolled || undefined}
+        inert={scrolled || undefined}
+        className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled
+            ? "max-h-0 opacity-0"
+            : "max-h-[74px] opacity-100 lg:max-h-[143px]"
+        }`}
+      >
+        <div>
+          <div className="shell flex h-[74px] items-center justify-between gap-8">
+            {/* `/`, not `/home-2`. This header used to be the chrome for the
+                /home-2 route and pointed its logo back at it; that route now
+                carries the other design, and this one is the front page. */}
+            <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
+              <Logo src="/karmo/logo-ink.png" className="h-8 w-auto lg:h-9" priority />
+            </Link>
 
-        <div className="flex shrink-0 items-center gap-6 lg:gap-7">
-          <span className="hidden sm:contents">
-            <Tool icon={FiHeart} label="Favourites" href="/wishlist" count={3} />
-            <Tool icon={FiUser} label="Account" href="/login" />
-          </span>
-          <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+            {/* Given the middle of the bar because on a shop the search field
+                is the thing most people came for. Hidden below lg, where it
+                moves into the drawer. */}
+            <form
+              role="search"
+              onSubmit={(e) => e.preventDefault()}
+              className="hidden h-[46px] max-w-[620px] flex-1 items-stretch overflow-hidden rounded-[4px] border border-ink/15 bg-cream/60 transition-colors duration-300 focus-within:border-brand/50 focus-within:bg-white lg:flex"
+            >
+              <input
+                type="search"
+                placeholder="Search foam grades, mattresses, bedding…"
+                aria-label="Search the Karmo range"
+                className="body-copy min-w-0 flex-1 bg-transparent pl-5 pr-3 text-[14px] text-ink outline-none placeholder:text-ink/45"
+              />
+              <button
+                type="submit"
+                aria-label="Search"
+                className="group relative flex shrink-0 items-center gap-2.5 overflow-hidden bg-brand px-6 text-white transition-colors duration-300 hover:bg-shade-deep"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 -translate-x-full bg-white/15 transition-transform duration-500 ease-out group-hover:translate-x-0"
+                />
+                <FiSearch className="relative text-[17px] transition-transform duration-300 group-hover:scale-110" />
+                <span className="relative text-[12px] font-bold uppercase tracking-[0.12em]">
+                  Search
+                </span>
+              </button>
+            </form>
 
-          {/* The scroll-only "Find a Store" button stood here. It existed
-              because row 3 folded away on scroll and took the bar's only call
-              to action with it. Row 3 stays now, so its own button is always
-              on screen and this one was a duplicate. */}
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Close menu" : "Open menu"}
-            aria-expanded={open}
-            className="text-[22px] text-ink lg:hidden"
-          >
-            {open ? <FiX /> : <FiMenu />}
-          </button>
+            <div className="flex shrink-0 items-center gap-6 lg:gap-7">
+              <span className="hidden sm:contents">
+                <Tool icon={FiHeart} label="Favourites" href="/wishlist" count={3} />
+                <Tool icon={FiUser} label="Account" href="/login" />
+              </span>
+              <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                className="text-[22px] text-ink lg:hidden"
+              >
+                {open ? <FiX /> : <FiMenu />}
+              </button>
+            </div>
+          </div>
+
+          <div className="hidden overflow-hidden border-t border-ink/8 lg:block">
+            <div className="shell flex h-[68px] items-center justify-between gap-6">
+              <DivisionNav panel={panel} openPanel={openPanel} />
+              <FindStoreButton />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── 3 · Navigation ───────────────────────────────────────────── */}
-      {/* Always on, at every scroll position. It used to roll away the same
-          way the announcement does, on the argument that the row above had
-          taken the menu on for itself — but that turned the header into one
-          line, and the client wants the two rows kept. Only the announcement
-          band collapses now. */}
-      <div className="hidden overflow-hidden border-t border-ink/8 lg:block">
-        <div className="shell flex h-[68px] items-center justify-between gap-6">
-          <nav>
-            <ul className="flex items-center">
-              {nav.map((entry) => (
-                <li key={entry.name} className="relative">
-                  <Link
-                    href={entry.href}
-                    onMouseEnter={() => openPanel(entry.name)}
-                    onFocus={() => openPanel(entry.name)}
-                    className={`flex items-center gap-3 py-3.5 pr-8 transition-colors duration-300 ${
-                      entry.accent ? "text-brand" : "text-ink hover:text-brand"
-                    }`}
-                  >
-                    <entry.icon
-                      className={`text-[19px] ${
-                        entry.accent ? "text-brand" : "text-ink/55"
-                      }`}
-                    />
-                    <span className="block">
-                      <span className="display block text-[12px] font-bold uppercase leading-none tracking-[0.1em]">
-                        {entry.name}
-                      </span>
-                      <span className="mt-1 block text-[10.5px] leading-none text-ink/50">
-                        {entry.line}
-                      </span>
-                    </span>
-                    {entry.submenu && (
-                      <FiChevronDown
-                        className={`text-[13px] text-ink/40 transition-transform duration-300 ${
-                          panel === entry.name ? "rotate-180" : ""
-                        }`}
-                      />
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+      <div
+        aria-hidden={!scrolled || undefined}
+        inert={!scrolled || undefined}
+        className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          scrolled ? "max-h-[74px] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div>
+          <div className="shell flex h-[74px] items-center gap-4">
+            {/* The short mark, not the full wordmark — see `ScrolledLogo`.
+                147px rendered against the resting logo's 319, so it hands 172px
+                back to the row.
 
-          {/* Black bar, red tile — the map pin sits on a solid brand square,
-              the one spot of colour on a dark button. Kept small and modern:
-              on hover the bar lifts to the lighter slate, the tile nudges up
-              with a soft red glow, and the arrow warms to brand and follows. */}
-          <Link
-            href="/find-store"
-            className="group flex h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade"
-          >
-            <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(230,0,0,0.6)] transition-all duration-300 group-hover:-translate-y-px group-hover:shadow-[0_6px_16px_-4px_rgba(230,0,0,0.75)]">
-              <FiMapPin className="text-[16px]" />
-            </span>
-            <span className="block text-left">
-              <span className="display block text-[12.5px] font-bold leading-tight">
-                Find a Store
+                Worth being honest about where that went, because it did not go
+                to the menu: Find a Store, added to the right in the same pass,
+                costs 218px. The bar is a net ~46px tighter than before, not
+                looser, and the menu's breakpoint stayed where it was rather
+                than coming down. Dropping Find a Store again is what would
+                actually buy the menu room at 1280. */}
+            <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
+              <ScrolledLogo className="h-10 lg:h-11" />
+            </Link>
+
+            {/* Centred in the space *left over* between the logo and the
+                icons, not on the bar as a whole — the two are unequal widths
+                even now, and centring against the full row measurably crowded
+                whichever side was wider. `flex-1` sidesteps the asymmetry
+                instead of compensating for it — the menu centres in whatever
+                room the logo and the icons actually leave, so it stays
+                balanced between them regardless of how wide either one is.
+
+                The breakpoint is its own, not `lg`, and it is tight rather
+                than cautious. Measured at this size: the menu is 593px
+                intrinsic, the logo 147 and the icons 409, which with the 32px
+                gap needs 1181px of content — 1341px of window once `.shell`
+                takes its 80px each side. `min-[1360px]` is the nearest round
+                number above that, and it lands at 47px of clearance either
+                side, not the ~100 an earlier note here claimed. At 1280 the
+                row has 524px free against the menu's 593 and genuinely does
+                not fit. Below the breakpoint this row is logo and icons only,
+                with the hamburger reaching the same drawer. */}
+            <div className="hidden min-[1360px]:flex min-[1360px]:flex-1 min-[1360px]:justify-center">
+              <DivisionNav compact panel={panel} openPanel={openPanel} />
+            </div>
+
+            {/* Find a Store returns here, at the client's ask, spending the
+                room the narrower logo freed on the left. `sm:flex` rather
+                than always-on for the same reason Favourites/Account already
+                hide below that width: a phone-width merged bar has logo,
+                cart and the hamburger to fit and nothing to spare. */}
+            <div className="ml-auto flex shrink-0 items-center gap-6 lg:gap-7">
+              <span className="hidden sm:contents">
+                <Tool icon={FiHeart} label="Favourites" href="/wishlist" count={3} />
+                <Tool icon={FiUser} label="Account" href="/login" />
               </span>
-              <span className="block text-[10.5px] leading-tight text-white/60">
-                Showrooms nationwide
+              <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+
+              <span className="hidden sm:block">
+                <FindStoreButton compact />
               </span>
-            </span>
-            <FiArrowRight className="text-[14px] text-white/55 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-brand" />
-          </Link>
+
+              <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                className="text-[22px] text-ink min-[1360px]:hidden"
+              >
+                {open ? <FiX /> : <FiMenu />}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

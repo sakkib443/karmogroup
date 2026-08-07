@@ -1126,4 +1126,91 @@ svg.app-icon[fill="none"] {
   .hero-copy {
     text-shadow: 0 1px 24px rgba(10, 8, 6, 0.55);
   }
+
+  /* The soft wash the Home 02 photographs sit under.
+     The client asked for the treatment on Hatil's homepage, where every picture
+     carries the same faint veil whether or not there is type over it — and that
+     last part is the whole point. A veil used only where words need one reads
+     as a scrim. Used on all of them it reads as grading: pictures shot in
+     different rooms at different exposures arrive at a common depth instead of
+     each bringing its own brightness to the page.
+
+     Shade-deep rather than black, for the reason that token gives above — the
+     cool undertone grades a photograph where flat black only dims it.
+
+     Two layers. The flat 12% is the veil. The gradient adds 10% more at the
+     very foot and nothing at all above the halfway line, and that is what keeps
+     the wash from reading as a grey film laid over the picture: a photograph
+     that darkens toward its own floor looks lit, one of even density looks
+     covered. They compound to 21% at the bottom edge, still under a quarter.
+
+     Deliberately too light to carry white type by itself, and by a wide margin:
+     on the shoppable scene, in the quietest corner of that picture, small white
+     text needs the wash near 46% before its worst pixel clears 4.5:1. Anything
+     setting words over a photograph therefore adds its own scrim on top of
+     this, sized to what is under those particular words. The section veil is
+     not that scrim and must not be thickened into one — at 46% it would stop
+     being soft on every other picture on the page. */
+  .photo-veil {
+    background-color: rgba(22, 28, 36, 0.12);
+    background-image: linear-gradient(
+      180deg,
+      rgba(22, 28, 36, 0) 50%,
+      rgba(22, 28, 36, 0.1) 100%
+    );
+  }
+
+  /* The second wash, for the one line of type on the shoppable scene. Poured
+     into the corner the line sits in rather than across the picture, so the
+     other 80% of the room keeps the soft veil above and nothing more.
+
+     Sized from the photograph, not by eye. Sampling the scene on a 10x6 grid
+     put its quietest ground in the top-right — mean luminance 0.16-0.24 against
+     0.45-0.52 through the middle — which is why the line sits there and not in
+     a corner that would have needed twice the scrim to hold it.
+
+     Every figure below was set by compositing this gradient and `.photo-veil`
+     over the pixels that actually land under the line at a given window, and
+     taking the *worst* pixel in the box rather than the average: the median
+     runs 7-13:1 at every size, and the number that matters is the one bright
+     patch on the wall the words happen to cross. Worst-case, white on:
+     4.91:1 at 1280x720, 4.87:1 at 1440x760, 6.88:1 at 1600x1000.
+     Two things move those numbers and both must be rechecked together if
+     either changes — the crop (the frame is `object-cover`, so the window's
+     shape decides which part of the room ends up behind the words) and the
+     scene photograph itself. A new picture invalidates all of it. */
+  .scene-type-scrim {
+    background: radial-gradient(
+      150% 115% at 100% 0%,
+      rgba(22, 28, 36, 0.46) 0%,
+      rgba(22, 28, 36, 0.3) 32%,
+      rgba(22, 28, 36, 0) 64%
+    );
+  }
+
+  /* The scrim is drawn in percentages of the frame, and below lg the frame is
+     barely a third of the height it has on a desktop — so the same line of
+     type, which hardly changes size, falls far deeper into the falloff and
+     comes out of it lit. One gradient for both gave 4.9:1 at 1280 and 2.56:1 at
+     375, which is why there are two.
+
+     Note which lever does the work here. Widening the ellipse spreads the wash
+     over more of the corner and lifts the ratio at *no extra darkness over the
+     words*; raising the stops buys the same ratio by making the corner heavier.
+     Both were measured at 375: 160%/210% at 0.56 reached 4.95:1 but sat at 0.59
+     alpha over the type, and this one gets 4.72:1 at 0.56. The lighter of two
+     passing answers wins — the reader sees the wash, and only the measurement
+     sees the ratio. Same reasoning set the desktop ellipse above.
+
+     Worst-case white-on-photograph here: 4.72:1 at 375x812, 7.5:1 at 768. */
+  @media (width < 64rem) {
+    .scene-type-scrim {
+      background: radial-gradient(
+        190% 260% at 100% 0%,
+        rgba(22, 28, 36, 0.52) 0%,
+        rgba(22, 28, 36, 0.36) 32%,
+        rgba(22, 28, 36, 0) 64%
+      );
+    }
+  }
 }
