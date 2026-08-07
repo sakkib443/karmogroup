@@ -226,20 +226,28 @@ export default function PopularProductsGrid() {
           four apart at 32px: tight makes a set to read across, loose makes
           separate propositions to pick between.
 
-          And 12px down each side, at the client's ask, so the row no longer
-          runs into the window edges. The figure is not a taste call — it is the
-          same 12px as the gaps, which makes the frame around the row identical
-          to the gutters inside it. Any other number and the outer margin either
-          crowds or outweighs the gaps, and the row stops reading as evenly set.
-          It is a slight inset by design: the heading above still sits on the
-          `.shell` gutter, three times wider, and that asymmetry is the one
-          `DivisionsStrip` established — the cards are meant to reach past the
-          copy, just not all the way off the page. */}
+          Down the sides it is 12px on a phone, 24 from md and 40 from lg — the
+          client asked twice for more, and the second ask is why the margin is
+          no longer tied to the gap.
+
+          It was 12px on the argument that the frame should equal the gutters
+          inside it. That is a real principle for a row sitting almost flush to
+          the window, and the wrong one once a visible margin is wanted: an
+          outer margin larger than the internal gutter is the ordinary case in
+          any grid — `.shell` itself runs 80px margins against these 12px gaps.
+          So the gaps stay at 12 and only the margin grows. Keeping them locked
+          together would have loosened the row to 40px gutters and walked this
+          design's density straight into Option B's.
+
+          It still stops well short of `.shell`'s 80px, and that is the point:
+          the heading above sits on the shell gutter, so the cards go on
+          reaching past the copy — which is the asymmetry `DivisionsStrip`
+          established — just by less than they did. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 md:px-6 lg:grid-cols-4 lg:px-10"
       >
         {popularProducts.map((item) => (
           <ProductTile key={item.id} item={item} />
