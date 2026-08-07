@@ -4,6 +4,7 @@ import CollectionsShowcase from "@/components/karmo/home2/CollectionsShowcase";
 import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
+import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -34,6 +35,13 @@ export default function HomePage() {
       <CollectionsShowcase />
       <ShoppableScene />
       <FoamStory />
+
+      {/* Two Popular Products designs were built here to be chosen between —
+          this quiet grid and an offer row of poster cards. The client picked
+          this one, so the other component and the scaffolding labels that
+          separated them are gone. The product data stays where it was, in
+          `popularProducts`, since it was always shared. */}
+      <PopularProductsGrid />
     </>
   );
 }
