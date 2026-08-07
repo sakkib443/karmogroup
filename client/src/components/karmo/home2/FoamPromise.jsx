@@ -107,6 +107,8 @@ function LeafRule() {
 /* Seconds of overlap between the outgoing and incoming copy of the loop. Kept
    in step with the 700ms opacity transition on the layers. */
 const CROSSFADE = 0.7;
+/* Slightly below 1 — the clip reads too brisk at native speed behind the copy. */
+const PLAYBACK = 0.9;
 const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
 
@@ -300,6 +302,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
       const other = which === 0 ? layerB.current : layerA.current;
       if (!other) return;
       other.currentTime = 0;
+      other.playbackRate = PLAYBACK;
       // Autoplay can still be refused — a power-saving tab, an OS setting.
       // Swallowing it leaves the still showing rather than throwing.
       other.play().catch(() => {});
@@ -319,6 +322,9 @@ export default function FoamPromise({ filmMode = "fixed" }) {
   // missed and the band would sit on the still forever. So the state is also
   // read straight off the element once, on mount.
   useEffect(() => {
+    for (const video of [layerA.current, layerB.current]) {
+      if (video) video.playbackRate = PLAYBACK;
+    }
     if (layerA.current?.readyState >= 2) setReady(true);
   }, []);
 
@@ -332,7 +338,10 @@ export default function FoamPromise({ filmMode = "fixed" }) {
     preload: "auto",
     "aria-hidden": true,
     tabIndex: -1,
-    onLoadedData: () => setReady(true),
+    onLoadedData: (event) => {
+      event.currentTarget.playbackRate = PLAYBACK;
+      setReady(true);
+    },
     onTimeUpdate: relay(which),
     onEnded: park,
   });
