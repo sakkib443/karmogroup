@@ -106,7 +106,14 @@ const CROSSFADE = 0.7;
 const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
 
-export default function FoamPromise() {
+/**
+ * `fixedFilm` decides whether the background is anchored to the viewport or
+ * simply travels with the section like any other backdrop. Both are on the
+ * page at once at the client's ask, to be compared and one kept — see the note
+ * where they are rendered. When the choice is made this prop and whichever
+ * branch loses can both go.
+ */
+export default function FoamPromise({ fixedFilm = true }) {
   const reduce = useReducedMotion();
   const reveal = reduce ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -144,7 +151,7 @@ export default function FoamPromise() {
    * one is the whole background and it behaves normally.
    */
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !fixedFilm) return;
     const section = sectionRef.current;
     const film = filmRef.current;
     if (!section || !film) return;
@@ -180,7 +187,7 @@ export default function FoamPromise() {
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [reduce]);
+  }, [reduce, fixedFilm]);
 
   /**
    * Two stacked copies of one clip, cross-faded at the seam.
@@ -245,9 +252,14 @@ export default function FoamPromise() {
        anything sticky inside, and the film's clipping is done with `clip-path`
        instead. The section still clips visually because every layer below is
        either inset to it or clipped to it. */
+    /* Taller at the client's ask, and the fixed mode is the reason it is worth
+       having: the anchored film only reads as anchored while there is enough
+       section to travel past it. Deeper padding rather than a `min-h`, so the
+       band grows around its content instead of leaving a gap under it when the
+       cards are short. */
     <section
       ref={sectionRef}
-      className="relative bg-shade-deep py-20 lg:py-28"
+      className="relative bg-shade-deep py-28 lg:py-40"
     >
       {/* A still under the film, never removed, so the band is never a black
           rectangle — not while the film buffers, not if it fails, and not for a
@@ -258,21 +270,39 @@ export default function FoamPromise() {
         <Image src={STILL} alt="" fill sizes="100vw" className="object-cover" priority={false} />
       </div>
 
-      {/* The fixed film. `clip-path` starts fully closed so that the moment
-          before the first measurement — and for anyone whose JS never runs —
-          this viewport-sized fixed element is not painting over the rest of
-          the page. The still above is showing until it opens. */}
-      {!reduce && (
-        <div
-          ref={filmRef}
-          aria-hidden
-          className="pointer-events-none fixed inset-0 z-0"
-          style={{ clipPath: "inset(100% 0 0 0)" }}
-        >
-          <video {...layerProps(0)} autoPlay src={FILM} />
-          <video {...layerProps(1)} src={FILM} />
-        </div>
-      )}
+      {/* The film, in whichever of the two modes this instance was given.
+          One set of `<video>` elements either way — the branch only changes
+          the box they sit in, so the loop rig, the refs and the crossfade are
+          untouched by the choice.
+
+          Fixed: `clip-path` starts fully closed so that the moment before the
+          first measurement — and for anyone whose JS never runs — this
+          viewport-sized fixed element is not painting over the rest of the
+          page. The still underneath is showing until it opens.
+
+          Normal: an ordinary absolute layer clipped by its own
+          `overflow-hidden`, travelling with the section like the still does.
+          No scroll listener, no clip maths, nothing to keep in step. */}
+      {!reduce &&
+        (fixedFilm ? (
+          <div
+            ref={filmRef}
+            aria-hidden
+            className="pointer-events-none fixed inset-0 z-0"
+            style={{ clipPath: "inset(100% 0 0 0)" }}
+          >
+            <video {...layerProps(0)} autoPlay src={FILM} />
+            <video {...layerProps(1)} src={FILM} />
+          </div>
+        ) : (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+          >
+            <video {...layerProps(0)} autoPlay src={FILM} />
+            <video {...layerProps(1)} src={FILM} />
+          </div>
+        ))}
 
       {/* The film is a light grey foam texture and the copy over it is white.
           Unveiled it measured 1.4:1 against the brightest frames — nowhere near

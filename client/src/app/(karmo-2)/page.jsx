@@ -40,8 +40,23 @@ export default function HomePage() {
       {/* Straight after the foam story, which is what it argues from: that
           section says what the foam is, this one says what it does. It is also
           the only dark section on a white page, so it wants a section either
-          side of it rather than sitting against the footer. */}
+          side of it rather than sitting against the footer.
+
+          ── Up twice, to be compared ────────────────────────────────────────
+          The same band with its background anchored to the viewport, then the
+          same band again with the background simply travelling with it. The
+          client wants to see the two against each other before keeping one.
+
+          They read as one long dark stretch back to back, which is the point —
+          scrolling from the first into the second is the comparison. Deleting
+          the loser is its `<Marker>` and its `<FoamPromise>` here; then drop
+          the marker component and the `fixedFilm` prop, keeping whichever
+          branch won inside the component. */}
+      <Marker>Background — fixed to the viewport</Marker>
       <FoamPromise />
+
+      <Marker>Background — scrolls with the section</Marker>
+      <FoamPromise fixedFilm={false} />
 
       {/* Two Popular Products designs were built here to be chosen between —
           this quiet grid and an offer row of poster cards. The client picked
@@ -50,5 +65,20 @@ export default function HomePage() {
           `popularProducts`, since it was always shared. */}
       <PopularProductsGrid />
     </>
+  );
+}
+
+/**
+ * A scaffolding label for the two-way comparison above, and it is meant to
+ * look like one — brand red on ink, so it cannot be mistaken for part of
+ * either band. It goes when the choice does.
+ */
+function Marker({ children }) {
+  return (
+    <div className="bg-brand py-2.5 text-center">
+      <span className="display text-[11px] font-bold uppercase tracking-[0.24em] text-white">
+        {children}
+      </span>
+    </div>
   );
 }
