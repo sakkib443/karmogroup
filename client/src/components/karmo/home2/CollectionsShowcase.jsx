@@ -27,9 +27,19 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *   · the right one is a room scene.
  *
  * So the label came off the *picture* and became a header band above it,
- * identical on all three. Nothing is laid over any photograph now — the poster
+ * identical on all three. No *words* sit on any photograph now — the poster
  * gets to be a poster, the scene gets to be a scene — and the three still read
  * as one set because the label block, the height and the baseline are shared.
+ *
+ * They also share the page's `.photo-veil`, added later at the client's ask
+ * after Hatil's homepage, where every picture carries the same faint wash. It
+ * earns more here than anywhere else on the page, because these three are the
+ * least alike: a printed campaign poster, a studio cutout and a room scene,
+ * each arriving at its own exposure. One veil across all three is what pulls
+ * them to a common depth. It costs the poster a little of its white, which is
+ * the trade — a poster dimmed with everything else still reads as part of the
+ * set, where a poster left bright beside two veiled photographs reads as a
+ * mistake.
  *
  * ── Equal heights out of unequal widths ────────────────────────────────────
  * One 4:5 box for all three made the section a screen and a half tall: the
@@ -181,6 +191,23 @@ function CollectionCard({ item }) {
             fill
             sizes={item.sizes}
             className={`object-cover ${item.position} transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
+          />
+
+          {/* A sibling of the picture rather than something the picture
+              carries, so the 1.04 hover zoom moves the photograph *under* a
+              veil that stays where it is. Laid on the image itself it would
+              scale with it, and the wash would breathe in and out at the edges
+              on every hover.
+
+              It lifts to 55% on hover, over the same long beat as the zoom.
+              These are links, and the veil has to feel like something the card
+              is holding rather than a film stuck to it — the picture waking up
+              as the pointer arrives is what says so. Lifting rather than
+              clearing: at zero the card would flash brighter than its two
+              neighbours and break the set the veil exists to make. */}
+          <span
+            aria-hidden
+            className="photo-veil pointer-events-none absolute inset-0 transition-opacity duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-55"
           />
         </div>
       </Link>
