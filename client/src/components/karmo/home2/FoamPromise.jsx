@@ -107,11 +107,24 @@ const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
 
 /**
- * `fixedFilm` decides whether the background is anchored to the viewport or
- * simply travels with the section like any other backdrop. Both are on the
- * page at once at the client's ask, to be compared and one kept — see the note
- * where they are rendered. When the choice is made this prop and whichever
- * branch loses can both go.
+ * How far the film drifts from its resting position, in pixels, at each end of
+ * the section's travel — so 40 means it moves 80px in total across the whole
+ * pass, against roughly 1700px of scrolling. Slow enough to read as the
+ * background breathing rather than sliding.
+ *
+ * The layer is overscanned by more than this at top and bottom (see
+ * `-inset-y-[70px]` below), so the drift never pulls an edge into the clip
+ * window. Raising this without raising the overscan is what would expose one.
+ */
+const DRIFT = 40;
+
+/**
+ * `fixedFilm` decides whether the background is anchored to the viewport, with
+ * a slight drift over it, or simply travels with the section like any other
+ * backdrop. Both were on the page at once to be compared; the client picked
+ * anchored, and this now defaults to it. The other branch is kept because it
+ * is three lines and is what any future section wanting a plain scrolling
+ * backdrop would reuse.
  */
 export default function FoamPromise({ fixedFilm = true }) {
   const reduce = useReducedMotion();
@@ -121,6 +134,7 @@ export default function FoamPromise({ fixedFilm = true }) {
   const layerB = useRef(null);
   const sectionRef = useRef(null);
   const filmRef = useRef(null);
+  const driftRef = useRef(null);
   const [front, setFront] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -145,6 +159,17 @@ export default function FoamPromise({ fixedFilm = true }) {
    * held in state: this runs on every scroll frame, and a `setState` per frame
    * would re-render the whole section — three cards and two videos — sixty
    * times a second to move one CSS value.
+   *
+   * ── Why the clip and the drift are two elements ────────────────────────────
+   * Fixed but dead still read as a photograph behind a hole, so the film also
+   * drifts a little — DRIFT px each way across the section's whole pass.
+   *
+   * That drift cannot go on the same element as the clip. `clip-path` is
+   * resolved in the element's own coordinate space and the transform then
+   * applies to the already-clipped result, so translating this node would
+   * carry the clip window with it and the section's edges would leak. The
+   * outer node therefore only ever carries `clip-path` and never moves; the
+   * inner one only ever carries `transform` and never clips.
    *
    * The still underneath stays a plain absolute layer, so it needs none of
    * this. Before hydration, and for a reader who asked for less motion, that
@@ -173,6 +198,21 @@ export default function FoamPromise({ fixedFilm = true }) {
       const top = Math.max(0, rect.top);
       const bottom = Math.max(0, vh - rect.bottom);
       film.style.clipPath = `inset(${top}px 0px ${bottom}px 0px)`;
+
+      // 0 as the section's top edge reaches the bottom of the window, 1 as its
+      // bottom edge leaves the top — so the full pass is the section's height
+      // plus a viewport, and the drift is spread across all of it rather than
+      // spent in the first screenful.
+      const travel = rect.height + vh;
+      const progress = Math.min(1, Math.max(0, (vh - rect.top) / travel));
+
+      // Downward at the start, upward at the end: the film rises as the page
+      // scrolls down, which is the direction that reads as parallax rather
+      // than as the background fighting the scroll.
+      const offset = (0.5 - progress) * 2 * DRIFT;
+      if (driftRef.current) {
+        driftRef.current.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+      }
     };
 
     const onScroll = () => {
@@ -252,14 +292,15 @@ export default function FoamPromise({ fixedFilm = true }) {
        anything sticky inside, and the film's clipping is done with `clip-path`
        instead. The section still clips visually because every layer below is
        either inset to it or clipped to it. */
-    /* Taller at the client's ask, and the fixed mode is the reason it is worth
-       having: the anchored film only reads as anchored while there is enough
-       section to travel past it. Deeper padding rather than a `min-h`, so the
+    /* Deeper than it started, and the anchored film is the reason it is worth
+       having: the drift only reads while there is enough section to travel
+       past it. Settled at 24/36 after 20/28 was called too short and 28/40 too
+       tall — 830px on a 1440x900 window. Padding rather than a `min-h`, so the
        band grows around its content instead of leaving a gap under it when the
        cards are short. */
     <section
       ref={sectionRef}
-      className="relative bg-shade-deep py-28 lg:py-40"
+      className="relative bg-shade-deep py-24 lg:py-36"
     >
       {/* A still under the film, never removed, so the band is never a black
           rectangle — not while the film buffers, not if it fails, and not for a
@@ -291,8 +332,14 @@ export default function FoamPromise({ fixedFilm = true }) {
             className="pointer-events-none fixed inset-0 z-0"
             style={{ clipPath: "inset(100% 0 0 0)" }}
           >
-            <video {...layerProps(0)} autoPlay src={FILM} />
-            <video {...layerProps(1)} src={FILM} />
+            {/* Overscanned past the clip window at top and bottom so the
+                drift has somewhere to travel without ever pulling an edge
+                into view. 70px against DRIFT's 40 leaves real margin — the
+                two have to be changed together. */}
+            <div ref={driftRef} className="absolute -inset-y-[70px] inset-x-0">
+              <video {...layerProps(0)} autoPlay src={FILM} />
+              <video {...layerProps(1)} src={FILM} />
+            </div>
           </div>
         ) : (
           <div

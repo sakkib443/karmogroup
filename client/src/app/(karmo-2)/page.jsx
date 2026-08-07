@@ -42,21 +42,14 @@ export default function HomePage() {
           the only dark section on a white page, so it wants a section either
           side of it rather than sitting against the footer.
 
-          ── Up twice, to be compared ────────────────────────────────────────
-          The same band with its background anchored to the viewport, then the
-          same band again with the background simply travelling with it. The
-          client wants to see the two against each other before keeping one.
-
-          They read as one long dark stretch back to back, which is the point —
-          scrolling from the first into the second is the comparison. Deleting
-          the loser is its `<Marker>` and its `<FoamPromise>` here; then drop
-          the marker component and the `fixedFilm` prop, keeping whichever
-          branch won inside the component. */}
-      <Marker>Background — fixed to the viewport</Marker>
+          It went up twice for a while — background anchored against background
+          scrolling with the section — and the client picked anchored, so the
+          second copy and the labels that separated them are gone. It keeps a
+          slight drift rather than sitting dead still; see `DRIFT` in the
+          component. The `fixedFilm` prop survives the choice because the other
+          branch is three lines and is what any future section wanting a plain
+          scrolling backdrop would reuse. */}
       <FoamPromise />
-
-      <Marker>Background — scrolls with the section</Marker>
-      <FoamPromise fixedFilm={false} />
 
       {/* Two Popular Products designs were built here to be chosen between —
           this quiet grid and an offer row of poster cards. The client picked
@@ -65,20 +58,5 @@ export default function HomePage() {
           `popularProducts`, since it was always shared. */}
       <PopularProductsGrid />
     </>
-  );
-}
-
-/**
- * A scaffolding label for the two-way comparison above, and it is meant to
- * look like one — brand red on ink, so it cannot be mistaken for part of
- * either band. It goes when the choice does.
- */
-function Marker({ children }) {
-  return (
-    <div className="bg-brand py-2.5 text-center">
-      <span className="display text-[11px] font-bold uppercase tracking-[0.24em] text-white">
-        {children}
-      </span>
-    </div>
   );
 }
