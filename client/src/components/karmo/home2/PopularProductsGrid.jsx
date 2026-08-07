@@ -132,10 +132,10 @@ export default function PopularProductsGrid() {
 
   return (
     <section className="bg-white pb-16 pt-16 lg:pb-24 lg:pt-24">
-      {/* Heading on the gutter, tiles full-bleed — the asymmetry
-          `DivisionsStrip` already established on this page. A heading hard
-          against the window edge reads as a mistake; a row of pictures running
-          off both edges does not. */}
+      {/* Heading on the `.shell` gutter, tiles on a much narrower one — the
+          asymmetry `DivisionsStrip` already established on this page. A heading
+          hard against the window edge reads as a mistake; a row of pictures
+          reaching well past it does not. */}
       <motion.div
         variants={group}
         {...reveal}
@@ -166,16 +166,26 @@ export default function PopularProductsGrid() {
         </motion.div>
       </motion.div>
 
-      {/* 12px, the page's one gutter figure — the same value between the four
-          division cards and the three collections cards above. It is the other
-          half of what separates this design from Option B, which sets its three
-          apart at 32px: tight makes a set to read across, loose makes three
-          propositions to pick between. */}
+      {/* 12px between the tiles — the page's one gutter figure, the same value
+          between the four division cards and the three collections cards above.
+          It is half of what separates this design from Option B, which sets its
+          four apart at 32px: tight makes a set to read across, loose makes
+          separate propositions to pick between.
+
+          And 12px down each side, at the client's ask, so the row no longer
+          runs into the window edges. The figure is not a taste call — it is the
+          same 12px as the gaps, which makes the frame around the row identical
+          to the gutters inside it. Any other number and the outer margin either
+          crowds or outweighs the gaps, and the row stops reading as evenly set.
+          It is a slight inset by design: the heading above still sits on the
+          `.shell` gutter, three times wider, and that asymmetry is the one
+          `DivisionsStrip` established — the cards are meant to reach past the
+          copy, just not all the way off the page. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         {popularProducts.map((item) => (
           <ProductTile key={item.id} item={item} />
