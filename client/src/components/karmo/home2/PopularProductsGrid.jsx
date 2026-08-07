@@ -186,37 +186,51 @@ export default function PopularProductsGrid() {
 
   return (
     <section className="bg-white pb-16 pt-16 lg:pb-24 lg:pt-24">
-      {/* Heading on the `.shell` gutter, tiles on a much narrower one — the
-          asymmetry `DivisionsStrip` already established on this page. A heading
-          hard against the window edge reads as a mistake; a row of pictures
-          reaching well past it does not. */}
+      {/* Centred, and carrying the same two lines as Option B, at the client's
+          ask. It was left on the `.shell` gutter with a "view all" held to the
+          right — the arrangement `DivisionsStrip` uses — and centring it left
+          that link nowhere to stand: a lone element pushed right beside a
+          centred block reads as a layout that failed to finish. It moved below
+          the row instead, which is where a "there is more" link belongs on a
+          catalogue anyway, and it is still centred so the section reads down one
+          axis from the eyebrow to the last word.
+
+          Both sections now carry the same heading. That is fine while they are
+          two candidates on a page and would not be if both ever shipped — only
+          one is meant to survive. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell mb-8 flex flex-wrap items-end justify-between gap-6 lg:mb-10"
+        className="shell mb-8 text-center lg:mb-10"
       >
         <motion.div variants={fade}>
-          <span className="flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
-            <span className="h-px w-8 bg-brand" />
+          <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
             Popular Products
           </span>
-          <h2 className="display mt-5 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
-            What Bangladesh
-            <br />
-            <span className="font-bold text-brand">buys most</span> from us
+          <h2 className="display mt-4 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
+            Hot offers <span className="font-bold text-brand">for you</span>
           </h2>
-        </motion.div>
 
-        <motion.div variants={fade}>
-          <Link href="/products" className="group inline-flex items-center gap-4">
-            <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
-              View all products
-            </span>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
-              <FiArrowUpRight />
-            </span>
-          </Link>
+          {/* The ornament the client asked for, and it introduces no new shape
+              to do the job. It is the page's two existing rules set on one line:
+              the 3px brand bar that sits under Option B's title and beneath the
+              foam story's eyebrow, extended either side by the 1px ink hairline
+              the division and collection eyebrows use. Two weights, one axis.
+
+              This is where the reference's leaf-and-gold device went, and why
+              it did not come back: a leaf appears nowhere else on this page, so
+              it reads as a leftover from another brand's artwork rather than as
+              Karmo's. An ornament built from parts the page already repeats
+              reads as the page. Decorative, so `aria-hidden`. */}
+          <span
+            aria-hidden
+            className="mt-6 flex items-center justify-center gap-2.5"
+          >
+            <span className="h-px w-8 bg-ink/20 sm:w-12" />
+            <span className="h-[3px] w-12 bg-brand sm:w-14" />
+            <span className="h-px w-8 bg-ink/20 sm:w-12" />
+          </span>
         </motion.div>
       </motion.div>
 
@@ -252,6 +266,28 @@ export default function PopularProductsGrid() {
         {popularProducts.map((item) => (
           <ProductTile key={item.id} item={item} />
         ))}
+      </motion.div>
+
+      {/* Below the row rather than beside the heading, since the heading became
+          centred. Kept, not dropped: it is the last thing this design says that
+          Option B does not — that the row is the front of a catalogue and there
+          is more behind it, rather than four offers and nothing else. */}
+      <motion.div
+        variants={group}
+        {...reveal}
+        viewport={VIEWPORT}
+        className="mt-10 text-center lg:mt-12"
+      >
+        <motion.div variants={fade}>
+          <Link href="/products" className="group inline-flex items-center gap-4">
+            <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
+              View all products
+            </span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
+              <FiArrowUpRight />
+            </span>
+          </Link>
+        </motion.div>
       </motion.div>
     </section>
   );
