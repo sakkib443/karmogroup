@@ -47,24 +47,19 @@ import { popularProducts, discountPercent } from "@/components/karmo/home2/popul
  * grade, and a buyer choosing between 280 and 4G needs the grade, not a mood.
  * So the second line is per-product and factual, off the client's own posters.
  *
- * It is also three across rather than four. There are three products; a fourth
- * column would be an empty tile. When a fourth product arrives this goes back
- * to `lg:grid-cols-4` and nothing else changes — the tile is built from the
- * column, not the other way round.
+ * Four across, at the client's ask and as the reference has it. The fourth
+ * product is a mattress rather than a combo, and it is not on offer — see
+ * `popularProducts` for why that is the honest way to reach four and not a
+ * compromise. It does mean this row has to look right with three SALE tiles and
+ * one plain one, which it does: the badge is the only thing that varies, and a
+ * tile without one is simply a tile.
  *
  * ── The picture is square ──────────────────────────────────────────────────
  * At the client's ask: width and height equal, which also keeps the section
  * clear of the full height of the screen. Every source is 4:5, so a square box
- * crops a fifth of the height away, and all three are anchored `object-top` so
- * that fifth comes off the foot. On these three stand-ins the foot is a hotline
- * strip, which the footer carries anyway; the logos and headline that do the
- * selling sit in the top 40% and survive. Centring instead would take 10% off
- * the top, and 10% off the top of a poster is the logo.
- *
- * One position for all three rather than a field per product, because the rule
- * belongs to posters rather than to these particular three. If a real cut-out
- * product shot ever lands here it will want centring, and that is the moment to
- * make this a field again.
+ * crops a fifth of the height away and `position` says which fifth — top for
+ * the three posters, so the crop takes the hotline strip at the foot and leaves
+ * the logos; centre for the photograph, where both ends are floor and ceiling.
  */
 
 function ProductTile({ item }) {
@@ -78,8 +73,8 @@ function ProductTile({ item }) {
             src={item.image}
             alt={item.alt}
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover object-top transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            className={`object-cover ${item.position} transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
           />
 
           {/* The page veil, same as everywhere else on this page. A sibling of
@@ -180,7 +175,7 @@ export default function PopularProductsGrid() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         {popularProducts.map((item) => (
           <ProductTile key={item.id} item={item} />

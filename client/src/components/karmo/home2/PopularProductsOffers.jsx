@@ -39,16 +39,30 @@ import { popularProducts, discountPercent } from "@/components/karmo/home2/popul
  *   reader to do the subtraction and a badge that does it for them is worth the
  *   space. See `discountPercent` for why it is never written by hand.
  *
+ * ── Four cards, not three ──────────────────────────────────────────────────
+ * Option A was asked for as a four-up, and this follows it because the whole
+ * point of the pair is that only the treatment differs — a row of three beside
+ * a row of four adds "shows more" as a variable nobody meant to test.
+ *
+ * It is the bigger departure from the reference of the two changes, so it is
+ * the one to say out loud: the client's live row is three wide cards and this
+ * is four narrower ones. If the three-up is part of what is being judged here,
+ * this is a one-word change back to `lg:grid-cols-3`.
+ *
+ * The fourth product is not on offer, which this design has to survive: no
+ * badge, no struck price, just the price and the button. That is the common
+ * case in real use and worth seeing before choosing.
+ *
  * ── The picture is square ──────────────────────────────────────────────────
  * At the client's ask: width and height equal, which also keeps the section
  * clear of the full height of the screen.
  *
  * It matters more here than in Option A, because the poster is doing more of
  * the work. Every source is 4:5, so a square box crops a fifth of the height
- * away, and all three are anchored `object-top` — the fifth comes off the foot,
- * which on these stand-ins is the hotline and free-delivery strip, and the
- * logos and headline stay. Centring would take 10% off the top, and 10% off the
- * top of a poster is the logo.
+ * away, and `position` says which fifth: the three posters are anchored
+ * `object-top` so the crop comes off the foot — the hotline and free-delivery
+ * strip — and the logos and headline stay. Centring one of those would take 10%
+ * off the top, and 10% off the top of a poster is the logo.
  *
  * That is a real cost of this design, worth weighing before choosing it: the
  * combo artwork Karmo supplies is portrait, so it is either cropped here or
@@ -67,8 +81,8 @@ function OfferCard({ item }) {
             src={item.image}
             alt={item.alt}
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover object-top transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            className={`object-cover ${item.position} transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
           />
 
           {/* The page veil. Lighter than it looks: these are posters, and a
@@ -111,8 +125,13 @@ function OfferCard({ item }) {
             fact that it no longer applies is the meaning, not the styling — a
             screen reader should say so too. Both are tabular so the digits line
             up down the row. */}
+        {/* The struck price is conditional, not empty-when-absent: the fourth
+            product carries no `was`, and an `<s>` around nothing still renders
+            a gap in the flex row that pushes the price off centre. */}
         <p className="mb-6 mt-3 flex items-baseline justify-center gap-3">
-          <s className="text-[14px] tabular-nums text-ink/40">{item.was}</s>
+          {item.was && (
+            <s className="text-[14px] tabular-nums text-ink/40">{item.was}</s>
+          )}
           <span className="text-[19px] font-bold tabular-nums text-ink">
             {item.now}
           </span>
@@ -150,14 +169,14 @@ export default function PopularProductsOffers() {
         </motion.div>
 
         {/* 32px between the cards, against Option A's 12px, and that gap is one
-            of the few real differences between the two designs. These are three
+            of the few real differences between the two designs. These are
             separate propositions a reader picks between, not one set read
             across — at 12px they run into a single block and lose the "or". */}
         <motion.div
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-8"
+          className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4 lg:gap-8"
         >
           {popularProducts.map((item) => (
             <OfferCard key={item.id} item={item} />

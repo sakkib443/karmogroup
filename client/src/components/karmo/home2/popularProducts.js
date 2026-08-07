@@ -19,6 +19,24 @@
  * five free cushions per set, in two sizes — rather than being written for the
  * layout.
  *
+ * The fourth is a mattress, and it is deliberately not an offer. Option A was
+ * asked for as a four-up and there is no fourth combo, so rather than invent a
+ * price and a discount for one, this carries the figure `ShoppableScene`
+ * already quotes for the same product and leaves `was` null. Two things fall
+ * out of that, and both are useful:
+ *
+ *   · Nothing is fabricated. Every number in this file is either the client's
+ *     live price or one already on this page.
+ *   · The row is mixed, so both designs have to show a product that is not on
+ *     offer — no badge, no struck price — which is the case they will meet
+ *     constantly in real use and the one an all-discounted row never tests.
+ *
+ * Note the currency mark sits *after* the amount on the three combos, because
+ * that is how the client's site writes it, and `ShoppableScene` writes the same
+ * product's price the other way round ("৳ 28,500"). This file follows the
+ * client. The two want reconciling, one way or the other, before either design
+ * ships — it is one page showing one product's price two ways.
+ *
  * ── The pictures ───────────────────────────────────────────────────────────
  * The combo posters themselves are not in the repo. Each entry names the file
  * it wants, and points at an existing Karmo poster until that file arrives, so
@@ -33,8 +51,13 @@
  * Both go away when the real files land. Nothing else changes: `image` and
  * `alt`, and that is all.
  *
- * All three sources are 4:5 and both designs crop them square, from the top —
- * see the note in either component for why the crop is anchored there.
+ * Every source is 4:5 and both designs crop it square, so a fifth of the height
+ * goes and `position` says which fifth. It used to be hard-coded `object-top`
+ * in both components, on the argument that the rule belonged to posters rather
+ * than to particular products — the mattress is the photograph that made it a
+ * field again, exactly as that note predicted. Top for anything with printed
+ * type at its head, so the crop takes the foot; centre for a photograph, where
+ * both ends are equally disposable.
  */
 export const popularProducts = [
   {
@@ -48,6 +71,7 @@ export const popularProducts = [
     /* Wants: /karmo/images/home-02/offers/280-foam-combo.jpg */
     image: "/karmo/images/mattress/plant-bedroom.jpg",
     alt: "Stand-in artwork — a Karmo Mattress campaign poster offering 15% off, in place of the 280 foam combo poster",
+    position: "object-top",
   },
   {
     id: "2001-foam-combo",
@@ -62,6 +86,7 @@ export const popularProducts = [
        last season's cut of it rather than the combo. */
     image: "/karmo/images/home-02/collections/01-best-selling-karmo-2001-campaign.jpg",
     alt: "Karmo campaign poster — a modular sofa on Karmo 2001 lavender foam cushions above a stack of foam blocks, offered at 20% off with free delivery",
+    position: "object-top",
   },
   {
     id: "4g-foam-combo",
@@ -74,6 +99,29 @@ export const popularProducts = [
     /* Wants: /karmo/images/home-02/offers/4g-foam-combo.jpg */
     image: "/karmo/images/mattress/cloud-poster.jpg",
     alt: "Stand-in artwork — a Karmo Mattress campaign poster offering 15% off, in place of the 4G foam combo poster",
+    position: "object-top",
+  },
+  {
+    id: "pro-foam-mattress",
+    name: "Karmo Pro Foam Mattress",
+    spec: "High-density foam core, quilted floral ticking",
+    variants: "Available in 3 sizes",
+    /* No offer on this one, and no `was` invented to manufacture one. Both
+       designs read the missing field the same way: `discountPercent` returns
+       null, so there is no badge and no struck price. */
+    was: null,
+    now: "28,500.00৳",
+    href: "/mattress",
+    /* Not a stand-in. The one genuine Karmo product photograph in the repo that
+       is not a campaign poster, which is also why it is worth having in the row:
+       it is the closest thing here to what Option A actually wants. */
+    image: "/karmo/images/mattress/suite-interior.jpg",
+    alt: "A Karmo mattress in red floral ticking with white piping on an upholstered bed, lit by two bedside lamps beneath a chandelier",
+    /* Centred, not topped. There is no printed headline to protect, and the
+       fifth that goes is chandelier above and floor below — the mattress itself
+       sits mid-frame and survives untouched. Anchored to the top it would keep
+       ceiling it does not need and cut the foot of the bed. */
+    position: "object-center",
   },
 ];
 
