@@ -115,19 +115,26 @@ const collections = [
     name: "Popular",
     line: "Karmo HD — the backbone of the range",
     href: "/collections/popular",
-    /* The generator's star was patched out rather than cropped: the foam
-       stack reaches almost into that corner and there was nothing to spare.
-       The field around it is perfectly flat, so a solid patch in its own
-       colour leaves no trace. */
-    image: "/karmo/images/home-02/collections/02-popular-karmo-hd.webp",
-    alt: "A man seated in an armchair beside a tall stack of Karmo HD foam blocks on a plain studio field",
+    /* Swapped for a Karmo Foam lifestyle shot — a family on a sofa beside a
+       stack of coloured KARMO FOAM blocks in a sunlit forest — at the client's
+       ask. It is a 1:1 source, so the previous image's `object-bottom` no
+       longer applies: that lift-to-the-floor was for an image with empty
+       studio field above the sitter. Here both the family and the foam stack
+       sit at mid-height, so a centred crop keeps the pair intact in every box.
+
+       Kept as PNG. The file is 2.6MB against 31KB for the previous WebP, and
+       Next/Image will serve derived AVIF/WebP variants at runtime, so what
+       ships to a visitor is not the source. Worth re-encoding at some point,
+       but not urgent. */
+    image: "/karmo/images/home-02/collections/02-popular-karmo-foam-family.png",
+    alt: "A family on a sofa in a sunlit forest, beside a tall stack of Karmo Foam blocks in green, blue, yellow and pink",
     sizes: "(min-width: 1024px) 36vw, 100vw",
-    /* The widest box takes the deepest crop, and all of it comes off the top,
-       where there is nothing but empty field above his head. Below lg the
-       cards stack at one width, so it drops back to the wings’ 21:20 and the
-       three read as one column. */
+    /* The widest box takes the deepest crop; on the wing ratio (21:20) a 1:1
+       source needs a hair of vertical trim, on the centre's 273:200 the source
+       needs its sides trimmed. Both come off equally with object-center,
+       because family and stack both sit mid-frame. */
     ratio: "aspect-[21/20] lg:aspect-[273/200]",
-    position: "object-bottom",
+    position: "object-center",
     wide: true,
   },
   {
