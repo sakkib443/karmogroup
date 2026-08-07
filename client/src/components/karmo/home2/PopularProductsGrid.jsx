@@ -13,50 +13,43 @@ import { popularProducts, discountPercent } from "@/components/karmo/home2/popul
  * sent: the quiet catalogue row.
  *
  * Option B is `PopularProductsOffers`. Both are on the page at once, both read
- * the same three products out of `popularProducts`, and both carry the same
+ * the same four products out of `popularProducts`, and both carry the same
  * heading — the client asked for identical pictures across the two so that what
  * is being judged is the treatment and nothing else. Whichever loses gets
  * deleted along with the marker bar above it; the data file stays.
  *
- * ── What this design is arguing ────────────────────────────────────────────
- * That the product should be the loudest thing in its tile, and that a buyer
- * choosing between foam grades wants specification before persuasion. A pale
- * field, the photograph, and underneath it the facts they actually sort on —
- * what it is, what it is made of, what it comes in, what it costs — and then
- * the way to buy it.
+ * ── Read this before adding anything back ──────────────────────────────────
+ * These two started far apart and the client has walked this one most of the
+ * way to the other. It is now centred, stacked, struck-through-priced and
+ * ended with an Order Now button — every one of those a step towards Option B,
+ * each asked for. The card content is identical to B's.
  *
- * It is the harder design to fill and the better one to live with. Harder,
- * because a tile with this much air only works if the photograph is cut out or
- * shot on a flat field, and Karmo has none of that yet. Better, because nothing
- * in it expires when a campaign ends.
+ * What is left between them is real but small, and it is worth knowing exactly
+ * what it is so nobody spends another round rediscovering it:
  *
- * The two have converged since they were first built: the client asked for this
- * one centred, with its copy stacked under the picture and an Order Now button,
- * which is Option B's card treatment. What is still genuinely different, and is
- * therefore what the choice now rests on:
+ *   · **Density.** 12px between these tiles against 32px between B's, so this
+ *     row reads as one set and B's as four offers.
+ *   · **The heading.** On the page gutter with a "view all products" link,
+ *     against B's centred title and rule.
+ *   · **The badge.** SALE here, the computed percentage there.
  *
- *   · **The specification.** This gives each product two lines of fact — the
- *     grade and what comes with it. Option B gives it none, on the argument
- *     that the poster already said everything.
- *   · **The saving.** Option B strikes the old price through and prints the
- *     percentage. This shows the price you pay and marks the tile SALE, and
- *     that is all. It is the weaker sell and the one that does not turn the row
- *     into a permanent clearance rack.
- *   · **The density.** Twelve pixels between these tiles against thirty-two
- *     between B's cards, and a heading on the gutter with a "view all" against
- *     B's centred title. One reads as a catalogue page, the other as four
- *     offers.
+ * That is the whole list. Nothing about the picture, the copy, the price or the
+ * button differs any more. If those three stop mattering too, the honest answer
+ * is that there is one design left and the other file should be deleted rather
+ * than kept as a near-duplicate that has to be edited twice.
  *
- * If those stop mattering too, the honest answer is that there is one design
- * left and the other file should go.
+ * ── What this design was arguing ───────────────────────────────────────────
+ * That a buyer choosing between foam grades wants specification before
+ * persuasion, so each tile carried two lines of fact — the grade, and what came
+ * in the set. The client asked for them out, which is their call to make; the
+ * data is still in `popularProducts` under `spec` and `variants` if it ever
+ * comes back, and nothing else has to change to restore it.
+ *
+ * What survives of that argument is the picture: a tile with this much air
+ * only works if the photograph is cut out or shot on a flat field, and Karmo
+ * has none of that yet. That is still the cost of choosing this one.
  *
  * ── Where it departs from the reference ────────────────────────────────────
- * The reference repeats one line of poetry under every product — the same
- * "solid in construction, simple in form" on all four. That works for a
- * furniture brand whose products differ mainly in shape. Karmo sells foam by
- * grade, and a buyer choosing between 280 and 4G needs the grade, not a mood.
- * So the second line is per-product and factual, off the client's own posters.
- *
  * Four across, at the client's ask and as the reference has it. The fourth
  * product is a mattress rather than a combo, and it is not on offer — see
  * `popularProducts` for why that is the honest way to reach four and not a
@@ -118,42 +111,39 @@ function ProductTile({ item }) {
         </div>
       </Link>
 
-      {/* Centred and stacked under the picture, at the client's ask — this was
-          a name-left/price-right row before, which reads faster down a column
-          but cannot hold a centred button under it without looking lopsided.
-          Once the button was in, the whole block had to follow it.
+      {/* Name, prices, button — nothing else, at the client's ask. The two
+          lines of specification that were here are gone, and with them the last
+          argument this design was making that Option B was not: that a buyer
+          choosing between foam grades wants the grade before the price. The
+          client's call, and the row is shorter for it — 582px to about 510.
 
-          The order is deliberate: what it is, then the two lines of fact, then
-          what it costs, then how to get it. The specification sits above the
-          price rather than below because it is what a buyer uses to decide
-          *which* grade — by the time they reach the number they should already
-          know what they are pricing.
+          The rest of the height came off the padding rather than the type,
+          because the type is already at the smallest size that stays readable
+          at 343px wide. 20px above and 24px below where it was 24 and 28.
 
           `flex-1` here with `mt-auto` on the button holds all four buttons on
-          one line however the copy wraps, and the 24px above the button is
-          `mb-6` on the price, not `mt-6` on the button. An auto margin only
+          one line however the names wrap, and the 20px above the button is
+          `mb-5` on the price, not `mt-5` on the button. An auto margin only
           distributes slack, so on a row where every card happens to be the same
           height it resolves to zero and the button lands hard against the price
           — which is exactly the bug this row's twin shipped with once already. */}
-      <div className="flex flex-1 flex-col items-center px-5 pb-7 pt-6 text-center lg:px-6">
+      <div className="flex flex-1 flex-col items-center px-5 pb-6 pt-5 text-center lg:px-6">
         <Link href={item.href}>
           <h3 className="text-[15px] font-semibold leading-snug text-ink transition-colors duration-300 group-hover:text-brand">
             {item.name}
           </h3>
         </Link>
 
-        <p className="body-copy mt-2 text-[13px] leading-[1.55] text-ink/55">
-          {item.spec}
-        </p>
-        <p className="body-copy mt-1 text-[13px] leading-[1.55] text-ink/40">
-          {item.variants}
-        </p>
-
-        {/* One number, no struck price. That is the line this design still
-            holds against Option B: the badge says there is an offer, and the
-            price says what you pay. */}
-        <p className="mb-6 mt-4 text-[19px] font-bold tabular-nums text-ink">
-          {item.now}
+        {/* The struck price is conditional, not empty-when-absent: the mattress
+            carries no `was`, and an `<s>` around nothing still renders its flex
+            gap, which pushes the lone price off centre. */}
+        <p className="mb-5 mt-3 flex items-baseline justify-center gap-3">
+          {item.was && (
+            <s className="text-[14px] tabular-nums text-ink/40">{item.was}</s>
+          )}
+          <span className="text-[19px] font-bold tabular-nums text-ink">
+            {item.now}
+          </span>
         </p>
 
         <Link
