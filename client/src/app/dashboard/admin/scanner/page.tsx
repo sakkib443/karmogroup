@@ -6,6 +6,7 @@ import { useGetProductsQuery } from '@/redux/api/productApi';
 import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
 import { useGetAdminUsersQuery } from '@/redux/api/userApi';
 import { useGetDashboardSummaryQuery } from '@/redux/api/dashboardApi';
+import { API_URL } from '@/config/api';
 
 type TestStatus = 'idle' | 'running' | 'success' | 'failed';
 
@@ -34,7 +35,7 @@ const ApiScannerPage = () => {
         setTests(prev => prev.map(t => t.id === testId ? { ...t, status: 'running' } : t));
 
         const token = localStorage.getItem('token');
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const baseUrl = API_URL;
 
         try {
             const response = await fetch(`${baseUrl}${tests.find(t => t.id === testId)?.endpoint}`, {

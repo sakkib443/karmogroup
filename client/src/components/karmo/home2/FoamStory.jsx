@@ -98,20 +98,37 @@ export default function FoamStory() {
 
   return (
     <section className="bg-white py-16 lg:py-24">
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        /* `.shell`, not a hand-rolled padding. Every other section on this page
-           runs full-bleed or on its own gutter, but this one is a column of
-           reading copy and it has to start where the hero's headline starts —
-           1.5rem / 3.5rem / 5rem, capped at 1600px, which is exactly what
-           `.shell` is. Writing the same figures out by hand would drift the
-           first time one of them changed. */
-        className="shell grid gap-12 lg:grid-cols-[minmax(0,1.16fr)_minmax(0,0.84fr)] lg:items-stretch lg:gap-16"
-      >
-        {/* ── Copy ─────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="lg:flex lg:flex-col lg:justify-center">
+      {/* `.shell`, not a hand-rolled padding. Every other section on this page
+          runs full-bleed or on its own gutter, but this one is a column of
+          reading copy and it has to start where the hero's headline starts —
+          1.5rem / 3.5rem / 5rem, capped at 1600px, which is exactly what
+          `.shell` is. Writing the same figures out by hand would drift the
+          first time one of them changed. */}
+      <div className="shell">
+        {/* One outlined card holding both halves, which is the reference's own
+            arrangement — and it settles an argument the previous version could
+            not win. The picture is square, so its height followed its column's
+            width and drifted away from the copy's height as the window grew:
+            50px apart at 1440, 79px at 1920, and no fixed column split holds
+            both. Inside a card the two halves are one row, so they are the
+            same height by construction at every width.
+
+            A soft 14px radius, not the square corners the rest of the page
+            uses. The client asked for this one specifically — neither a pill
+            nor a hard corner — and `overflow-hidden` is what carries it
+            through to the photograph, whose corners would otherwise sit
+            outside the card's. */}
+        <motion.div
+          variants={group}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="grid overflow-hidden rounded-[14px] border border-ink/12 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:items-stretch"
+        >
+          {/* ── Copy ───────────────────────────────────────────────────── */}
+          <motion.div
+            variants={fade}
+            className="flex flex-col justify-center p-8 sm:p-10 lg:p-14"
+          >
           <h2 className="display text-[clamp(1.35rem,2.2vw,2.2rem)] font-bold! uppercase leading-[1.08]! tracking-[-0.01em] text-ink">
             {HEADING.map((line) => (
               <span key={line} className="block">
@@ -204,17 +221,26 @@ export default function FoamStory() {
           </div>
         </motion.div>
 
-        {/* ── Picture ──────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="relative aspect-square overflow-hidden bg-cream lg:aspect-auto lg:h-full">
-          <Image
-            src={picture.src}
-            alt={picture.alt}
-            fill
-            sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-cover"
-          />
+          {/* ── Picture ────────────────────────────────────────────────── */}
+          {/* No padding and no gap: the photograph runs to the card's own
+              edges, and the hairline between it and the copy is the card's
+              border carried inward rather than a second rule. Stacked below
+              lg it keeps its square shape; from lg it takes the row's height,
+              which the copy sets. */}
+          <motion.div
+            variants={fade}
+            className="relative aspect-square border-t border-ink/12 bg-cream lg:aspect-auto lg:h-full lg:border-l lg:border-t-0"
+          >
+            <Image
+              src={picture.src}
+              alt={picture.alt}
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+          </motion.div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   );
 }

@@ -5,6 +5,7 @@ import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
+import FoamPromise from "@/components/karmo/home2/FoamPromise";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -35,6 +36,18 @@ export default function HomePage() {
       <CollectionsShowcase />
       <ShoppableScene />
       <FoamStory />
+
+      {/* Straight after the foam story, which is what it argues from: that
+          section says what the foam is, this one says what it does. It is also
+          the only dark section on a white page, so it wants a section either
+          side of it rather than sitting against the footer.
+
+          The background is the product film, anchored to the viewport so the
+          copy scrolls over a held frame. The client chose this over the
+          alternatives (`FILM_MODES` in the component) and asked that it not sit
+          dead still — a fully pinned frame read as a photograph behind a hole —
+          so it drifts gently along the scroll; see `DRIFT` in the component. */}
+      <FoamPromise filmMode="fixed" />
 
       {/* Two Popular Products designs were built here to be chosen between —
           this quiet grid and an offer row of poster cards. The client picked

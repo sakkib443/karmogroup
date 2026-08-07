@@ -1,6 +1,5 @@
 import { store } from '@/redux/store';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '@/config/api';
 
 /**
  * Downloads an analytics report PDF for the given role and triggers a browser

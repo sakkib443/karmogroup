@@ -6,6 +6,7 @@ import { store } from './store';
 import { hydrateCart } from './slices/cartSlice';
 import { hydrateWishlist } from './slices/wishlistSlice';
 import { loginSuccess, logout, sessionRestoreFinished } from './slices/authSlice';
+import { API_URL, API_CONFIGURED } from '@/config/api';
 
 interface ReduxProviderProps {
     children: React.ReactNode;
@@ -28,9 +29,13 @@ const restoreSession = async () => {
         return;
     }
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    if (!API_CONFIGURED) {
+        store.dispatch(sessionRestoreFinished());
+        return;
+    }
+
     try {
-        const res = await fetch(`${apiUrl}/auth/me`, {
+        const res = await fetch(`${API_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('session expired');
