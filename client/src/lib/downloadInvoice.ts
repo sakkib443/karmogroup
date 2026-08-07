@@ -1,6 +1,5 @@
 import { store } from '@/redux/store';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '@/config/api';
 
 /**
  * Downloads an invoice PDF for the given order and triggers a browser download.

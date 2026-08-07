@@ -11,6 +11,7 @@ import { FaXTwitter, FaTiktok } from 'react-icons/fa6';
 import { toast } from 'react-hot-toast';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import type { IconType } from 'react-icons';
+import { API_URL } from '@/config/api';
 
 /* ─── Map a social label to its icon (case-insensitive) ─── */
 const SOCIAL_ICONS: { match: string; icon: IconType }[] = [
@@ -28,7 +29,7 @@ const getSocialIcon = (label: string): IconType => {
     return found?.icon || FaFacebookF;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE = API_URL;
 
 const NewFooter: React.FC = () => {
     const { isAuthenticated, user } = useAppSelector((state) => state.auth);

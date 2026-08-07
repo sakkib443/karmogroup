@@ -1,11 +1,11 @@
 import { io, Socket } from 'socket.io-client';
+import { API_URL, API_CONFIGURED } from '@/config/api';
 
 let socket: Socket | null = null;
 
 // Derive the socket origin from the REST API base URL by stripping a trailing /api.
 function getSocketUrl(): string {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-    return apiUrl.replace(/\/api\/?$/, '');
+    return API_URL.replace(/\/api\/?$/, '');
 }
 
 function readToken(): string | undefined {
@@ -19,6 +19,11 @@ function readToken(): string | undefined {
  */
 export function connectSocket(token?: string): Socket | null {
     if (typeof window === 'undefined') return null;
+    // Nowhere to connect to. Worse than useless without this: socket.io retries
+    // for ever, so an unconfigured build would reopen the connection — and, on
+    // the old localhost fallback, Chrome's local-network prompt — again and
+    // again. See src/config/api.ts.
+    if (!API_CONFIGURED) return null;
 
     const authToken = token || readToken();
 

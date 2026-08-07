@@ -2,8 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { RootState } from '../store';
 import { logout } from '../slices/authSlice';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { API_URL, API_CONFIGURED } from '@/config/api';
 
 const rawBaseQuery = fetchBaseQuery({
     baseUrl: API_URL,
@@ -18,6 +17,15 @@ const rawBaseQuery = fetchBaseQuery({
 
 // Wrapper that handles 401 → auto logout
 const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+    // A build with no NEXT_PUBLIC_API_URL has nowhere to send this. Fail here
+    // rather than let it out of the browser: with an empty baseUrl every call
+    // would go to the site's own origin and 404, and with the old
+    // localhost:5000 fallback it went to the *visitor's* machine and made
+    // Chrome ask each of them for permission. See src/config/api.ts.
+    if (!API_CONFIGURED) {
+        return { error: { status: 'CUSTOM_ERROR', error: 'No API configured (NEXT_PUBLIC_API_URL is unset)' } };
+    }
+
     const result = await rawBaseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {

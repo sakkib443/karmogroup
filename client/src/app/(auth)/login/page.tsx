@@ -11,6 +11,7 @@ import { useMergeWishlistMutation } from '@/redux/api/userApi';
 import { toast } from 'react-hot-toast';
 import { LuLock, LuEye, LuEyeOff, LuArrowRight, LuCircleAlert, LuUser } from 'react-icons/lu';
 import GoogleSignInButton from '@/components/shared/GoogleSignInButton';
+import { API_URL } from '@/config/api';
 
 const inputCls =
     'w-full pl-11 pr-4 py-3 rounded-lg border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15';
@@ -83,7 +84,7 @@ const LoginPageInner = () => {
             } else {
                 try {
                     const ordersRes = await fetch(
-                        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/orders/my?limit=1`,
+                        `${API_URL}/orders/my?limit=1`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
                     const ordersData = await ordersRes.json();
