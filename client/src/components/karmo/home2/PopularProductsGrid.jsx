@@ -35,18 +35,31 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * 2001 needs the grade, not a mood. So the second line is per-product and
  * factual. The structure is the reference's; the words do a different job.
  *
+ * ── The picture is square ──────────────────────────────────────────────────
+ * At the client's ask: width and height equal, which also keeps the section
+ * off the full height of the screen — a 4:5 box put the row at 577px a tile
+ * and this brings it to about 490px.
+ *
+ * Every source is 4:5, so a square box crops a fifth of the height off each
+ * one, and where that fifth comes from is stated per product in `position`.
+ * Centred by default; `object-top` on anything carrying printed type at the
+ * top, so the crop takes the empty foot rather than a logo; `object-bottom`
+ * where the picture has dead field above the product. Getting this wrong is
+ * not subtle — it is a beheaded logo — so it is a field rather than a default.
+ *
  * ── The pictures, and what choosing this design commits to ─────────────────
  * This design wants catalogue photography: one product, cut out or on a flat
- * pale field, shot square-on. Karmo has none of that yet. Every 4:5 image in
- * the repo is either a room scene or a campaign poster, so these four tiles are
- * standing in — and two of them are pictures already used elsewhere on this
- * page, which is the giveaway.
+ * pale field, shot square-on. Karmo has none of that yet. Every square-croppable
+ * image in the repo is either a room scene or a campaign poster, so these four
+ * tiles are standing in — and two of them are pictures already used elsewhere
+ * on this page, which is the giveaway.
  *
  * That is worth saying plainly rather than hiding, because it is half the
  * decision: picking this design commits to a product shoot. Picking Option B
  * does not, because the posters it wants are the ones Karmo already makes every
  * campaign. Nothing else here needs to change when the real shots arrive — only
- * `image`, `alt` and `ratio` below.
+ * `image`, `alt` and `position` below, and anything framed square to begin with
+ * will not need `position` at all.
  */
 
 /**
@@ -70,6 +83,10 @@ const products = [
        photographed in a room, with the Karmo Mattress mark in the corner. */
     image: "/karmo/images/mattress/suite-interior.jpg",
     alt: "A Karmo mattress in red floral ticking with white piping on an upholstered bed, lit by two bedside lamps under a chandelier",
+    /* Centred: the mattress sits mid-frame and the fifth that goes is
+       chandelier at the top and floor at the bottom, neither of which is the
+       product. The Karmo Mattress mark is top-right and survives a 10% trim. */
+    position: "object-center",
   },
   {
     id: "hd-foam",
@@ -81,6 +98,10 @@ const products = [
     /* Already on this page, in the collections row above. A stand-in. */
     image: "/karmo/images/home-02/collections/02-popular-karmo-hd.webp",
     alt: "A man seated in an armchair beside a tall stack of Karmo HD foam blocks on a plain studio field",
+    /* All of the crop off the top, where there is nothing but empty studio
+       field above his head — the same call the collections row makes about the
+       same picture, and for the same reason. */
+    position: "object-bottom",
   },
   {
     id: "zuti-foam-sofa",
@@ -90,9 +111,12 @@ const products = [
     variants: "2 colours available",
     href: "/foam",
     badge: "NEW",
-    /* Already on this page, in the foam story below. A stand-in. */
+    /* Already on this page, in the foam story below. A stand-in — but the only
+       one of the four that is square in the file (1400x1400), so it is the only
+       tile losing nothing at all to the crop. */
     image: "/karmo/images/home-02/foam-story/foam-blue-velvet-sofa.webp",
     alt: "A three-seat sofa in deep blue velvet with a leather KARMO ZUTI tab on its front rail, against a marigold wall",
+    position: "object-center",
   },
   {
     id: "cloud-mattress",
@@ -106,6 +130,10 @@ const products = [
        The clearest argument in the repo for shooting the real thing. */
     image: "/karmo/images/mattress/cloud-poster.jpg",
     alt: "Karmo Mattress poster — a bed dressed in white linen floating above clouds at sunset, offering 15% off all mattresses",
+    /* Anchored to the top so the whole fifth comes off the foot, which on this
+       poster is the hotline strip — the footer carries that number anyway. The
+       two Karmo logos and the headline sit in the top 40% and all survive. */
+    position: "object-top",
   },
 ];
 
@@ -113,13 +141,17 @@ function ProductTile({ item }) {
   return (
     <motion.div variants={fade} className="bg-cream">
       <Link href={item.href} className="group block">
-        <div className="relative aspect-[4/5] overflow-hidden">
+        {/* Square, at the client's ask. It is also the ratio this design wants:
+            a product tile is a thumbnail of the thing, and a square gives the
+            product the same room on both axes whether it is a sofa lying wide
+            or a foam stack standing tall. */}
+        <div className="relative aspect-square overflow-hidden">
           <Image
             src={item.image}
             alt={item.alt}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            className={`object-cover ${item.position} transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
           />
 
           {/* The page veil, same as the collections row and the scene below it.

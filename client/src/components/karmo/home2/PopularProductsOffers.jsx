@@ -41,6 +41,24 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *   combos happen to be exactly 15% off, which is why the badge is not fighting
  *   for attention with three different numbers.
  *
+ * ── The picture is square ──────────────────────────────────────────────────
+ * At the client's ask: width and height equal, which also keeps the section
+ * clear of the full height of the screen — a 4:5 box put a card at 686px and
+ * this brings it to about 585px.
+ *
+ * It matters more here than it does in Option A, because these are posters.
+ * A poster is composed for its own edges, and a square box crops a fifth of its
+ * height away — so every one of them is anchored `object-top`. The fifth then
+ * comes off the foot, which on all three stand-ins is the hotline and
+ * free-delivery strip, and the logos and the headline that do the selling stay.
+ * Centring instead would take 10% off the top, and 10% off the top of a poster
+ * is the logo.
+ *
+ * That is a real cost of this design and worth stating: the combo artwork Karmo
+ * supplies is portrait, so either it gets cropped here or it gets shot square.
+ * Cropped is fine while the important half is the top half — check it is, for
+ * every new poster, rather than assuming.
+ *
  * ── The pictures ───────────────────────────────────────────────────────────
  * The three combo posters are not in the repo. Each entry names the file it
  * wants under `image`, and points at an existing Karmo poster until that file
@@ -114,13 +132,17 @@ function OfferCard({ item }) {
   return (
     <motion.div variants={fade} className="group flex flex-col bg-cream">
       <Link href={item.href} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden">
+        {/* Square, and every poster anchored to its top — see the note above.
+            One position for all three rather than a field per offer, because
+            the rule is a property of posters, not of these particular three:
+            anything dropped in here is artwork with its mark at the top. */}
+        <div className="relative aspect-square overflow-hidden">
           <Image
             src={item.image}
             alt={item.alt}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            className="object-cover object-top transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
           />
 
           {/* The page veil. Lighter here than it looks: these are posters, and a
