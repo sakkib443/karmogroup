@@ -1,46 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-
-import { group, rise, VIEWPORT } from "../motion";
-import HeadingThree, { Mark } from "./HeadingThree";
-
-/**
- * The heritage panel — and the only section on this page with no photograph in
- * it, on purpose.
- *
- * By the time the reader arrives here they have passed a full-width hero
- * photograph and a rail of four divisions, and below this sit three curated
- * room scenes, a film band and a strip of running video. A page of pictures
- * needs somewhere to stop. A dark panel of nothing but type is that stop, and
- * it makes the two sections either side of it look better than they do next to
- * each other.
- *
- * It also carries no call to action. Everything else on this page is asking for
- * something — explore the division, see the range, watch the film. This is the
- * one block that only states a fact, and putting a button on it would turn the
- * company's own history into another offer.
- *
- * ── On the claims ───────────────────────────────────────────────────────────
- * Two are figures and two are the client's own words, and they are set
- * differently because they are different kinds of statement:
- *
- *   · **1965** and **04** are facts this site already publishes elsewhere — the
- *     founding year in the (karmo) layout's own description, the four divisions
- *     in every navigation on the site.
- *   · *Largest Raw Material Stock* and *International Quality Certified* are
- *     Generic 2 and 3 from `docs/copy/taglines.md`, verbatim. That file lists
- *     both as approved but unused, with the trust strip as their suggested
- *     home. They fit better here, where the section is about standing rather
- *     than about product.
- *
- * Nothing is invented, and nothing is dressed up with a number it does not
- * have. `Capabilities.jsx` records what happened the last time claims were
- * borrowed for this site without checking whose they were; the two lines here
- * without a figure are the ones Karmo has words for but no measure, and they
- * are set as words.
- */
-
+import { group, rise, VIEWPORT } from "@/components/karmo/motion";
+import HeadingThree, { Mark } from "../HeadingThree/HeadingThree";
 const figures = [
   {
     value: "1965",
@@ -52,7 +14,6 @@ const figures = [
   },
 ];
 
-/* Generic 2 and Generic 3, exactly as supplied. */
 const claims = ["Largest Raw Material Stock", "International Quality Certified"];
 
 export default function ProofPanel() {

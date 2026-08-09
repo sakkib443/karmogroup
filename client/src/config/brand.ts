@@ -28,7 +28,7 @@ export const BRAND_SECONDARY = BRAND_PRIMARY;
 /* ─────────────── TYPOGRAPHY ─────────────── */
 
 /** ⬇⬇⬇  THE ONE FONT VARIABLE  ⬇⬇⬇  Body text across the whole site. */
-export const BRAND_FONT = 'Poppins';
+export const BRAND_FONT = 'Plus Jakarta Sans';
 
 /**
  * Headings. Set it to the same face as `BRAND_FONT` for one uniform

@@ -14,10 +14,12 @@
  */
 
 // Arrive and stop. Fast out of the gate, long settle, no bounce.
+/** @type {const} */
 export const SETTLE = [0.22, 1, 0.36, 1];
 
 // Curtains, wipes and pans — eases at both ends, for things that travel a
 // long way across the frame.
+/** @type {const} */
 export const SWEEP = [0.76, 0, 0.24, 1];
 
 // Durations, in seconds.
@@ -81,3 +83,10 @@ export const curtainRight = {
   hidden: { x: "0%" },
   show: { x: "101%", transition: { duration: SLOW_S, ease: SWEEP } },
 };
+
+/** Simple fade in animation variant */
+export const fade = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: RISE_S, ease: SETTLE } },
+};
+
