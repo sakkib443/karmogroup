@@ -6,6 +6,8 @@ import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
+import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Reels from "@/components/karmo/Reels";
 
 export const metadata = {
@@ -28,13 +30,17 @@ export const metadata = {
  * padding with a negative margin to do it; this header is opaque and holds its
  * own space, so the two arrangements cannot both be right.
  */
+/* Mid-page Best Selling / Popular / New Arrival band — hidden for now.
+   Flip to `true` to bring the three collection cards back. */
+const SHOW_COLLECTIONS_SHOWCASE = false;
+
 export default function HomePage() {
   return (
     <>
       <HeroTwo />
       <StandardStrip />
       <DivisionsStrip />
-      <CollectionsShowcase />
+      {SHOW_COLLECTIONS_SHOWCASE ? <CollectionsShowcase /> : null}
       <ShoppableScene />
       <FoamStory />
 
@@ -57,26 +63,16 @@ export default function HomePage() {
           `popularProducts`, since it was always shared. */}
       <PopularProductsGrid />
 
-      {/* The screening room is the shared component `Reels` already carries
-          the resource — six real clips, the marquee, the lightbox, the
-          in-view gate that keeps 35MB of video from loading until this
-          section is actually reached. Nothing about that needed rebuilding,
-          only a heading in this page's own voice: the eyebrow-and-dash line
-          plus display heading every section above it uses, not the numbered
-          `SectionHeading` the /home-2 and /home-3 designs pass it. */}
-      <Reels
-        heading={
-          <div>
-            <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-              <span className="h-px w-8 bg-brand" />
-              Karmo On Screen
-            </span>
-            <h2 className="display mt-5 max-w-xl text-[1.55rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink lg:text-[1.85rem]">
-              See what <span className="font-bold text-brand">comfort is made of</span>
-            </h2>
-          </div>
-        }
-      />
+      {/* Film strip — uses its own slim editorial label (not the big centred
+          section title), so it does not leave a void under Popular Products. */}
+      <Reels />
+
+      {/* Matches the client's live "Certified By" band — room photo, dark wash,
+          centred type with the orange leaf rule, three framed certificates. */}
+      <CertifiedBy />
+
+      {/* Last band before the footer — order path + contact. */}
+      <OrderAndContact />
     </>
   );
 }

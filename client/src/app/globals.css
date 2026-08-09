@@ -1214,37 +1214,26 @@ svg.app-icon[fill="none"] {
      either changes — the crop (the frame is `object-cover`, so the window's
      shape decides which part of the room ends up behind the words) and the
      scene photograph itself. A new picture invalidates all of it. */
+  /* Was a top-right corner wash for the small caption. The line now sits in
+     the middle of the scene at display size, so the wash follows it — a soft
+     oval at centre that keeps the letters readable without greying the whole
+     room. */
   .scene-type-scrim {
     background: radial-gradient(
-      150% 115% at 100% 0%,
-      rgba(22, 28, 36, 0.46) 0%,
-      rgba(22, 28, 36, 0.3) 32%,
-      rgba(22, 28, 36, 0) 64%
+      70% 55% at 50% 78%,
+      rgba(22, 28, 36, 0.5) 0%,
+      rgba(22, 28, 36, 0.28) 42%,
+      rgba(22, 28, 36, 0) 72%
     );
   }
 
-  /* The scrim is drawn in percentages of the frame, and below lg the frame is
-     barely a third of the height it has on a desktop — so the same line of
-     type, which hardly changes size, falls far deeper into the falloff and
-     comes out of it lit. One gradient for both gave 4.9:1 at 1280 and 2.56:1 at
-     375, which is why there are two.
-
-     Note which lever does the work here. Widening the ellipse spreads the wash
-     over more of the corner and lifts the ratio at *no extra darkness over the
-     words*; raising the stops buys the same ratio by making the corner heavier.
-     Both were measured at 375: 160%/210% at 0.56 reached 4.95:1 but sat at 0.59
-     alpha over the type, and this one gets 4.72:1 at 0.56. The lighter of two
-     passing answers wins — the reader sees the wash, and only the measurement
-     sees the ratio. Same reasoning set the desktop ellipse above.
-
-     Worst-case white-on-photograph here: 4.72:1 at 375x812, 7.5:1 at 768. */
   @media (width < 64rem) {
     .scene-type-scrim {
       background: radial-gradient(
-        190% 260% at 100% 0%,
-        rgba(22, 28, 36, 0.52) 0%,
-        rgba(22, 28, 36, 0.36) 32%,
-        rgba(22, 28, 36, 0) 64%
+        95% 70% at 50% 78%,
+        rgba(22, 28, 36, 0.55) 0%,
+        rgba(22, 28, 36, 0.32) 45%,
+        rgba(22, 28, 36, 0) 74%
       );
     }
   }
