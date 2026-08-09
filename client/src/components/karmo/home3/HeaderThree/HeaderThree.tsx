@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Link from "next/link";
@@ -15,41 +16,6 @@ import {
 } from "react-icons/fi";
 
 import Logo from "@/components/karmo/Logo";
-
-/**
- * The Home 03 header — one row, and the argument is what it costs.
- *
- * The other two designs both buy their structure with height. Home 01 runs a
- * dark bar plus a utility strip: 120px. Home 02 runs an announcement band, an
- * identity row and a navigation row: 182px, and the layout has to reserve all
- * of it permanently because the announcement rolls away without the offset
- * following. On a 900px laptop that is a fifth of the window gone before the
- * page has said anything.
- *
- * This is 72px and never changes. Everything the other two spread over two and
- * three rows is still here — four divisions with their sub-ranges, search, the
- * store finder, the basket — held in one row by moving two things off it:
- *
- *   · **Search** is a sheet, not a field. Home 02 gives the middle of the bar
- *     to a permanent input; this opens a full-width one under the row when it
- *     is asked for and gives the space back when it is not.
- *   · **Sub-ranges** are a panel, not a dropdown. Foam alone has five, and a
- *     column of five links hanging off a bar is the weakest thing on both other
- *     headers — a list of words with nothing to look at. The panel is the full
- *     width of the page: the sub-ranges in two columns, and the division's own
- *     photograph beside them, so the menu shows the range instead of listing it.
- *
- * The bar is the deep slate the rest of the site uses for dark surfaces, and it
- * is solid from the first pixel. Home 01's fades in from transparent over its
- * hero; here the hero opens on a photograph that runs to the top of its own
- * band, and a bar that dissolves into a picture is a bar you cannot read. Solid
- * also means the default wordmark artwork works — "GROUP" and "Since 1965" are
- * set in white for exactly this.
- *
- * Fixed height is load-bearing. The layout below reserves 72px, so no row here
- * may grow with its contents; the search sheet and the division panel both hang
- * *below* the bar rather than pushing it taller.
- */
 
 const divisions = [
   {
@@ -100,10 +66,6 @@ const divisions = [
   },
 ];
 
-/* The three designs are being compared side by side, so each header has to be
-   able to reach the other two. They go in the drawer and in a small rail on the
-   right of the bar rather than into the division menu — they are scaffolding,
-   and they come out with the two losing routes. */
 const trials = [
   { name: "01", href: "/" },
   { name: "02", href: "/home-2" },
@@ -113,31 +75,28 @@ const trials = [
 export default function HeaderThree() {
   const pathname = usePathname();
 
-  // Which division panel is open, by name. One at a time; `null` is closed.
-  const [panel, setPanel] = useState(null);
+  const [panel, setPanel] = useState<string | null>(null);
   const [search, setSearch] = useState(false);
   const [drawer, setDrawer] = useState(false);
 
-  const searchInput = useRef(null);
-  // Opening a panel on hover and closing it the instant the pointer leaves
-  // makes the gap between two menu entries a trapdoor. A short grace period on
-  // the way out is the whole difference between a menu and a flicker.
-  const closeTimer = useRef(null);
+  const searchInput = useRef<HTMLInputElement | null>(null);
+  const closeTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const openPanel = (name) => {
-    clearTimeout(closeTimer.current);
+  const openPanel = (name: string) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
     setPanel(name);
   };
   const closePanel = () => {
-    clearTimeout(closeTimer.current);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setPanel(null), 160);
   };
 
-  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
 
-  // Everything shuts on Escape, wherever focus happens to be.
   useEffect(() => {
-    const onKey = (e) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       setPanel(null);
       setSearch(false);
@@ -147,8 +106,6 @@ export default function HeaderThree() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // And on arrival anywhere else — a menu left hanging over the new page is the
-  // classic single-page-app leftover.
   useEffect(() => {
     setPanel(null);
     setSearch(false);
@@ -166,8 +123,7 @@ export default function HeaderThree() {
       className="fixed inset-x-0 top-0 z-[10000] bg-shade-deep"
       onMouseLeave={closePanel}
     >
-      {/* ── The row. 72px, always. ──────────────────────────────────── */}
-      <div className="shell flex h-[72px] items-center gap-8">
+      <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 flex h-[72px] items-center gap-8">
         <Link href="/home-3" aria-label="Karmo Group, home" className="shrink-0">
           <Logo className="h-7 w-auto sm:h-8" priority />
         </Link>
@@ -189,8 +145,6 @@ export default function HeaderThree() {
                     }`}
                   >
                     {entry.name}
-                    {/* Marks the open panel as well as the current page, so the
-                        bar always says which sheet is hanging off it. */}
                     <span
                       className={`absolute inset-x-4 bottom-0 h-[2px] origin-left bg-brand transition-transform duration-300 ${
                         active || panel === entry.name ? "scale-x-100" : "scale-x-0"
@@ -204,7 +158,6 @@ export default function HeaderThree() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-          {/* Trial switcher. Temporary, like the three routes it points at. */}
           <div className="mr-3 hidden items-center gap-1 xl:flex">
             <span className="mr-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/35">
               Design
@@ -269,15 +222,12 @@ export default function HeaderThree() {
         </div>
       </div>
 
-      {/* ── Search sheet ────────────────────────────────────────────── */}
-      {/* Hangs below the bar rather than inside it, so the 72px the layout
-          reserves is still the whole header when this is open. */}
       {search && (
         <div className="absolute inset-x-0 top-full bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.45)]">
           <form
             role="search"
             onSubmit={(e) => e.preventDefault()}
-            className="shell flex items-center gap-4 py-6"
+            className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 flex items-center gap-4 py-6"
           >
             <FiSearch className="shrink-0 text-[20px] text-ink/35" />
             <input
@@ -298,14 +248,13 @@ export default function HeaderThree() {
         </div>
       )}
 
-      {/* ── Division panel ──────────────────────────────────────────── */}
       {open && !search && (
         <div
           className="absolute inset-x-0 top-full hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.45)] lg:block"
           onMouseEnter={() => openPanel(open.name)}
           onMouseLeave={closePanel}
         >
-          <div className="shell grid grid-cols-12 gap-10 py-9">
+          <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 grid grid-cols-12 gap-10 py-9">
             <div className="col-span-3">
               <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-brand">
                 {open.name}
@@ -322,11 +271,8 @@ export default function HeaderThree() {
               </Link>
             </div>
 
-            {/* The sub-ranges, in two columns rather than one long list — five
-                entries stacked reach further down the page than the picture
-                beside them and leave the panel lopsided. */}
             <ul className="col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
-              {open.submenu.map((sub) => (
+              {open.submenu?.map((sub) => (
                 <li key={sub.href}>
                   <Link
                     href={sub.href}
@@ -359,10 +305,9 @@ export default function HeaderThree() {
         </div>
       )}
 
-      {/* ── Drawer, below lg ────────────────────────────────────────── */}
       {drawer && (
         <div className="absolute inset-x-0 top-full max-h-[calc(100svh-72px)] overflow-y-auto bg-white lg:hidden">
-          <div className="shell py-6">
+          <div className="w-full max-w-[1800px] mx-auto px-6 lg:px-12 py-6">
             <ul className="divide-y divide-ink/8">
               {divisions.map((entry) => (
                 <li key={entry.name} className="py-4">

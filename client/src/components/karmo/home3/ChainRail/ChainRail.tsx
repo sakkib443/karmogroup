@@ -4,38 +4,8 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 
-import { group, rise, VIEWPORT } from "../motion";
-import HeadingThree, { Mark } from "./HeadingThree";
-
-/**
- * The chain — the one claim this business can make that its competitors cannot,
- * and the section neither other homepage has.
- *
- * Home 01 shows the four divisions as four photographs of four rooms; Home 02's
- * header lists them as four menu entries. Both present them as a *range*. They
- * are not a range, they are a sequence: the chemistry goes into the foam, the
- * foam goes into the mattress, and the mattress is dressed in the bedding.
- * Karmo owns every step of that, which is the actual reason to buy from a group
- * rather than from four suppliers — and until this section, nowhere on the site
- * says it.
- *
- * So the order here is deliberately **not** the order of the navigation. The
- * menu leads on Foam because that is the biggest division; the rail leads on
- * Chemistry because that is where the material starts. The rail is what makes
- * the difference legible: a line the eye follows left to right rather than four
- * cards it has to be told are related.
- *
- * The connector is drawn per node rather than as one absolutely-positioned line
- * across the list. A single line would have to know the column widths and the
- * gutter to stop at the last dot instead of running off the end, and it would
- * have to know them again at every breakpoint. Each node simply reaches its own
- * neighbour, so the last one draws nothing and the geometry stays correct at
- * any width.
- *
- * The lead is the sentence the site already publishes as its own description
- * (see the metadata in the (karmo) layout), so it is approved by use rather
- * than newly written.
- */
+import { group, VIEWPORT } from "@/components/karmo/motion";
+import HeadingThree, { Mark } from "../HeadingThree/HeadingThree";
 
 const steps = [
   {
@@ -87,11 +57,8 @@ export default function ChainRail() {
           {steps.map((step, i) => (
             <motion.li
               key={step.name}
-              variants={rise}
               className="relative pl-9 md:pl-0 md:pt-7"
             >
-              {/* Reaches its own neighbour and no further; the last node draws
-                  nothing, which is what stops the rail overrunning the list. */}
               {i < steps.length - 1 && (
                 <>
                   <span

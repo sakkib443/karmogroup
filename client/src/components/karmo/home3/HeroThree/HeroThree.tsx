@@ -6,62 +6,13 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiMapPin } from "react-icons/fi";
 
-import { group, line as lineReveal, rise, SETTLE } from "../motion";
-
-/**
- * The Home 03 hero — the photograph and the words never touch.
- *
- * ── Why it is built this way ────────────────────────────────────────────────
- * Both other heroes set their copy *on* the picture and pay for it. Home 01
- * needs a two-gradient scrim (`.hero-veil`) and a text-shadow under every
- * headline. Home 02 goes further and constrains the photography itself: its
- * docblock states that any third slide must have its left 45% bare wall, or the
- * copy lands on furniture and the arrangement has to be rethought.
- *
- * That is a design telling the photographer what to shoot. Here the copy sits
- * on a solid slate card that overlaps the bottom of the picture, so there is
- * no scrim, no shadow, no rule about what may be in frame, and the contrast is
- * fixed at whatever the card is — about 15:1 — regardless of the photograph.
- * Any future image drops in unchanged. The overlap is what stops the two
- * halves reading as two stacked blocks.
- *
- * ── Why it is a division switcher, not a slideshow ──────────────────────────
- * Both other heroes run a timer at the visitor. Home 01 changes its headline
- * every seven seconds whether or not anyone is reading it; Home 02 changes only
- * the room behind one fixed claim.
- *
- * This one is the site's own navigation. Each state is a division — its
- * photograph, its tagline, its own "Explore" button — so the row underneath is
- * a way into the four sections of the business rather than four dots. It still
- * advances on its own, because a visitor who never touches it should still
- * learn there are four; but the first time anyone chooses a division the timer
- * stops for good, and what they chose stays on screen. Reduced motion never
- * starts it.
- *
- * ── The copy ────────────────────────────────────────────────────────────────
- * All four headlines are client taglines from `docs/copy/taglines.md`, each in
- * the place that file itself proposes for it — Generic 19 and Mattress 5 are
- * listed there as hero candidates, Generic 12 against HomeTex and Generic 9
- * against Chemicals. They are set **exactly as supplied**, including the
- * client's own inconsistent casing ("Where Comfort meets Elegance"), because
- * this design is mixed-case throughout and so, unlike Home 01 and Home 02, it
- * does not have to re-case them to fit. Nothing in this file is invented; the
- * supporting lines are the division descriptions already used in the nav.
- *
- * ── The pictures ────────────────────────────────────────────────────────────
- * Three come from `images/divisions`, which is the only set in the library with
- * one photograph per division. Foam takes the Home 01 hero slide instead: its
- * division file is 905x452, which upscales visibly across a band this wide.
- * A purpose-shot foam picture at 2400px or more is the one asset this design
- * still wants — see IMAGE-PROMPTS.md.
- */
+import { group, line as lineReveal, rise, SETTLE } from "@/components/karmo/motion";
 
 const divisions = [
   {
     id: "foam",
     index: "01",
     name: "Foam",
-    // Generic 19.
     title: ["Redefining", "Everyday Comfort"],
     lead: "Furniture and upholstery, footwear, automotive and acoustic grades — poured, cured and cut in Karmo's own plants.",
     href: "/foam",
@@ -73,7 +24,6 @@ const divisions = [
     id: "mattress",
     index: "02",
     name: "Mattress",
-    // Mattress 5.
     title: ["Sleep Well,", "Live Well"],
     lead: "Pocket spring, euro top, orthopaedic and memory foam — built on foam we make ourselves rather than buy in.",
     href: "/mattress",
@@ -85,7 +35,6 @@ const divisions = [
     id: "hometex",
     index: "03",
     name: "HomeTex",
-    // Generic 12.
     title: ["Where Comfort", "meets Elegance"],
     lead: "Bed sheets, comforters, pillows and cushions — the layers that finish a bedroom.",
     href: "/hometex",
@@ -97,7 +46,6 @@ const divisions = [
     id: "chemicals",
     index: "04",
     name: "Chemicals",
-    // Generic 9.
     title: ["We Create The", "Chemistry Of Comfort"],
     lead: "Adhesives, polymers and sodium silicate — the chemistry the other three divisions are built on.",
     href: "/chemicals",
@@ -107,21 +55,15 @@ const divisions = [
   },
 ];
 
-/* Long enough to read a two-line headline and its supporting sentence without
-   hurrying, which is the shortest this may be — the copy changes with the
-   picture here, unlike Home 02 where only the room does. */
 const DWELL_MS = 7500;
 const FADE_MS = 900;
 
 export default function HeroThree() {
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
-  // Latches on the first click and never clears. The timer is there to show a
-  // passive visitor that there are four divisions; once someone has said which
-  // one they want, moving it off them is just taking it away again.
   const [steered, setSteered] = useState(false);
 
-  const choose = useCallback((next) => {
+  const choose = useCallback((next: number) => {
     setSteered(true);
     setIndex(next);
   }, []);
@@ -139,11 +81,6 @@ export default function HeroThree() {
 
   return (
     <section className="bg-linen">
-      {/* ── The picture ──────────────────────────────────────────────
-          Nothing is ever drawn on it. Every slide is mounted and only
-          opacity moves, so a change costs no layout and the incoming
-          picture is already decoded when it is needed. Four is still
-          cheap; a longer list would want mounting on demand. */}
       <div className="relative h-[40svh] min-h-[260px] w-full overflow-hidden bg-shade-deep sm:h-[46svh] lg:h-[56svh] lg:min-h-[360px]">
         {divisions.map((d, i) => (
           <Image
@@ -164,15 +101,8 @@ export default function HeroThree() {
       </div>
 
       <div className="shell">
-        {/* The negative margin lifts the whole row over the picture; the
-            switcher column pushes itself back down by exactly the same amount,
-            so it starts on the picture's bottom edge while the card breaks
-            through it. Keep the two numbers in step. */}
         <div className="relative -mt-16 flex flex-col gap-8 pb-16 lg:-mt-36 lg:flex-row lg:gap-0 lg:pb-24">
           <div className="bg-shade-deep px-7 py-9 shadow-[0_30px_60px_-30px_rgba(22,28,36,0.55)] sm:px-10 sm:py-11 lg:w-[58%] lg:min-h-[25rem] lg:px-12 lg:py-14">
-            {/* The frame line. Constant across all four states, so the group
-                is never off the screen even when the headline is a division's
-                rather than the brand's. */}
             <div className="flex items-center justify-between gap-6 border-b border-white/12 pb-5">
               <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.24em] text-white/60">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand" />
@@ -186,10 +116,6 @@ export default function HeroThree() {
               </span>
             </div>
 
-            {/* Keyed on the division so the lines replay each time one is
-                chosen. `animate` rather than `whileInView` — this block is
-                above the fold on load and then changes in place, so a viewport
-                trigger would fire once and never again. */}
             <motion.div
               key={active.id}
               variants={group}
@@ -239,10 +165,6 @@ export default function HeroThree() {
             </motion.div>
           </div>
 
-          {/* ── The switcher ───────────────────────────────────────────
-              Four real destinations, not four dots. Buttons rather than links
-              because they change what is on the screen; the link to each
-              division is the button in the card. */}
           <div className="lg:w-[42%] lg:pt-36 lg:pl-12">
             <span className="block text-[10.5px] font-semibold uppercase tracking-[0.26em] text-ink/40">
               Four divisions
