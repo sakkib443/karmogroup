@@ -225,46 +225,23 @@ export default function ShoppableScene() {
             className="object-cover"
           />
 
-          {/* The page's soft veil, and then a second wash into the top-right
-              corner where the line below sits. Two layers rather than one
-              stronger one, because they answer different questions: the veil is
-              the section's, shared with the three collection cards above so the
-              two sections read as one block, and the scrim is this line's
-              alone. Thickening the veil until the words held would have dragged
-              every other picture on the page down with it.
+          {/* One even soft wash over the whole frame — same opacity edge to
+              edge. `pointer-events-none` so markers stay hoverable under it. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[rgba(22,28,36,0.36)]"
+          />
 
-              Both are `pointer-events-none` — they cover the whole frame, and
-              the markers underneath have to stay hoverable through them. */}
-          <span aria-hidden className="photo-veil pointer-events-none absolute inset-0" />
-          <span aria-hidden className="scene-type-scrim pointer-events-none absolute inset-0" />
-
-          {/* The client's line, in the corner the measurements chose.
-              Set small and letterspaced rather than as a headline: the room is
-              the subject and the markers are the point, so this is a caption on
-              the scene, not a title over it. The brand rule under it is the
-              same one the foam story uses beneath its eyebrow.
-
-              Ahead of the markers in the DOM and carrying no `z`, so the
-              markers (z-10) and any open card (z-20) both pass over it — a
-              product card should never open underneath a line of decoration.
-              `pointer-events-none` for the same reason: the sofa marker is the
-              nearest one to this corner and nothing here may intercept it.
-
-              The text-shadow is polish, not contrast. It softens the letters
-              against the busier parts of the wall, but it is worth nothing to a
-              contrast ratio, so the scrim behind is sized as though it were not
-              there. */}
-          <p className="display pointer-events-none absolute right-5 top-6 max-w-[13rem] text-right text-[10.5px] font-bold uppercase leading-[1.7] tracking-[0.2em] text-white [text-shadow:0_1px_18px_rgba(10,8,6,0.5)] lg:right-10 lg:top-10 lg:max-w-[15rem] lg:text-[12px]">
-            {/* Broken by hand rather than left to the max-width, so the line
-                lands the same way at every size instead of moving with the
-                column. The max-width stays as a guard for the smallest
-                screens. */}
-            Karmo is everywhere
-            <br />
-            in our lives
+          {/* Client ask (9 Aug 2026): pull the caption out of the top-right
+              corner, enlarge it, and hold it in the middle of the scene.
+              Still `pointer-events-none` and below the markers (z-10) / open
+              cards (z-20) so hotspots stay reachable through the type. */}
+          <p className="display pointer-events-none absolute left-1/2 top-[78%] z-[1] w-max max-w-[min(92vw,42rem)] -translate-x-1/2 -translate-y-1/2 px-6 text-center text-[1.35rem] font-bold uppercase leading-[1.25] tracking-[0.08em] text-white [text-shadow:0_2px_28px_rgba(10,8,6,0.55)] sm:text-[1.85rem] lg:text-[2.55rem] lg:tracking-[0.1em]">
+            <span className="block whitespace-nowrap">Karmo is everywhere</span>
+            <span className="block whitespace-nowrap">in our lives</span>
             <span
               aria-hidden
-              className="mt-3 ml-auto block h-[3px] w-10 bg-brand lg:w-12"
+              className="mx-auto mt-4 block h-[3px] w-14 bg-brand sm:mt-5 sm:w-16 lg:mt-6 lg:h-[3.5px] lg:w-20"
             />
           </p>
 

@@ -172,7 +172,7 @@ export default function PopularProductsGrid() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white pb-16 pt-16 lg:pb-24 lg:pt-24">
+    <section className="bg-white pb-10 pt-16 lg:pb-12 lg:pt-24">
       {/* Centred, and carrying these two lines, at the client's ask. It was
           left on the `.shell` gutter with a "view all" held to the
           right — the arrangement `DivisionsStrip` uses — and centring it left
@@ -280,7 +280,7 @@ export default function PopularProductsGrid() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-10 text-center lg:mt-12"
+        className="mt-7 text-center lg:mt-8"
       >
         <motion.div variants={fade}>
           <Link href="/products" className="group inline-flex items-center gap-4">
