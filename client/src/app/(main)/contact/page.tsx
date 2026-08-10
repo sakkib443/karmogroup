@@ -1,12 +1,13 @@
-import type { Metadata } from 'next';
-import ContactClient from './ContactClient';
+import type { Metadata } from "next";
+import ContactPage from "@/components/karmo/contact/ContactPage";
 
 export const metadata: Metadata = {
-    title: "Contact Us — We're Here to Help",
-    description: "Get in touch with S Kawsar Sunnah Mart. Call, email, or WhatsApp our team for orders, product questions, and support — we reply within minutes during business hours.",
-    alternates: { canonical: "/contact" },
+  title: "Contact Karmo — Call, WhatsApp or Visit Motijheel",
+  description:
+    "Talk to Karmo Group for foam, mattress, HomeTex and chemical enquiries. Call 01713483284, email info@karmogroup.com, or visit our Motijheel head office.",
+  alternates: { canonical: "/contact" },
 };
 
-export default function ContactPage() {
-    return <ContactClient />;
+export default function Page() {
+  return <ContactPage />;
 }

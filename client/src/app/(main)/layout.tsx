@@ -1,29 +1,27 @@
-import Header from "@/components/layout/Header/Header";
+import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
 import Footer from "@/components/karmo/Footer";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import SmoothScroll from "@/components/karmo/SmoothScroll";
 
 /**
- * Every storefront route except the homepage.
+ * Public storefront routes (cart, checkout, shop, contact, …).
  *
- * The header stays the shop one — search, cart, wishlist, account — because
- * these are the pages where those are the whole point. The footer is the Karmo
- * footer, the same as the homepage carries, so the page ends the same way
- * wherever the visitor is. NewFooter is left in place unused; it is the
- * storefront's own and worth keeping until the rebrand is finished.
+ * Uses the same HeaderTwo + Footer chrome as the homepage / foam page.
+ * Home 02 (`(karmo)/home-2`) and Home 03 (`(karmo-3)/home-3`) keep their
+ * own layouts and are not wrapped here.
  */
 export default function MainLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <>
-            <Header />
-            <main className="pb-[58px] sm:pb-0">
-                {children}
-            </main>
-            <Footer />
-            <MobileBottomNav />
-        </>
-    );
+  return (
+    <>
+      <SmoothScroll />
+      <HeaderTwo />
+      <main className="min-h-screen bg-white pt-[109px] lg:pt-[178px]">
+        {children}
+      </main>
+      <Footer />
+    </>
+  );
 }

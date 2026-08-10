@@ -30,7 +30,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *   · **The odd card out.** The middle card is solid white while its
  *     neighbours are transparent with an orange border. That is the
  *     reference's arrangement and it is doing real work — it lands on
- *     "Long Durability", so the eye is pulled to the middle of three rather
+ *     "Long Lasting", so the eye is pulled to the middle of three rather
  *     than raked left to right.
  *
  * ── The background film ────────────────────────────────────────────────────
@@ -46,30 +46,30 @@ const ORANGE = "#FF9A1F";
 
 const claims = [
   {
-    id: "no-filler",
+    id: "pure-quality",
     icon: TbDropletOff,
     /* The badge colours are the reference's, and they are the only three
        colours on the page that answer to nothing in the Karmo palette. Kept
        because they are what makes the row recognisable as this section. */
     badge: "bg-[#E03131]",
-    title: "No Filler",
-    body: "Zero fillers, ever. Made from 100% pure rubber grade materials for maximum density and lasting strength that won't crumble.",
+    title: "Pure Quality",
+    body: "Built with pure, premium-grade materials — no shortcuts, no compromise. From foam and mattresses to pillows and bedding, every Karmo piece is made for real density, clean finish and lasting strength.",
   },
   {
-    id: "long-durability",
+    id: "long-lasting",
     icon: TbShieldCheck,
     badge: "bg-[#1C7ED6]",
-    title: "Long Durability",
-    body: "Built to take heavy daily use without sagging. Our advanced polyurethane foam holds its shape and support for years.",
+    title: "Long Lasting",
+    body: "Engineered for everyday use without sagging or losing shape. Karmo foam, mattresses and HomeTex are built to hold their support and comfort for years — not just the first few nights.",
     /* The one solid card. See the note above on why it is the middle one. */
     solid: true,
   },
   {
-    id: "more-resilient",
+    id: "certified-comfort",
     icon: TbArrowBigDownLines,
     badge: "bg-[#2F9E44]",
-    title: "More Resilient",
-    body: "Superior bounce, elasticity and air flow. Responds dynamically to pressure for steady support and instant relief.",
+    title: "Certified Comfort",
+    body: "Breathable, resilient and quality-checked for a healthier rest. Soft where you need it, supportive where it counts — comfort you can trust across the whole Karmo range.",
   },
 ];
 
@@ -167,6 +167,10 @@ export default function FoamPromise({ filmMode = "fixed" }) {
   const sectionRef = useRef(null);
   const filmRef = useRef(null);
   const driftRef = useRef(null);
+  /* Latest fixed-mode clip. Owned by the scroll loop, mirrored into React's
+     style prop so a `setReady` / `setFront` re-render cannot snap it back to
+     fully closed (which used to leave only the still visible). */
+  const clipRef = useRef("inset(100% 0 0 0)");
   const [front, setFront] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -217,6 +221,13 @@ export default function FoamPromise({ filmMode = "fixed" }) {
     const film = filmRef.current;
     if (isFixed && !film) return;
 
+    // Start fully clipped. `clipRef` is the source of truth so React re-renders
+    // (video ready / crossfade) re-apply the *current* window, not a closed one.
+    if (isFixed) {
+      clipRef.current = "inset(100% 0 0 0)";
+      film.style.clipPath = clipRef.current;
+    }
+
     let frame = 0;
     const measure = () => {
       frame = 0;
@@ -229,14 +240,18 @@ export default function FoamPromise({ filmMode = "fixed" }) {
       // and simply go with it, so there is nothing to do and no reason to keep
       // recomputing a transform nobody can see.
       if (rect.bottom <= 0 || rect.top >= vh) {
-        if (isFixed) film.style.clipPath = "inset(100% 0 0 0)";
+        if (isFixed) {
+          clipRef.current = "inset(100% 0 0 0)";
+          film.style.clipPath = clipRef.current;
+        }
         return;
       }
 
       if (isFixed) {
         const top = Math.max(0, rect.top);
         const bottom = Math.max(0, vh - rect.bottom);
-        film.style.clipPath = `inset(${top}px 0px ${bottom}px 0px)`;
+        clipRef.current = `inset(${top}px 0px ${bottom}px 0px)`;
+        film.style.clipPath = clipRef.current;
       }
 
       // 0 as the section's top edge reaches the bottom of the window, 1 as its
@@ -398,7 +413,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
               ? "pointer-events-none fixed inset-0 z-0"
               : "pointer-events-none absolute inset-0 z-0 overflow-hidden"
           }
-          style={filmMode === "fixed" ? { clipPath: "inset(100% 0 0 0)" } : undefined}
+          style={filmMode === "fixed" ? { clipPath: clipRef.current } : undefined}
         >
           <div
             ref={driftRef}
