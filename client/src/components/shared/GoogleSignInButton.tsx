@@ -131,10 +131,10 @@ const GoogleSignInButton: React.FC<Props> = ({ redirectPath, label = 'Continue w
             type="button"
             onClick={handleClick}
             disabled={busy}
-            className="w-full py-3 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 flex items-center justify-center gap-2.5 transition hover:bg-slate-50 hover:border-slate-300 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex w-full items-center justify-center gap-2.5 border border-ink/20 bg-white py-3 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink/40 hover:bg-cream/50 disabled:cursor-not-allowed disabled:opacity-60"
         >
             {busy ? (
-                <span className="w-[18px] h-[18px] border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+                <span className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-ink/20 border-t-ink" />
             ) : (
                 <GoogleIcon />
             )}

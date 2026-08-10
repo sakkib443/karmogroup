@@ -29,7 +29,7 @@ import {
   TbBed,
   TbFeather,
   TbFlask,
-  TbTag,
+  TbGridDots,
 } from "react-icons/tb";
 
 /**
@@ -87,14 +87,17 @@ import {
  * entry and the basket count, so it marks the three things worth marking.
  */
 
+/* Right-panel photos match the homepage Divisions strip (third section),
+   so hovering Foam / Mattress / HomeTex / Chemicals shows the same four
+   images the page already uses below. */
 const nav = [
   {
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
     icon: TbArmchair,
-    image: "/karmo/images/divisions/foam-armchair.jpg",
-    alt: "A linen armchair with a deep-red cushion in a daylit living-room corner",
+    image: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
+    alt: "A Karmo Foam sofa with lavender cushions and stacked foam blocks in a studio setting",
     submenu: [
       { name: "Furniture & Upholstery", href: "/foam/furniture-upholstery" },
       { name: "Studio / Acoustic Foam", href: "/foam/acoustic" },
@@ -108,14 +111,16 @@ const nav = [
     line: "Pocket spring, euro top",
     href: "/mattress",
     icon: TbBed,
+    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
+    alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
   },
   {
     name: "HomeTex",
     line: "Bed sheets, comforters",
     href: "/hometex",
     icon: TbFeather,
-    image: "/karmo/images/divisions/hometex-bed-linen.jpg",
-    alt: "A bed made up in cream sateen bedding with stacked linen pillows",
+    image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
+    alt: "Karmo HomeTex bedding in a styled bedroom",
     submenu: [
       { name: "Pillow", href: "/hometex/pillow" },
       { name: "Cushion", href: "/hometex/cushion" },
@@ -128,8 +133,8 @@ const nav = [
     line: "Adhesives, polymers",
     href: "/chemicals",
     icon: TbFlask,
-    image: "/karmo/images/divisions/chemicals-bench.jpg",
-    alt: "Polyurethane foam sheets, a beaker of resin and sample tins on an oak bench",
+    image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
+    alt: "Karmo Adhesive tins in a showroom setting",
     submenu: [
       { name: "Karmo Adhesive", href: "/chemicals/adhesive" },
       { name: "Evergain Chemical", href: "/chemicals/evergain" },
@@ -137,11 +142,23 @@ const nav = [
     ],
   },
   {
-    name: "Sale",
-    line: "Special offers",
-    href: "/sale",
-    icon: TbTag,
-    accent: true,
+    /* Was "Sale" — a red-badged link to an offers page nobody built. Swapped
+       for the one entry every other page on the site still needs a way to
+       reach: the company pages, which have no home anywhere else in this
+       header. No `accent`, so it loses the red the Sale entry had; this one
+       is a doorway, not a promotion. */
+    name: "All Menu",
+    line: "About, contact & more",
+    href: "/about",
+    icon: TbGridDots,
+    image: "/karmo/images/products/whykarmo-family.jpg",
+    alt: "A family at home with Karmo furniture and bedding",
+    submenu: [
+      { name: "About Karmo", href: "/about" },
+      { name: "Contact Us", href: "/contact" },
+      { name: "Portfolio", href: "/portfolio" },
+      { name: "Find a Store", href: "/find-store" },
+    ],
   },
 ];
 
@@ -192,9 +209,13 @@ function Tool({ icon: Icon, label, href, count }) {
  * and the sub-line is the part a reader who has already scrolled past the top
  * of the page no longer needs.
  */
-function DivisionNav({ compact, panel, openPanel }) {
+function DivisionNav({ compact, panel, openPanel, leaveMenuZone }) {
   return (
-    <nav aria-label="Divisions">
+    <nav
+      aria-label="Divisions"
+      data-mega-menu
+      onMouseLeave={leaveMenuZone}
+    >
       <ul className="flex items-center">
         {nav.map((entry) => (
           <li key={entry.name} className="relative">
@@ -214,13 +235,13 @@ function DivisionNav({ compact, panel, openPanel }) {
               <span className="block">
                 <span
                   className={`display block font-bold uppercase leading-none tracking-[0.1em] ${
-                    compact ? "text-[11.5px]" : "text-[12px]"
+                    compact ? "text-[12.5px]" : "text-[13px]"
                   }`}
                 >
                   {entry.name}
                 </span>
                 {!compact && (
-                  <span className="mt-1 block text-[10.5px] leading-none text-ink/50">
+                  <span className="mt-1 block text-[11.5px] leading-none text-ink/50">
                     {entry.line}
                   </span>
                 )}
@@ -324,10 +345,11 @@ export default function HeaderTwo() {
   // logo, search, the three account icons, the division row itself — is
   // untouched; only what drops below a division with a submenu changed.
   //
-  // The open/close mechanics are Home 03's too: a name in state rather than
-  // `group-hover`, so the close can carry a short grace period (160ms) and
-  // survive the pointer crossing the gap between the link and the panel
-  // instead of snapping shut the instant it leaves the link.
+  // Open/close: hover keeps the panel while the pointer is on the division
+  // row or the panel itself (`data-mega-menu`). Leaving that zone starts a
+  // short grace close so the pointer can cross the seam between the link and
+  // the panel. A click outside the zone, or on any link inside the panel,
+  // dismisses immediately — so the menu does not sit half-open over the page.
   const [panel, setPanel] = useState(null);
   const closeTimer = useRef(null);
 
@@ -335,18 +357,58 @@ export default function HeaderTwo() {
     clearTimeout(closeTimer.current);
     setPanel(name);
   };
+  const dismissPanel = () => {
+    clearTimeout(closeTimer.current);
+    setPanel(null);
+  };
   const closePanel = () => {
     clearTimeout(closeTimer.current);
     closeTimer.current = setTimeout(() => setPanel(null), 160);
   };
+  // Only schedule a close when the pointer is actually leaving the mega-menu
+  // zone. Moving from a division link into the panel (or back) must not count
+  // as a leave — both carry `data-mega-menu`, so relatedTarget stays inside.
+  const leaveMenuZone = (e) => {
+    const next = e.relatedTarget;
+    if (next && typeof next.closest === "function" && next.closest("[data-mega-menu]")) {
+      return;
+    }
+    closePanel();
+  };
 
   useEffect(() => () => clearTimeout(closeTimer.current), []);
 
-  const openEntry = nav.find((entry) => entry.name === panel && entry.submenu);
+  // Click anywhere outside the division row / panel → close at once. Hover
+  // alone used to leave the panel hanging when the pointer settled on the
+  // white chrome of the header or the page beneath it.
+  useEffect(() => {
+    if (!panel) return;
+    const onPointerDown = (e) => {
+      const target = e.target;
+      if (target && typeof target.closest === "function" && target.closest("[data-mega-menu]")) {
+        return;
+      }
+      dismissPanel();
+    };
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") dismissPanel();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [panel]);
+
+  // Open for any division that has a photo panel — submenu optional
+  // (Mattress has the Divisions image but no sub-ranges yet).
+  const openEntry = nav.find(
+    (entry) => entry.name === panel && (entry.submenu || entry.image)
+  );
 
   return (
     <header
-      onMouseLeave={closePanel}
       // A hairline shadow is enough while the page sits at the top, where the
       // hero underneath supplies its own separation. Scrolled, the bar has
       // nothing behind it but page content, so it earns a real shadow and a
@@ -552,7 +614,11 @@ export default function HeaderTwo() {
 
           <div className="hidden overflow-hidden border-t border-ink/8 lg:block">
             <div className="shell flex h-[68px] items-center justify-between gap-6">
-              <DivisionNav panel={panel} openPanel={openPanel} />
+              <DivisionNav
+                panel={panel}
+                openPanel={openPanel}
+                leaveMenuZone={leaveMenuZone}
+              />
               <FindStoreButton />
             </div>
           </div>
@@ -601,7 +667,12 @@ export default function HeaderTwo() {
                 not fit. Below the breakpoint this row is logo and icons only,
                 with the hamburger reaching the same drawer. */}
             <div className="hidden min-[1360px]:flex min-[1360px]:flex-1 min-[1360px]:justify-center">
-              <DivisionNav compact panel={panel} openPanel={openPanel} />
+              <DivisionNav
+                compact
+                panel={panel}
+                openPanel={openPanel}
+                leaveMenuZone={leaveMenuZone}
+              />
             </div>
 
             {/* Find a Store returns here, at the client's ask, spending the
@@ -642,8 +713,9 @@ export default function HeaderTwo() {
           why it lives here instead of inside the `<li>`. */}
       {openEntry && (
         <div
+          data-mega-menu
           onMouseEnter={() => openPanel(openEntry.name)}
-          onMouseLeave={closePanel}
+          onMouseLeave={leaveMenuZone}
           className="absolute inset-x-0 top-full hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.35)] lg:block"
         >
           <div className="shell grid grid-cols-12 gap-10 py-9">
@@ -656,6 +728,7 @@ export default function HeaderTwo() {
               </p>
               <Link
                 href={openEntry.href}
+                onClick={dismissPanel}
                 className="group mt-6 inline-flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink"
               >
                 The whole division
@@ -664,10 +737,11 @@ export default function HeaderTwo() {
             </div>
 
             <ul className="col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
-              {openEntry.submenu.map((sub) => (
+              {(openEntry.submenu ?? []).map((sub) => (
                 <li key={sub.href}>
                   <Link
                     href={sub.href}
+                    onClick={dismissPanel}
                     className="group flex items-center justify-between gap-4 border-b border-ink/8 py-3 text-[13.5px] text-ink/75 transition-colors duration-200 hover:text-ink"
                   >
                     {sub.name}
@@ -679,6 +753,7 @@ export default function HeaderTwo() {
 
             <Link
               href={openEntry.href}
+              onClick={dismissPanel}
               className="group relative col-span-4 aspect-[16/10] overflow-hidden"
             >
               <Image

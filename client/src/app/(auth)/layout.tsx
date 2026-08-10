@@ -1,59 +1,76 @@
-import React from 'react';
-import Link from 'next/link';
-import Logo from '@/components/shared/Logo';
+import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
+import Footer from "@/components/karmo/Footer";
+import SmoothScroll from "@/components/karmo/SmoothScroll";
+import Link from "next/link";
 
+/**
+ * Auth routes (login, register, password reset, verify).
+ * Same HeaderTwo + Footer chrome as the public storefront / Home 02.
+ */
 export default function AuthLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-50 px-4 py-12">
-
-            {/* ── Soft aurora background ── */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div
-                    className="absolute -top-32 -left-24 w-[440px] h-[440px] rounded-full blur-3xl opacity-40"
-                    style={{ background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)' }}
-                />
-                <div
-                    className="absolute top-1/3 -right-32 w-[480px] h-[480px] rounded-full blur-3xl opacity-30"
-                    style={{ background: 'radial-gradient(circle, #6366F1 0%, transparent 70%)' }}
-                />
-                <div
-                    className="absolute -bottom-40 left-1/4 w-[420px] h-[420px] rounded-full blur-3xl opacity-20"
-                    style={{ background: 'radial-gradient(circle, #22C55E 0%, transparent 70%)' }}
-                />
-                {/* faint grid texture */}
-                <div
-                    className="absolute inset-0 opacity-[0.4]"
-                    style={{
-                        backgroundImage:
-                            'linear-gradient(to right, rgba(15,23,42,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.03) 1px, transparent 1px)',
-                        backgroundSize: '36px 36px',
-                        maskImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%)',
-                        WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 40%, black 30%, transparent 75%)',
-                    }}
-                />
-            </div>
-
-            {/* ── Brand (centered, above the card) ── */}
-            <Link href="/" className="relative z-10 mb-7 inline-flex items-center group transition-transform hover:scale-[1.02]">
-                <Logo imgClassName="h-[52px] md:h-[68px]" />
-            </Link>
-
-            {/* ── Form card slot ── */}
-            <div className="relative z-10 w-full max-w-[420px]">
-                {children}
-            </div>
-
-            {/* ── Footer ── */}
-            <p className="relative z-10 mt-7 text-[12px] text-slate-400 text-center max-w-sm">
-                By continuing you agree to our{' '}
-                <Link href="/terms" className="text-slate-500 hover:text-[var(--color-primary)] underline-offset-2 hover:underline">Terms</Link>{' '}
-                &amp;{' '}
-                <Link href="/privacy" className="text-slate-500 hover:text-[var(--color-primary)] underline-offset-2 hover:underline">Privacy Policy</Link>.
-            </p>
+  return (
+    <>
+      <SmoothScroll />
+      <HeaderTwo />
+      <main className="relative min-h-screen overflow-hidden bg-cream pt-[109px] lg:pt-[178px]">
+        {/* Soft brand wash — atmosphere without the old purple aurora. */}
+        <div className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute -left-24 top-0 h-[360px] w-[360px] rounded-full opacity-[0.12] blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, var(--color-brand) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute -right-20 bottom-10 h-[320px] w-[320px] rounded-full opacity-[0.08] blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, var(--color-ink) 0%, transparent 70%)",
+            }}
+          />
+          <div
+            className="absolute inset-0 opacity-[0.35]"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, rgba(34,34,34,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(34,34,34,0.03) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+              maskImage:
+                "radial-gradient(ellipse 70% 55% at 50% 35%, black 25%, transparent 75%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse 70% 55% at 50% 35%, black 25%, transparent 75%)",
+            }}
+          />
         </div>
-    );
+
+        <div className="shell relative z-10 flex justify-center py-10 lg:py-14">
+          <div className="w-full max-w-[440px]">
+            {children}
+            <p className="mt-7 text-center text-[11px] uppercase tracking-[0.12em] text-ink/40">
+              By continuing you agree to our{" "}
+              <Link
+                href="/terms"
+                className="text-ink/55 underline-offset-2 hover:text-brand hover:underline"
+              >
+                Terms
+              </Link>{" "}
+              &amp;{" "}
+              <Link
+                href="/privacy"
+                className="text-ink/55 underline-offset-2 hover:text-brand hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </>
+  );
 }
