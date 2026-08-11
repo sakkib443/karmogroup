@@ -15,30 +15,36 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 const ORANGE = "#FF9A1F";
 
+/**
+ * The three divisions, not three grades of foam.
+ *
+ * These were "About Karmo Foam / Furniture Foam / Footwear Foam" — all three
+ * about the same product, which left the section speaking for one division on
+ * a page that sells four. The client asked for the divisions instead, so the
+ * strip now matches the header's menu and the division cards further up.
+ *
+ * Facts are from the company profile (p.4–5): the supplier list and the
+ * per-customer formulation under Foam, the pocket-spring and density range
+ * under Mattress, the bedding lines under HomeTex.
+ */
 const tabs = [
   {
-    id: "about",
-    n: "01",
-    label: "About Karmo Foam",
-    short: "About",
+    id: "foam",
+    label: "Foam",
     lead: "Karmo Foam",
     body: "delivers high-density resilience and lasting body support — pure rubber grade, no fillers, firm air flow that holds for years.",
   },
   {
-    id: "furniture",
-    n: "02",
-    label: "Furniture Foam",
-    short: "Furniture",
-    lead: "Furniture grades",
-    body: "are cut for seat, back and arm loads, formulated per customer from BASF, Momentive, Shell, Mitsui and Dow stock.",
+    id: "mattress",
+    label: "Mattress",
+    lead: "Karmo Mattress",
+    body: "runs from firm orthopaedic foam to pocket springs, each layer graded for the load it takes so the surface holds its shape night after night.",
   },
   {
-    id: "footwear",
-    n: "03",
-    label: "Footwear Foam",
-    short: "Footwear",
-    lead: "Footbeds and insoles",
-    body: "stack three densities in one shoe — high underfoot, mid at the collar, low at the tongue — so the sole does not flatten.",
+    id: "hometex",
+    label: "HomeTex",
+    lead: "Karmo HomeTex",
+    body: "covers what goes over the mattress — bed sheets, comforters and pillows, woven and filled in the same plants that make the foam inside them.",
   },
 ];
 
@@ -81,14 +87,41 @@ export default function FoamStory() {
         >
           {/* ── Copy ─────────────────────────────────────────────────── */}
           <motion.div variants={fade} className="min-w-0">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-              Karmo Foam
-            </span>
+            {/* The reference's opening move: the count of years, said plainly.
+                1965 is on the client's own logo, so the figure is theirs, not
+                a claim invented here — 2026 less 1965 is 61, which is what
+                "60+" is standing on. Written as a range rather than "61 Years"
+                so the line does not have to be edited every January. */}
+            <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="display text-[1.2rem] font-bold! leading-none! tracking-[-0.01em] text-brand sm:text-[1.45rem]">
+                60+ Years
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
+                Since 1965
+              </span>
+            </p>
 
-            <h2 className="display mt-3 text-[1.65rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.85rem] lg:text-[2.15rem]">
-              Iconic brands.
-              <br />
-              Storied history.
+            {/* Two lines, still uppercase. Three of these plus the years line
+                above made four big lines stacked before the reader reached a
+                single word of copy, which is what the client was looking at.
+                The break now falls after "history" — the first two sentences
+                are the company, the third is what it does.
+
+                Dropped from 2.15rem to 1.75rem to go with it: uppercase runs
+                about a third wider than sentence case, and at the old size
+                "ICONIC BRANDS. STORIED HISTORY." does not fit the copy column
+                on one line, so it would have wrapped straight back to three. */}
+            {/* Sized against the column, not by eye. "ICONIC BRANDS. STORIED
+                HISTORY." measures a shade under 18em wide in this face at this
+                tracking, so the largest it can be and still hold one line is
+                column ÷ 18 — about 29px in a 524px column. `2.1vw` lands at 27
+                there, and keeps roughly that margin as the column grows with
+                the window; the 2.05rem cap stops it running away on a very
+                wide screen. A fixed size cannot do both: whatever fits at 1024
+                is small at 1920, and whatever suits 1920 wraps back to three
+                lines at 1024. */}
+            <h2 className="display mt-3 text-[1.2rem] font-light uppercase leading-[1.16] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[clamp(1.6rem,2.1vw,2.05rem)]">
+              Iconic brands. Storied history.
               <br />
               <span className="font-bold text-brand">
                 Industry-leading innovation.
@@ -116,12 +149,11 @@ export default function FoamStory() {
               </span>
             </span>
 
-            {/* Numbered tab rail */}
             <div
               role="tablist"
               aria-label="Karmo Foam"
               onKeyDown={onKeyDown}
-              className="mt-8 flex flex-wrap gap-6 border-b border-ink/10 sm:gap-8"
+              className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-3 border-b border-ink/10"
             >
               {tabs.map((tab, i) => {
                 const on = tab.id === active;
@@ -135,21 +167,18 @@ export default function FoamStory() {
                     aria-controls={`foam-panel-${tab.id}`}
                     tabIndex={on ? 0 : -1}
                     onClick={() => setActive(tab.id)}
-                    className={`group relative -mb-px pb-3.5 text-left transition-colors duration-300 ${
-                      on ? "text-brand" : "text-ink/40 hover:text-ink"
+                    className={`relative -mb-px pb-3 text-[13px] font-bold uppercase tracking-[0.08em] transition-colors duration-300 ${
+                      on ? "text-brand" : "text-ink/55 hover:text-ink"
                     }`}
                   >
-                    <span className="block text-[10px] font-bold tracking-[0.2em]">
-                      {tab.n}
-                    </span>
-                    <span className="mt-1 block text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[13px]">
-                      <span className="sm:hidden">{tab.short}</span>
-                      <span className="hidden sm:inline">{tab.label}</span>
-                    </span>
+                    {tab.label}
+                    {/* The indicator sits on the strip's own bottom border, so
+                        the selected tab looks like it is cut out of the rule
+                        rather than underlined beneath it. */}
                     <span
                       aria-hidden
-                      className={`absolute inset-x-0 -bottom-px h-[2.5px] origin-left bg-brand transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                        on ? "scale-x-100" : "scale-x-0 group-hover:scale-x-50"
+                      className={`absolute inset-x-0 -bottom-px h-[2px] bg-brand transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        on ? "scale-x-100" : "scale-x-0"
                       }`}
                     />
                   </button>
@@ -178,17 +207,17 @@ export default function FoamStory() {
               </AnimatePresence>
             </div>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Link
                 href="/foam"
-                className="group inline-flex h-[50px] items-center gap-3 bg-brand px-8 text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
+                className="group inline-flex h-[50px] w-full items-center justify-center gap-3 bg-brand px-8 text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark sm:w-auto sm:justify-start"
               >
                 Find your perfect foam
                 <FiArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex h-[50px] items-center border border-ink/12 px-8 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-300 hover:border-brand hover:text-brand"
+                className="inline-flex h-[50px] w-full items-center justify-center border border-ink/12 px-8 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors duration-300 hover:border-brand hover:text-brand sm:w-auto"
               >
                 Contact us
               </Link>
@@ -199,7 +228,7 @@ export default function FoamStory() {
           <motion.div variants={fade} className="relative w-full">
             {/* Thin outer mat — quiet frame without a heavy card look */}
             <div className="relative border border-ink/8 bg-white p-2 sm:p-2.5">
-              <div className="relative aspect-[5/4] w-full overflow-hidden lg:max-h-[440px] lg:aspect-[4/3]">
+              <div className="relative aspect-[5/4] w-full overflow-hidden lg:max-h-[520px] lg:aspect-[4/3]">
                 <Image
                   src={picture.src}
                   alt={picture.alt}

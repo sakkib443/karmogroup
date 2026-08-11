@@ -103,7 +103,7 @@ export default function CertifiedBy() {
 
         <motion.ul
           variants={group}
-          className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-6 lg:mt-16 lg:gap-8"
+          className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 lg:mt-16 lg:gap-8"
         >
           {certificates.map((cert) => (
             <motion.li

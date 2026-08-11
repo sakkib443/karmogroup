@@ -1097,6 +1097,15 @@ svg.app-icon[fill="none"] {
   animation: marquee-right 52s linear infinite;
 }
 
+/* Partners strip — same loop, slower so the logos can be read. */
+.marquee-left-slow {
+  animation: marquee-left 145s linear infinite;
+}
+
+.marquee-right-slow {
+  animation: marquee-right 158s linear infinite;
+}
+
 /* Holds still under the pointer, so a tile can actually be looked at. */
 .marquee-rows:hover .marquee {
   animation-play-state: paused;

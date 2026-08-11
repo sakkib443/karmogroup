@@ -200,6 +200,36 @@ export const aboutStrength = {
   suppliers: ["BASF", "Momentive", "Shell", "Mitsui", "Dow"],
 };
 
+/* ── Working partners (carousel on About) ─────────────────────────────────
+ *
+ * Sector partners Karmo actually serves — not invented brand marks. When the
+ * client supplies transparent PNGs/SVGs, set `logo: "/karmo/images/about/partners/….png"`
+ * on an entry and the carousel tile shows the mark instead of the wordmark.
+ */
+
+export const aboutPartners = {
+  eyebrow: "Working partners",
+  titleLead: "Built beside",
+  titleAccent: "the makers who trust us",
+  lead: "From upholstery lines to footwear lasts, automotive trim and hospitality beds — Karmo foam and chemistry sit inside the work of manufacturers across Bangladesh and beyond.",
+  rowOne: [
+    { name: "Furniture OEMs", sector: "Seating & upholstery", logo: null },
+    { name: "Mattress houses", sector: "Core & comfort layers", logo: null },
+    { name: "Footwear plants", sector: "Lasting & midsole", logo: null },
+    { name: "Automotive trim", sector: "Cabin & seating foam", logo: null },
+    { name: "HomeTex mills", sector: "Bedding fill & quilt", logo: null },
+    { name: "Hospitality fit-out", sector: "Hotels & residences", logo: null },
+  ],
+  rowTwo: [
+    { name: "Acoustic studios", sector: "Sound treatment", logo: null },
+    { name: "Packaging lines", sector: "EPS & protection", logo: null },
+    { name: "Construction", sector: "Insulation board", logo: null },
+    { name: "Adhesive users", sector: "Polymers & bonds", logo: null },
+    { name: "Dealer network", sector: "747 points nationwide", logo: null },
+    { name: "Export partners", sector: "Regional supply", logo: null },
+  ],
+};
+
 /* ── Where Karmo is made ────────────────────────────────────────────────── */
 
 export const aboutFacilities = {

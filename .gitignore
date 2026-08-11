@@ -24,10 +24,26 @@ client/public/images/MoneyReceipt*
 Thumbs.db
 *.log
 
-# Client reference material — the agency's 32-page company profile, a single
-# 549 MB Illustrator file. Past GitHub's 100 MB per-file limit outright, and
-# once in the history the repo carries the weight even after a delete.
+# Client reference material — Illustrator masters, 500 MB apiece. Past
+# GitHub's 100 MB per-file limit outright, and once in the history the repo
+# carries the weight even after a delete. Named rather than globbed as `*.ai`
+# so a small artwork file can still be committed deliberately.
 Company profile 1-32 page for agency.ai
+Foam Catalogue .ai
+
+# Raw image drops that land in the project root on their way in — generator
+# output, phone photos, screenshots. Anything the site actually uses is
+# converted into client/public/karmo/images/ under a name that says what it
+# is, and the master is filed under recource/originals/ (also ignored). What
+# is left here is a staging area, 3-7 MB a file, and belongs in neither.
+/magnific_*
+/[0-9]*.png
+/[0-9]*.jpg
+/[0-9]*.jpeg
+/ChatGPT Image *
+/logos company.jpg
+/Foam-web-page-*
+/601482029_*
 
 # Installers and other binaries that land in the working folder by accident.
 *.exe

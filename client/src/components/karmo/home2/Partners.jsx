@@ -3,53 +3,19 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
+import LeafRule from "@/components/karmo/about/LeafRule";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * The client roll — who Karmo actually supplies.
  *
  * Real logos, cut from the client's own "PARTNERS & CLIENTS" sheet
- * (`logos company.jpg`, A4 at 300dpi). The cards on that sheet were found by
- * their orange borders rather than by measuring a grid off a screenshot, then
- * each logo was cropped from the box above its caption rule and trimmed to its
- * own bounding box — see `cut-logos.mjs`. Nothing here is redrawn, retyped or
- * approximated.
- *
- * ── Why the intrinsic size of every file is recorded below ─────────────────
- * The logos are wildly different shapes: Akij is 141x161, Catamount is
- * 414x39 — a ten-to-one difference in aspect. `next/image` needs real width
- * and height to reserve the right box, and with `object-contain` those numbers
- * are also what stops a wide wordmark being stretched to the height of a tall
- * roundel. They are the trimmed sizes, so they are the artwork's true
- * proportions rather than the card's.
- *
- * Height is what is held constant on screen, not width. Logos read as "the
- * same size" when their type is the same size, and matching widths would make
- * Catamount's thin line of text tower over Akij's compact badge.
- *
- * ── Two mismatches on the client's sheet ───────────────────────────────────
- * Worth knowing before anyone reports them as bugs here: the sheet captions
- * one card "Allex" over a NADIA Furniture Limited logo, and another "Earth
- * Footwear Ltd" over a BION logo. The captions match the names in the foam
- * catalogue, so the captions are used — but one of the two is wrong on the
- * client's artwork and they should say which.
- *
- * ── Why a marquee and not a grid ───────────────────────────────────────────
- * Thirty-six logos in a static grid is a wall that nobody reads and a lot of
- * page to scroll past. A moving row reads as "more than we can show you",
- * which is the actual claim, and it costs a fixed three rows of height however
- * many logos get added later.
- *
- * It reuses the marquee already in `globals.css` — the same rig `Reels` runs
- * on — so the edge fade, the hover-pause and the two speeds are the page's
- * existing behaviour rather than a second implementation of it. Each row's
- * track is rendered twice and travels -50%, which is what makes the loop
- * seamless; the duplicate is `aria-hidden` so the list is announced once.
+ * (`logos company.jpg`). Intrinsic sizes below keep each mark's true ratio
+ * under `object-contain`. The marquee is a sample of a longer list — the
+ * "100+" claim is the client's figure for the wider network this strip
+ * represents, not a count of files in the folder.
  */
 
-/* Trimmed intrinsic sizes, straight from the cutting script's manifest. If the
-   sheet is ever re-cut these have to be regenerated with it — a stale pair
-   silently letterboxes or stretches the artwork rather than failing. */
 const logos = [
   { slug: "rfl", name: "RFL", w: 178, h: 161 },
   { slug: "navana-group", name: "Navana Group", w: 365, h: 123 },
@@ -89,63 +55,58 @@ const logos = [
   { slug: "glogo-industry", name: "Glogo Industry Ltd.", w: 173, h: 155 },
 ];
 
-/**
- * Deal into three rows round-robin rather than in slabs, so no row ends up
- * being all footwear — a row of nothing but shoe brands reads as "supplies
- * footwear", which is the opposite of what the section is for.
- */
+/** Round-robin into three rows so no strip is all footwear. */
 const ROWS = 3;
 const rows = Array.from({ length: ROWS }, (_, r) =>
   logos.filter((_, i) => i % ROWS === r)
 );
 
-/** Rounded down to a ten, so the claim can never outrun the list. */
-const CLAIMED = Math.floor(logos.length / 10) * 10;
+/** Client claim for the wider partner network this strip samples. */
+const CLAIMED = 100;
 
-/**
- * One logo.
- *
- * The box is a fixed height and `w-auto`, so each logo keeps its own width and
- * the row spaces itself by how wide the artwork actually is.
- *
- * Full colour, at the client's ask. These were greyed back at first on the
- * argument that thirty-six colour marks at once compete with the rest of the
- * page — the client wants them as their owners drew them, which is the better
- * claim to make about a client list. What holds the row together instead is
- * the white card behind each one and the single 86/100px height they all sit
- * in, so the set still reads as a set without desaturating anybody's brand.
- */
-function Logo({ item }) {
+function LogoTile({ item }) {
   return (
-    <span className="mr-3 flex h-[86px] shrink-0 items-center justify-center border border-ink/10 bg-white px-8 transition-colors duration-300 hover:border-brand/35 lg:mr-4 lg:h-[100px] lg:px-10">
+    <span className="group relative mr-3 flex h-[4.75rem] shrink-0 items-center justify-center border border-ink/8 bg-white px-7 transition-colors duration-300 hover:border-brand/30 sm:h-[5.25rem] sm:px-8 lg:mr-4 lg:h-[5.75rem] lg:px-10">
       <Image
         src={`/karmo/images/partners/${item.slug}.png`}
         alt={item.name}
         width={item.w}
         height={item.h}
-        sizes="240px"
-        className="h-auto max-h-[46px] w-auto max-w-[150px] object-contain lg:max-h-[54px] lg:max-w-[180px]"
+        sizes="220px"
+        className="h-auto max-h-[40px] w-auto max-w-[140px] object-contain opacity-[0.92] transition-opacity duration-300 group-hover:opacity-100 sm:max-h-[46px] sm:max-w-[160px] lg:max-h-[52px] lg:max-w-[176px]"
+      />
+      <span
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-brand transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
       />
     </span>
   );
 }
 
-function Row({ items, direction }) {
+function Row({ items, direction, still }) {
+  if (still) {
+    return (
+      <div className="flex justify-center gap-3 overflow-x-auto px-4 pb-1 sm:gap-4">
+        {items.map((item) => (
+          <LogoTile key={item.slug} item={item} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="marquee-rows overflow-hidden">
       <div
         className={`marquee flex w-max ${
-          direction === "left" ? "marquee-left" : "marquee-right"
+          direction === "left" ? "marquee-left-slow" : "marquee-right-slow"
         }`}
       >
         {items.map((item) => (
-          <Logo key={item.slug} item={item} />
+          <LogoTile key={item.slug} item={item} />
         ))}
-        {/* The duplicate that makes the loop seamless. Hidden from assistive
-            tech so the list is announced once, not twice. */}
         <span aria-hidden className="flex">
           {items.map((item) => (
-            <Logo key={`${item.slug}-copy`} item={item} />
+            <LogoTile key={`${item.slug}-copy`} item={item} />
           ))}
         </span>
       </div>
@@ -158,42 +119,49 @@ export default function Partners() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-cream/60 py-20 lg:py-28">
+    <section
+      id="partners"
+      className="relative overflow-hidden bg-[#F5F5F5] pb-14 pt-12 md:pb-20 md:pt-16 lg:pb-24 lg:pt-20"
+      aria-label="Partners and clients"
+    >
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell text-center"
+        className="shell relative text-center"
       >
-        <motion.div variants={fade}>
-          <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
-            Partners &amp; Clients
+        <motion.div variants={fade} className="mx-auto max-w-2xl md:max-w-none">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand sm:text-[12px]">
+            Partners &amp; clients
           </span>
-          <h2 className="display mt-4 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
-            Trusted by <span className="font-bold text-brand">{CLAIMED}+</span> names
-            <br />
-            you already know
+          {/* One line from md up, so the block reads as two lines total —
+              eyebrow, then heading. The size is tied to the viewport rather
+              than stepped per breakpoint because `nowrap` has no escape: at a
+              fixed size the line would run under the gutters somewhere between
+              the breakpoints. 3vw keeps it inside the shell's padding at every
+              width from 768 up, and the cap stops it growing past the old
+              size on a wide screen. */}
+          <h2 className="display mt-3 text-[1.6rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.85rem] md:whitespace-nowrap md:text-[clamp(1.35rem,3vw,2.3rem)] lg:mt-4">
+            Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
+            makers across the country
           </h2>
-          <p className="body-copy mx-auto mt-5 max-w-[46rem] text-[14.5px] leading-[1.75] text-ink/55">
-            Furniture makers, footwear manufacturers, retail chains, hotels and
-            hospitals across Bangladesh build on Karmo foam — many of them since
-            long before the brands became household names.
-          </p>
+          <LeafRule />
         </motion.div>
       </motion.div>
 
-      {/* Full-bleed, unlike the heading above it. The rows are meant to run off
-          both edges — that is what says the list continues past the frame — so
-          they sit outside `.shell` and the edge fade in `.marquee-rows` does
-          the rest. */}
       <motion.div
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-12 space-y-3 lg:mt-14 lg:space-y-4"
+        className="mt-10 space-y-3 sm:mt-12 sm:space-y-3.5 lg:mt-14 lg:space-y-4"
       >
         {rows.map((items, i) => (
-          <Row key={i} items={items} direction={i % 2 === 0 ? "left" : "right"} />
+          <Row
+            key={i}
+            items={items}
+            direction={i % 2 === 0 ? "left" : "right"}
+            still={!!reduceMotion}
+          />
         ))}
       </motion.div>
     </section>
