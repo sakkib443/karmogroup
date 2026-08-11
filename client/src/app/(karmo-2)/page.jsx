@@ -8,6 +8,7 @@ import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
 import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
+import Partners from "@/components/karmo/home2/Partners";
 import Reels from "@/components/karmo/Reels";
 
 export const metadata = {
@@ -70,6 +71,16 @@ export default function HomePage() {
       {/* Matches the client's live "Certified By" band — room photo, dark wash,
           centred type with the orange leaf rule, three framed certificates. */}
       <CertifiedBy />
+
+      {/* Who actually buys the foam, straight after who certifies it. The order
+          is the argument: the certificates say the product is sound, this says
+          the market already agreed, and the contact band below asks for the
+          order. Proof before the ask, and the strongest proof last.
+
+          Every name in it is read off pages 24-26 of the client's own foam
+          catalogue — see the component for what was corrected and what was
+          left out rather than guessed. */}
+      <Partners />
 
       {/* Last band before the footer — order path + contact. */}
       <OrderAndContact />
