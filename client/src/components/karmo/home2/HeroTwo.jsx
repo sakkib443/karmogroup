@@ -88,45 +88,39 @@ export default function HeroTwo() {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[68%_center] lg:object-right"
+        /* Prefer the quiet upper wall for type; keep the family in the right
+           third. Anchoring too low pulled the sofa into the headline. */
+        className="object-cover object-[72%_32%] sm:object-[74%_30%] lg:object-[80%_28%]"
       />
 
-      {/* A flat dark veil, and the type reversed out of it.
+      {/* Dark veil — a notch lighter than the last pass, still enough for
+          white type on the mustard wall. */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(105deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.50) 35%, rgba(8,8,10,0.42) 60%, rgba(8,8,10,0.38) 100%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/18 to-transparent"
+      />
 
-          Dark type on the unveiled picture did not work. On the room this
-          replaced it measured 6.04:1 for the ink headline but 1.81:1 for the
-          brand-red accent line, 2.14:1 for the eyebrow and 2.21:1 for the
-          lead — three of four under the bar. Red is the worst thing to put on
-          a warm wall: the two are close in luminance, so the letters sit on
-          the background instead of over it.
-
-          Flat, not a gradient. A left-to-right fade was tried earlier and its
-          stops collapsed into a hard edge down the middle of the frame, which
-          read as a divider rather than a veil. A flat veil cannot do that.
-
-          48%, and the number is measured rather than chosen. It is set from
-          the *lightest* pixel under each line — here a slant of window light
-          on the golden wall at #f9dda8 — so the worst case is the one that
-          clears the bar. It was 45% for the previous grade of this same room;
-          this one relit the wall brighter and 45% left the eyebrow at 4.22:1
-          and the lead at 3.77:1, both just under. **Any new picture needs this
-          re-measured, not assumed** — two grades of one room have now wanted
-          different numbers. */}
-      <div aria-hidden className="absolute inset-0 bg-black/48" />
-
-      <div className="shell relative flex h-full min-h-[480px] items-center py-12 sm:min-h-[520px] sm:py-16 lg:min-h-0">
-        {/* Same copy, tighter professional setting: quiet claim → rule →
-            even display block → support → CTAs. */}
+      <div className="shell relative flex h-full min-h-[480px] items-start py-14 sm:min-h-[520px] sm:items-center sm:py-16 lg:min-h-0 lg:items-center lg:pb-20 lg:pt-10">
+        {/* Copy sits on the quiet wall above the sofa line — not dead-centre
+            where the furniture cuts the headline. */}
         <motion.div
           variants={group}
           initial={reduceMotion ? false : "hidden"}
           animate="show"
-          className="relative max-w-[44rem] translate-y-2 text-left lg:translate-y-4"
+          className="relative max-w-[40rem] text-left sm:max-w-[42rem] lg:max-w-[44rem] lg:-translate-y-6"
         >
           {SHOW_FOAM_BRAND_CLAIM ? (
             <motion.div variants={rise}>
               <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:gap-x-3">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/80 sm:text-[12px]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 sm:text-[12px]">
                   Bangladesh&rsquo;s
                 </span>
                 <Image
@@ -136,28 +130,19 @@ export default function HeroTwo() {
                   height={badge.height}
                   className="h-9 w-auto shrink-0 -translate-y-[10%] sm:h-10"
                 />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/80 sm:text-[12px]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 sm:text-[12px]">
                   Foam Brand
                 </span>
               </div>
               <span
                 aria-hidden
-                className="mt-5 block h-px w-12 bg-white/35 sm:mt-6 sm:w-14"
+                className="mt-5 block h-px w-12 bg-white/40 sm:mt-6 sm:w-14"
               />
             </motion.div>
           ) : null}
 
-          {/* Two lines and bigger, which needed the column widened to get both.
-              "CHEMISTRY OF COMFORT" measures 12.28em in this face at this
-              tracking — measured, not guessed — so at the old 34rem column the
-              largest it could be on one line was 44px, *smaller* than the 46px
-              the three-line version already ran at. Widening to 44rem raises
-              that ceiling to 57px, and 4.3vw sits at 55 with room to spare.
-
-              Written out rather than left to wrap — a wrap breaks wherever the
-              column happens to end, and that moves with the window. */}
           <h1
-            className={`display text-[clamp(1.6rem,4.3vw,3.4rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white ${
+            className={`display text-[clamp(1.6rem,4.3vw,3.4rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white [text-shadow:0_2px_28px_rgba(10,6,2,0.35)] ${
               SHOW_FOAM_BRAND_CLAIM ? "mt-5 sm:mt-6" : "mt-0"
             }`}
           >
@@ -172,7 +157,7 @@ export default function HeroTwo() {
 
           <motion.p
             variants={rise}
-            className="mt-6 max-w-[20.5rem] text-[12.5px] font-medium leading-[1.65] tracking-[0.01em] text-white/68 sm:mt-7 sm:text-[13.5px]"
+            className="mt-5 max-w-[22rem] text-[12.5px] font-medium leading-[1.65] tracking-[0.01em] text-white/78 sm:mt-6 sm:text-[13.5px]"
           >
             Foam, mattress and HomeTex — crafted in Bangladesh since 1965.
           </motion.p>
@@ -181,11 +166,11 @@ export default function HeroTwo() {
             initial={reduceMotion ? false : rise.hidden}
             whileInView={rise.show}
             viewport={{ once: true }}
-            className="mt-8 flex w-full flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center"
+            className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center"
           >
             <Link
               href="/products"
-              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
+              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_-12px_rgba(230,0,0,0.65)] transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
             >
               Shop the range
               <FiArrowRight className="text-[15px] transition-transform duration-300 group-hover:translate-x-1" />
@@ -193,7 +178,7 @@ export default function HeroTwo() {
 
             <Link
               href="/find-store"
-              className="group inline-flex h-[50px] w-full items-center justify-center gap-2.5 border border-white/40 bg-transparent px-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-ink sm:h-[52px] sm:w-auto sm:justify-start sm:px-8 sm:text-[12px] sm:tracking-[0.12em]"
+              className="group inline-flex h-[50px] w-full items-center justify-center gap-2.5 border border-white/55 bg-white/5 px-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-[2px] transition-colors duration-300 hover:border-white hover:bg-white hover:text-ink sm:h-[52px] sm:w-auto sm:justify-start sm:px-8 sm:text-[12px] sm:tracking-[0.12em]"
             >
               <FiMapPin className="text-[15px]" />
               Find a store
