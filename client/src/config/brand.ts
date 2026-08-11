@@ -157,7 +157,7 @@ export function brandCssVariables(): string {
  * markup here instead keeps the favicon on the same single source of truth as
  * everything else. Wired up via `metadata.icons` in `src/app/layout.tsx`.
  */
-export function brandFaviconDataUri(letter = 'S'): string {
+export function brandFaviconDataUri(letter = 'K'): string {
     const svg =
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">` +
         `<rect width="64" height="64" rx="14" fill="${brand.primary}"/>` +
