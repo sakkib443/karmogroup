@@ -36,7 +36,7 @@ const divisions = [
     name: "Mattress",
     line: "Pocket spring, euro top, orthopaedic",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-magnific-6A2NM3ciJO.png",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-magnific-SyOgGVtUb8.jpg",
     alt: "A Karmo floral quilted mattress on a channel-tufted taupe bed, styled with green and ochre cushions between potted plants",
   },
   {
