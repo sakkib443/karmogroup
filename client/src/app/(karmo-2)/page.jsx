@@ -12,12 +12,13 @@ import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Partners from "@/components/karmo/home2/Partners";
 import InstagramShop from "@/components/karmo/home2/InstagramShop";
 import Reels from "@/components/karmo/Reels";
+import { pageMetadata, SITE_TITLE, SITE_DESCRIPTION } from "@/config/site";
 
-export const metadata = {
-  title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
-  description:
-    "Bangladesh's number one home brand. Foam, bedding, mattresses and industrial chemicals, made in Bangladesh since 1965.",
-};
+export const metadata = pageMetadata({
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  path: "/",
+});
 
 /**
  * The homepage.
