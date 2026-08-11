@@ -33,19 +33,19 @@ const divisions = [
   },
   {
     index: "02",
+    name: "Mattress",
+    line: "Pocket spring, euro top, orthopaedic",
+    href: "/mattress",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-magnific-6A2NM3ciJO.png",
+    alt: "A Karmo floral quilted mattress on a channel-tufted taupe bed, styled with green and ochre cushions between potted plants",
+  },
+  {
+    index: "03",
     name: "HomeTex",
     line: "Bed sheets, comforters, pillows",
     href: "/hometex",
     image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
     alt: "Karmo HomeTex bedding in a styled bedroom",
-  },
-  {
-    index: "03",
-    name: "Mattress",
-    line: "Pocket spring, euro top, orthopaedic",
-    href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
-    alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
   },
   {
     index: "04",

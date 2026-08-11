@@ -10,6 +10,7 @@ import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
 import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Partners from "@/components/karmo/home2/Partners";
+import InstagramShop from "@/components/karmo/home2/InstagramShop";
 import Reels from "@/components/karmo/Reels";
 
 export const metadata = {
@@ -40,6 +41,9 @@ const SHOW_COLLECTIONS_SHOWCASE = false;
    settled later. The component and its four pictures are untouched; flip to
    `true` to bring it back. */
 const SHOW_KARMO_GALLERY = false;
+
+/* Instagram Shop — hidden for now; flip to `true` to bring it back. */
+const SHOW_INSTAGRAM_SHOP = false;
 
 export default function HomePage() {
   return (
@@ -93,6 +97,10 @@ export default function HomePage() {
       {/* Matches the client's live "Certified By" band — room photo, dark wash,
           centred type with the orange leaf rule, three framed certificates. */}
       <CertifiedBy />
+
+      {/* Instagram feed wall — left copy + masonry shots, before the order /
+          contact close. Links out to @karmogroup. Hidden for now. */}
+      {SHOW_INSTAGRAM_SHOP ? <InstagramShop /> : null}
 
       {/* Last band before the footer — order path + contact. */}
       <OrderAndContact />
