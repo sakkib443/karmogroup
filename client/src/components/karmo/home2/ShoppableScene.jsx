@@ -199,23 +199,16 @@ export default function ShoppableScene() {
   }, [openId, close]);
 
   return (
-    <section className="bg-white pb-14 lg:pb-16">
+    <section className="bg-white">
       <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
-        {/* Full-bleed: no `.shell`, no padding, straight into both edges.
-            Height from lg is the screen less 9rem — 756px on a 900px window.
-            This was `100svh` less the 174px header less a little, which is the
-            arithmetic the brief asked for, but it read as too short: by the
-            time the reader scrolls the scene under the bar, the header is no
-            longer taking a bite out of it, so subtracting its height only left
-            a gap. Measuring from the whole window instead fills the view and
-            still stops a little short of it. The cap stops it growing absurd
-            on a tall monitor; the floor keeps it usable on a short laptop.
-            Below lg it goes back to a ratio near the picture's own — a phone
-            is 375px wide, and cropping a wide room into a tall narrow frame
-            would carry the left-hand cushion clean off the picture. */}
+        {/* True full-viewport band. Mid-page the sticky header floats over
+            the top of the picture; measuring `100svh` (not `100svh − header`)
+            means when the scene is brought to the top of the window it fills
+            edge-to-edge — no strip of the next section peeking underneath. */}
         <div
           ref={frameRef}
-          className="relative aspect-[16/10] w-full overflow-hidden [container-type:size] lg:aspect-auto lg:h-[calc(100svh-9rem)] lg:max-h-[1000px] lg:min-h-[420px]"
+          className="relative h-svh min-h-[560px] w-full overflow-hidden [container-type:size]"
+          style={{ height: "100svh" }}
         >
           <Image
             src={scene.src}
@@ -236,12 +229,16 @@ export default function ShoppableScene() {
               corner, enlarge it, and hold it in the middle of the scene.
               Still `pointer-events-none` and below the markers (z-10) / open
               cards (z-20) so hotspots stay reachable through the type. */}
-          <p className="display pointer-events-none absolute left-1/2 top-[78%] z-[1] w-max max-w-[min(92vw,42rem)] -translate-x-1/2 -translate-y-1/2 px-6 text-center text-[1.35rem] font-bold uppercase leading-[1.25] tracking-[0.08em] text-white [text-shadow:0_2px_28px_rgba(10,8,6,0.55)] sm:text-[1.85rem] lg:text-[2.55rem] lg:tracking-[0.1em]">
-            <span className="block whitespace-nowrap">Karmo is everywhere</span>
-            <span className="block whitespace-nowrap">in our lives</span>
+          <p className="display pointer-events-none absolute left-1/2 top-[72%] z-[1] w-[min(92vw,42rem)] max-w-[min(92vw,42rem)] -translate-x-1/2 -translate-y-1/2 px-4 text-center text-[1.15rem] font-bold uppercase leading-[1.25] tracking-[0.06em] text-white [text-shadow:0_2px_28px_rgba(10,8,6,0.55)] sm:top-[78%] sm:px-6 sm:text-[1.85rem] sm:tracking-[0.08em] lg:text-[2.55rem] lg:tracking-[0.1em]">
+            <span className="block max-lg:whitespace-normal lg:whitespace-nowrap">
+              Karmo is everywhere
+            </span>
+            <span className="block max-lg:whitespace-normal lg:whitespace-nowrap">
+              in our lives
+            </span>
             <span
               aria-hidden
-              className="mx-auto mt-4 block h-[3px] w-14 bg-brand sm:mt-5 sm:w-16 lg:mt-6 lg:h-[3.5px] lg:w-20"
+              className="mx-auto mt-3 block h-[3px] w-12 bg-brand sm:mt-5 sm:w-16 lg:mt-6 lg:h-[3.5px] lg:w-20"
             />
           </p>
 

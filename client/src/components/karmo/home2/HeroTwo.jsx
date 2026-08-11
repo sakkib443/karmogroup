@@ -63,6 +63,9 @@ const badge = {
   height: 330,
 };
 
+/* "Bangladesh's [1] Foam Brand" claim — set false to park it for reuse elsewhere. */
+const SHOW_FOAM_BRAND_CLAIM = true;
+
 /**
  * The approved picture, and the reference every other image on this site is
  * matched against — the client signed it off as the brand's own look, so the
@@ -78,14 +81,14 @@ export default function HeroTwo() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative min-h-[520px] w-full overflow-hidden bg-[#f4efe8] lg:h-[calc(100svh-174px)] lg:min-h-[460px] lg:max-h-[43vw]">
+    <section className="relative min-h-[480px] w-full overflow-hidden bg-[#f4efe8] sm:min-h-[520px] lg:h-[calc(100svh-174px)] lg:min-h-[460px] lg:max-h-[43vw]">
       <Image
         src={hero.src}
         alt={hero.alt}
         fill
         priority
         sizes="100vw"
-        className="object-cover object-right"
+        className="object-cover object-[68%_center] lg:object-right"
       />
 
       {/* A flat dark veil, and the type reversed out of it.
@@ -111,103 +114,46 @@ export default function HeroTwo() {
           different numbers. */}
       <div aria-hidden className="absolute inset-0 bg-black/48" />
 
-      <div className="shell relative flex h-full min-h-[520px] items-center py-16 lg:min-h-0">
-        {/* The hero sets its own type rather than borrowing `SectionHeading`.
-            That component is the shared treatment for the *sections* — one
-            scale, capped at 2.45rem, deliberately even from section to section
-            — and a hero wearing it reads as one more section rather than as
-            the top of the page. The words are unchanged; only the setting is.
-
-            Three things carry the change: size (39px to a fluid 34-50px),
-            leading (1.02 down to 0.92, so two lines lock into one block), and
-            tracking (+0.01em out to -0.02em — wide letterspacing on a large
-            caps headline is what dates it). */}
+      <div className="shell relative flex h-full min-h-[480px] items-center py-12 sm:min-h-[520px] sm:py-16 lg:min-h-0">
+        {/* Same copy, tighter professional setting: quiet claim → rule →
+            even display block → support → CTAs. */}
         <motion.div
           variants={group}
           initial={reduceMotion ? false : "hidden"}
           animate="show"
-          /* Nudged down off dead centre. The flex parent centres this block,
-             which put equal air above and below it; sitting a little low reads
-             as deliberate placement in the room rather than as a block dropped
-             in the middle of the frame. `translate` rather than a margin so
-             the centring maths underneath is left alone. */
-          className="max-w-[40rem] translate-y-5 text-left lg:translate-y-7"
+          className="relative max-w-[34rem] translate-y-2 text-left lg:translate-y-4"
         >
-          {/* The badge interrupts the sentence rather than sitting beside it —
-              "BANGLADESH'S" to its left, "FOAM BRAND" to its right — which is
-              how the client's artwork uses it. `flex-wrap` so the phrase breaks
-              either side of the badge on a narrow phone rather than shrinking
-              it. */}
-          <motion.div
-            variants={rise}
-            className="flex flex-wrap items-center gap-x-4 gap-y-1"
+          {SHOW_FOAM_BRAND_CLAIM ? (
+            <motion.div variants={rise}>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:gap-x-3">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/80 sm:text-[12px]">
+                  Bangladesh&rsquo;s
+                </span>
+                <Image
+                  src={badge.src}
+                  alt=""
+                  width={badge.width}
+                  height={badge.height}
+                  className="h-9 w-auto shrink-0 -translate-y-[10%] sm:h-10"
+                />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/80 sm:text-[12px]">
+                  Foam Brand
+                </span>
+              </div>
+              <span
+                aria-hidden
+                className="mt-5 block h-px w-12 bg-white/35 sm:mt-6 sm:w-14"
+              />
+            </motion.div>
+          ) : null}
+
+          <h1
+            className={`display text-[clamp(1.7rem,3.6vw,2.85rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white ${
+              SHOW_FOAM_BRAND_CLAIM ? "mt-5 sm:mt-6" : "mt-0"
+            }`}
           >
-            <span className="text-[14px] font-bold uppercase tracking-[0.1em] text-white sm:text-[16px] lg:text-[18px]">
-              Bangladesh&rsquo;s
-            </span>
-            {/* Lifted off the row's centre line, and the amount is measured
-                rather than eyeballed: scanning the file for rows that read as
-                the ribbon's red puts the ribbon between 41% and 75% of the
-                badge's height, so its centre is at 58% — 8% *below* the middle
-                of the picture. `items-center` lines up the picture's middle
-                with the text's, which therefore hangs the ribbon low and
-                leaves the gold "1" looking sunk. Raising it 10% of its own
-                height puts the ribbon just above the text's centre line and
-                lets the numeral rise, which is how the artwork is drawn.
-
-                A percentage, not pixels, so it holds at both badge sizes.
-
-                `width`/`height` are the file's own, so the space is reserved
-                before it loads and the line does not jump. The rendered size
-                comes from the height class; `w-auto` keeps the ratio. */}
-            <Image
-              src={badge.src}
-              alt=""
-              width={badge.width}
-              height={badge.height}
-              className="h-12 w-auto shrink-0 -translate-y-[10%] lg:h-14"
-            />
-            {/* "Foam Brand", the client's own wording on their site, not the
-                "Home Brand" this said before. Worth knowing they are not the
-                same claim: the group is four divisions and Home Brand covers
-                all of them, while Foam Brand is the foam division's. One word
-                to switch back. */}
-            <span className="text-[14px] font-bold uppercase tracking-[0.1em] text-white sm:text-[16px] lg:text-[18px]">
-              Foam Brand
-            </span>
-          </motion.div>
-
-          {/* An `h1`, not the `h2` the shared heading renders. This is the
-              homepage now, and it had no first-level heading at all.
-              `font-normal!` and `leading-[0.92]!` because globals.css sets
-              `h1 { font-weight: 600; line-height: 1.2 }` outside any cascade
-              layer, and an unlayered rule beats a layered Tailwind utility
-              whatever its specificity. Without the bangs this renders at 600
-              weight on 1.2 leading — which is most of what made it read as a
-              section heading in the first place.
-
-              The words are the client's, off their own site: Generic 9 in
-              `docs/copy/taglines.md`, "We Create The Chemistry Of Comfort".
-              (That file pencils Generic 9 in for the Chemicals division page
-              rather than a homepage hero — the client has since used it as
-              their hero line, so the note there is out of date.)
-
-              Broken into three lines the way their artwork breaks it, rather
-              than left to wrap: "COMFORT" alone on the last line is what gives
-              the block its shape, and a wrap would put it wherever the column
-              width happened to land.
-
-              One weight throughout, which is most of why the reference reads
-              as a hero: at this size the eye takes the block as a single
-              shape, and a weight change inside it splits the shape in two.
-
-              The lines are shorter than the ones they replaced, so the ceiling
-              goes up — "CHEMISTRY OF" at 5rem is 595px inside an 832px column.
-              The floor is what keeps the longest of the three on one line in a
-              375px phone's 327px column. */}
-          <h1 className="display mt-2 text-[clamp(2.05rem,4.9vw,4.25rem)] font-bold! uppercase leading-[0.95]! tracking-[-0.015em] text-white lg:mt-3">
-            {["We Create the", "Chemistry of", "Comfort"].map((ln) => (
-              <span key={ln} className="block overflow-hidden pb-[0.06em]">
+            {["We create the", "Chemistry of", "Comfort"].map((ln) => (
+              <span key={ln} className="block overflow-hidden pb-[0.04em]">
                 <motion.span variants={lineReveal} className="block">
                   {ln}
                 </motion.span>
@@ -215,46 +161,35 @@ export default function HeroTwo() {
             ))}
           </h1>
 
-          {/* A supporting paragraph stood here — "Foam, mattresses, bedding
-              and the chemistry that holds them together…". The client's
-              artwork carries the eyebrow and the headline and nothing else, so
-              it is gone rather than kept as a fourth voice under a line that
-              already says the whole thing. The buttons stay: they are the way
-              out of the hero, not more copy. */}
+          <motion.p
+            variants={rise}
+            className="mt-6 max-w-[20.5rem] text-[12.5px] font-medium leading-[1.65] tracking-[0.01em] text-white/68 sm:mt-7 sm:text-[13.5px]"
+          >
+            Foam, mattress and HomeTex — crafted in Bangladesh since 1965.
+          </motion.p>
 
-          {/* Square, like everything else on this page — the 4px these carried
-              was the last radius left in the hero. Tracking comes in from
-              0.14em: at 12px caps that was doing the same spreading the eyebrow
-              was, and a button label wants to read as one word. */}
           <motion.div
             initial={reduceMotion ? false : rise.hidden}
             whileInView={rise.show}
             viewport={{ once: true }}
-            className="mt-10 flex flex-wrap items-center gap-3"
+            className="mt-8 flex w-full flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center"
           >
             <Link
               href="/products"
-              className="btn-primary group inline-flex h-[52px] items-center gap-3 bg-brand px-9 text-[12px] font-bold uppercase tracking-[0.1em] text-white"
+              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
             >
               Shop the range
-              <FiArrowRight className="text-base transition-transform duration-300 group-hover:translate-x-1" />
+              <FiArrowRight className="text-[15px] transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
 
             <Link
               href="/find-store"
-              /* Reversed with the rest: an ink outline is invisible on a
-                 veiled photograph, and the hover fills white and inks the
-                 label rather than the other way round. */
-              className="group inline-flex h-[52px] items-center gap-3 border border-white/50 px-8 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-ink"
+              className="group inline-flex h-[50px] w-full items-center justify-center gap-2.5 border border-white/40 bg-transparent px-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-ink sm:h-[52px] sm:w-auto sm:justify-start sm:px-8 sm:text-[12px] sm:tracking-[0.12em]"
             >
-              <FiMapPin className="text-base" />
+              <FiMapPin className="text-[15px]" />
               Find a store
             </Link>
           </motion.div>
-
-          {/* The slide dots stood here. With one picture there is nothing for
-              them to switch between, and a single dot is a control that does
-              nothing — so they are gone rather than disabled. */}
         </motion.div>
       </div>
     </section>

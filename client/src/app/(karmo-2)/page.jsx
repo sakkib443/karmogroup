@@ -4,6 +4,7 @@ import CollectionsShowcase from "@/components/karmo/home2/CollectionsShowcase";
 import DivisionsStrip from "@/components/karmo/home2/DivisionsStrip";
 import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
+import KarmoGallery from "@/components/karmo/home2/KarmoGallery";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
@@ -35,6 +36,11 @@ export const metadata = {
    Flip to `true` to bring the three collection cards back. */
 const SHOW_COLLECTIONS_SHOWCASE = false;
 
+/* Campaign bento (KarmoGallery) — hidden for now at the client's request, to be
+   settled later. The component and its four pictures are untouched; flip to
+   `true` to bring it back. */
+const SHOW_KARMO_GALLERY = false;
+
 export default function HomePage() {
   return (
     <>
@@ -44,6 +50,11 @@ export default function HomePage() {
       {SHOW_COLLECTIONS_SHOWCASE ? <CollectionsShowcase /> : null}
       <ShoppableScene />
       <FoamStory />
+
+      {/* The client's `album-wrapper` section rebuilt as a bento. It sits here
+          because it is pictures with almost no words, between the foam story
+          and the dark film section — both of which are dense with copy. */}
+      {SHOW_KARMO_GALLERY ? <KarmoGallery /> : null}
 
       {/* Straight after the foam story, which is what it argues from: that
           section says what the foam is, this one says what it does. It is also
@@ -68,19 +79,20 @@ export default function HomePage() {
           section title), so it does not leave a void under Popular Products. */}
       <Reels />
 
+      {/* Who actually buys the foam. It sat below the certification band until
+          the client moved it up, and the new order argues the better way round:
+          the market vouches first, then the certificates back that up with
+          paperwork. It also puts the white logo strip between two dark bands
+          rather than leaving two of them adjacent.
+
+          The logos are cut from the client's own "PARTNERS & CLIENTS" sheet —
+          see the component for the two caption/logo mismatches on that artwork
+          that they still need to settle. */}
+      <Partners />
+
       {/* Matches the client's live "Certified By" band — room photo, dark wash,
           centred type with the orange leaf rule, three framed certificates. */}
       <CertifiedBy />
-
-      {/* Who actually buys the foam, straight after who certifies it. The order
-          is the argument: the certificates say the product is sound, this says
-          the market already agreed, and the contact band below asks for the
-          order. Proof before the ask, and the strongest proof last.
-
-          Every name in it is read off pages 24-26 of the client's own foam
-          catalogue — see the component for what was corrected and what was
-          left out rather than guessed. */}
-      <Partners />
 
       {/* Last band before the footer — order path + contact. */}
       <OrderAndContact />

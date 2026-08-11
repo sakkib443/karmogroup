@@ -42,7 +42,7 @@ export default function KarmoTwoLayout({
           trust strip, as a pale band between the hero and the sections under
           it. Set here rather than on `body` so the other 68 storefront pages
           keep the background they were built on. */}
-      <main className="min-h-screen bg-white pt-[109px] lg:pt-[178px]">
+      <main className="min-h-screen overflow-x-hidden bg-white pt-[109px] lg:pt-[178px]">
         {children}
       </main>
       <Footer />

@@ -29,12 +29,32 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
     const result = await rawBaseQuery(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
-        // Token expired or invalid — logout and redirect
-        api.dispatch(logout());
-        if (typeof window !== 'undefined') {
-            const currentPath = window.location.pathname;
-            if (!currentPath.includes('/login')) {
-                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}&expired=true`;
+        // Only a session that exists can expire.
+        //
+        // This used to fire on *any* 401, which is not the same thing. A
+        // visitor who never signed in has no session to lose, and 401 from an
+        // endpoint that happens to require auth is the normal answer for them
+        // — not an expiry. `FloatingContact` sits in the root layout and calls
+        // `/site-content` on every page; the backend answers that call 401,
+        // so every page load threw an anonymous visitor to
+        // `/login?expired=true`. Opening the site went to the login page, and
+        // so did clicking any menu item.
+        //
+        // Checking for a token first keeps the real behaviour — a stale token
+        // still logs out and redirects — without inventing a session for
+        // someone who never had one.
+        const hadSession = Boolean(
+            (api.getState() as RootState).auth.token ||
+            (typeof window !== 'undefined' && localStorage.getItem('token'))
+        );
+
+        if (hadSession) {
+            api.dispatch(logout());
+            if (typeof window !== 'undefined') {
+                const currentPath = window.location.pathname;
+                if (!currentPath.includes('/login')) {
+                    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}&expired=true`;
+                }
             }
         }
     }
