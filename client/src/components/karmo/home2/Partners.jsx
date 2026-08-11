@@ -106,10 +106,14 @@ const CLAIMED = Math.floor(logos.length / 10) * 10;
  * One logo.
  *
  * The box is a fixed height and `w-auto`, so each logo keeps its own width and
- * the row spaces itself by how wide the artwork actually is. Greyed back and
- * lifted to full colour on hover: thirty-six full-colour logos at once is a
- * fruit salad that competes with everything else on the page, and the greyscale
- * is what makes them read as one set.
+ * the row spaces itself by how wide the artwork actually is.
+ *
+ * Full colour, at the client's ask. These were greyed back at first on the
+ * argument that thirty-six colour marks at once compete with the rest of the
+ * page — the client wants them as their owners drew them, which is the better
+ * claim to make about a client list. What holds the row together instead is
+ * the white card behind each one and the single 86/100px height they all sit
+ * in, so the set still reads as a set without desaturating anybody's brand.
  */
 function Logo({ item }) {
   return (
@@ -120,7 +124,7 @@ function Logo({ item }) {
         width={item.w}
         height={item.h}
         sizes="240px"
-        className="h-auto max-h-[46px] w-auto max-w-[150px] object-contain opacity-70 grayscale transition duration-500 hover:opacity-100 hover:grayscale-0 lg:max-h-[54px] lg:max-w-[180px]"
+        className="h-auto max-h-[46px] w-auto max-w-[150px] object-contain lg:max-h-[54px] lg:max-w-[180px]"
       />
     </span>
   );
