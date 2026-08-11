@@ -172,7 +172,7 @@ export default function PopularProductsGrid() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white pb-16 pt-16 lg:pb-24 lg:pt-24">
+    <section className="bg-white pb-10 pt-16 lg:pb-12 lg:pt-24">
       {/* Centred, and carrying these two lines, at the client's ask. It was
           left on the `.shell` gutter with a "view all" held to the
           right — the arrangement `DivisionsStrip` uses — and centring it left
@@ -212,11 +212,22 @@ export default function PopularProductsGrid() {
               reads as the page. Decorative, so `aria-hidden`. */}
           <span
             aria-hidden
-            className="mt-6 flex items-center justify-center gap-2.5"
+            className="mt-6 flex items-center justify-center gap-3"
           >
-            <span className="h-px w-8 bg-ink/20 sm:w-12" />
-            <span className="h-[3px] w-12 bg-brand sm:w-14" />
-            <span className="h-px w-8 bg-ink/20 sm:w-12" />
+            <span className="h-px w-16 sm:w-20" style={{ backgroundColor: "#FF9A1F" }} />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <path
+                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
+                fill="#FF9A1F"
+              />
+              <path
+                d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
+                stroke="#B4651A"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="h-px w-16 sm:w-20" style={{ backgroundColor: "#FF9A1F" }} />
           </span>
         </motion.div>
       </motion.div>
@@ -269,7 +280,7 @@ export default function PopularProductsGrid() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-10 text-center lg:mt-12"
+        className="mt-7 text-center lg:mt-8"
       >
         <motion.div variants={fade}>
           <Link href="/products" className="group inline-flex items-center gap-4">

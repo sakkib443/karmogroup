@@ -137,24 +137,24 @@ const CartItemVariants = ({
         return (
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {item.color && (
-                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                        <span className="w-2 h-2 rounded-full border border-gray-200" style={{ background: item.colorHex || '#ccc' }} />
+                    <span className="inline-flex items-center gap-1.5 text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
+                        <span className="w-2 h-2 rounded-full border border-ink/12" style={{ background: item.colorHex || '#ccc' }} />
                         {item.color}
                     </span>
                 )}
                 {item.size && (
-                    <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">{item.size}</span>
+                    <span className="text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">{item.size}</span>
                 )}
             </div>
         );
     }
 
     return (
-        <div className={`mt-2 rounded-md ${incomplete ? 'border border-amber-300 bg-amber-50/50 p-2' : ''}`}>
+        <div className={`mt-2 rounded-none ${incomplete ? 'border border-amber-300 bg-amber-50/50 p-2' : ''}`}>
             {needsColor && (
                 <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                    <span className="text-[11px] font-medium text-gray-500 w-10">Color</span>
-                    {item.color && <span className="text-[11px] font-semibold text-gray-800">{item.color}</span>}
+                    <span className="text-[11px] font-medium text-ink/50 w-10">Color</span>
+                    {item.color && <span className="text-[11px] font-semibold text-ink">{item.color}</span>}
                     <div className="flex items-center gap-1.5 flex-wrap">
                         {colorSwatches.map((c) => {
                             const selected = item.color === c.name;
@@ -169,8 +169,8 @@ const CartItemVariants = ({
                                     className="w-6 h-6 rounded-full flex-shrink-0 transition-all disabled:opacity-35 disabled:cursor-not-allowed"
                                     style={{
                                         background: c.hex,
-                                        border: selected ? '2px solid var(--color-primary)' : '1.5px solid #d1d5db',
-                                        boxShadow: selected ? '0 0 0 2px rgba(var(--color-primary-rgb),0.2)' : 'none',
+                                        border: selected ? '2px solid #e60000' : '1.5px solid #d1d5db',
+                                        boxShadow: selected ? '0 0 0 2px rgba(230,0,0,0.2)' : 'none',
                                     }}
                                 />
                             );
@@ -180,7 +180,7 @@ const CartItemVariants = ({
             )}
             {needsSize && (
                 <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] font-medium text-gray-500 w-10">Size</span>
+                    <span className="text-[11px] font-medium text-ink/50 w-10">Size</span>
                     <div className="flex items-center gap-1.5 flex-wrap">
                         {sizeList.map((s) => {
                             const selected = item.size === s;
@@ -193,8 +193,8 @@ const CartItemVariants = ({
                                     onClick={() => apply(item.color || '', s)}
                                     className={`min-w-[30px] h-7 px-2 rounded text-[11px] font-semibold transition-all disabled:opacity-35 disabled:cursor-not-allowed ${
                                         selected
-                                            ? 'border-2 border-[var(--color-primary)] text-[var(--color-primary)] bg-[var(--color-primary)]/[0.08]'
-                                            : 'border border-gray-300 text-gray-700 bg-white hover:border-gray-400'
+                                            ? 'border-2 border-brand text-brand bg-brand/[0.08]'
+                                            : 'border border-ink/20 text-ink/80 bg-white hover:border-gray-400'
                                     }`}
                                 >
                                     {s}
@@ -368,34 +368,34 @@ const CartPage = () => {
 
     /* ═══ SAVED FOR LATER SECTION (shared between empty + filled cart) ═══ */
     const savedSection = savedItems.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm">
-            <div className="px-4 sm:px-5 py-3.5 border-b border-gray-100 flex items-center gap-2">
-                <LuHeart size={16} className="text-[var(--color-primary)]" />
-                <h2 className="text-sm font-semibold text-gray-900">
+        <div className="border border-ink/10 bg-white">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-ink/8 flex items-center gap-2">
+                <LuHeart size={16} className="text-brand" />
+                <h2 className="text-sm font-semibold text-ink">
                     Saved for Later
-                    <span className="ml-2 text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                    <span className="ml-2 text-xs font-medium text-ink/50 bg-cream px-2 py-0.5 rounded">
                         {savedItems.length}
                     </span>
                 </h2>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-ink/8">
                 {savedItems.map((item) => (
                     <div key={item.id} className="flex items-center gap-3 px-4 sm:px-5 py-4">
-                        <div className="w-16 h-16 rounded border border-gray-100 bg-white p-1 flex-shrink-0">
+                        <div className="w-16 h-16 rounded border border-ink/8 bg-white p-1 flex-shrink-0">
                             <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h3 className="text-sm text-gray-800 line-clamp-2 leading-snug">{item.name}</h3>
+                            <h3 className="text-sm text-ink line-clamp-2 leading-snug">{item.name}</h3>
                             <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                <span className="text-sm font-semibold text-[var(--color-primary)]">৳{item.price.toLocaleString()}</span>
+                                <span className="text-sm font-semibold text-brand">৳{item.price.toLocaleString()}</span>
                                 {item.color && (
-                                    <span className="inline-flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
-                                        <span className="w-2 h-2 rounded-full border border-gray-200" style={{ background: item.colorHex || '#ccc' }} />
+                                    <span className="inline-flex items-center gap-1.5 text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
+                                        <span className="w-2 h-2 rounded-full border border-ink/12" style={{ background: item.colorHex || '#ccc' }} />
                                         {item.color}
                                     </span>
                                 )}
                                 {item.size && (
-                                    <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
+                                    <span className="text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
                                         {item.size}
                                     </span>
                                 )}
@@ -403,14 +403,14 @@ const CartPage = () => {
                             <div className="flex items-center gap-3 mt-2.5">
                                 <button
                                     onClick={() => handleMoveToCart(item)}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[var(--color-primary)] hover:opacity-90 transition-opacity px-3 py-1.5 rounded"
+                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-brand hover:opacity-90 transition-opacity px-3 py-1.5 rounded"
                                 >
                                     <LuShoppingCart size={12} />
                                     Move to Cart
                                 </button>
                                 <button
                                     onClick={() => dispatch(removeFromSaved(item.id))}
-                                    className="inline-flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-red-500 transition-colors"
+                                    className="inline-flex items-center gap-1 text-xs font-medium text-ink/50 hover:text-red-500 transition-colors"
                                 >
                                     <LuTrash2 size={12} />
                                     Remove
@@ -426,7 +426,7 @@ const CartPage = () => {
     /* ═══ EMPTY CART STATE ═══ */
     if (items.length === 0) {
         return (
-            <div className="bg-[#F8FAFC] min-h-screen pb-20">
+            <div className="bg-white min-h-screen pb-20">
                 {savedItems.length === 0 ? (
                     <div className="py-20">
                         <EmptyState
@@ -437,14 +437,14 @@ const CartPage = () => {
                         />
                     </div>
                 ) : (
-                    <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-6 max-w-6xl">
-                        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-5 transition-colors">
+                    <div className="shell pt-8 pb-12 lg:pt-10 lg:pb-16">
+                        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-ink/50 hover:text-ink mb-5 transition-colors">
                             <LuChevronLeft size={16} />
                             Back to Shopping
                         </Link>
-                        <div className="bg-white rounded-lg shadow-sm px-5 py-8 text-center mb-6">
-                            <LuShoppingCart size={28} className="text-gray-300 mx-auto mb-3" />
-                            <p className="text-sm text-gray-500">Your cart is empty — your saved items are below.</p>
+                        <div className="border border-ink/10 bg-white px-5 py-8 text-center mb-6">
+                            <LuShoppingCart size={28} className="text-ink/25 mx-auto mb-3" />
+                            <p className="text-sm text-ink/50">Your cart is empty — your saved items are below.</p>
                         </div>
                         {savedSection}
                     </div>
@@ -454,28 +454,31 @@ const CartPage = () => {
     }
 
     return (
-        <div className="bg-[#F8FAFC] min-h-screen pb-24 lg:pb-20">
-            <div className="container mx-auto px-4 sm:px-8 md:px-12 lg:px-16 pt-6 max-w-6xl">
+        <div className="bg-white min-h-screen pb-24 lg:pb-20">
+            <div className="shell pt-8 pb-12 lg:pt-10 lg:pb-16">
 
                 {/* ═══ HEADER ═══ */}
-                <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-4 transition-colors">
-                    <LuChevronLeft size={16} />
+                <Link href="/" className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/45 hover:text-brand mb-6 transition-colors">
+                    <LuChevronLeft size={14} />
                     Back to Shopping
                 </Link>
 
-                <div className="flex items-center justify-between mb-5">
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                        Shopping Cart
-                        <span className="ml-2 text-sm font-medium text-gray-500">
-                            ({totalQuantity} {totalQuantity === 1 ? 'item' : 'items'})
-                        </span>
-                    </h1>
+                <div className="flex items-end justify-between gap-4 mb-7 border-b border-ink/10 pb-5">
+                    <div>
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">Karmo</span>
+                        <h1 className="display mt-2 text-[1.55rem] font-light uppercase leading-[1.1] tracking-[0.01em] text-ink sm:text-[1.85rem]">
+                            Your Cart
+                        </h1>
+                        <p className="mt-1.5 text-sm text-ink/50">
+                            {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'} ready for checkout
+                        </p>
+                    </div>
                     <button
                         onClick={handleClearCart}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-red-500 transition-colors"
+                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/45 hover:text-brand transition-colors mb-1"
                     >
                         <LuTrash2 size={13} />
-                        Clear Cart
+                        Clear
                     </button>
                 </div>
 
@@ -484,48 +487,48 @@ const CartPage = () => {
 
                     {/* ═══ LEFT: CART ITEMS ═══ */}
                     <div className="lg:col-span-8">
-                        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div className="border border-ink/10 bg-white overflow-hidden">
 
                             {/* Select-all bar (Daraz-style) */}
-                            <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-gray-100">
-                                <button onClick={toggleAll} className="flex items-center gap-2.5 text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                                    <span className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors ${allSelected ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-gray-300'}`}>
+                            <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-ink/8">
+                                <button onClick={toggleAll} className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/80">
+                                    <span className={`w-[18px] h-[18px] border flex items-center justify-center transition-colors ${allSelected ? 'bg-brand border-brand' : 'border-ink/20'}`}>
                                         {allSelected && <LuCheck size={12} className="text-white" />}
                                     </span>
-                                    Select All ({items.length} Item{items.length !== 1 ? 's' : ''})
+                                    Select All ({items.length})
                                 </button>
                                 <button
                                     onClick={deleteSelected}
                                     disabled={selectedIds.length === 0}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-red-500 transition-colors disabled:opacity-40 disabled:hover:text-gray-500 uppercase"
+                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/50 hover:text-red-500 transition-colors disabled:opacity-40 disabled:hover:text-ink/50 uppercase"
                                 >
                                     <LuTrash2 size={14} /> Delete
                                 </button>
                             </div>
 
                             {/* Cart Items */}
-                            <div className="divide-y divide-gray-100">
+                            <div className="divide-y divide-ink/8">
                                 {items.map((item) => (
                                     <div key={item.id} className="group flex gap-3 sm:gap-4 px-4 sm:px-5 py-4">
                                         {/* Select checkbox */}
                                         <button onClick={() => toggleItem(item.id)} className="self-center flex-shrink-0" aria-label="Select item">
-                                            <span className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors ${isSelected(item.id) ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-gray-300'}`}>
+                                            <span className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors ${isSelected(item.id) ? 'bg-brand border-brand' : 'border-ink/20'}`}>
                                                 {isSelected(item.id) && <LuCheck size={12} className="text-white" />}
                                             </span>
                                         </button>
                                         {/* Product image */}
-                                        <div className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-md border border-gray-100 bg-white p-1.5 flex-shrink-0">
+                                        <div className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-none border border-ink/8 bg-white p-1.5 flex-shrink-0">
                                             <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                                         </div>
 
                                         {/* Details */}
                                         <div className="flex-1 min-w-0 flex flex-col">
                                             <div className="flex items-start justify-between gap-2">
-                                                <h3 className="text-sm text-gray-800 line-clamp-2 leading-snug pr-1">{item.name}</h3>
+                                                <h3 className="text-sm text-ink line-clamp-2 leading-snug pr-1">{item.name}</h3>
                                                 {/* Delete (desktop) */}
                                                 <button
                                                     onClick={() => setDeleteConfirmId(item.id)}
-                                                    className="hidden sm:flex w-7 h-7 rounded items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+                                                    className="hidden sm:flex w-7 h-7 rounded items-center justify-center text-ink/25 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
                                                     aria-label="Remove item"
                                                 >
                                                     <LuTrash2 size={15} />
@@ -537,9 +540,9 @@ const CartPage = () => {
 
                                             {/* Unit price */}
                                             <div className="mt-1.5 flex items-baseline gap-2">
-                                                <span className="text-sm font-semibold text-[var(--color-primary)]">৳{item.price.toLocaleString()}</span>
+                                                <span className="text-sm font-semibold text-brand">৳{item.price.toLocaleString()}</span>
                                                 {item.mrp && item.mrp > item.price && (
-                                                    <span className="text-xs text-gray-400 line-through">৳{item.mrp.toLocaleString()}</span>
+                                                    <span className="text-xs text-ink/40 line-through">৳{item.mrp.toLocaleString()}</span>
                                                 )}
                                             </div>
 
@@ -547,21 +550,21 @@ const CartPage = () => {
                                             <div className="mt-auto pt-3 flex items-end justify-between gap-2">
                                                 <div className="flex flex-col gap-2">
                                                     {/* Quantity stepper */}
-                                                    <div className="flex items-center border border-gray-200 rounded-md overflow-hidden w-fit">
+                                                    <div className="flex items-center border border-ink/12 rounded-none overflow-hidden w-fit">
                                                         <button
                                                             onClick={() => dispatch(decreaseQuantity(item.id))}
                                                             disabled={item.quantity <= 1}
-                                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                                            className="w-8 h-8 flex items-center justify-center text-ink/65 hover:bg-cream/60 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                                                             aria-label="Decrease quantity"
                                                         >
                                                             <LuMinus size={13} />
                                                         </button>
-                                                        <div className="w-10 h-8 flex items-center justify-center text-sm font-semibold text-gray-900 border-x border-gray-200">
+                                                        <div className="w-10 h-8 flex items-center justify-center text-sm font-semibold text-ink border-x border-ink/12">
                                                             {item.quantity}
                                                         </div>
                                                         <button
                                                             onClick={() => dispatch(increaseQuantity(item.id))}
-                                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-50 transition-colors"
+                                                            className="w-8 h-8 flex items-center justify-center text-ink/65 hover:bg-cream/60 transition-colors"
                                                             aria-label="Increase quantity"
                                                         >
                                                             <LuPlus size={13} />
@@ -571,7 +574,7 @@ const CartPage = () => {
                                                     {/* Save for later */}
                                                     <button
                                                         onClick={() => handleSaveForLater(item)}
-                                                        className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[var(--color-primary)] transition-colors w-fit"
+                                                        className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/50 hover:text-brand transition-colors w-fit"
                                                     >
                                                         <LuBookmark size={12} />
                                                         Save for later
@@ -581,12 +584,12 @@ const CartPage = () => {
                                                 {/* Line total + mobile delete */}
                                                 <div className="flex items-end gap-2">
                                                     <div className="text-right">
-                                                        <p className="text-[11px] text-gray-400">৳{item.price.toLocaleString()} × {item.quantity}</p>
-                                                        <p className="text-base font-bold text-gray-900">৳{(item.price * item.quantity).toLocaleString()}</p>
+                                                        <p className="text-[11px] text-ink/40">৳{item.price.toLocaleString()} × {item.quantity}</p>
+                                                        <p className="text-base font-bold text-ink">৳{(item.price * item.quantity).toLocaleString()}</p>
                                                     </div>
                                                     <button
                                                         onClick={() => setDeleteConfirmId(item.id)}
-                                                        className="sm:hidden w-7 h-7 rounded flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+                                                        className="sm:hidden w-7 h-7 rounded flex items-center justify-center text-ink/25 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
                                                         aria-label="Remove item"
                                                     >
                                                         <LuTrash2 size={14} />
@@ -601,7 +604,7 @@ const CartPage = () => {
 
                         {/* Continue Shopping */}
                         <div className="pt-4">
-                            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-600 hover:text-[var(--color-primary)] transition-colors">
+                            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-ink/65 hover:text-brand transition-colors">
                                 <LuChevronLeft size={14} />
                                 Continue Shopping
                             </Link>
@@ -616,18 +619,18 @@ const CartPage = () => {
                     </div>
 
                     {/* ═══ RIGHT: ORDER SUMMARY ═══ */}
-                    <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-                        <div className="bg-white rounded-lg shadow-sm">
+                    <div className="lg:col-span-4 lg:sticky lg:top-[200px] h-fit">
+                        <div className="border border-ink/10 bg-white">
 
-                            <div className="px-5 py-3.5 border-b border-gray-100">
-                                <h2 className="text-sm font-semibold text-gray-900">Order Summary</h2>
+                            <div className="px-5 py-3.5 border-b border-ink/8">
+                                <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Order Summary</h2>
                             </div>
 
                             {/* Coupon Input */}
                             <div className="px-5 pt-4">
-                                <div className="border border-dashed border-[var(--color-primary)]/30 rounded-md p-3 bg-[var(--color-primary)]/[0.03]">
-                                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-                                        <LuTag size={12} className="text-[var(--color-primary)]" /> Apply Coupon / Voucher
+                                <div className="border border-dashed border-brand/30 rounded-none p-3 bg-brand/[0.03]">
+                                    <p className="text-xs font-semibold text-ink/80 mb-2 flex items-center gap-1.5">
+                                        <LuTag size={12} className="text-brand" /> Apply Coupon / Voucher
                                     </p>
                                     <div className="flex gap-2">
                                         <input
@@ -636,12 +639,12 @@ const CartPage = () => {
                                             onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                             onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
                                             placeholder="Enter coupon code"
-                                            className="flex-1 min-w-0 px-3 py-2 text-sm border border-gray-200 rounded outline-none focus:border-[var(--color-primary)] bg-white uppercase placeholder:normal-case placeholder:text-gray-400"
+                                            className="flex-1 min-w-0 px-3 py-2 text-sm border border-ink/12 rounded outline-none focus:border-brand bg-white uppercase placeholder:normal-case placeholder:text-ink/40"
                                         />
                                         <button
                                             onClick={handleApplyCoupon}
                                             disabled={isValidating || !couponCode.trim()}
-                                            className="px-4 py-2 text-xs font-semibold bg-[var(--color-primary)] text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                                            className="px-4 py-2 text-xs font-semibold bg-brand text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                                         >
                                             {isValidating ? '...' : 'Apply'}
                                         </button>
@@ -657,13 +660,13 @@ const CartPage = () => {
                                                     <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 min-w-0">
                                                         <LuCheck size={12} className="flex-shrink-0" />
                                                         <span className="truncate">{c.code}</span>
-                                                        <span className="text-[11px] font-medium text-gray-400 flex-shrink-0">
+                                                        <span className="text-[11px] font-medium text-ink/40 flex-shrink-0">
                                                             {c.freeShipping && c.discount === 0 ? 'Free shipping' : `−৳${(c.discount || 0).toLocaleString()}`}
                                                         </span>
                                                     </span>
                                                     <button
                                                         onClick={() => handleRemoveCoupon(c.code)}
-                                                        className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+                                                        className="text-ink/40 hover:text-red-500 transition-colors flex-shrink-0"
                                                         aria-label={`Remove ${c.code}`}
                                                     >
                                                         <LuX size={13} />
@@ -678,8 +681,8 @@ const CartPage = () => {
                             {/* Totals */}
                             <div className="px-5 py-4 space-y-2.5">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">Subtotal ({selectedQty} {selectedQty === 1 ? 'item' : 'items'})</span>
-                                    <span className="text-gray-900 font-medium">৳{selectedSubtotal.toLocaleString()}</span>
+                                    <span className="text-ink/50">Subtotal ({selectedQty} {selectedQty === 1 ? 'item' : 'items'})</span>
+                                    <span className="text-ink font-medium">৳{selectedSubtotal.toLocaleString()}</span>
                                 </div>
                                 {couponDiscount > 0 && (
                                     <div className="flex justify-between text-sm text-green-600">
@@ -697,28 +700,28 @@ const CartPage = () => {
                                     </div>
                                 )}
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-gray-500">
+                                    <span className="text-ink/50">
                                         Delivery (estimated)
-                                        <span className="block text-xs text-gray-400">Final cost calculated at checkout</span>
+                                        <span className="block text-xs text-ink/40">Final cost calculated at checkout</span>
                                     </span>
                                     {freeShipping ? (
                                         <span className="font-medium text-green-600">FREE</span>
                                     ) : (
-                                        <span className="text-gray-900 font-medium">৳{shippingCost.toLocaleString()}</span>
+                                        <span className="text-ink font-medium">৳{shippingCost.toLocaleString()}</span>
                                     )}
                                 </div>
                                 {remainingForFree > 0 && (
-                                    <div className="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-md px-2.5 py-1.5 flex items-center gap-1.5">
+                                    <div className="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-none px-2.5 py-1.5 flex items-center gap-1.5">
                                         🚚 Add <span className="font-bold">৳{remainingForFree.toLocaleString()}</span> more for FREE shipping
                                     </div>
                                 )}
-                                <div className="flex justify-between items-center pt-3 mt-1 border-t border-gray-100">
-                                    <span className="text-sm font-semibold text-gray-900">Total</span>
+                                <div className="flex justify-between items-center pt-3 mt-1 border-t border-ink/8">
+                                    <span className="text-sm font-semibold text-ink">Total</span>
                                     <div className="text-right">
                                         {(couponDiscount > 0 || couponFreeShipping) && preDiscountTotal > finalTotal && (
-                                            <p className="text-xs line-through text-gray-400">৳{preDiscountTotal.toLocaleString()}</p>
+                                            <p className="text-xs line-through text-ink/40">৳{preDiscountTotal.toLocaleString()}</p>
                                         )}
-                                        <span className="text-xl font-bold text-[var(--color-primary)]">৳{finalTotal.toLocaleString()}</span>
+                                        <span className="text-xl font-bold text-brand">৳{finalTotal.toLocaleString()}</span>
                                     </div>
                                 </div>
                             </div>
@@ -726,7 +729,7 @@ const CartPage = () => {
                             {/* Proceed to Checkout */}
                             <div className="px-5 pb-5">
                                 {hasVariantIssues && (
-                                    <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                                    <div className="mb-3 flex items-start gap-2 rounded-none border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-700">
                                         <LuTriangleAlert size={14} className="mt-0.5 flex-shrink-0" />
                                         <span>
                                             {incompleteSelected.length} selected item{incompleteSelected.length > 1 ? 's need' : ' needs'} a color/size choice before checkout.
@@ -734,16 +737,16 @@ const CartPage = () => {
                                     </div>
                                 )}
                                 {!canCheckout ? (
-                                    <button disabled className="w-full flex items-center justify-center gap-2 py-3 bg-gray-200 text-gray-400 rounded-md text-sm font-semibold cursor-not-allowed">
-                                        {hasVariantIssues ? 'Select Variations to Continue' : 'Proceed to Checkout (0)'}
+                                    <button disabled className="w-full flex items-center justify-center gap-2 py-3.5 bg-ink/10 text-ink/35 rounded-none text-[12px] font-bold uppercase tracking-[0.14em] cursor-not-allowed">
+                                        {hasVariantIssues ? 'Select Variations' : 'Checkout (0)'}
                                     </button>
                                 ) : (
                                     <Link
                                         href="/checkout"
                                         onClick={goCheckout}
-                                        className="w-full flex items-center justify-center gap-2 py-3 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:opacity-90 transition-opacity shadow-sm"
+                                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-brand text-white rounded-none text-[12px] font-bold uppercase tracking-[0.14em] hover:bg-brand-dark transition-colors"
                                     >
-                                        Proceed to Checkout ({selectedIds.length})
+                                        Checkout ({selectedIds.length})
                                         <LuChevronRight size={16} />
                                     </Link>
                                 )}
@@ -754,20 +757,20 @@ const CartPage = () => {
             </div>
 
             {/* ═══ MOBILE STICKY CHECKOUT BAR ═══ */}
-            <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-ink/12 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                 <div className="min-w-0">
-                    <p className="text-[11px] text-gray-500">Total</p>
-                    <p className="text-lg font-bold text-[var(--color-primary)] leading-none">৳{finalTotal.toLocaleString()}</p>
+                    <p className="text-[11px] text-ink/50">Total</p>
+                    <p className="text-lg font-bold text-brand leading-none">৳{finalTotal.toLocaleString()}</p>
                 </div>
                 {!canCheckout ? (
-                    <button disabled className="flex items-center justify-center gap-1.5 px-6 py-3 bg-gray-200 text-gray-400 rounded-md text-sm font-semibold flex-shrink-0 cursor-not-allowed">
+                    <button disabled className="flex items-center justify-center gap-1.5 px-6 py-3.5 bg-ink/10 text-ink/35 rounded-none text-[12px] font-bold uppercase tracking-[0.12em] flex-shrink-0 cursor-not-allowed">
                         {hasVariantIssues ? 'Select Variations' : 'Checkout (0)'}
                     </button>
                 ) : (
                     <Link
                         href="/checkout"
                         onClick={goCheckout}
-                        className="flex items-center justify-center gap-1.5 px-6 py-3 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:opacity-90 transition-opacity flex-shrink-0"
+                        className="flex items-center justify-center gap-1.5 px-6 py-3.5 bg-brand text-white rounded-none text-[12px] font-bold uppercase tracking-[0.12em] hover:bg-brand-dark transition-colors flex-shrink-0"
                     >
                         Checkout ({selectedIds.length})
                         <LuChevronRight size={16} />
@@ -782,20 +785,20 @@ const CartPage = () => {
                     onClick={() => setDeleteConfirmId(null)}
                 >
                     <div
-                        className="bg-white rounded-lg p-6 max-w-sm w-full text-center"
+                        className="bg-white rounded-none p-6 max-w-sm w-full text-center"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
                             <LuTriangleAlert size={22} className="text-red-500" />
                         </div>
-                        <h3 className="text-base font-semibold text-gray-900 mb-1.5">Remove Item?</h3>
-                        <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+                        <h3 className="text-base font-semibold text-ink mb-1.5">Remove Item?</h3>
+                        <p className="text-sm text-ink/50 mb-6 leading-relaxed">
                             Are you sure you want to remove this item from your cart?
                         </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setDeleteConfirmId(null)}
-                                className="flex-1 py-2.5 rounded border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+                                className="flex-1 py-2.5 rounded border border-ink/12 text-sm font-medium text-ink/65 hover:bg-cream/60 transition-colors"
                             >
                                 Keep It
                             </button>

@@ -28,32 +28,32 @@ const divisions = [
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
-    image: "/karmo/images/mattress/plant-bedroom.jpg",
-    alt: "Stand-in artwork — a Karmo Mattress campaign poster offering 15% off",
+    image: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
+    alt: "A Karmo Foam sofa with lavender cushions and stacked foam blocks in a studio setting",
   },
   {
     index: "02",
     name: "HomeTex",
     line: "Bed sheets, comforters, pillows",
     href: "/hometex",
-    image: "/karmo/images/home-02/collections/01-best-selling-karmo-2001-campaign.jpg",
-    alt: "Karmo campaign poster — a modular sofa on Karmo 2001 lavender foam cushions above a stack of foam blocks, offered at 20% off with free delivery",
+    image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
+    alt: "Karmo HomeTex bedding in a styled bedroom",
   },
   {
     index: "03",
     name: "Mattress",
     line: "Pocket spring, euro top, orthopaedic",
     href: "/mattress",
-    image: "/karmo/images/mattress/cloud-poster.jpg",
-    alt: "Stand-in artwork — a Karmo Mattress campaign poster offering 15% off",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
+    alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
   },
   {
     index: "04",
     name: "Chemicals",
     line: "Adhesives, polymers, sodium silicate",
     href: "/chemicals",
-    image: "/karmo/images/mattress/suite-interior.jpg",
-    alt: "A Karmo mattress in red floral ticking with white piping on an upholstered bed, lit by two bedside lamps beneath a chandelier",
+    image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
+    alt: "Karmo Adhesive tins in a showroom setting",
   },
 ];
 
@@ -79,16 +79,9 @@ function DivisionCard({ division }) {
             sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
             className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
           />
-          {/* The page-wide `photo-veil`, kept: this pattern is on every
-              picture-card on the page, and the hover lift is what says the
-              card is a link once the gradient and the arrow are gone. */}
-          <span
-            aria-hidden
-            className="photo-veil pointer-events-none absolute inset-0 transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-45"
-          />
         </div>
 
-        <p className="mt-2.5 text-center text-[14px] font-medium text-ink/70 transition-colors duration-300 group-hover:text-brand lg:mt-3 lg:text-[15px]">
+        <p className="display mt-3 text-center text-[16px] font-semibold uppercase text-ink/80 transition-colors duration-300 group-hover:text-brand lg:mt-4 lg:text-[18px]">
           {division.name}
         </p>
       </Link>
@@ -111,21 +104,33 @@ export default function DivisionsStrip() {
         viewport={VIEWPORT}
         className="shell text-center"
       >
-        <motion.span
-          variants={fade}
-          className="inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-brand sm:text-[12px]"
-        >
-          <span className="h-px w-8 bg-brand" />
-          Our Divisions
-          <span className="h-px w-8 bg-brand" />
-        </motion.span>
-
-        <motion.h2
-          variants={fade}
-          className="display mx-auto mt-4 max-w-2xl text-[1.75rem] font-light uppercase leading-[1.14] tracking-[0.01em] text-ink sm:text-[2rem] lg:text-[2.35rem]"
-        >
-          One group, <span className="font-bold text-brand">four crafts</span>
-        </motion.h2>
+        <motion.div variants={fade}>
+          <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
+            Our Divisions
+          </span>
+          <h2 className="display mt-1 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
+            One group, <span className="font-bold text-brand">four crafts</span>
+          </h2>
+          <span
+            aria-hidden
+            className="mt-4 flex items-center justify-center gap-3"
+          >
+            <span className="h-px w-16 sm:w-20" style={{ backgroundColor: "#FF9A1F" }} />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
+              <path
+                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
+                fill="#FF9A1F"
+              />
+              <path
+                d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
+                stroke="#B4651A"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="h-px w-16 sm:w-20" style={{ backgroundColor: "#FF9A1F" }} />
+          </span>
+        </motion.div>
       </motion.div>
 
       {/* Full width — the row skips `.shell` at the client's ask and runs on
@@ -136,7 +141,7 @@ export default function DivisionsStrip() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-10 grid grid-cols-2 gap-4 px-3 md:mt-14 md:gap-6 md:px-4 lg:grid-cols-4"
+        className="mt-6 grid grid-cols-2 gap-4 px-3 md:mt-8 md:gap-6 md:px-4 lg:grid-cols-4"
       >
         {divisions.map((division) => (
           <DivisionCard key={division.name} division={division} />
