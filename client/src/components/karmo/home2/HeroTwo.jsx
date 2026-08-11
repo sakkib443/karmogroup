@@ -121,7 +121,7 @@ export default function HeroTwo() {
           variants={group}
           initial={reduceMotion ? false : "hidden"}
           animate="show"
-          className="relative max-w-[34rem] translate-y-2 text-left lg:translate-y-4"
+          className="relative max-w-[44rem] translate-y-2 text-left lg:translate-y-4"
         >
           {SHOW_FOAM_BRAND_CLAIM ? (
             <motion.div variants={rise}>
@@ -147,12 +147,21 @@ export default function HeroTwo() {
             </motion.div>
           ) : null}
 
+          {/* Two lines and bigger, which needed the column widened to get both.
+              "CHEMISTRY OF COMFORT" measures 12.28em in this face at this
+              tracking — measured, not guessed — so at the old 34rem column the
+              largest it could be on one line was 44px, *smaller* than the 46px
+              the three-line version already ran at. Widening to 44rem raises
+              that ceiling to 57px, and 4.3vw sits at 55 with room to spare.
+
+              Written out rather than left to wrap — a wrap breaks wherever the
+              column happens to end, and that moves with the window. */}
           <h1
-            className={`display text-[clamp(1.7rem,3.6vw,2.85rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white ${
+            className={`display text-[clamp(1.6rem,4.3vw,3.4rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white ${
               SHOW_FOAM_BRAND_CLAIM ? "mt-5 sm:mt-6" : "mt-0"
             }`}
           >
-            {["We create the", "Chemistry of", "Comfort"].map((ln) => (
+            {["We create the", "Chemistry of Comfort"].map((ln) => (
               <span key={ln} className="block overflow-hidden pb-[0.04em]">
                 <motion.span variants={lineReveal} className="block">
                   {ln}
