@@ -6,6 +6,9 @@ import ShoppableScene from "@/components/karmo/home2/ShoppableScene";
 import FoamStory from "@/components/karmo/home2/FoamStory";
 import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
+import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
+import Reels from "@/components/karmo/Reels";
 
 export const metadata = {
   title: "Karmo Group — Foam, HomeTex, Mattress and Chemicals since 1965",
@@ -27,13 +30,17 @@ export const metadata = {
  * padding with a negative margin to do it; this header is opaque and holds its
  * own space, so the two arrangements cannot both be right.
  */
+/* Mid-page Best Selling / Popular / New Arrival band — hidden for now.
+   Flip to `true` to bring the three collection cards back. */
+const SHOW_COLLECTIONS_SHOWCASE = false;
+
 export default function HomePage() {
   return (
     <>
       <HeroTwo />
       <StandardStrip />
       <DivisionsStrip />
-      <CollectionsShowcase />
+      {SHOW_COLLECTIONS_SHOWCASE ? <CollectionsShowcase /> : null}
       <ShoppableScene />
       <FoamStory />
 
@@ -55,6 +62,17 @@ export default function HomePage() {
           separated them are gone. The product data stays where it was, in
           `popularProducts`, since it was always shared. */}
       <PopularProductsGrid />
+
+      {/* Film strip — uses its own slim editorial label (not the big centred
+          section title), so it does not leave a void under Popular Products. */}
+      <Reels />
+
+      {/* Matches the client's live "Certified By" band — room photo, dark wash,
+          centred type with the orange leaf rule, three framed certificates. */}
+      <CertifiedBy />
+
+      {/* Last band before the footer — order path + contact. */}
+      <OrderAndContact />
     </>
   );
 }
