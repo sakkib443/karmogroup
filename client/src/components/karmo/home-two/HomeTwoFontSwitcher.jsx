@@ -5,16 +5,16 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "karmo-home-two-font";
 
 const OPTIONS = [
-  { id: "manrope", label: "Manrope" },
   { id: "josefin", label: "Josefin Sans" },
+  { id: "manrope", label: "Manrope" },
 ];
 
 /**
  * Home Two only — tiny font dropdown (fixed, right). Swaps the page face
- * between Manrope and Josefin Sans via --font-family / --font-heading.
+ * between Josefin Sans (default) and Manrope via --font-family / --font-heading.
  */
 export default function HomeTwoFontSwitcher({ children, families, classNames }) {
-  const [font, setFont] = useState("manrope");
+  const [font, setFont] = useState("josefin");
 
   useEffect(() => {
     try {
