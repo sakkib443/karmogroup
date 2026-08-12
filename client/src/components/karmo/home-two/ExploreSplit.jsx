@@ -64,7 +64,7 @@ function Panel({ panel }) {
         className="pointer-events-none absolute inset-0 bg-shade-deep/35"
       />
       <div
-        className={`relative z-[1] flex h-full flex-col justify-start pt-16 sm:pt-20 lg:pt-24 xl:pt-28 p-7 sm:p-9 lg:p-11 xl:p-12 ${
+        className={`relative z-[1] flex h-full flex-col justify-start pt-28 sm:pt-32 lg:pt-40 xl:pt-44 p-7 sm:p-9 lg:p-11 xl:p-12 ${
           isRight
             ? "items-end pr-10 text-right sm:pr-14 lg:pr-16 xl:pr-20"
             : "items-start text-left"
