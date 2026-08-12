@@ -170,7 +170,7 @@ export default function HeroTwo() {
           >
             <Link
               href="/products"
-              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_-12px_rgba(230,0,0,0.65)] transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
+              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_-12px_rgba(212,67,72,0.65)] transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
             >
               Shop the range
               <FiArrowRight className="text-[15px] transition-transform duration-300 group-hover:translate-x-1" />
