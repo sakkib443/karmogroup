@@ -1,51 +1,79 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Home Two — promo trio.
  *
- * Full viewport height under the header. Images removed for now — three
- * flat panels keep the copy. Light gutters between the shapes.
+ * Left feature + right stacked tiles (mattress top, HomeTex bottom).
  */
 
 const VIEW_H = "h-[calc(100svh-80px)] min-h-[calc(100svh-80px)]";
 const GAP = "gap-2 md:gap-2.5";
 
 const feature = {
-  eyebrow: "New arrival",
-  title: "Foam seating collection",
+  eyebrow: "Our popular products",
+  titleLines: ["Foam seating", "collection"],
   href: "/foam",
+  src: "/karmo/images/home-02/promo-trio/feature-left-lJJ3nW8gv9.png",
+  alt: "Karmo foam seating lifestyle",
+  cta: "Shop the collection",
 };
 
 const side = [
   {
-    id: "mattress",
-    title: "Mattress range",
-    href: "/mattress",
-    tone: "bg-[#ececec]",
-  },
-  {
     id: "hometex",
     title: "HomeTex bedding",
     href: "/hometex",
+    src: "/karmo/images/home-02/promo-trio/side-top-nVV867gYQD.png",
+    alt: "Karmo HomeTex bedding",
+    tone: "bg-[#ececec]",
+  },
+  {
+    id: "mattress",
+    title: "Mattress range",
+    href: "/mattress",
+    src: "/karmo/images/home-02/promo-trio/side-bottom-bxxJ1Zj5Y2.png",
+    alt: "Karmo mattress range",
     tone: "bg-[#e2e2e2]",
+    overlay: true,
   },
 ];
 
 function SideCard({ item }) {
+  const hasImage = Boolean(item.src);
+
   return (
     <Link
       href={item.href}
-      className={`group relative flex h-full min-h-[50vh] flex-col justify-center px-5 py-6 sm:px-6 lg:min-h-0 lg:px-7 ${item.tone}`}
+      className={`group relative flex h-full min-h-[50vh] flex-col justify-center overflow-hidden px-5 py-6 sm:px-6 lg:min-h-0 lg:px-7 ${item.tone}`}
     >
-      <h3 className="display text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
+      {hasImage ? (
+        <>
+          <Image
+            src={item.src}
+            alt={item.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 34vw"
+            className="object-cover object-center"
+          />
+          {item.overlay ? (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 z-[1] bg-[#1a1a1a]/12"
+            />
+          ) : null}
+        </>
+      ) : null}
+      <h3 className="display relative z-10 text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
         {item.title}
       </h3>
-      <span className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
+      <span className="relative z-10 mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
         Shop now
       </span>
     </Link>
@@ -57,35 +85,55 @@ export default function PromoTrio() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="w-full max-w-none bg-white">
+    <section
+      data-home-two-snap
+      className="relative z-10 mt-3 w-full max-w-none bg-white sm:mt-4 lg:mt-5"
+    >
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
         className={`grid w-full grid-cols-1 bg-white lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] ${GAP} ${VIEW_H}`}
       >
-        {/* Left — large feature panel (no image) */}
+        {/* Left — popular products feature */}
         <motion.div
           variants={fade}
-          className="relative min-h-[50vh] w-full bg-[#f3f3f3] lg:min-h-0 lg:h-full"
+          className="relative min-h-[50vh] w-full overflow-hidden bg-[#f3f3f3] lg:min-h-0 lg:h-full"
         >
+          <Image
+            src={feature.src}
+            alt={feature.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            className="object-cover object-center"
+            priority
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-l from-black/20 via-black/10 to-black/[0.04]"
+          />
           <Link
             href={feature.href}
-            className="group flex h-full flex-col justify-center px-6 py-8 sm:px-8 lg:px-10 xl:px-12"
+            className="group absolute inset-0 z-20 flex flex-col items-end justify-center py-8 pl-6 pr-10 text-right sm:pl-8 sm:pr-14 lg:pl-10 lg:pr-20 xl:pr-24"
           >
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
+            <span className="relative z-20 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
               {feature.eyebrow}
             </span>
-            <h2 className="display mt-3 max-w-[14rem] text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-ink sm:max-w-[16rem] sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
-              {feature.title}
+            <h2 className="display relative z-20 mt-3 text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
+              {feature.titleLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
             </h2>
-            <span className="mt-6 inline-flex h-11 w-fit items-center bg-ink px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 group-hover:bg-brand sm:h-12 sm:px-7 sm:text-[12px]">
-              Shop now
+            <span className="relative z-20 mt-6 inline-flex h-11 w-fit items-center gap-2 bg-white px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-12 sm:px-7 sm:text-[12px]">
+              {feature.cta}
+              <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
             </span>
           </Link>
         </motion.div>
 
-        {/* Right — two stacked panels with the same light gutter */}
+        {/* Right — original layout: mattress top, HomeTex bottom */}
         <motion.div
           variants={fade}
           className={`grid min-h-0 w-full grid-rows-2 ${GAP}`}

@@ -1002,11 +1002,23 @@ svg.app-icon[fill="none"] {
   font-family: var(--font-family) !important;
 }
 
-/* Home Two only — Manrope is loaded + wired in `(karmo-home-two)/layout.tsx`
-   via next/font className and inline --font-family / --font-heading overrides.
-   This class marks the scope; the face itself comes from that layout. */
-.home-two-type {
-  font-family: var(--font-family) !important;
+/* Home Two — division editorials desktop height (right masonry fills this). */
+@media (min-width: 1024px) {
+  .division-editorials {
+    height: var(--division-h, calc(100svh - 32px)) !important;
+    min-height: var(--division-h, calc(100svh - 32px)) !important;
+  }
+
+  .reels-editorials {
+    height: var(--reels-h, calc(100svh - 32px)) !important;
+    min-height: var(--reels-h, calc(100svh - 32px)) !important;
+  }
+}
+
+/* Home Two — explore split bands (paired panels + full-width) match editorials. */
+.explore-band {
+  height: var(--explore-band-h, calc(100svh - 32px)) !important;
+  min-height: var(--explore-band-h, calc(100svh - 32px)) !important;
 }
 
 /* Gallery and film-strip marquees.

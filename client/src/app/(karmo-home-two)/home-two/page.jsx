@@ -2,15 +2,13 @@ import PromoTrio from "@/components/karmo/home-two/PromoTrio";
 import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
 import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Partners from "@/components/karmo/home2/Partners";
-import InstagramShop from "@/components/karmo/home2/InstagramShop";
 import DivisionsStrip from "@/components/karmo/home-two/DivisionsStrip";
-import Reels from "@/components/karmo/Reels";
-import PopularProductsGrid from "@/components/karmo/home2/PopularProductsGrid";
+import Reels from "@/components/karmo/home-two/Reels";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import ExploreSplit from "@/components/karmo/home-two/ExploreSplit";
 import DivisionEditorials from "@/components/karmo/home-two/DivisionEditorials";
 import StandardStrip from "@/components/karmo/home-two/StandardStrip";
-import HeroTwo from "@/components/karmo/home2/HeroTwo";
+import HeroTwo from "@/components/karmo/home-two/HeroTwo";
 
 export const metadata = {
   title: "Home Two — Karmo Group",
@@ -53,17 +51,12 @@ export default function HomeTwoPage() {
 
       {/* <ShoppableScene /> — “Karmo is everywhere”; hidden for now */}
 
-      <FoamPromise filmMode="fixed" />
       <PromoTrio />
+      <FoamPromise filmMode="fixed" />
 
-      <PopularProductsGrid />
       <Reels />
       <Partners />
       <CertifiedBy />
-
-      {/* Instagram feed wall — left copy + masonry shots, before the order and
-          contact close. Links out to @karmogroup. */}
-      <InstagramShop />
 
       <OrderAndContact />
     </>

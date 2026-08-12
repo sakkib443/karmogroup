@@ -25,10 +25,12 @@ export default function HomeTwoFontSwitcher({ children, families, classNames }) 
     }
   }, []);
 
-  const stack = `${families[font]}, "Hind Siliguri", sans-serif`;
+  const heading = `${families[font]}, "Hind Siliguri", sans-serif`;
+  /* Body stays Manrope so descriptions never pick up the display face. */
+  const body = `${families.manrope}, "Hind Siliguri", sans-serif`;
   const style = {
-    "--font-family": stack,
-    "--font-heading": stack,
+    "--font-family": body,
+    "--font-heading": heading,
   };
 
   function onChange(next) {

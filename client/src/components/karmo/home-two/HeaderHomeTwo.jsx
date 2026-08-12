@@ -358,10 +358,10 @@ export default function HeaderHomeTwo() {
           <p className="flex min-w-0 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] sm:gap-3 sm:text-[11px] sm:tracking-[0.12em]">
             <a
               href="tel:+8801713483284"
-              className="flex shrink-0 items-center gap-2 transition-opacity duration-300 hover:opacity-75 sm:gap-2.5"
+              className="flex shrink-0 items-center gap-2 text-[11px] transition-opacity duration-300 hover:opacity-75 sm:gap-2.5 sm:text-[12px]"
             >
               <FiPhone className="shrink-0 text-[13px]" />
-              01713 483 284
+              01713483284
             </a>
 
             <span aria-hidden="true" className="hidden h-3 w-px bg-white/40 sm:block" />
