@@ -183,9 +183,9 @@ export default function Reels() {
       >
         <motion.div
           variants={fade}
-          className="min-w-0 max-w-md self-center lg:max-w-[28rem]"
+          className="min-w-0 max-w-md self-center text-right lg:max-w-[28rem]"
         >
-          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <p className="flex flex-wrap items-baseline justify-end gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
               On film
             </span>
@@ -194,14 +194,14 @@ export default function Reels() {
             </span>
           </p>
 
-          <h2 className="display mt-3 text-[1.75rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
+          <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
             <span className="block whitespace-nowrap">See comfort.</span>
-            <span className="block whitespace-nowrap font-bold text-brand">
+            <span className="block whitespace-nowrap text-brand">
               On screen.
             </span>
           </h2>
 
-          <span className="mt-4 flex items-center gap-3">
+          <span className="mt-4 flex items-center justify-end gap-3">
             <span className="h-px w-10 bg-brand" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
               Watch the craft
@@ -234,7 +234,7 @@ export default function Reels() {
 
           <Link
             href="/media/video-ads"
-            className="group mt-8 inline-flex items-center gap-3"
+            className="group mt-8 inline-flex items-center justify-end gap-3"
           >
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Watch all films
