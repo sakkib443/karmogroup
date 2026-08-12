@@ -1,51 +1,49 @@
+import { Josefin_Sans, Manrope } from "next/font/google";
+
 import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
-import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
+import HeaderHomeTwo from "@/components/karmo/home-two/HeaderHomeTwo";
+import HomeTwoFontSwitcher from "@/components/karmo/home-two/HomeTwoFontSwitcher";
+import HomeTwoSectionSnap from "@/components/karmo/home-two/HomeTwoSectionSnap";
 
 /**
- * The homepage runs on its own chrome.
+ * Live homepage chrome — the Home Two header and offset, promoted to `/`.
  *
- * The three homepage designs share a footer and nothing above it. The other
- * two sit in (karmo) and (karmo-3) under their own bars; this group exists so
- * this design can carry the light three-row retail header instead. A nested
- * layout would not have done it — layouts nest rather than replace, so another
- * design's bar would still have rendered above this one.
- *
- * This group serves `/` as of 5 August 2026, when the client picked this design
- * for the front page; it served `/home-2` before that. Because each design's
- * chrome lives in its own layout, promoting one is a rename of a route segment
- * and nothing else.
- *
- * When the choice is final, the losing groups go.
+ * Manrope / Josefin stay scoped here via the font switcher. Foam, About and
+ * Portfolio in this group inherit the same bar so the storefront reads as one
+ * site.
  */
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const josefin = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
 export default function KarmoTwoLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <HomeTwoFontSwitcher
+      classNames={`${manrope.className} ${josefin.className}`}
+      families={{
+        manrope: manrope.style.fontFamily,
+        josefin: josefin.style.fontFamily,
+      }}
+    >
       <SmoothScroll />
-      <HeaderTwo />
-      {/* Clears the fixed header exactly: 3px brand rule + 32px announcement +
-          74px identity row = 109, plus 68px of navigation and the 1px rule
-          above it from lg up = 178. All of them are fixed heights in HeaderTwo
-          for this reason — if a row grew with its contents, every page would
-          start that far underneath the bar.
-          That 1px was missed when these figures were first written, so the top
-          of every page sat a hair under the bar from lg up; measuring the bar
-          to add the brand rule is what turned it up.
-          The announcement rolls away on scroll but the offset does not follow
-          it; the page would jump under the reader if it did. A hero that wants
-          to sit beneath the bar cancels this itself. */}
-      {/* White ground for the whole page. The storefront's `body` runs on the
-          pale blue --color-background (#F8FAFC), which showed through wherever
-          a section is transparent — most visibly in the gutters beside the
-          trust strip, as a pale band between the hero and the sections under
-          it. Set here rather than on `body` so the other 68 storefront pages
-          keep the background they were built on. */}
-      <main className="min-h-screen overflow-x-hidden bg-white pt-[109px] lg:pt-[178px]">
+      <HomeTwoSectionSnap />
+      <HeaderHomeTwo />
+      {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
+      <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">
         {children}
       </main>
       <Footer />
-    </>
+    </HomeTwoFontSwitcher>
   );
 }

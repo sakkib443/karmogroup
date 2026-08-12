@@ -401,7 +401,7 @@ export default function HeaderHomeTwo() {
 
       {/* ── 2 · Menu bar ─────────────────────────────────────────────── */}
       <div className="shell-home-two flex h-[80px] items-center gap-4">
-        <Link href="/home-two" aria-label="Karmo Group, home" className="shrink-0">
+        <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
           <Logo
             src="/karmo/logo-ink.png"
             className="h-7 w-auto max-w-[min(50vw,13rem)] sm:h-8 sm:max-w-none"
