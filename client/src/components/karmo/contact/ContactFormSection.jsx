@@ -14,7 +14,7 @@ import LeafRule from "@/components/karmo/about/LeafRule";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 const inputCls =
-  "w-full rounded-none border border-ink/15 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(230,0,0,0.08)]";
+  "w-full rounded-none border border-ink/15 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(212,67,72,0.08)]";
 
 const labelCls =
   "mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.1em] text-ink/55";

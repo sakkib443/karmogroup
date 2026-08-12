@@ -967,8 +967,8 @@ svg.app-icon[fill="none"] {
    two off-whites that step between the white sections. Only --color-brand
    overlaps, and it is set to the same red BRAND_PRIMARY carries. */
 @theme {
-  --color-brand: #e60000;
-  --color-brand-dark: #cc0000;
+  --color-brand: #D44348;
+  --color-brand-dark: #AE373B;
   --color-ink: #222222;
   --color-cream: #f5f5f5;
   --color-sand: #e4e4e4;
@@ -999,6 +999,13 @@ svg.app-icon[fill="none"] {
 }
 
 .body-copy {
+  font-family: var(--font-family) !important;
+}
+
+/* Home Two only — Manrope is loaded + wired in `(karmo-home-two)/layout.tsx`
+   via next/font className and inline --font-family / --font-heading overrides.
+   This class marks the scope; the face itself comes from that layout. */
+.home-two-type {
   font-family: var(--font-family) !important;
 }
 
@@ -1132,6 +1139,21 @@ svg.app-icon[fill="none"] {
 
   @media (width >= 64rem) {
     .shell { padding-inline: 5rem; }
+  }
+
+  /* Home Two chrome — a touch wider than the live homepage `.shell`. */
+  .shell-home-two {
+    margin-inline: auto;
+    max-width: 1760px;
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .shell-home-two { padding-inline: 3rem; }
+  }
+
+  @media (width >= 64rem) {
+    .shell-home-two { padding-inline: 4rem; }
   }
 
   /* Hero wash. Two gradients stack and their opacities compound, so each

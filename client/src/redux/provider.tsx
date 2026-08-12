@@ -38,7 +38,29 @@ const restoreSession = async () => {
         const res = await fetch(`${API_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
         });
-        if (!res.ok) throw new Error('session expired');
+
+        // Only the server saying "this token is no good" ends a session.
+        //
+        // This used to treat every failed response the same way and delete the
+        // token — the old comment said "unreachable" out loud. So a backend
+        // restart, a dropped wifi packet, a 502 from the proxy or a slow cold
+        // start on the exact page load that ran this was enough to sign an
+        // admin out for good, mid-session, with nothing wrong with their
+        // credentials. That is the "logs out by itself after a while" the
+        // client reported.
+        //
+        // 401/403 is the only answer that means the credential is dead.
+        // Anything else is the server's problem, not the session's: keep the
+        // token and let the next call try again.
+        if (res.status === 401 || res.status === 403) {
+            window.localStorage.removeItem('token');
+            store.dispatch(logout());
+            return;
+        }
+        if (!res.ok) {
+            store.dispatch(sessionRestoreFinished());
+            return;
+        }
 
         const json = await res.json();
         const u = json?.data;
@@ -56,10 +78,12 @@ const restoreSession = async () => {
             token,
         }));
     } catch {
-        // Expired / revoked / unreachable — drop the dead token so the user gets
-        // a clean login rather than a half-signed-in state.
-        window.localStorage.removeItem('token');
-        store.dispatch(logout());
+        // Reached only when the request never got an answer — offline, DNS,
+        // CORS, a connection refused because the API was mid-restart — or when
+        // the body came back malformed. None of those say anything about the
+        // token, so it stays. The rejection above is the only path that clears
+        // it, and it needs the server to have actually said 401 or 403.
+        store.dispatch(sessionRestoreFinished());
     }
 };
 

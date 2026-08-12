@@ -20,7 +20,7 @@
 /* ─────────────── COLOUR ─────────────── */
 
 /** ⬇⬇⬇  THE ONE COLOUR VARIABLE  ⬇⬇⬇ */
-export const BRAND_PRIMARY = '#e60000';
+export const BRAND_PRIMARY = '#D44348';
 
 /** Accent used alongside the primary (defaults to the primary itself). */
 export const BRAND_SECONDARY = BRAND_PRIMARY;

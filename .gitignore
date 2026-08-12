@@ -36,14 +36,14 @@ Foam Catalogue .ai
 # converted into client/public/karmo/images/ under a name that says what it
 # is, and the master is filed under recource/originals/ (also ignored). What
 # is left here is a staging area, 3-7 MB a file, and belongs in neither.
-/magnific_*
-/[0-9]*.png
-/[0-9]*.jpg
-/[0-9]*.jpeg
-/ChatGPT Image *
-/logos company.jpg
-/Foam-web-page-*
-/601482029_*
+# Any loose image at the repo root, whatever it is called — the named patterns
+# this replaced kept missing new ones (BG1.jpg, a stock filename in Cyrillic
+# transliteration). Nothing is meant to live here: site assets go under
+# client/public/karmo/images/ and masters under recource/originals/.
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
 
 # Installers and other binaries that land in the working folder by accident.
 *.exe
