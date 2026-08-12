@@ -4,6 +4,7 @@ import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Partners from "@/components/karmo/home2/Partners";
 import DivisionsStrip from "@/components/karmo/home-two/DivisionsStrip";
 import Reels from "@/components/karmo/home-two/Reels";
+import LivingLookbook from "@/components/karmo/home-two/LivingLookbook";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import ExploreSplit from "@/components/karmo/home-two/ExploreSplit";
 import DivisionEditorials from "@/components/karmo/home-two/DivisionEditorials";
@@ -36,6 +37,7 @@ export default function HomePage() {
       <FoamPromise filmMode="fixed" />
 
       <Reels />
+      <LivingLookbook />
       <Partners />
       <CertifiedBy />
 
