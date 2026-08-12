@@ -4,6 +4,7 @@ import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 import HeaderHomeTwo from "@/components/karmo/home-two/HeaderHomeTwo";
 import HomeTwoFontSwitcher from "@/components/karmo/home-two/HomeTwoFontSwitcher";
+import HomeTwoSectionSnap from "@/components/karmo/home-two/HomeTwoSectionSnap";
 
 /**
  * Home Two faces — Manrope (default) and Josefin Sans.
@@ -47,6 +48,7 @@ export default function KarmoHomeTwoLayout({
       }}
     >
       <SmoothScroll />
+      <HomeTwoSectionSnap />
       <HeaderHomeTwo />
       {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
       <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">

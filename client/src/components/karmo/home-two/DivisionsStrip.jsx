@@ -71,7 +71,7 @@ function DivisionCard({ division }) {
   return (
     <motion.div variants={fade} className="min-w-0">
       <Link href={division.href} className="group block">
-        <div className="relative aspect-[4/5] overflow-hidden">
+        <div className="relative aspect-[1/1] overflow-hidden">
           <Image
             src={division.image}
             alt={division.alt}
@@ -97,7 +97,7 @@ export default function DivisionsStrip() {
     // Centred heading, then a full-width row of four cards — the client's
     // second reference (a furniture catalogue's product row), which they
     // preferred to the asymmetric left-copy / right-grid arrangement.
-    <section className="bg-white py-14 md:py-20 lg:py-24">
+    <section className="bg-white pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12">
       <motion.div
         variants={group}
         {...reveal}
@@ -140,7 +140,7 @@ export default function DivisionsStrip() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-6 grid grid-cols-2 gap-2 px-2 md:mt-8 md:gap-2.5 md:px-2.5 lg:grid-cols-4"
+        className="mt-3 grid grid-cols-2 gap-2 px-2 md:mt-3.5 md:gap-2.5 md:px-2.5 lg:grid-cols-4"
       >
         {divisions.map((division) => (
           <DivisionCard key={division.name} division={division} />

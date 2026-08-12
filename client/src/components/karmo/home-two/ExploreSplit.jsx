@@ -14,9 +14,10 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * White gutters between all three, matching the reference grid.
  */
 
-const GAP = "gap-2 md:gap-2.5";
-/* Viewport below the fixed Home Two header (32 + 80 = 112). */
-const VIEW_H = "h-[calc(100svh-112px)] min-h-[calc(100svh-112px)]";
+const GAP = "gap-1 md:gap-1.5";
+/* Same desktop height as DivisionEditorials (Iconic brands band). */
+const BAND_H = "calc(100svh - 32px)";
+const VIEW_H = "h-[calc(100svh-32px)] min-h-[calc(100svh-32px)]";
 
 const panels = [
   {
@@ -63,8 +64,10 @@ function Panel({ panel }) {
         className="pointer-events-none absolute inset-0 bg-shade-deep/35"
       />
       <div
-        className={`relative z-[1] flex h-full flex-col justify-start pt-10 sm:pt-12 lg:pt-14 xl:pt-16 p-7 sm:p-9 lg:p-11 xl:p-12 ${
-          isRight ? "items-end text-right" : "items-start text-left"
+        className={`relative z-[1] flex h-full flex-col justify-start pt-16 sm:pt-20 lg:pt-24 xl:pt-28 p-7 sm:p-9 lg:p-11 xl:p-12 ${
+          isRight
+            ? "items-end pr-10 text-right sm:pr-14 lg:pr-16 xl:pr-20"
+            : "items-start text-left"
         }`}
       >
         <h2 className="display text-[1.45rem] font-bold uppercase leading-[1.2] tracking-[0.02em] text-white sm:text-[1.65rem] lg:text-[1.85rem] xl:text-[2rem]">
@@ -84,16 +87,17 @@ export default function ExploreSplit() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white">
+    <section data-home-two-snap className="bg-white">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
         className={`grid bg-white ${GAP}`}
+        style={{ ["--explore-band-h"]: BAND_H }}
       >
         {/* Top row — two equal panels with a light white gutter between them */}
         <div
-          className={`grid grid-cols-1 grid-rows-2 bg-white md:grid-cols-2 md:grid-rows-1 ${GAP} ${VIEW_H}`}
+          className={`explore-band grid grid-cols-1 grid-rows-2 bg-white md:grid-cols-2 md:grid-rows-1 ${GAP} ${VIEW_H}`}
         >
           {panels.map((panel) => (
             <motion.div key={panel.id} variants={fade} className="min-h-0 min-w-0 h-full">
@@ -102,10 +106,10 @@ export default function ExploreSplit() {
           ))}
         </div>
 
-        {/* Bottom — full-width flagship, same under-header height */}
+        {/* Bottom — full-width flagship, same height as the row above */}
         <motion.div
           variants={fade}
-          className={`relative overflow-hidden bg-[#d8d8d8] ${VIEW_H}`}
+          className={`explore-band relative overflow-hidden bg-[#d8d8d8] ${VIEW_H}`}
         >
           <Image
             src="/karmo/images/home-02/banners/magnific-3zzTfKCREY.png"

@@ -17,8 +17,10 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 
 const ORANGE = "#FF9A1F";
-/* Viewport under the fixed Home Two header (32 + 80). */
-const VIEW_H = "lg:h-[calc(100svh-112px)] lg:min-h-[calc(100svh-112px)]";
+/* Desktop band height — set as an inline style too so the masonry
+   cannot miss a Tailwind rebuild / stale class. ~80px taller than the
+   original calc(100svh-112px). */
+const DESKTOP_H = "calc(100svh - 32px)";
 
 const columns = [
   [
@@ -118,7 +120,14 @@ export default function DivisionEditorials() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className={`overflow-x-clip bg-white py-14 lg:py-0 ${VIEW_H}`}>
+    <section
+      data-home-two-snap
+      className="division-editorials overflow-x-clip bg-white py-14 lg:mt-4 lg:overflow-visible lg:py-0"
+      style={{
+        // Inline so desktop height always applies even if a utility class is stale.
+        ["--division-h"]: DESKTOP_H,
+      }}
+    >
       {/*
         Left aligns with .shell; right meets the screen edge with a light pad.
         Height locks to the viewport under the header on lg+.
@@ -127,7 +136,7 @@ export default function DivisionEditorials() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className={`grid items-center gap-10 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-3 xl:gap-10 xl:pr-4 ${VIEW_H}`}
+        className="grid items-center gap-10 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-3 xl:gap-10 xl:pr-4"
       >
         <motion.div
           variants={fade}
@@ -142,9 +151,9 @@ export default function DivisionEditorials() {
             </span>
           </p>
 
-          <h2 className="display mt-3 text-[1.75rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
+          <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
             <span className="block whitespace-nowrap">Iconic brands.</span>
-            <span className="block whitespace-nowrap font-bold text-brand">
+            <span className="block whitespace-nowrap text-brand">
               Lasting craft.
             </span>
           </h2>
@@ -187,7 +196,7 @@ export default function DivisionEditorials() {
           </Link>
         </motion.div>
 
-        <div className="grid min-h-0 w-full min-w-0 grid-cols-2 gap-0 md:grid-cols-3 lg:h-full lg:py-6">
+        <div className="grid min-h-0 w-full min-w-0 grid-cols-2 gap-0 md:grid-cols-3 lg:h-full">
           {columns.map((col, i) => (
             <div
               key={`div-col-${i}`}
