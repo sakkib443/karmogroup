@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
@@ -13,6 +12,7 @@ import {
   FiUser,
   FiShoppingBag,
   FiChevronDown,
+  FiChevronRight,
   FiArrowRight,
   FiArrowUpRight,
   FiMenu,
@@ -30,7 +30,34 @@ import {
   TbFeather,
   TbFlask,
   TbGridDots,
+  TbBox,
+  TbRecycle,
+  TbShape,
+  TbWaveSine,
+  TbStack,
+  TbShoe,
+  TbCar,
+  TbCloud,
+  TbSquareRounded,
+  TbDiamond,
+  TbBedFlat,
+  TbLayoutGrid,
+  TbDroplet,
+  TbTestPipe,
+  TbAtom,
+  TbInfoCircle,
+  TbPhone,
+  TbBriefcase,
+  TbMapPin,
 } from "react-icons/tb";
+import {
+  MattressFirmIcon,
+  MattressMediumIcon,
+  MattressSoftIcon,
+  BedSingleIcon,
+  BedDoubleIcon,
+  BedTripleIcon,
+} from "@/components/karmo/icons/MattressMenuIcons";
 
 /**
  * The Home 02 header — a light, three-row retail bar, built to the reference
@@ -87,17 +114,12 @@ import {
  * entry and the basket count, so it marks the three things worth marking.
  */
 
-/* Right-panel photos match the homepage Divisions strip (third section),
-   so hovering Foam / Mattress / HomeTex / Chemicals shows the same four
-   images the page already uses below. */
 const nav = [
   {
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
     icon: TbArmchair,
-    image: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
-    alt: "A Karmo Foam sofa with lavender cushions and stacked foam blocks in a studio setting",
     /* The eight foam categories, read off the client's own "Foam Catalogue"
        artwork rather than invented — pages 5 to 23 of it, one entry per
        product type it gives a spread to.
@@ -120,14 +142,14 @@ const nav = [
        They are written as the real slugs rather than pointed at `/foam` so
        that building the pages is all that is left to do. */
     submenu: [
-      { name: "Set / Block Foam", href: "/foam/set-foam" },
-      { name: "Rebonded Foam", href: "/foam/rebonded" },
-      { name: "Contour Design Foam", href: "/foam/contour-design" },
-      { name: "Acoustic Foam", href: "/foam/acoustic" },
-      { name: "Peeling Roll Foam", href: "/foam/peeling-roll" },
-      { name: "Footwear / Load Bearing", href: "/foam/footwear" },
-      { name: "Bed & Automotive", href: "/foam/bed-automotive" },
-      { name: "Memory Foam", href: "/foam/memory-foam" },
+      { name: "Set / Block Foam", href: "/foam/set-foam", icon: TbBox },
+      { name: "Rebonded Foam", href: "/foam/rebonded", icon: TbRecycle },
+      { name: "Contour Design Foam", href: "/foam/contour-design", icon: TbShape },
+      { name: "Acoustic Foam", href: "/foam/acoustic", icon: TbWaveSine },
+      { name: "Peeling Roll Foam", href: "/foam/peeling-roll", icon: TbStack },
+      { name: "Footwear / Load Bearing", href: "/foam/footwear", icon: TbShoe },
+      { name: "Bed & Automotive", href: "/foam/bed-automotive", icon: TbCar },
+      { name: "Memory Foam", href: "/foam/memory-foam", icon: TbCloud },
     ],
   },
   {
@@ -135,21 +157,53 @@ const nav = [
     line: "Pocket spring, euro top",
     href: "/mattress",
     icon: TbBed,
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
-    alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
+    /* Three ways into the same range at once, the shape of the "Shop By"
+       reference the client sent for this exact division — not a single list
+       like Foam/HomeTex/Chemicals, so it renders through `columns`, not
+       `submenu`. Coir and Latex are the client's own reference items; Karmo's
+       confirmed line is foam and spring (see CLIENT-FEEDBACK.md's open
+       questions) — swap or drop what does not actually exist once confirmed. */
+    columns: [
+      {
+        label: "Comfort",
+        items: [
+          { name: "Firm Mattress", href: "/mattress/firm", icon: MattressFirmIcon },
+          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: MattressMediumIcon },
+          { name: "Soft Mattress", href: "/mattress/soft", icon: MattressSoftIcon },
+        ],
+      },
+      {
+        /* The bed with the sleepers in it, not one or the other — a bed glyph
+           alone is the same rectangle at every size, and a row of figures
+           alone loses the bed. Drawn locally; see `BedSizeIcons`. */
+        label: "Size",
+        items: [
+          { name: "Single", href: "/mattress/size/single", icon: BedSingleIcon },
+          { name: "Queen", href: "/mattress/size/queen", icon: BedDoubleIcon },
+          { name: "King", href: "/mattress/size/king", icon: BedTripleIcon },
+        ],
+      },
+      {
+        label: "Type",
+        items: [
+          { name: "Foam Mattress", href: "/mattress/foam" },
+          { name: "Rubberised Coir Mattress", href: "/mattress/rubberised-coir" },
+          { name: "Spring Mattress", href: "/mattress/spring" },
+          { name: "Latex Mattress", href: "/mattress/latex" },
+        ],
+      },
+    ],
   },
   {
     name: "HomeTex",
     line: "Bed sheets, comforters",
     href: "/hometex",
     icon: TbFeather,
-    image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
-    alt: "Karmo HomeTex bedding in a styled bedroom",
     submenu: [
-      { name: "Pillow", href: "/hometex/pillow" },
-      { name: "Cushion", href: "/hometex/cushion" },
-      { name: "Bed Sheet", href: "/hometex/bed-sheet" },
-      { name: "Comforter", href: "/hometex/comforter" },
+      { name: "Pillow", href: "/hometex/pillow", icon: TbSquareRounded },
+      { name: "Cushion", href: "/hometex/cushion", icon: TbDiamond },
+      { name: "Bed Sheet", href: "/hometex/bed-sheet", icon: TbBedFlat },
+      { name: "Comforter", href: "/hometex/comforter", icon: TbLayoutGrid },
     ],
   },
   {
@@ -157,12 +211,10 @@ const nav = [
     line: "Adhesives, polymers",
     href: "/chemicals",
     icon: TbFlask,
-    image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
-    alt: "Karmo Adhesive tins in a showroom setting",
     submenu: [
-      { name: "Karmo Adhesive", href: "/chemicals/adhesive" },
-      { name: "Evergain Chemical", href: "/chemicals/evergain" },
-      { name: "Sodium Silicate", href: "/chemicals/sodium-silicate" },
+      { name: "Karmo Adhesive", href: "/chemicals/adhesive", icon: TbDroplet },
+      { name: "Evergain Chemical", href: "/chemicals/evergain", icon: TbTestPipe },
+      { name: "Sodium Silicate", href: "/chemicals/sodium-silicate", icon: TbAtom },
     ],
   },
   {
@@ -175,13 +227,11 @@ const nav = [
     line: "About, contact & more",
     href: "/about",
     icon: TbGridDots,
-    image: "/karmo/images/products/whykarmo-family.jpg",
-    alt: "A family at home with Karmo furniture and bedding",
     submenu: [
-      { name: "About Karmo", href: "/about" },
-      { name: "Contact Us", href: "/contact" },
-      { name: "Portfolio", href: "/portfolio" },
-      { name: "Find a Store", href: "/find-store" },
+      { name: "About Karmo", href: "/about", icon: TbInfoCircle },
+      { name: "Contact Us", href: "/contact", icon: TbPhone },
+      { name: "Portfolio", href: "/portfolio", icon: TbBriefcase },
+      { name: "Find a Store", href: "/find-store", icon: TbMapPin },
     ],
   },
 ];
@@ -233,7 +283,7 @@ function Tool({ icon: Icon, label, href, count }) {
  * and the sub-line is the part a reader who has already scrolled past the top
  * of the page no longer needs.
  */
-function DivisionNav({ compact, panel, openPanel, leaveMenuZone }) {
+function DivisionNav({ compact, panel, openPanel, leaveMenuZone, dismissPanel }) {
   return (
     <nav
       aria-label="Divisions"
@@ -241,7 +291,7 @@ function DivisionNav({ compact, panel, openPanel, leaveMenuZone }) {
       onMouseLeave={leaveMenuZone}
     >
       <ul className="flex items-center">
-        {nav.map((entry) => (
+        {nav.map((entry, index) => (
           <li key={entry.name} className="relative">
             <Link
               href={entry.href}
@@ -270,7 +320,7 @@ function DivisionNav({ compact, panel, openPanel, leaveMenuZone }) {
                   </span>
                 )}
               </span>
-              {entry.submenu && (
+              {(entry.submenu || entry.columns) && (
                 <FiChevronDown
                   className={`text-[13px] text-ink/40 transition-transform duration-300 ${
                     panel === entry.name ? "rotate-180" : ""
@@ -278,6 +328,124 @@ function DivisionNav({ compact, panel, openPanel, leaveMenuZone }) {
                 />
               )}
             </Link>
+
+            {/* Shop-By-style card: heading, then the sub-ranges as a plain
+                list — an icon, a name, a chevron, a hairline between rows.
+                Anchored to this `<li>` rather than spanning the header, so
+                it is only ever as wide as the list actually needs. The last
+                entry anchors its card to the right edge instead of the
+                left, or it would run off the side of the window. */}
+            {entry.submenu && (
+              <div
+                data-mega-menu
+                onMouseEnter={() => openPanel(entry.name)}
+                onMouseLeave={leaveMenuZone}
+                className={`absolute top-full z-[1100] hidden w-[21rem] bg-[#f7f7f7] shadow-[0_24px_50px_-18px_rgba(0,0,0,0.25)] transition-all duration-300 lg:block ${
+                  index === nav.length - 1 ? "right-0" : "left-0"
+                } ${
+                  panel === entry.name
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="border-b border-ink/10 px-6 pb-4 pt-6">
+                  <span className="text-[13px] text-ink/55">Shop By </span>
+                  <span className="display text-[20px] font-bold text-ink">
+                    {entry.name}
+                  </span>
+                </div>
+
+                <ul>
+                  {entry.submenu.map((sub, subIndex) => (
+                    <li
+                      key={sub.href}
+                      className={
+                        subIndex < entry.submenu.length - 1
+                          ? "border-b border-ink/10"
+                          : ""
+                      }
+                    >
+                      <Link
+                        href={sub.href}
+                        onClick={dismissPanel}
+                        className="group flex items-center justify-between gap-3 px-6 py-3.5 transition-colors duration-200 hover:bg-white"
+                      >
+                        <span className="flex items-center gap-3">
+                          <sub.icon className="shrink-0 text-[19px] text-ink/60" />
+                          <span className="text-[13.5px] font-medium text-ink">
+                            {sub.name}
+                          </span>
+                        </span>
+                        <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* The wide card: Mattress alone, three ways to shop it side by
+                side rather than one list — the shape of the client's own
+                "Shop By Comfort / Size / Type" reference. Icons on Comfort
+                and Size, none on Type, matching that reference exactly. */}
+            {entry.columns && (
+              <div
+                data-mega-menu
+                onMouseEnter={() => openPanel(entry.name)}
+                onMouseLeave={leaveMenuZone}
+                className={`absolute left-0 top-full z-[1100] hidden w-[54rem] bg-[#f7f7f7] shadow-[0_24px_50px_-18px_rgba(0,0,0,0.25)] transition-all duration-300 lg:block ${
+                  panel === entry.name
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="grid grid-cols-3 divide-x divide-ink/10 px-8 py-7">
+                  {entry.columns.map((col) => (
+                    <div key={col.label} className="px-6 first:pl-0 last:pr-0">
+                      <div className="border-b border-ink/10 pb-3">
+                        <span className="text-[13px] text-ink/55">Shop By </span>
+                        <span className="display text-[18px] font-bold text-ink">
+                          {col.label}
+                        </span>
+                      </div>
+
+                      <ul>
+                        {col.items.map((item, itemIndex) => (
+                          <li
+                            key={item.href}
+                            className={
+                              itemIndex < col.items.length - 1
+                                ? "border-b border-ink/10"
+                                : ""
+                            }
+                          >
+                            <Link
+                              href={item.href}
+                              onClick={dismissPanel}
+                              className="group flex items-center justify-between gap-3 py-3.5 transition-colors duration-200 hover:text-brand"
+                            >
+                              <span className="flex items-center gap-3.5">
+                                {/* Bigger than the single-column cards' 19px:
+                                    these are drawings with a headboard, pillows
+                                    and a valance in them, and at 19px that
+                                    detail closes up into a smudge. */}
+                                {item.icon && (
+                                  <item.icon className="shrink-0 text-[30px] text-ink/60" />
+                                )}
+                                <span className="text-[13.5px] font-medium text-ink">
+                                  {item.name}
+                                </span>
+                              </span>
+                              <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -391,11 +559,14 @@ export default function HeaderTwo() {
     return () => window.removeEventListener("resize", sync);
   }, [scrolled]);
 
-  // What opens on hover is now Home 03's panel, not Home 02's old list: a
-  // photograph on the right, the sub-ranges as a two-column list beside it,
-  // rather than a column of words hanging off the link. The bar above it —
-  // logo, search, the three account icons, the division row itself — is
-  // untouched; only what drops below a division with a submenu changed.
+  // What opens on hover used to be a full-width panel — a photograph on the
+  // right, the sub-ranges as a two-column list beside it, hanging the width
+  // of the browser off one link. The client's own words on it: "Menu has to
+  // be better, i dont like this theme." It is now a compact card anchored to
+  // the division itself, the shape of the "Shop By" reference they sent —
+  // small heading, then the sub-ranges as a plain list with an icon and a
+  // chevron each, nothing spanning the page. See the card inside
+  // `DivisionNav`, not here; there is no longer a header-wide panel to hold.
   //
   // Open/close: hover keeps the panel while the pointer is on the division
   // row or the panel itself (`data-mega-menu`). Leaving that zone starts a
@@ -452,12 +623,6 @@ export default function HeaderTwo() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [panel]);
-
-  // Open for any division that has a photo panel — submenu optional
-  // (Mattress has the Divisions image but no sub-ranges yet).
-  const openEntry = nav.find(
-    (entry) => entry.name === panel && (entry.submenu || entry.image)
-  );
 
   return (
     <header
@@ -649,6 +814,7 @@ export default function HeaderTwo() {
                 panel={panel}
                 openPanel={openPanel}
                 leaveMenuZone={leaveMenuZone}
+                dismissPanel={dismissPanel}
               />
               <FindStoreButton />
             </div>
@@ -703,6 +869,7 @@ export default function HeaderTwo() {
                 panel={panel}
                 openPanel={openPanel}
                 leaveMenuZone={leaveMenuZone}
+                dismissPanel={dismissPanel}
               />
             </div>
 
@@ -735,73 +902,6 @@ export default function HeaderTwo() {
           </div>
         </div>
       </div>
-
-      {/* ── Division panel ───────────────────────────────────────────── */}
-      {/* Home 03's shape exactly: description and "the whole division" on the
-          left, the sub-ranges in two columns, the division's own photograph
-          on the right so the panel shows the range instead of just naming it.
-          Hangs below the bar full width rather than off one link, which is
-          why it lives here instead of inside the `<li>`. */}
-      {openEntry && (
-        <div
-          data-mega-menu
-          onMouseEnter={() => openPanel(openEntry.name)}
-          onMouseLeave={leaveMenuZone}
-          className="absolute inset-x-0 top-full hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.35)] lg:block"
-        >
-          <div className="shell grid grid-cols-12 gap-10 py-9">
-            <div className="col-span-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-brand">
-                {openEntry.name}
-              </span>
-              <p className="body-copy mt-3 text-[13.5px] leading-[1.75] text-ink/55">
-                {openEntry.line}
-              </p>
-              <Link
-                href={openEntry.href}
-                onClick={dismissPanel}
-                className="group mt-6 inline-flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink"
-              >
-                The whole division
-                <FiArrowUpRight className="text-brand transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Link>
-            </div>
-
-            <ul className="col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
-              {(openEntry.submenu ?? []).map((sub) => (
-                <li key={sub.href}>
-                  <Link
-                    href={sub.href}
-                    onClick={dismissPanel}
-                    className="group flex items-center justify-between gap-4 border-b border-ink/8 py-3 text-[13.5px] text-ink/75 transition-colors duration-200 hover:text-ink"
-                  >
-                    {sub.name}
-                    <FiArrowRight className="shrink-0 text-[13px] text-ink/0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              href={openEntry.href}
-              onClick={dismissPanel}
-              className="group relative col-span-4 aspect-[16/10] overflow-hidden"
-            >
-              <Image
-                src={openEntry.image}
-                alt={openEntry.alt}
-                fill
-                sizes="33vw"
-                className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-              />
-              <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-shade-deep/80 to-transparent" />
-              <span className="display absolute bottom-5 left-5 text-[1.15rem] font-bold tracking-[-0.02em] text-white">
-                {openEntry.name}
-              </span>
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* ── Drawer — phone + tablet until compact scrolled nav fits ─── */}
       {open ? (

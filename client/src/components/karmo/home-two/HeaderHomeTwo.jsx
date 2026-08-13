@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
@@ -13,7 +12,7 @@ import {
   FiUser,
   FiShoppingBag,
   FiChevronDown,
-  FiArrowRight,
+  FiChevronRight,
   FiArrowUpRight,
   FiGrid,
   FiMenu,
@@ -25,6 +24,31 @@ import {
   FaLinkedinIn,
   FaYoutube,
 } from "react-icons/fa";
+import {
+  TbBox,
+  TbRecycle,
+  TbShape,
+  TbWaveSine,
+  TbStack,
+  TbShoe,
+  TbCar,
+  TbCloud,
+  TbSquareRounded,
+  TbDiamond,
+  TbBedFlat,
+  TbLayoutGrid,
+  TbDroplet,
+  TbTestPipe,
+  TbAtom,
+} from "react-icons/tb";
+import {
+  MattressFirmIcon,
+  MattressMediumIcon,
+  MattressSoftIcon,
+  BedSingleIcon,
+  BedDoubleIcon,
+  BedTripleIcon,
+} from "@/components/karmo/icons/MattressMenuIcons";
 
 /**
  * The Home Two header — two layers, not three.
@@ -72,62 +96,87 @@ import {
  * can simply name the two people actually look for. Portfolio keeps its place
  * in the drawer and the footer.
  *
- * Right-panel photos match the homepage Divisions strip, so hovering
- * Foam / Mattress / HomeTex / Chemicals shows the same four images the page
- * already uses below. About and Contact are plain links with no panel — they
- * are one page each, and a mega panel holding a single link is a worse way to
- * reach it than the link itself.
+ * What opens under Foam / HomeTex / Chemicals is a compact card, not a photo
+ * panel — the shape of the "Shop By" reference the client sent instead of the
+ * full-width mega menu they said they did not like. Mattress, About and
+ * Contact are plain links with no submenu: one page each, nothing to list.
  */
 const nav = [
   {
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
-    image: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
-    alt: "A Karmo Foam sofa with lavender cushions and stacked foam blocks in a studio setting",
     submenu: [
-      { name: "Set / Block Foam", href: "/foam/set-foam" },
-      { name: "Rebonded Foam", href: "/foam/rebonded" },
-      { name: "Contour Design Foam", href: "/foam/contour-design" },
-      { name: "Acoustic Foam", href: "/foam/acoustic" },
-      { name: "Peeling Roll Foam", href: "/foam/peeling-roll" },
-      { name: "Footwear / Load Bearing", href: "/foam/footwear" },
-      { name: "Bed & Automotive", href: "/foam/bed-automotive" },
-      { name: "Memory Foam", href: "/foam/memory-foam" },
+      { name: "Set / Block Foam", href: "/foam/set-foam", icon: TbBox },
+      { name: "Rebonded Foam", href: "/foam/rebonded", icon: TbRecycle },
+      { name: "Contour Design Foam", href: "/foam/contour-design", icon: TbShape },
+      { name: "Acoustic Foam", href: "/foam/acoustic", icon: TbWaveSine },
+      { name: "Peeling Roll Foam", href: "/foam/peeling-roll", icon: TbStack },
+      { name: "Footwear / Load Bearing", href: "/foam/footwear", icon: TbShoe },
+      { name: "Bed & Automotive", href: "/foam/bed-automotive", icon: TbCar },
+      { name: "Memory Foam", href: "/foam/memory-foam", icon: TbCloud },
     ],
   },
   {
     name: "Mattress",
     line: "Pocket spring, euro top",
     href: "/mattress",
-    /* `.png`, which is what is actually on disk. Home One's copy of this list
-       asks for `.jpg` and 404s in its mega-menu; do not copy that back. */
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.png",
-    alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
+    /* Three ways into the same range at once, the shape of the "Shop By"
+       reference the client sent for this exact division — not a single list
+       like Foam/HomeTex/Chemicals, so it renders through `columns`, not
+       `submenu`. Coir and Latex are the client's own reference items; Karmo's
+       confirmed line is foam and spring (see CLIENT-FEEDBACK.md's open
+       questions) — swap or drop what does not actually exist once confirmed. */
+    columns: [
+      {
+        label: "Comfort",
+        items: [
+          { name: "Firm Mattress", href: "/mattress/firm", icon: MattressFirmIcon },
+          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: MattressMediumIcon },
+          { name: "Soft Mattress", href: "/mattress/soft", icon: MattressSoftIcon },
+        ],
+      },
+      {
+        /* The bed with the sleepers in it, not one or the other — a bed glyph
+           alone is the same rectangle at every size, and a row of figures
+           alone loses the bed. Drawn locally; see `BedSizeIcons`. */
+        label: "Size",
+        items: [
+          { name: "Single", href: "/mattress/size/single", icon: BedSingleIcon },
+          { name: "Queen", href: "/mattress/size/queen", icon: BedDoubleIcon },
+          { name: "King", href: "/mattress/size/king", icon: BedTripleIcon },
+        ],
+      },
+      {
+        label: "Type",
+        items: [
+          { name: "Foam Mattress", href: "/mattress/foam" },
+          { name: "Rubberised Coir Mattress", href: "/mattress/rubberised-coir" },
+          { name: "Spring Mattress", href: "/mattress/spring" },
+          { name: "Latex Mattress", href: "/mattress/latex" },
+        ],
+      },
+    ],
   },
   {
     name: "HomeTex",
     line: "Bed sheets, comforters",
     href: "/hometex",
-    image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
-    alt: "Karmo HomeTex bedding in a styled bedroom",
     submenu: [
-      { name: "Pillow", href: "/hometex/pillow" },
-      { name: "Cushion", href: "/hometex/cushion" },
-      { name: "Bed Sheet", href: "/hometex/bed-sheet" },
-      { name: "Comforter", href: "/hometex/comforter" },
+      { name: "Pillow", href: "/hometex/pillow", icon: TbSquareRounded },
+      { name: "Cushion", href: "/hometex/cushion", icon: TbDiamond },
+      { name: "Bed Sheet", href: "/hometex/bed-sheet", icon: TbBedFlat },
+      { name: "Comforter", href: "/hometex/comforter", icon: TbLayoutGrid },
     ],
   },
   {
     name: "Chemicals",
     line: "Adhesives, polymers",
     href: "/chemicals",
-    image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
-    alt: "Karmo Adhesive tins in a showroom setting",
     submenu: [
-      { name: "Karmo Adhesive", href: "/chemicals/adhesive" },
-      { name: "Evergain Chemical", href: "/chemicals/evergain" },
-      { name: "Sodium Silicate", href: "/chemicals/sodium-silicate" },
+      { name: "Karmo Adhesive", href: "/chemicals/adhesive", icon: TbDroplet },
+      { name: "Evergain Chemical", href: "/chemicals/evergain", icon: TbTestPipe },
+      { name: "Sodium Silicate", href: "/chemicals/sodium-silicate", icon: TbAtom },
     ],
   },
   { name: "About", line: "The group since 1965", href: "/about" },
@@ -180,12 +229,12 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
 }
 
 /** The division menu that sits in the middle of the bar. */
-function DivisionNav({ panel, openPanel, leaveMenuZone }) {
+function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
   return (
     <nav aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
       <ul className="flex items-center">
-        {nav.map((entry) => (
-          <li key={entry.name}>
+        {nav.map((entry, index) => (
+          <li key={entry.name} className="relative">
             <Link
               href={entry.href}
               onMouseEnter={() => openPanel(entry.name)}
@@ -195,7 +244,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone }) {
               <span className="display block text-[13px] font-bold uppercase leading-none tracking-[0.1em]">
                 {entry.name}
               </span>
-              {entry.submenu && (
+              {(entry.submenu || entry.columns) && (
                 <FiChevronDown
                   className={`text-[13px] text-ink/40 transition-transform duration-300 ${
                     panel === entry.name ? "rotate-180" : ""
@@ -203,6 +252,123 @@ function DivisionNav({ panel, openPanel, leaveMenuZone }) {
                 />
               )}
             </Link>
+
+            {/* Shop-By-style card: heading, then the sub-ranges as a plain
+                list — icon, name, chevron, a hairline between rows. Anchored
+                to this `<li>`, not the header, so it is only ever as wide as
+                the list needs. The last entry anchors right instead of left
+                so its card cannot run off the edge of the window. */}
+            {entry.submenu && (
+              <div
+                data-mega-menu
+                onMouseEnter={() => openPanel(entry.name)}
+                onMouseLeave={leaveMenuZone}
+                className={`absolute top-full z-[1100] hidden w-[21rem] bg-[#f7f7f7] shadow-[0_24px_50px_-18px_rgba(0,0,0,0.25)] transition-all duration-300 xl:block ${
+                  index === nav.length - 1 ? "right-0" : "left-0"
+                } ${
+                  panel === entry.name
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="border-b border-ink/10 px-6 pb-4 pt-6">
+                  <span className="text-[13px] text-ink/55">Shop By </span>
+                  <span className="display text-[20px] font-bold text-ink">
+                    {entry.name}
+                  </span>
+                </div>
+
+                <ul>
+                  {entry.submenu.map((sub, subIndex) => (
+                    <li
+                      key={sub.href}
+                      className={
+                        subIndex < entry.submenu.length - 1
+                          ? "border-b border-ink/10"
+                          : ""
+                      }
+                    >
+                      <Link
+                        href={sub.href}
+                        onClick={dismissPanel}
+                        className="group flex items-center justify-between gap-3 px-6 py-3.5 transition-colors duration-200 hover:bg-white"
+                      >
+                        <span className="flex items-center gap-3">
+                          <sub.icon className="shrink-0 text-[19px] text-ink/60" />
+                          <span className="text-[13.5px] font-medium text-ink">
+                            {sub.name}
+                          </span>
+                        </span>
+                        <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* The wide card: Mattress alone, three ways to shop it side by
+                side rather than one list — the shape of the client's own
+                "Shop By Comfort / Size / Type" reference. Icons on Comfort
+                and Size, none on Type, matching that reference exactly. */}
+            {entry.columns && (
+              <div
+                data-mega-menu
+                onMouseEnter={() => openPanel(entry.name)}
+                onMouseLeave={leaveMenuZone}
+                className={`absolute left-0 top-full z-[1100] hidden w-[54rem] bg-[#f7f7f7] shadow-[0_24px_50px_-18px_rgba(0,0,0,0.25)] transition-all duration-300 xl:block ${
+                  panel === entry.name
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="grid grid-cols-3 divide-x divide-ink/10 px-8 py-7">
+                  {entry.columns.map((col) => (
+                    <div key={col.label} className="px-6 first:pl-0 last:pr-0">
+                      <div className="border-b border-ink/10 pb-3">
+                        <span className="text-[13px] text-ink/55">Shop By </span>
+                        <span className="display text-[18px] font-bold text-ink">
+                          {col.label}
+                        </span>
+                      </div>
+
+                      <ul>
+                        {col.items.map((item, itemIndex) => (
+                          <li
+                            key={item.href}
+                            className={
+                              itemIndex < col.items.length - 1
+                                ? "border-b border-ink/10"
+                                : ""
+                            }
+                          >
+                            <Link
+                              href={item.href}
+                              onClick={dismissPanel}
+                              className="group flex items-center justify-between gap-3 py-3.5 transition-colors duration-200 hover:text-brand"
+                            >
+                              <span className="flex items-center gap-3.5">
+                                {/* Bigger than the single-column cards' 19px:
+                                    these are drawings with a headboard, pillows
+                                    and a valance in them, and at 19px that
+                                    detail closes up into a smudge. */}
+                                {item.icon && (
+                                  <item.icon className="shrink-0 text-[30px] text-ink/60" />
+                                )}
+                                <span className="text-[13.5px] font-medium text-ink">
+                                  {item.name}
+                                </span>
+                              </span>
+                              <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </li>
         ))}
       </ul>
@@ -334,12 +500,6 @@ export default function HeaderHomeTwo() {
     };
   }, [panel]);
 
-  // Opens for any division with a photo panel — submenu optional, since
-  // Mattress has the Divisions image but no sub-ranges yet.
-  const openEntry = nav.find(
-    (entry) => entry.name === panel && (entry.submenu || entry.image)
-  );
-
   return (
     <header
       className={`fixed inset-x-0 top-0 z-[10000] transition-[background-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -432,6 +592,7 @@ export default function HeaderHomeTwo() {
             panel={panel}
             openPanel={openPanel}
             leaveMenuZone={leaveMenuZone}
+            dismissPanel={dismissPanel}
           />
         </div>
 
@@ -496,72 +657,6 @@ export default function HeaderHomeTwo() {
           </div>
         </div>
       ) : null}
-
-      {/* ── Division panel ───────────────────────────────────────────── */}
-      {/* Description and "the whole division" on the left, the sub-ranges in two
-          columns, the division's own photograph on the right. Hangs below the
-          bar full width rather than off one link, which is why it lives here
-          rather than inside the `<li>`. */}
-      {openEntry && !search && (
-        <div
-          data-mega-menu
-          onMouseEnter={() => openPanel(openEntry.name)}
-          onMouseLeave={leaveMenuZone}
-          className="absolute inset-x-0 top-full hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.35)] xl:block"
-        >
-          <div className="shell-home-two grid grid-cols-12 gap-10 py-9">
-            <div className="col-span-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-brand">
-                {openEntry.name}
-              </span>
-              <p className="body-copy mt-3 text-[13.5px] leading-[1.75] text-ink/55">
-                {openEntry.line}
-              </p>
-              <Link
-                href={openEntry.href}
-                onClick={dismissPanel}
-                className="group mt-6 inline-flex items-center gap-2.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink"
-              >
-                The whole division
-                <FiArrowUpRight className="text-brand transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </Link>
-            </div>
-
-            <ul className="col-span-5 grid grid-cols-2 gap-x-8 gap-y-1 self-start">
-              {(openEntry.submenu ?? []).map((sub) => (
-                <li key={sub.href}>
-                  <Link
-                    href={sub.href}
-                    onClick={dismissPanel}
-                    className="group flex items-center justify-between gap-4 border-b border-ink/8 py-3 text-[13.5px] text-ink/75 transition-colors duration-200 hover:text-ink"
-                  >
-                    {sub.name}
-                    <FiArrowRight className="shrink-0 text-[13px] text-ink/0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <Link
-              href={openEntry.href}
-              onClick={dismissPanel}
-              className="group relative col-span-4 aspect-[16/10] overflow-hidden"
-            >
-              <Image
-                src={openEntry.image}
-                alt={openEntry.alt}
-                fill
-                sizes="33vw"
-                className="object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-              />
-              <span className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-shade-deep/80 to-transparent" />
-              <span className="display absolute bottom-5 left-5 text-[1.15rem] font-bold tracking-[-0.02em] text-white">
-                {openEntry.name}
-              </span>
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* ── Drawer — everything below the centred menu's breakpoint ───── */}
       {open ? (

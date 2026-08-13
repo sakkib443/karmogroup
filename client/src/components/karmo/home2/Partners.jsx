@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
-import LeafRule from "@/components/karmo/about/LeafRule";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
@@ -121,31 +120,27 @@ export default function Partners() {
   return (
     <section
       id="partners"
-      className="relative overflow-hidden bg-[#F5F5F5] pb-14 pt-12 md:pb-20 md:pt-16 lg:pb-24 lg:pt-20"
+      className="relative overflow-hidden bg-[#F5F5F5] pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
       aria-label="Partners and clients"
     >
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell relative text-center"
+        className="shell-home-two relative text-left"
       >
-        <motion.div variants={fade} className="mx-auto max-w-2xl md:max-w-none">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand sm:text-[12px]">
+        {/* Same heading setting as the divisions band above: small red eyebrow,
+            one light uppercase line under it, left-aligned and nothing below
+            it. The centred version with the leaf rule was the odd one out once
+            the other bands lost theirs. */}
+        <motion.div variants={fade}>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Partners &amp; clients
           </span>
-          {/* One line from md up, so the block reads as two lines total —
-              eyebrow, then heading. The size is tied to the viewport rather
-              than stepped per breakpoint because `nowrap` has no escape: at a
-              fixed size the line would run under the gutters somewhere between
-              the breakpoints. 3vw keeps it inside the shell's padding at every
-              width from 768 up, and the cap stops it growing past the old
-              size on a wide screen. */}
-          <h2 className="display mt-3 text-[1.6rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.85rem] md:whitespace-nowrap md:text-[clamp(1.35rem,3vw,2.3rem)] lg:mt-4">
+          <h2 className="display mt-1 whitespace-nowrap text-[1.05rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.15rem] lg:text-[1.3rem]">
             Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
-            makers across the country
+            makers
           </h2>
-          <LeafRule />
         </motion.div>
       </motion.div>
 
@@ -153,7 +148,7 @@ export default function Partners() {
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-10 space-y-3 sm:mt-12 sm:space-y-3.5 lg:mt-14 lg:space-y-4"
+        className="mt-3 space-y-1.5 sm:mt-3.5 lg:mt-4"
       >
         {rows.map((items, i) => (
           <Row

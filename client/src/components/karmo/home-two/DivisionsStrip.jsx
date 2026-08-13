@@ -111,24 +111,6 @@ export default function DivisionsStrip() {
           <h2 className="display mt-1 whitespace-nowrap text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
             One group, <span className="font-bold text-brand">four crafts</span>
           </h2>
-          <span
-            aria-hidden
-            className="mt-3 flex items-center gap-3"
-          >
-            <span className="h-px w-10 sm:w-12" style={{ backgroundColor: "#FF9A1F" }} />
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <path
-                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
-                fill="#FF9A1F"
-              />
-              <path
-                d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
-                stroke="#B4651A"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
         </motion.div>
       </motion.div>
 
@@ -140,7 +122,7 @@ export default function DivisionsStrip() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-3 grid grid-cols-2 gap-2 px-2 md:mt-3.5 md:gap-2.5 md:px-2.5 lg:grid-cols-4"
+        className="mt-3 grid grid-cols-2 gap-1 px-1 md:mt-3.5 md:gap-1.5 md:px-1.5 lg:grid-cols-4"
       >
         {divisions.map((division) => (
           <DivisionCard key={division.name} division={division} />
