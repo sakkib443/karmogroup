@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { FiArrowUpRight } from "react-icons/fi";
+
 import {
-  FiCalendar,
-  FiLayers,
-  FiMapPin,
-  FiTruck,
-  FiArrowUpRight,
-} from "react-icons/fi";
+  IconHeritage,
+  IconFoamStack,
+  IconStockists,
+  IconDelivery,
+} from "@/components/karmo/icons/CartoonIcons";
 
 import {
   group,
@@ -28,22 +29,22 @@ const OVERLAP_HERO = false;
 
 const pillars = [
   {
-    icon: FiCalendar,
+    icon: IconHeritage,
     title: "60 Years Strong",
     note: "Manufacturing since 1965.",
   },
   {
-    icon: FiLayers,
+    icon: IconFoamStack,
     title: "Market Leader in Foam",
     note: "Poured and tested in our plants.",
   },
   {
-    icon: FiMapPin,
+    icon: IconStockists,
     title: "Stockists Nationwide",
     note: "Dealers across the country.",
   },
   {
-    icon: FiTruck,
+    icon: IconDelivery,
     title: "Safe Delivery",
     note: "Ships carefully across Bangladesh.",
   },
@@ -110,8 +111,11 @@ export default function StandardStrip() {
                 i > 0 ? "lg:border-l lg:border-ink/10" : ""
               }`}
             >
-              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand/8 text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
-                <Icon className="text-[26px]" strokeWidth={1.6} />
+              {/* The tile no longer flips to solid red on hover. These icons
+                  carry their own colour, so inverting the tile under them left
+                  a red drawing on a red disc. It lifts and warms instead. */}
+              <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand/6 p-3 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-brand/12">
+                <Icon />
               </span>
               <h3 className="display mt-4 text-[0.78rem] font-bold uppercase tracking-[0.1em] text-ink">
                 {title}
@@ -163,8 +167,8 @@ function OverlapCard() {
         >
           {pillars.map(({ icon: Icon, title, note }) => (
             <motion.div key={title} variants={fade} className="group">
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand/8 text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
-                <Icon className="text-[28px]" />
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand/6 p-3 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-brand/12">
+                <Icon />
               </span>
               <h3 className="display mt-5 text-[0.88rem] font-bold uppercase tracking-[0.08em] text-ink">
                 {title}

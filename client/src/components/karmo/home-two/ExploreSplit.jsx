@@ -87,7 +87,7 @@ export default function ExploreSplit() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section data-home-two-snap className="bg-white">
+    <section data-home-two-snap className={`bg-white mt-1 md:mt-1.5`}>
       <motion.div
         variants={group}
         {...reveal}
