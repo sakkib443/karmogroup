@@ -14,7 +14,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 
 const VIEW_H = "h-[calc(100svh-80px)] min-h-[calc(100svh-80px)]";
-const GAP = "gap-2 md:gap-2.5";
+const GAP = "gap-1 md:gap-1.5";
 
 const feature = {
   eyebrow: "Our popular products",
@@ -87,7 +87,7 @@ export default function PromoTrio() {
   return (
     <section
       data-home-two-snap
-      className="relative z-10 mt-3 w-full max-w-none bg-white sm:mt-4 lg:mt-5"
+      className="relative z-10 mt-1.5 w-full max-w-none bg-white pb-1.5"
     >
       <motion.div
         variants={group}
