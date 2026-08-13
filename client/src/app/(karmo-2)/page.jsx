@@ -4,6 +4,7 @@ import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import Partners from "@/components/karmo/home2/Partners";
 import DivisionsStrip from "@/components/karmo/home-two/DivisionsStrip";
 import Reels from "@/components/karmo/home-two/Reels";
+import ShopByMaterial from "@/components/karmo/home-two/ShopByMaterial";
 import LivingLookbook from "@/components/karmo/home-two/LivingLookbook";
 import FoamPromise from "@/components/karmo/home2/FoamPromise";
 import ExploreSplit from "@/components/karmo/home-two/ExploreSplit";
@@ -32,6 +33,10 @@ export default function HomePage() {
       <ExploreSplit />
 
       <DivisionsStrip />
+
+      {/* Sits after the divisions strip because that is where the page stops
+          introducing the company and starts selling a product. */}
+      <ShopByMaterial />
 
       <PromoTrio />
       <FoamPromise filmMode="fixed" />

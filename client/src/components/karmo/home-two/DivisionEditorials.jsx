@@ -142,9 +142,9 @@ export default function DivisionEditorials() {
       >
         <motion.div
           variants={fade}
-          className="min-w-0 max-w-md self-center text-right lg:max-w-[28rem]"
+          className="min-w-0 max-w-md self-center text-left lg:max-w-[28rem]"
         >
-          <p className="flex flex-wrap items-baseline justify-end gap-x-3 gap-y-1">
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
               60+ Years
             </span>
@@ -160,7 +160,7 @@ export default function DivisionEditorials() {
             </span>
           </h2>
 
-          <span className="mt-4 flex items-center justify-end gap-3">
+          <span className="mt-4 flex items-center gap-3">
             <span className="h-px w-10 bg-brand" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
               Crafted to last
@@ -187,7 +187,7 @@ export default function DivisionEditorials() {
 
           <Link
             href="/foam"
-            className="group mt-8 inline-flex items-center justify-end gap-3"
+            className="group mt-8 inline-flex items-center gap-3"
           >
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Explore foam

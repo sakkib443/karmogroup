@@ -110,7 +110,7 @@ function FilmShot({ film, still, onOpen }) {
       type="button"
       onClick={(event) => onOpen(film, event.currentTarget)}
       aria-label={`Play ${film.title} full size`}
-      className={`group relative block w-full min-h-0 overflow-hidden border border-[#d0d0d0] bg-ink text-left ${film.ratio} md:aspect-auto md:flex-1 ${film.grow}`}
+      className={`group relative block w-full min-h-0 overflow-hidden bg-ink text-left ${film.ratio} md:aspect-auto md:flex-1 ${film.grow}`}
     >
       {load ? (
         <video
@@ -171,7 +171,7 @@ export default function Reels() {
   return (
     <section
       data-home-two-snap
-      className="reels-editorials overflow-x-clip bg-white py-14 lg:mt-4 lg:overflow-visible lg:py-0"
+      className="reels-editorials overflow-x-clip bg-white py-1.5 lg:mt-0 lg:overflow-visible lg:py-1.5"
       style={{ ["--reels-h"]: DESKTOP_H }}
       aria-label="Karmo films"
     >
@@ -179,13 +179,13 @@ export default function Reels() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid items-center gap-10 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-3 xl:gap-10 xl:pr-4"
+        className="grid items-center gap-10 px-6 md:px-14 lg:grid-cols-3 lg:h-full lg:min-h-0 lg:items-stretch lg:gap-1.5 lg:px-0"
       >
         <motion.div
           variants={fade}
-          className="min-w-0 max-w-md self-center text-right lg:max-w-[28rem]"
+          className="min-w-0 max-w-md self-center text-left lg:max-w-none lg:pl-[max(3rem,calc((100vw-1760px)/2+3rem))] lg:pr-8"
         >
-          <p className="flex flex-wrap items-baseline justify-end gap-x-3 gap-y-1">
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
               On film
             </span>
@@ -201,7 +201,7 @@ export default function Reels() {
             </span>
           </h2>
 
-          <span className="mt-4 flex items-center justify-end gap-3">
+          <span className="mt-4 flex items-center gap-3">
             <span className="h-px w-10 bg-brand" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
               Watch the craft
@@ -234,7 +234,7 @@ export default function Reels() {
 
           <Link
             href="/media/video-ads"
-            className="group mt-8 inline-flex items-center justify-end gap-3"
+            className="group mt-8 inline-flex items-center gap-3"
           >
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Watch all films
@@ -245,11 +245,11 @@ export default function Reels() {
           </Link>
         </motion.div>
 
-        <div className="grid min-h-0 w-full min-w-0 grid-cols-2 gap-0 md:grid-cols-3 lg:h-full lg:py-6">
+        <div className="grid min-h-0 w-full min-w-0 grid-cols-2 gap-1 md:grid-cols-3 md:gap-1.5 lg:col-span-2 lg:h-full">
           {columns.map((col, i) => (
             <div
               key={`film-col-${i}`}
-              className="flex min-h-0 flex-col gap-0 lg:h-full"
+              className="flex min-h-0 flex-col gap-1 md:gap-1.5 lg:h-full"
             >
               {col.map((film) => (
                 <FilmShot

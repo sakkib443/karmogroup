@@ -1,0 +1,44 @@
+<svg width="100" height="100" viewBox="5.97 8.59 84.44 84.44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Stores nationwide — a shopfront in grey line art with the gradient pin
+    standing over it.
+
+    Drawn rather than supplied, and drawn as a shop rather than a country: the
+    file this replaces was a map of INDIA on a pillar that reads "Pan
+    Bangladesh". A Bangladesh outline was the obvious swap and was rejected —
+    a national brand's own coastline drawn from memory is worse wrong than
+    absent. A shopfront says the same thing the words already say, and cannot
+    be geographically wrong.
+
+    Palette and construction follow the four supplied icons exactly: #484848
+    line art, one gradient element, blue through magenta.
+  -->
+  <defs>
+    <linearGradient id="storesGrad" x1="52" y1="14" x2="80" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6090C0" />
+      <stop offset="0.55" stop-color="#A86090" />
+      <stop offset="1" stop-color="#C04878" />
+    </linearGradient>
+  </defs>
+
+  <g stroke="#484848" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Awning, then the shop body under it. -->
+    <path d="M18 42H70" />
+    <path d="M22 42V34C22 32.3 23.3 31 25 31H63C64.7 31 66 32.3 66 34V42" />
+    <path d="M22 86V42" />
+    <path d="M66 86V56" />
+    <path d="M14 86H74" />
+
+    <!-- Door and window. -->
+    <path d="M31 86V64C31 62.3 32.3 61 34 61H42C43.7 61 45 62.3 45 64V86" />
+    <path d="M53 55H59" />
+  </g>
+
+  <!-- The pin, the one gradient element — same role it plays in the box and
+       map icons of the supplied set. -->
+  <path
+    d="M71 14C63.8 14 58 19.8 58 27C58 36.8 71 50 71 50C71 50 84 36.8 84 27C84 19.8 78.2 14 71 14Z"
+    fill="url(#storesGrad)"
+  />
+  <circle cx="71" cy="27" r="5" fill="#FFFFFF" />
+</svg>

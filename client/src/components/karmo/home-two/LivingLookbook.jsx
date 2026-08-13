@@ -17,8 +17,11 @@ import SectionHeading, { Accent } from "@/components/karmo/SectionHeading";
  * same gutter as the tiles so the block reads as one section.
  */
 
-const GAP = "gap-2.5 md:gap-3";
-const GUTTER = "p-3 sm:p-4 lg:p-5";
+const GAP = "gap-1 md:gap-1.5";
+/* Sides and bottom only. The top is left to the section above (Reels), which
+   carries the 6px the client set as the gap between every two sections —
+   padding on both would double it. */
+const GUTTER = "px-0 pb-0 pt-0";
 const TILE_H =
   "h-[min(62svh,600px)] min-h-[340px] md:h-[min(60svh,620px)]";
 const FILM_H =
