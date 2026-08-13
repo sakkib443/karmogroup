@@ -17,6 +17,8 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 
 const ORANGE = "#FF9A1F";
+/* Same white gutter as ExploreSplit (fourth section) between image tiles. */
+const GAP = "gap-1 md:gap-1.5";
 /* Desktop band height — set as an inline style too so the masonry
    cannot miss a Tailwind rebuild / stale class. ~80px taller than the
    original calc(100svh-112px). */
@@ -84,7 +86,7 @@ function Shot({ shot }) {
     return (
       <div
         aria-hidden
-        className={`relative block w-full min-h-0 border border-[#d0d0d0] bg-gray-100 ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
+        className={`relative block w-full min-h-0 bg-gray-100 ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
       />
     );
   }
@@ -92,7 +94,7 @@ function Shot({ shot }) {
   return (
     <Link
       href={shot.href}
-      className={`group relative block w-full min-h-0 overflow-hidden border border-[#d0d0d0] ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
+      className={`group relative block w-full min-h-0 overflow-hidden ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
     >
       <Image
         src={shot.src}
@@ -122,7 +124,7 @@ export default function DivisionEditorials() {
   return (
     <section
       data-home-two-snap
-      className="division-editorials overflow-x-clip bg-white py-14 lg:mt-4 lg:overflow-visible lg:py-0"
+      className="division-editorials overflow-x-clip bg-white py-14 lg:mt-0 lg:overflow-visible lg:py-0"
       style={{
         // Inline so desktop height always applies even if a utility class is stale.
         ["--division-h"]: DESKTOP_H,
@@ -136,7 +138,7 @@ export default function DivisionEditorials() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid items-center gap-10 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-3 xl:gap-10 xl:pr-4"
+        className="grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-0 xl:gap-10"
       >
         <motion.div
           variants={fade}
@@ -196,11 +198,13 @@ export default function DivisionEditorials() {
           </Link>
         </motion.div>
 
-        <div className="grid min-h-0 w-full min-w-0 grid-cols-2 gap-0 md:grid-cols-3 lg:h-full">
+        <div
+          className={`grid min-h-0 w-full min-w-0 grid-cols-2 md:grid-cols-3 lg:h-full ${GAP}`}
+        >
           {columns.map((col, i) => (
             <div
               key={`div-col-${i}`}
-              className="flex min-h-0 flex-col gap-0 lg:h-full"
+              className={`flex min-h-0 flex-col lg:h-full ${GAP}`}
             >
               {col.map((shot) => (
                 <Shot key={shot.id} shot={shot} />
