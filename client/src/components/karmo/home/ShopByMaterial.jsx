@@ -128,7 +128,7 @@ export default function ShopByMaterial() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell-home-two"
+        className="pl-4 text-left"
       >
         <motion.div variants={fade}>
           <SectionLabel eyebrow="Built from the inside out">

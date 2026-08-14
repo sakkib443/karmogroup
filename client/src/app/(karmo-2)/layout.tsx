@@ -19,9 +19,9 @@ import {
 
 import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
-import HeaderHomeTwo from "@/components/karmo/home-two/HeaderHomeTwo";
-import ThemeControl from "@/components/karmo/home-two/ThemeControl";
-import HomeTwoSectionSnap from "@/components/karmo/home-two/HomeTwoSectionSnap";
+import Header from "@/components/karmo/header/Header";
+import ThemeControl from "@/components/karmo/chrome/ThemeControl";
+import HomeTwoSectionSnap from "@/components/karmo/chrome/HomeTwoSectionSnap";
 
 /**
  * Live homepage chrome — the Home Two header and offset, promoted to `/`.
@@ -165,7 +165,7 @@ export default function KarmoTwoLayout({
     >
       <SmoothScroll />
       <HomeTwoSectionSnap />
-      <HeaderHomeTwo />
+      <Header />
       {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
       <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">
         {children}

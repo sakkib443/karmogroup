@@ -1196,10 +1196,10 @@ svg.app-icon[fill="none"] {
     .shell { padding-inline: 5rem; }
   }
 
-  /* Home Two chrome — a touch wider than the live homepage `.shell`. */
+  /* Home Two chrome — header / top bar content width. */
   .shell-home-two {
     margin-inline: auto;
-    max-width: 1760px;
+    max-width: 1600px;
     padding-inline: 1.5rem;
   }
 

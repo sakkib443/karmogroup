@@ -8,9 +8,7 @@ import { FiArrowRight, FiMapPin } from "react-icons/fi";
 import { group, line as lineReveal, rise } from "@/components/karmo/motion";
 
 /**
- * Home Two hero — same scene and copy as Home One's HeroTwo, but the box
- * fills the viewport under the fixed Home Two header (112px), with no
- * `43vw` cap. Live `/` keeps `karmo/home2/HeroTwo` unchanged.
+ * Homepage hero — fills the viewport under the fixed header (112px).
  */
 
 const badge = {
@@ -28,7 +26,7 @@ const hero = {
 
 const VIEW_H = "h-[calc(100svh-112px+5px)] min-h-[calc(100svh-112px+5px)]";
 
-export default function HeroTwo() {
+export default function Hero() {
   const reduceMotion = useReducedMotion();
 
   return (

@@ -183,7 +183,7 @@ export default function Reels() {
       >
         <motion.div
           variants={fade}
-          className="min-w-0 max-w-md self-center text-left lg:max-w-none lg:pl-[max(3rem,calc((100vw-1760px)/2+3rem))] lg:pr-8"
+          className="min-w-0 max-w-md self-center text-left lg:max-w-none lg:pl-[max(3rem,calc((100vw-1600px)/2+3rem))] lg:pr-8"
         >
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">

@@ -7,14 +7,10 @@ import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * The Home 02 divisions band — a centred headline above four full-bleed
- * picture cards in one row. Same four divisions and photographs as before;
- * the layout was rebuilt after the client found the old left-heading /
- * right-grid arrangement hard to read.
+ * The Home 02 divisions band — left-flush headline above four full-bleed
+ * picture cards in one row. Same four divisions and photographs as before.
  *
- * The header sits in `.shell` so the copy has a comfortable measure. The cards
- * below skip `.shell` and run edge to edge with the page's 12px gutter
- * between them — the same figure `CollectionsShowcase` uses.
+ * Heading keeps a small left inset; the four cards run full-bleed edge to edge.
  */
 /* Images are borrowed from the Popular Products row further down the page, at
    the client's ask — the four division cards now show the same four product
@@ -94,15 +90,12 @@ export default function DivisionsStrip() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    // Centred heading, then a full-width row of four cards — the client's
-    // second reference (a furniture catalogue's product row), which they
-    // preferred to the asymmetric left-copy / right-grid arrangement.
     <section className="bg-white pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell-home-two"
+        className="pl-4 text-left"
       >
         <motion.div variants={fade}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
@@ -114,15 +107,11 @@ export default function DivisionsStrip() {
         </motion.div>
       </motion.div>
 
-      {/* Full width — the row skips `.shell` at the client's ask and runs on
-          a small edge padding instead, so the cards get as much of the window
-          as they can. The heading above still sits in `.shell` for a proper
-          measure; this row is deliberately wider than it. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-3 grid grid-cols-2 gap-1 px-1 md:mt-3.5 md:gap-1.5 md:px-1.5 lg:grid-cols-4"
+        className="mt-3 grid grid-cols-2 gap-1 px-0 md:mt-3.5 md:gap-1.5 lg:grid-cols-4"
       >
         {divisions.map((division) => (
           <DivisionCard key={division.name} division={division} />
