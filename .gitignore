@@ -30,6 +30,13 @@ Thumbs.db
 # so a small artwork file can still be committed deliberately.
 Company profile 1-32 page for agency.ai
 Foam Catalogue .ai
+Mattress Catalogue (1).ai
+
+# Client catalogue source (Adobe/PDF) and the lightweight page renders of the
+# mattress catalogue extracted from it. Reference material, kept on disk but
+# out of the repo — the brochure alone is ~68 MB of page PNGs.
+Karmo Adhesive Catalog.pdf
+Mattress Brochure/
 
 # Raw image drops that land in the project root on their way in — generator
 # output, phone photos, screenshots. Anything the site actually uses is

@@ -1,16 +1,17 @@
-import PromoTrio from "@/components/karmo/home-two/PromoTrio";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
-import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
-import Partners from "@/components/karmo/home2/Partners";
-import DivisionsStrip from "@/components/karmo/home-two/DivisionsStrip";
-import Reels from "@/components/karmo/home-two/Reels";
-import ShopByMaterial from "@/components/karmo/home-two/ShopByMaterial";
-import LivingLookbook from "@/components/karmo/home-two/LivingLookbook";
-import FoamPromise from "@/components/karmo/home2/FoamPromise";
-import ExploreSplit from "@/components/karmo/home-two/ExploreSplit";
-import DivisionEditorials from "@/components/karmo/home-two/DivisionEditorials";
-import StandardStrip from "@/components/karmo/home-two/StandardStrip";
-import HeroTwo from "@/components/karmo/home-two/HeroTwo";
+import PromoTrio from "@/components/karmo/home/PromoTrio";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
+import CertifiedBy from "@/components/karmo/home/CertifiedBy";
+import Partners from "@/components/karmo/home/Partners";
+import PartnerPromoBand from "@/components/karmo/home/PartnerPromoBand";
+import DivisionsStrip from "@/components/karmo/home/DivisionsStrip";
+import Reels from "@/components/karmo/home/Reels";
+import ShopByMaterial from "@/components/karmo/home/ShopByMaterial";
+import LivingLookbook from "@/components/karmo/home/LivingLookbook";
+import FoamPromise from "@/components/karmo/home/FoamPromise";
+import ExploreSplit from "@/components/karmo/home/ExploreSplit";
+import DivisionEditorials from "@/components/karmo/home/DivisionEditorials";
+import StandardStrip from "@/components/karmo/home/StandardStrip";
+import Hero from "@/components/karmo/home/Hero";
 import { pageMetadata, SITE_TITLE, SITE_DESCRIPTION } from "@/config/site";
 
 export const metadata = pageMetadata({
@@ -20,14 +21,13 @@ export const metadata = pageMetadata({
 });
 
 /**
- * The homepage — Home Two promoted to `/`.
- *
- * The previous live design is kept at `/home-two` for reference.
+ * The homepage — sections live under `components/karmo/home/`.
+ * Site chrome (header) is mounted from the layout.
  */
 export default function HomePage() {
   return (
     <>
-      <HeroTwo />
+      <Hero />
       <StandardStrip />
       <DivisionEditorials />
       <ExploreSplit />
@@ -46,6 +46,7 @@ export default function HomePage() {
       <Partners />
       <CertifiedBy />
 
+      <PartnerPromoBand />
       <OrderAndContact />
     </>
   );

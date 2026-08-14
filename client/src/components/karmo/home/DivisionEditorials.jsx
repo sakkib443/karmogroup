@@ -138,7 +138,7 @@ export default function DivisionEditorials() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1760px)/2+4rem))] lg:pr-0 xl:gap-10"
+        className="grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
       >
         <motion.div
           variants={fade}
