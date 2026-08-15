@@ -24,8 +24,8 @@ const leftPane = {
 };
 
 const rightPane = {
-  src: "/karmo/images/home-02/divisions/mattress-karmo-grey-bedroom.webp",
-  alt: "A quiet bedroom dressed with a Karmo mattress",
+  src: "/karmo/images/hero/slide-1-hometex-couple.png",
+  alt: "A couple reading on the floor beside a Karmo bed dressed in HomeTex bedding",
   href: "/mattress",
 };
 
