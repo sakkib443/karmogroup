@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 
-import Logo from "@/components/karmo/Logo";
 import { rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
@@ -29,24 +28,6 @@ const rightPane = {
   alt: "A quiet bedroom dressed with a Karmo mattress",
   href: "/mattress",
 };
-
-/** EMI bank partners — names until official logo files are supplied. */
-const emiBanks = [
-  "BRAC Bank",
-  "City Bank",
-  "Bank Asia",
-  "Eastern Bank",
-  "Mutual Trust",
-  "Prime Bank",
-  "UCB",
-  "One Bank",
-  "Jamuna Bank",
-  "Dutch-Bangla",
-  "Standard Chartered",
-  "HSBC",
-  "Pubali Bank",
-  "Southeast Bank",
-];
 
 function OfferPanels() {
   return (
@@ -109,7 +90,7 @@ export default function PartnerPromoBand() {
   return (
     <section
       aria-label="Website discount and EMI facility"
-      className="relative w-full overflow-hidden bg-white"
+      className="relative mt-1.5 w-full overflow-hidden bg-white"
     >
       <div
         className={`grid ${GAP} lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_15.5rem] xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_16.5rem]`}
@@ -121,45 +102,24 @@ export default function PartnerPromoBand() {
           <ImagePane pane={rightPane} priority />
         </div>
 
+        {/* EMI bank partners — a single supplied artwork (the "12 months EMI"
+            panel with every partner bank's logo) rather than the text cards it
+            replaced. `object-contain` so no logo is cropped; the panel keeps
+            the same min-height as the two image panes beside it. */}
         <motion.aside
           variants={fade}
           initial={reduceMotion ? false : "hidden"}
           whileInView="show"
           viewport={VIEWPORT}
-          className="col-span-full flex flex-col border border-ink/8 bg-white px-4 py-5 sm:px-5 sm:py-6 lg:col-span-1 lg:min-h-[460px] xl:min-h-[500px]"
+          className="relative col-span-full min-h-[460px] border border-ink/8 bg-white lg:col-span-1 lg:min-h-[460px] xl:min-h-[500px]"
         >
-          <div className="border-b border-ink/10 pb-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand">
-              Easy payment
-            </p>
-            <h2 className="display mt-1.5 text-[1.05rem] font-bold uppercase leading-[1.2] tracking-[0.02em] text-ink sm:text-[1.12rem]">
-              Up to 12 months EMI
-            </h2>
-          </div>
-
-          <div className="mt-3.5 grid flex-1 grid-cols-2 content-start gap-x-2.5 gap-y-2">
-            {emiBanks.map((name) => (
-              <div
-                key={name}
-                className="flex h-10 items-center justify-center border border-ink/6 bg-[#FAFAFA] px-1.5"
-              >
-                <span className="text-center text-[9.5px] font-bold uppercase leading-tight tracking-[0.04em] text-ink/70">
-                  {name}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-4 flex items-end justify-between border-t border-ink/10 pt-4">
-            <Logo src="/karmo/logo-ink.png" className="h-6 w-auto sm:h-7" />
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.14em] text-ink/55 transition-colors hover:text-brand"
-            >
-              Ask about EMI
-              <FiArrowUpRight className="text-[12px]" />
-            </Link>
-          </div>
+          <Image
+            src="/karmo/images/home-02/emi-banks-panel.png"
+            alt="Up to 12 months EMI available with BRAC Bank, City Bank, MTB, Prime Bank, UCB, One Bank, Jamuna Bank and other partner banks"
+            fill
+            sizes="(min-width: 1280px) 264px, (min-width: 1024px) 248px, 100vw"
+            className="object-contain p-3"
+          />
         </motion.aside>
       </div>
     </section>
