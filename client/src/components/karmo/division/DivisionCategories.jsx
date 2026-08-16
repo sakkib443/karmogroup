@@ -4,13 +4,15 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
-import { mattressCategories } from "@/components/karmo/mattress/mattressData";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Mattress categories — the eight models, shown like the homepage ShopByMaterial
- * cards: the label sits *on* the picture over a bottom gradient, not below it.
- * Three columns. Clicking a card filters the product grid below to that model.
+ * Category gallery — cards shown like the homepage ShopByMaterial: the label
+ * sits *on* the picture over a bottom gradient. Clicking a card filters the
+ * product grid below to that category.
+ *
+ * Hidden by default on every page (the client's ideal mattress page hides it) —
+ * slot `<DivisionCategories>` back into `DivisionPage` to bring it to all four.
  */
 function CategoryCard({ cat, active, onSelect }) {
   return (
@@ -60,7 +62,7 @@ function CategoryCard({ cat, active, onSelect }) {
   );
 }
 
-export default function MattressCategories({ activeId, onSelect }) {
+export default function DivisionCategories({ items = [], activeId, onSelect }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -74,7 +76,7 @@ export default function MattressCategories({ activeId, onSelect }) {
         viewport={VIEWPORT}
         className="grid grid-cols-2 gap-1 px-0 md:grid-cols-4 md:gap-1.5"
       >
-        {mattressCategories.map((cat) => (
+        {items.map((cat) => (
           <CategoryCard
             key={cat.id}
             cat={cat}
