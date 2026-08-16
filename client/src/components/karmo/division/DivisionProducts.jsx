@@ -4,14 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
-import { mattressProducts } from "@/components/karmo/mattress/mattressData";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 const ORANGE = "#FF9A1F";
 
 /**
- * Mattress product grid — Home 02 Popular Products tile language, identical to
- * FoamProducts. Order Now opens the shared product-detail page.
+ * Division product grid — Home 02 Popular Products tile language, shared by
+ * every category page. Order Now opens the shared product-detail page. The
+ * heading, anchor id and products come from props; the tile, grid and footnote
+ * design stay here.
  */
 function ProductTile({ item }) {
   const onOffer = Boolean(item.was);
@@ -63,17 +64,24 @@ function ProductTile({ item }) {
   );
 }
 
-export default function MattressProducts({ categoryId = "all" }) {
+export default function DivisionProducts({
+  eyebrow = "Best price",
+  headingLead = "Hot offer",
+  headingAccent = "for you",
+  offersId = "division-offers",
+  items = [],
+  categoryId = "all",
+}) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
-  const items =
+  const list =
     categoryId === "all"
-      ? mattressProducts
-      : mattressProducts.filter((p) => p.category === categoryId);
+      ? items
+      : items.filter((p) => p.category === categoryId);
 
   return (
-    <section id="mattress-offers" className="scroll-mt-24 bg-white pb-16 pt-4 lg:pb-24 lg:pt-6">
+    <section id={offersId} className="scroll-mt-24 bg-white pb-16 pt-4 lg:pb-24 lg:pt-6">
       <motion.div
         variants={group}
         {...reveal}
@@ -82,10 +90,10 @@ export default function MattressProducts({ categoryId = "all" }) {
       >
         <motion.div variants={fade}>
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
-            Best price
+            {eyebrow}
           </span>
           <h2 className="display mt-4 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
-            Hot offer <span className="font-bold text-brand">for you</span>
+            {headingLead} <span className="font-bold text-brand">{headingAccent}</span>
           </h2>
           <span
             aria-hidden
@@ -109,7 +117,7 @@ export default function MattressProducts({ categoryId = "all" }) {
         </motion.div>
       </motion.div>
 
-      {items.length === 0 ? (
+      {list.length === 0 ? (
         <p className="shell text-center text-[14px] text-ink/50">
           No products in this category yet.{" "}
           <Link href="/contact" className="font-semibold text-brand underline">
@@ -125,7 +133,7 @@ export default function MattressProducts({ categoryId = "all" }) {
           viewport={VIEWPORT}
           className="shell grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-8"
         >
-          {items.map((item) => (
+          {list.map((item) => (
             <ProductTile key={item.id} item={item} />
           ))}
         </motion.div>

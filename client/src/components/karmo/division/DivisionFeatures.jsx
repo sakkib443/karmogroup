@@ -2,27 +2,17 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
-import { mattressFeatures } from "@/components/karmo/mattress/mattressData";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Trust strip — built to match the homepage `StandardStrip` exactly: illustrated
- * badge images (not boxed line-icons), the same 88px icon, typography, hover
- * lift, `border-l` dividers and the 6px seam below. Four mattress claims instead
- * of the homepage's six pillars.
+ * Trust strip — built to match the homepage `StandardStrip`: illustrated badge
+ * images (not boxed line-icons), an 88px icon, hover lift, `border-l` dividers
+ * and the 6px seam below. Four claims per division.
  *
- * ⚠ Only "Since 1965" has a true badge (`legacy-60-years`). The other three
- * reuse existing trust badges as visual stand-ins so the *style* matches now —
- * swap in proper Doctor / Anti-Dust / 20-Year badges when they exist.
+ * Each item carries its own `icon` (an image path) so the strip is entirely
+ * data-driven; the layout and type stay here, shared across all four pages.
  */
-const icons = {
-  years: "/karmo/images/trust/legacy-60-years.png",
-  doctor: "/karmo/images/trust/trusted-families.png",
-  antidust: "/karmo/images/trust/sustainable-products.png",
-  durability: "/karmo/images/trust/recognised-super-brand.png",
-};
-
-export default function MattressFeatures() {
+export default function DivisionFeatures({ items = [] }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -34,19 +24,19 @@ export default function MattressFeatures() {
         viewport={VIEWPORT}
         className="grid w-full grid-cols-2 gap-5 px-6 py-8 md:grid-cols-4 md:gap-7 md:px-10 md:py-10 lg:gap-0 lg:px-16 lg:py-12"
       >
-        {mattressFeatures.map((item, i) => (
+        {items.map((item, i) => (
           <motion.li
             key={item.id}
             variants={fade}
             className={`group text-center lg:px-4 xl:px-6 ${
               i === 0 ? "lg:pl-0" : ""
-            } ${i === mattressFeatures.length - 1 ? "lg:pr-0" : ""} ${
+            } ${i === items.length - 1 ? "lg:pr-0" : ""} ${
               i > 0 ? "lg:border-l lg:border-ink/10" : ""
             }`}
           >
             <span className="mx-auto flex h-20 w-20 items-center justify-center transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[5.5rem] sm:w-[5.5rem]">
               <img
-                src={icons[item.id]}
+                src={item.icon}
                 alt=""
                 aria-hidden="true"
                 width={88}
