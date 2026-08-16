@@ -54,3 +54,6 @@ Mattress Brochure/
 
 # Installers and other binaries that land in the working folder by accident.
 *.exe
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
