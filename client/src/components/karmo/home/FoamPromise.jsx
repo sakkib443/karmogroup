@@ -44,7 +44,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
    two rules, so those lift with it and the section stays one colour. */
 const ORANGE = "#FF9A1F";
 
-const claims = [
+const DEFAULT_CLAIMS = [
   {
     id: "pure-quality",
     icon: TbDropletOff,
@@ -158,7 +158,21 @@ const ZOOM_TO = 1.18;
  * above for what each one does and why. Defaults to `fixed`, the treatment the
  * client chose, so a caller that says nothing gets the one the homepage uses.
  */
-export default function FoamPromise({ filmMode = "fixed" }) {
+export default function FoamPromise({
+  filmMode = "fixed",
+  heading = "Blending tradition with innovation",
+  subline = "Lasting Comfort to your Doorstep",
+  claims = DEFAULT_CLAIMS,
+  /* Background still. Defaults to the homepage foam texture; callers can pass a
+     photo instead (e.g. the mattress page's sea-beach shot). */
+  still = STILL,
+  /* When false the looping film is skipped and only `still` shows — a plain
+     photographic background instead of the homepage's video band. */
+  showFilm = true,
+  /* Which clip loops behind the band. Defaults to the homepage foam film; the
+     mattress page passes its own "Sleep Well" clip. */
+  film = FILM,
+}) {
   const reduce = useReducedMotion();
   const reveal = reduce ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -212,7 +226,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
    * it is the whole background and it behaves normally.
    */
   useEffect(() => {
-    if (reduce || filmMode === "drift") return;
+    if (reduce || !showFilm || filmMode === "drift") return;
     const section = sectionRef.current;
     const inner = driftRef.current;
     if (!section || !inner) return;
@@ -294,7 +308,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [reduce, filmMode]);
+  }, [reduce, filmMode, showFilm]);
 
   /**
    * Two stacked copies of one clip, cross-faded at the seam.
@@ -382,7 +396,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
           This one is a plain absolute layer and scrolls with the section, which
           is also what makes it the right fallback before hydration. */}
       <div aria-hidden className="absolute inset-0 z-0 overflow-hidden">
-        <Image src={STILL} alt="" fill sizes="100vw" className="object-cover" priority={false} />
+        <Image src={still} alt="" fill sizes="100vw" className="object-cover" priority={false} />
       </div>
 
       {/* The film. One set of `<video>` elements in every mode — the mode only
@@ -404,7 +418,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
             · drift is a CSS keyframe and its own overscan is in that rule.
           Each overscan has to stay clear of its figure above — raising one
           without the other is exactly what pulls an edge into view. */}
-      {!reduce && (
+      {!reduce && showFilm && (
         <div
           ref={filmRef}
           aria-hidden
@@ -427,8 +441,8 @@ export default function FoamPromise({ filmMode = "fixed" }) {
                     : "absolute inset-0"
             }
           >
-            <video {...layerProps(0)} autoPlay src={FILM} />
-            <video {...layerProps(1)} src={FILM} />
+            <video {...layerProps(0)} autoPlay src={film} />
+            <video {...layerProps(1)} src={film} />
           </div>
         </div>
       )}
@@ -449,10 +463,10 @@ export default function FoamPromise({ filmMode = "fixed" }) {
       >
         <motion.div variants={fade} className="text-center">
           <h2 className="display text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-white lg:text-[2.3rem]">
-            Blending tradition with innovation
+            {heading}
           </h2>
           <p className="body-copy mt-3 text-[15px] text-white/90">
-            Lasting Comfort to your Doorstep
+            {subline}
           </p>
           <LeafRule />
         </motion.div>

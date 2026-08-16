@@ -90,7 +90,7 @@ export default function DivisionsStrip() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12">
+    <section className="bg-white">
       <motion.div
         variants={group}
         {...reveal}

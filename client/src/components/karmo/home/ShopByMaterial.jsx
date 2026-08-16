@@ -9,67 +9,66 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import SectionLabel from "./SectionLabel";
 
 /**
- * Shop by material — four materials in an asymmetric bento.
+ * Shop by material — the four core materials a Karmo mattress is built from,
+ * in an asymmetric bento. Not mattress *types* any more; these are the layers
+ * the brochure's "intersection" diagrams name over and over — the section's
+ * "built from the inside out" eyebrow taken literally.
  *
  * The client's words were "add this segment, but much better spacing and boxes
  * (assymentric)", so this is deliberately *not* the reference's symmetric
  * three-column split. Two tall cards bracket a stacked pair, and the tall ones
- * are unequal — Foam is the widest because it is the division the company is
- * known for, Spring the narrowest.
+ * are unequal — Rebonded Foam is the widest because foam is the craft the
+ * company is known for, Pocket Spring the narrowest.
  *
- * ⚠ **The pictures are stand-ins.** These are the closest product shots in the
- * library, not macro photography of the material itself; the reference used a
- * close-up of each surface, which is the right idea and what should replace
- * them. Prompts belong in `IMAGE-PROMPTS.md` when the client asks for them.
- *
- * ⚠ **Coir and Latex are unconfirmed.** The company profile lists foam and
- * spring; whether Karmo makes coir and latex mattresses is an open question in
- * `CLIENT-FEEDBACK.md`. If the answer is no, drop those two and the bento
- * becomes a two-up — the layout is written so that is a small change.
+ * ⚠ **The pictures are stand-ins.** These still point at the old product shots.
+ * Each card wants a macro close-up of the *material itself* (foam chips, PE
+ * foam, coil springs, coir fibre). Drop the new files under
+ * `/karmo/images/home-02/materials/` and swap the four `src` lines — the
+ * generation prompts live in `Mattress Brochure/MATERIAL-IMAGE-PROMPTS.md`.
  */
 
 const materials = [
   {
-    id: "foam",
-    name: "Foam Mattress",
-    line: "Moulds to your body for support that holds its shape.",
+    id: "rebonded-foam",
+    name: "Rebonded Foam",
+    line: "Finest hi-density foam chips, steam-bonded for support that lasts.",
     href: "/mattress",
     src: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
-    alt: "Stacked Karmo foam blocks in a studio",
+    alt: "Close-up of Karmo rebonded foam — bonded hi-density foam chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
     sizes: "(min-width: 1024px) 38vw, 100vw",
   },
   {
-    id: "coir",
-    name: "Coir Mattress",
-    line: "Firm support from natural coconut fibre.",
+    id: "pe-foam",
+    name: "Polyethylene Foam",
+    line: "Load-bearing hi-density core — made only by Karmo.",
     href: "/mattress",
     src: "/karmo/images/home-02/divisions/mattress-karmo-grey-bedroom.webp",
-    alt: "A Karmo mattress on a channel-tufted bed",
+    alt: "Close-up of Karmo hi-density polyethylene (PE) foam",
     span: "lg:col-start-2 lg:row-start-1",
     ratio: "aspect-[16/9]",
     sizes: "(min-width: 1024px) 36vw, 100vw",
   },
   {
-    id: "latex",
-    name: "Latex Mattress",
-    line: "Durable support with natural resilience.",
+    id: "natural-coir",
+    name: "Natural Coir",
+    line: "100% coconut-husk fibre — breathable, cool, biodegradable.",
     href: "/mattress",
     src: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
-    alt: "Karmo bedding layered in a studio setting",
+    alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
     span: "lg:col-start-2 lg:row-start-2",
     ratio: "aspect-[16/9]",
     sizes: "(min-width: 1024px) 36vw, 100vw",
   },
   {
-    id: "spring",
-    name: "Spring Mattress",
-    line: "Responsive support from a pocketed coil core.",
+    id: "pocket-spring",
+    name: "Pocket Spring",
+    line: "Vanadium-coated coils that move independently, contouring to you.",
     href: "/mattress",
     src: "/karmo/images/home-02/divisions/mattress-karmo-magnific-SyOgGVtUb8.jpg",
-    alt: "A Karmo quilted mattress styled in a bedroom",
+    alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
     span: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
     sizes: "(min-width: 1024px) 26vw, 100vw",
