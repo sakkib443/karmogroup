@@ -13,7 +13,8 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * Left feature + right stacked tiles (mattress top, HomeTex bottom).
  */
 
-const VIEW_H = "h-[calc(100svh-80px)] min-h-[calc(100svh-80px)]";
+const VIEW_H =
+  "h-auto min-h-0 lg:h-[calc(100svh-80px)] lg:min-h-[calc(100svh-80px)]";
 const GAP = "gap-1 md:gap-1.5";
 
 const feature = {
@@ -51,7 +52,7 @@ function SideCard({ item }) {
   return (
     <Link
       href={item.href}
-      className={`group relative flex h-full min-h-[50vh] flex-col justify-center overflow-hidden px-5 py-6 sm:px-6 lg:min-h-0 lg:px-7 ${item.tone}`}
+      className={`group relative flex h-full min-h-[min(42svh,360px)] flex-col justify-center overflow-hidden px-5 py-6 sm:px-6 lg:min-h-0 lg:px-7 ${item.tone}`}
     >
       {hasImage ? (
         <>
@@ -98,7 +99,7 @@ export default function PromoTrio() {
         {/* Left — popular products feature */}
         <motion.div
           variants={fade}
-          className="relative min-h-[50vh] w-full overflow-hidden bg-[#f3f3f3] lg:min-h-0 lg:h-full"
+          className="relative min-h-[min(48svh,400px)] w-full overflow-hidden bg-[#f3f3f3] lg:min-h-0 lg:h-full"
         >
           <Image
             src={feature.src}

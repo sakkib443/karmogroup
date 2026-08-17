@@ -3,32 +3,32 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
-import LeafRule from "@/components/karmo/about/LeafRule";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * What’s inside the grade — Karmo-facing layers (replaces the Douglas image).
+ * One full-width band: Feel guide (left) + Build 4 layer (right).
  */
+
 const layers = [
   {
-    n: "01",
-    title: "Surface comfort layer",
-    body: "A softer top pour that takes the first sit — pressure relief without a quicksand feel, so cushions stay inviting day after day.",
+    n: 1,
+    title: "Quilted comfort cover",
+    body: "Breathable top fabric that draws moisture away for a cool, dry sleep surface.",
   },
   {
-    n: "02",
-    title: "High-resilience core",
-    body: "The working heart of Karmo 180. Pure rubber-grade foam that springs back after every load and keeps sofa seats from sagging.",
+    n: 2,
+    title: "Hi-density comfort foam",
+    body: "Responsive pour that cushions pressure points without a quicksand sink.",
   },
   {
-    n: "03",
-    title: "Support base",
-    body: "A denser foundation layer for edge hold and long-term structure — the part that carries the frame’s weight without crumbling.",
+    n: 3,
+    title: "Resilient support foam",
+    body: "Mid-layer for recovery and posture — holds shape under load for years.",
   },
   {
-    n: "04",
-    title: "Clean cut finish",
-    body: "Sheets cut to your width, length and height so the foam fills the cavity properly — no gaps, no stuffing with fillers.",
+    n: 4,
+    title: "Motion-isolation base",
+    body: "Dense foundation that limits motion transfer and protects edge support.",
   },
 ];
 
@@ -37,61 +37,94 @@ export default function ProductLayers() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-b border-ink/8 bg-white py-8 md:py-10 lg:py-12">
+    <section className="mt-[6px] bg-[#EEEFF1]">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell grid items-center gap-12 lg:grid-cols-12 lg:gap-16"
+        className="grid grid-cols-1 lg:grid-cols-2"
       >
-        <motion.div variants={fade} className="lg:col-span-5">
-          <div className="relative aspect-[4/5] overflow-hidden bg-cream">
-            <Image
-              src="/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png"
-              alt="Karmo foam blocks stacked in studio"
-              fill
-              sizes="(min-width: 1024px) 40vw, 100vw"
-              className="object-cover"
-            />
+        {/* ── Feel guide ── */}
+        <motion.div
+          variants={fade}
+          className="flex flex-col bg-[#EEEFF1] px-5 py-6 sm:px-7 sm:py-7 lg:border-r lg:border-ink/8 lg:px-8 lg:py-8"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
+            Feel guide
+          </p>
+          <h2 className="display mt-1.5 text-[1.35rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.55rem]">
+            Soft to{" "}
+            <span className="font-bold text-brand">extra firm</span>
+          </h2>
+          <p className="body-copy mt-2.5 max-w-md text-[13px] leading-relaxed text-ink/55">
+            Same weight, different sink. Match Soft, Medium or Firm above to how
+            deep you want the foam to give under everyday sitting.
+          </p>
+
+          <div className="relative mt-5 flex flex-1 items-center justify-center bg-[#EEEFF1] p-1 sm:mt-6">
+            <div className="relative aspect-[16/7] w-full min-h-[160px] sm:min-h-[200px] lg:min-h-[240px]">
+              <Image
+                src="/karmo/images/product/gg.gif"
+                alt="Firmness scale — how far the same weight sinks from soft to firm"
+                fill
+                unoptimized
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-contain object-center"
+              />
+            </div>
           </div>
         </motion.div>
 
-        <motion.div variants={fade} className="lg:col-span-7">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-            Construction
-          </span>
-          <h2 className="display mt-3 text-[1.55rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[1.9rem]">
-            Built in{" "}
-            <span className="font-bold text-brand">four layers</span>
-          </h2>
-          <LeafRule align="start" />
-          <p className="body-copy mt-5 max-w-lg text-[14px] leading-relaxed text-ink/55">
-            Not a mystery sandwich of unknown foam. Every sheet is poured,
-            graded and cut so comfort, bounce and support each have a job.
+        {/* ── Build 4 layer ── */}
+        <motion.div
+          variants={fade}
+          className="flex flex-col bg-[#EEEFF1] px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
+            Build 4 layer
           </p>
+          <h2 className="display mt-1.5 text-[1.35rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.55rem]">
+            Inside every{" "}
+            <span className="font-bold text-brand">Karmo mattress</span>
+          </h2>
 
-          <ol className="mt-8 space-y-0">
-            {layers.map((layer, i) => (
-              <li
-                key={layer.n}
-                className={`flex gap-4 py-5 ${
-                  i < layers.length - 1 ? "border-b border-ink/8" : ""
-                }`}
-              >
-                <span className="display shrink-0 text-[1.25rem] font-bold tabular-nums text-brand">
-                  {layer.n}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-[14px] font-bold uppercase tracking-[0.06em] text-ink">
-                    {layer.title}
-                  </h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-ink/55">
-                    {layer.body}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-4 grid flex-1 items-center gap-4 sm:mt-5 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-5">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-[220px] sm:max-w-[260px] lg:max-w-none lg:max-h-[420px]">
+              <Image
+                src="/karmo/images/product/build-4-layers.png"
+                alt="Karmo mattress build — four numbered layers exploded"
+                fill
+                sizes="(min-width: 1024px) 22vw, 260px"
+                className="object-contain object-center"
+              />
+            </div>
+
+            <ol className="space-y-0">
+              {layers.map((layer, i) => (
+                <li
+                  key={layer.n}
+                  className={`flex gap-2.5 py-2.5 ${
+                    i < layers.length - 1 ? "border-b border-ink/10" : ""
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-[11px] font-bold text-white"
+                  >
+                    {layer.n}
+                  </span>
+                  <div className="min-w-0">
+                    <h3 className="text-[13px] font-bold leading-snug text-brand sm:text-[14px]">
+                      {layer.title}
+                    </h3>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-ink/55 sm:text-[12.5px]">
+                      {layer.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </motion.div>
       </motion.div>
     </section>

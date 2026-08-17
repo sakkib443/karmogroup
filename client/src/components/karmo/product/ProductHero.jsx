@@ -4,21 +4,20 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiCheck, FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
+import { FiCheck, FiChevronDown, FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 
 import { useAppDispatch } from "@/redux";
 import { addToCart } from "@/redux/slices/cartSlice";
 
-function FieldLabel({ children, value }) {
+function OptionBlock({ title, children }) {
   return (
-    <div className="mb-2.5 flex items-baseline justify-between gap-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55">
-        {children}
-      </p>
-      {value ? (
-        <span className="text-[12px] font-semibold text-ink">{value}</span>
-      ) : null}
+    <div className="border-b border-ink/10 py-2.5">
+      <div className="mb-2.5 flex items-center gap-2">
+        <FiChevronDown className="shrink-0 text-ink/70" size={14} />
+        <span className="text-[13px] font-semibold text-ink">{title}</span>
+      </div>
+      {children}
     </div>
   );
 }
@@ -28,7 +27,7 @@ export default function ProductHero({ product }) {
   const router = useRouter();
 
   const [active, setActive] = useState(0);
-  const [density, setDensity] = useState(product.densities?.[0]?.id || "");
+  const [fabric, setFabric] = useState(product.fabrics?.[0]?.id || "");
   const [color, setColor] = useState(product.colors?.[0]?.id || "");
   const [sizeId, setSizeId] = useState(product.sizes?.[0]?.id || "custom");
   const [width, setWidth] = useState("72");
@@ -39,8 +38,8 @@ export default function ProductHero({ product }) {
   const gallery = product.gallery || [];
   const mainSrc = gallery[active] || gallery[0];
 
+  const selectedFabric = product.fabrics?.find((f) => f.id === fabric);
   const selectedColor = product.colors?.find((c) => c.id === color);
-  const selectedDensity = product.densities?.find((d) => d.id === density);
   const selectedSize = product.sizes?.find((s) => s.id === sizeId);
   const isCustom = sizeId === "custom";
 
@@ -53,17 +52,17 @@ export default function ProductHero({ product }) {
   const onAdd = () => {
     dispatch(
       addToCart({
-        id: `${product.slug}_${color}_${sizeId}_${density}_${qty}`,
+        id: `${product.slug}_${fabric}_${color}_${sizeId}_${qty}`,
         productId: product.slug,
         name: product.name,
         price: product.price,
         mrp: product.mrp || product.price,
-        image: mainSrc,
+        image: selectedFabric?.image || mainSrc,
         category: product.division,
         quantity: qty,
         color: selectedColor?.label,
         colorHex: selectedColor?.hex,
-        size: `${selectedDensity?.label || ""} · ${sizeLabel}`.replace(/^ · /, ""),
+        size: [selectedFabric?.label, sizeLabel].filter(Boolean).join(" · "),
       })
     );
     toast.success("Added to cart", {
@@ -82,8 +81,8 @@ export default function ProductHero({ product }) {
 
   return (
     <section className="border-b border-ink/8 bg-white">
-      <div className="shell py-8 lg:py-12">
-        <nav className="mb-6 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/40">
+      <div className="shell pt-3 pb-8 lg:pt-4 lg:pb-12">
+        <nav className="mb-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/40">
           <Link href="/" className="hover:text-brand">
             Home
           </Link>
@@ -96,7 +95,6 @@ export default function ProductHero({ product }) {
         </nav>
 
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-          {/* ── Gallery ─────────────────────────────────────────────────── */}
           <div className="lg:col-span-7">
             <div className="flex gap-3">
               <ul className="hidden w-[76px] shrink-0 flex-col gap-2 sm:flex">
@@ -149,7 +147,6 @@ export default function ProductHero({ product }) {
             </ul>
           </div>
 
-          {/* ── Buy box ────────────────────────────────────────────────── */}
           <div className="lg:col-span-5">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
@@ -162,21 +159,21 @@ export default function ProductHero({ product }) {
               ) : null}
             </div>
 
-            <h1 className="display mt-3 text-[1.7rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-ink sm:text-[2rem]">
+            <h1 className="display mt-2.5 text-[1.7rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-ink sm:text-[2rem]">
               {product.name}
             </h1>
 
             {product.description ? (
-              <p className="body-copy mt-3 line-clamp-2 text-[13px] leading-[1.65] text-ink/55">
+              <p className="body-copy mt-2.5 line-clamp-2 text-[13px] leading-[1.65] text-ink/55">
                 {product.description}
               </p>
             ) : product.line ? (
-              <p className="mt-3 line-clamp-2 text-[13px] leading-[1.65] text-ink/55">
+              <p className="mt-2.5 line-clamp-2 text-[13px] leading-[1.65] text-ink/55">
                 {product.line}
               </p>
             ) : null}
 
-            <div className="mt-6 border-y border-ink/10 py-5">
+            <div className="mt-4 border-y border-ink/10 py-2.5">
               <div className="flex flex-wrap items-end gap-3">
                 {product.wasLabel ? (
                   <s className="text-[15px] tabular-nums text-ink/35">
@@ -188,139 +185,135 @@ export default function ProductHero({ product }) {
                 </span>
               </div>
               {product.unitNote ? (
-                <p className="mt-2 text-[12px] text-ink/40">{product.unitNote}</p>
+                <p className="mt-1 text-[12px] text-ink/40">{product.unitNote}</p>
               ) : null}
             </div>
 
-            {/* Colour swatches — small squares */}
-            {product.colors?.length ? (
-              <div className="mt-5">
-                <FieldLabel value={selectedColor?.label}>Colour</FieldLabel>
-                <ul className="flex flex-wrap gap-2">
-                  {product.colors.map((c) => {
-                    const on = color === c.id;
-                    return (
-                      <li key={c.id}>
-                        <button
-                          type="button"
-                          title={c.label}
-                          aria-label={c.label}
-                          aria-pressed={on}
-                          onClick={() => setColor(c.id)}
-                          className={`relative flex h-7 w-7 items-center justify-center border transition-all ${
-                            on
-                              ? "border-brand ring-1 ring-brand/30"
-                              : "border-ink/20 hover:border-ink/40"
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                        >
-                          {on ? (
-                            <FiCheck
-                              className={
-                                c.hex === "#3D3D3D" || c.hex === "#1E3A5F"
-                                  ? "text-white"
-                                  : "text-ink"
-                              }
-                              size={12}
-                              strokeWidth={2.5}
+            <div className="mt-1">
+              {product.fabrics?.length ? (
+                <OptionBlock title="Fabric">
+                  <ul className="flex flex-wrap gap-1.5">
+                    {product.fabrics.map((f) => {
+                      const on = fabric === f.id;
+                      return (
+                        <li key={f.id}>
+                          <button
+                            type="button"
+                            title={f.label}
+                            aria-label={f.label}
+                            aria-pressed={on}
+                            onClick={() => setFabric(f.id)}
+                            className={`relative block h-9 w-9 overflow-hidden border transition-colors ${
+                              on
+                                ? "border-brand"
+                                : "border-ink/15 hover:border-ink/35"
+                            }`}
+                          >
+                            <Image
+                              src={f.image}
+                              alt=""
+                              fill
+                              sizes="36px"
+                              className="object-cover"
                             />
-                          ) : null}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ) : null}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </OptionBlock>
+              ) : null}
 
-            {/* Density — compact, active brand red */}
-            {product.densities?.length ? (
-              <div className="mt-5">
-                <FieldLabel value={selectedDensity?.label}>Density</FieldLabel>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {product.densities.map((d) => {
-                    const on = density === d.id;
-                    return (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => setDensity(d.id)}
-                        className={`border px-1.5 py-2 text-center transition-colors ${
-                          on
-                            ? "border-brand bg-brand text-white"
-                            : "border-ink/15 bg-white text-ink hover:border-ink/35"
-                        }`}
-                      >
-                        <span className="block text-[10px] font-bold uppercase tracking-[0.08em]">
-                          {d.label}
-                        </span>
-                        <span
-                          className={`mt-0.5 block text-[9px] leading-tight ${
-                            on ? "text-white/75" : "text-ink/40"
+              {product.colors?.length ? (
+                <OptionBlock title="Colour">
+                  <ul className="flex flex-wrap gap-2">
+                    {product.colors.map((c) => {
+                      const on = color === c.id;
+                      return (
+                        <li key={c.id}>
+                          <button
+                            type="button"
+                            title={c.label}
+                            aria-label={c.label}
+                            aria-pressed={on}
+                            onClick={() => setColor(c.id)}
+                            className={`relative flex h-7 w-7 items-center justify-center border transition-all ${
+                              on
+                                ? "border-brand ring-1 ring-brand/30"
+                                : "border-ink/20 hover:border-ink/40"
+                            }`}
+                            style={{ backgroundColor: c.hex }}
+                          >
+                            {on ? (
+                              <FiCheck
+                                className={
+                                  c.hex === "#3D3D3D" || c.hex === "#1E3A5F"
+                                    ? "text-white"
+                                    : "text-ink"
+                                }
+                                size={12}
+                                strokeWidth={2.5}
+                              />
+                            ) : null}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </OptionBlock>
+              ) : null}
+
+              {product.sizes?.length ? (
+                <OptionBlock title="Size (cm)">
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {product.sizes.map((s) => {
+                      const on = sizeId === s.id;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => setSizeId(s.id)}
+                          className={`border px-1 py-2 text-center transition-colors ${
+                            on
+                              ? "border-brand bg-brand/[0.06] text-ink"
+                              : "border-ink/15 text-ink hover:border-ink/35"
                           }`}
                         >
-                          {d.note}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
-
-            {/* Size — four compact chips on one row */}
-            {product.sizes?.length ? (
-              <div className="mt-5">
-                <FieldLabel value={sizeLabel}>Size</FieldLabel>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {product.sizes.map((s) => {
-                    const on = sizeId === s.id;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => setSizeId(s.id)}
-                        className={`border px-1 py-2 text-center transition-colors ${
-                          on
-                            ? "border-brand bg-brand/[0.06] text-ink"
-                            : "border-ink/15 text-ink hover:border-ink/35"
-                        }`}
-                      >
-                        <span className="block text-[10px] font-bold leading-tight tracking-tight">
-                          {s.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {isCustom ? (
-                  <div className="mt-2.5 grid grid-cols-3 gap-1.5">
-                    {[
-                      ["W", "Width", width, setWidth],
-                      ["L", "Length", length, setLength],
-                      ["H", "Height", height, setHeight],
-                    ].map(([short, label, value, set]) => (
-                      <label key={label} className="block">
-                        <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.1em] text-ink/40">
-                          {short}
-                        </span>
-                        <input
-                          type="number"
-                          min="1"
-                          value={value}
-                          onChange={(e) => set(e.target.value)}
-                          className="w-full border border-ink/15 bg-white px-2 py-2 text-[12px] text-ink outline-none focus:border-brand"
-                        />
-                      </label>
-                    ))}
+                          <span className="block text-[10px] font-bold leading-tight tracking-tight">
+                            {s.label}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
-                ) : null}
-              </div>
-            ) : null}
 
-            {/* Quantity */}
-            <div className="mt-6 flex items-center justify-between gap-4">
+                  {isCustom ? (
+                    <div className="mt-2 grid grid-cols-3 gap-1.5">
+                      {[
+                        ["Width", width, setWidth],
+                        ["Length", length, setLength],
+                        ["Height", height, setHeight],
+                      ].map(([label, value, set]) => (
+                        <label key={label} className="block">
+                          <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.1em] text-ink/40">
+                            {label}
+                          </span>
+                          <input
+                            type="number"
+                            min="1"
+                            value={value}
+                            onChange={(e) => set(e.target.value)}
+                            className="w-full border border-ink/15 bg-white px-2 py-2 text-[12px] text-ink outline-none focus:border-brand"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  ) : null}
+                </OptionBlock>
+              ) : null}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/55">
                 Quantity
               </p>
@@ -329,29 +322,29 @@ export default function ProductHero({ product }) {
                   type="button"
                   aria-label="Decrease quantity"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="flex h-11 w-11 items-center justify-center text-ink/55 hover:text-ink"
+                  className="flex h-10 w-10 items-center justify-center text-ink/55 hover:text-ink"
                 >
                   <FiMinus size={14} />
                 </button>
-                <span className="min-w-[2.75rem] text-center text-[15px] font-bold tabular-nums text-ink">
+                <span className="min-w-[2.5rem] text-center text-[15px] font-bold tabular-nums text-ink">
                   {qty}
                 </span>
                 <button
                   type="button"
                   aria-label="Increase quantity"
                   onClick={() => setQty((q) => q + 1)}
-                  className="flex h-11 w-11 items-center justify-center text-ink/55 hover:text-ink"
+                  className="flex h-10 w-10 items-center justify-center text-ink/55 hover:text-ink"
                 >
                   <FiPlus size={14} />
                 </button>
               </div>
             </div>
 
-            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={onAdd}
-                className="inline-flex h-[50px] items-center justify-center gap-2 border border-ink bg-white text-[12px] font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-cream"
+                className="inline-flex h-[48px] items-center justify-center gap-2 border border-ink bg-white text-[12px] font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-cream"
               >
                 <FiShoppingCart size={15} />
                 Add to cart
@@ -359,7 +352,7 @@ export default function ProductHero({ product }) {
               <button
                 type="button"
                 onClick={onOrder}
-                className="inline-flex h-[50px] items-center justify-center bg-brand text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark"
+                className="inline-flex h-[48px] items-center justify-center bg-brand text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark"
               >
                 Order now
               </button>

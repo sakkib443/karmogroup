@@ -1,36 +1,35 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { FiAward, FiCreditCard, FiShield, FiTruck } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Four service claims under the buy box — presented in the homepage
- * `StandardStrip` / `MattressFeatures` language: a centred icon in an 88px
- * hover-scale badge area, a bold uppercase title and a note, with `border-l`
- * dividers between columns. (No illustrated badge art exists for EMI / trial /
- * warranty, so the line icons are used, sized up and brand-coloured to sit in
- * the same badge slot.)
+ * Four service claims under the buy box — same illustrated-icon language as
+ * the homepage `StandardStrip` New pack (trust/v2).
  */
 const promises = [
   {
-    icon: FiCreditCard,
+    src: "/karmo/images/trust/v2/trusted.png",
+    scale: 0.82,
     title: "No Cost EMI",
     note: "Flexible monthly plans on eligible orders",
   },
   {
-    icon: FiAward,
+    src: "/karmo/images/trust/v2/recognised.png",
+    scale: 0.82,
     title: "30 Nights Free Trial",
     note: "Sleep on it — return within 30 nights if it is not right",
   },
   {
-    icon: FiTruck,
+    src: "/karmo/images/trust/v2/free-delivery.png",
+    scale: 1,
     title: "Free Delivery",
     note: "Doorstep delivery across Bangladesh on this range",
   },
   {
-    icon: FiShield,
+    src: "/karmo/images/trust/v2/legacy-60.png",
+    scale: 1,
     title: "Up to 20 Years Warranty",
     note: "Covered for long-term durability and manufacturing defects",
   },
@@ -46,7 +45,7 @@ export default function ProductPromiseStrip() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid w-full grid-cols-2 gap-5 px-6 py-8 md:grid-cols-4 md:gap-7 md:px-10 md:py-10 lg:gap-0 lg:px-16 lg:py-12"
+        className="grid w-full grid-cols-2 gap-4 px-6 py-4 md:grid-cols-4 md:gap-5 md:px-10 md:py-5 lg:gap-0 lg:px-16 lg:py-5"
       >
         {promises.map((item, i) => (
           <motion.li
@@ -58,13 +57,23 @@ export default function ProductPromiseStrip() {
               i > 0 ? "lg:border-l lg:border-ink/10" : ""
             }`}
           >
-            <span className="mx-auto flex h-20 w-20 items-center justify-center text-brand transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[5.5rem] sm:w-[5.5rem]">
-              <item.icon className="text-[40px]" strokeWidth={1.5} />
+            <span className="relative mx-auto flex h-14 w-14 items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-16 sm:w-16">
+              <img
+                src={item.src}
+                alt=""
+                aria-hidden="true"
+                width={64}
+                height={64}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 m-auto h-14 w-14 object-contain sm:h-16 sm:w-16"
+                style={item.scale !== 1 ? { transform: `scale(${item.scale})` } : undefined}
+              />
             </span>
-            <h3 className="display mt-2.5 text-[0.72rem] font-bold uppercase leading-snug tracking-[0.08em] text-ink xl:text-[0.78rem]">
+            <h3 className="display mt-1.5 text-[0.72rem] font-bold uppercase leading-snug tracking-[0.08em] text-ink xl:text-[0.78rem]">
               {item.title}
             </h3>
-            <p className="body-copy mx-auto mt-1.5 max-w-[11rem] text-[12px] leading-[1.55] text-ink/55 xl:text-[12.5px]">
+            <p className="body-copy mx-auto mt-1 max-w-[11rem] text-[12px] leading-[1.5] text-ink/55 xl:text-[12.5px]">
               {item.note}
             </p>
           </motion.li>

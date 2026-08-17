@@ -40,7 +40,7 @@ export default function Hero() {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[72%_32%] sm:object-[74%_30%] lg:object-[80%_28%]"
+        className="object-cover object-[48%_38%] sm:object-[74%_30%] lg:object-[80%_28%]"
       />
 
       <div

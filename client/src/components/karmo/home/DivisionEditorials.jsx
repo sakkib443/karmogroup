@@ -154,8 +154,8 @@ export default function DivisionEditorials() {
           </p>
 
           <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
-            <span className="block whitespace-nowrap">Iconic brands.</span>
-            <span className="block whitespace-nowrap text-brand">
+            <span className="block sm:whitespace-nowrap">Iconic brands.</span>
+            <span className="block text-brand sm:whitespace-nowrap">
               Lasting craft.
             </span>
           </h2>
@@ -204,7 +204,11 @@ export default function DivisionEditorials() {
           {columns.map((col, i) => (
             <div
               key={`div-col-${i}`}
-              className={`flex min-h-0 flex-col lg:h-full ${GAP}`}
+              className={
+                i === columns.length - 1
+                  ? `col-span-2 grid min-h-0 grid-cols-2 ${GAP} md:col-span-1 md:flex md:flex-col lg:h-full`
+                  : `flex min-h-0 flex-col lg:h-full ${GAP}`
+              }
             >
               {col.map((shot) => (
                 <Shot key={shot.id} shot={shot} />

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
   FiMapPin,
-  FiPhone,
   FiSearch,
   FiHeart,
   FiUser,
@@ -13,11 +12,16 @@ import {
   FiChevronDown,
   FiChevronRight,
   FiArrowUpRight,
+  FiArrowRight,
   FiGrid,
   FiMenu,
   FiX,
 } from "react-icons/fi";
 import {
+  TbArmchair,
+  TbBed,
+  TbFeather,
+  TbFlask,
   TbBox,
   TbRecycle,
   TbShape,
@@ -63,6 +67,7 @@ const nav = [
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
+    icon: TbArmchair,
     /* Eight categories from the client's Foam Catalogue (pages 5–23). */
     columns: [
       {
@@ -94,6 +99,7 @@ const nav = [
     name: "Mattress",
     line: "Orthopedic, pocket spring",
     href: "/mattress",
+    icon: TbBed,
     panelWidth: "w-[78rem]",
     /* Old Shop By Comfort / Size / Type + catalogue product lines. */
     columns: [
@@ -146,6 +152,7 @@ const nav = [
     name: "HomeTex",
     line: "Bed sheets, comforters",
     href: "/hometex",
+    icon: TbFeather,
     /* Bedding range from Mattress Catalogue pages 19–27 (HomeTex section). */
     columns: [
       {
@@ -176,6 +183,7 @@ const nav = [
     name: "Chemicals",
     line: "Adhesives, polymers",
     href: "/chemicals",
+    icon: TbFlask,
     columns: [
       {
         label: "Adhesive",
@@ -243,6 +251,9 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
               onFocus={() => openPanel(entry.name)}
               className="flex items-center gap-1.5 px-2.5 py-2.5 text-ink transition-colors duration-300 hover:text-brand"
             >
+              {entry.icon ? (
+                <entry.icon className="shrink-0 text-[17px] text-ink/55" />
+              ) : null}
               <span className="display block text-[13px] font-bold uppercase leading-none tracking-[0.1em]">
                 {entry.name}
               </span>
@@ -328,21 +339,30 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
 }
 
 /**
- * Primary header CTA — contact over store-finding, because Karmo is not
- * stocked in every city. Same dark bar + brand tile as the old store button.
+ * Primary header CTA — Find a Store (dark bar + brand map-pin tile).
  */
-function HeaderCtaButton() {
+function HeaderCtaButton({ compact = false }) {
   return (
     <Link
-      href="/contact"
-      className="group flex h-[44px] shrink-0 items-center gap-2.5 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade"
+      href="/find-store"
+      className="group flex h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade"
     >
-      <span className="flex h-[32px] w-[32px] items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(212,67,72,0.6)] transition-all duration-300 group-hover:-translate-y-px group-hover:shadow-[0_6px_16px_-4px_rgba(212,67,72,0.75)]">
-        <FiPhone className="text-[15px]" />
+      <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(212,67,72,0.6)] transition-all duration-300 group-hover:-translate-y-px group-hover:shadow-[0_6px_16px_-4px_rgba(212,67,72,0.75)]">
+        <FiMapPin className="text-[16px]" />
       </span>
-      <span className="display block text-[12.5px] font-bold uppercase leading-none tracking-[0.08em]">
-        Talk to Us
+      <span className="block text-left">
+        <span className="display block text-[12.5px] font-bold leading-tight">
+          Find a Store
+        </span>
+        {!compact && (
+          <span className="block text-[10.5px] leading-tight text-white/60">
+            Showrooms nationwide
+          </span>
+        )}
       </span>
+      {!compact && (
+        <FiArrowRight className="text-[14px] text-white/55 transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-brand" />
+      )}
     </Link>
   );
 }
@@ -519,6 +539,9 @@ export default function Navbar() {
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-3.5"
                     >
+                      {entry.icon ? (
+                        <entry.icon className="shrink-0 text-[18px] text-ink/55" />
+                      ) : null}
                       <span className="min-w-0 flex-1">
                         <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
                           {entry.name}
@@ -596,12 +619,22 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/contact"
+                href="/find-store"
                 onClick={() => setOpen(false)}
-                className="mt-2 flex items-center justify-center gap-3 bg-shade-soft py-3.5 text-[13px] font-bold uppercase tracking-[0.08em] text-white md:hidden"
+                className="mt-2 flex items-center gap-3 rounded-[4px] bg-shade-soft py-2.5 pl-2 pr-4 text-white md:hidden"
               >
-                <FiPhone className="text-[16px]" />
-                Talk to Us
+                <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[3px] bg-brand">
+                  <FiMapPin className="text-[16px]" />
+                </span>
+                <span className="block text-left">
+                  <span className="display block text-[12.5px] font-bold leading-tight">
+                    Find a Store
+                  </span>
+                  <span className="block text-[10.5px] leading-tight text-white/60">
+                    Showrooms nationwide
+                  </span>
+                </span>
+                <FiArrowRight className="ml-auto text-[14px] text-white/55" />
               </Link>
             </div>
           </div>

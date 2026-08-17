@@ -22,10 +22,9 @@ const GAP = "gap-1 md:gap-1.5";
    carries the 6px the client set as the gap between every two sections —
    padding on both would double it. */
 const GUTTER = "px-0 pb-0 pt-0";
-const TILE_H =
-  "h-[min(62svh,600px)] min-h-[340px] md:h-[min(60svh,620px)]";
+const TILE_H = "md:h-[min(60svh,620px)]";
 const FILM_H =
-  "h-[min(72svh,720px)] min-h-[420px] md:h-[min(68svh,700px)]";
+  "h-[min(58svh,520px)] min-h-[320px] md:h-[min(68svh,700px)] md:min-h-[420px]";
 
 const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
@@ -141,7 +140,7 @@ export default function LivingLookbook() {
             <motion.div
               key={panel.id}
               variants={fade}
-              className="relative min-h-[260px] min-w-0 md:min-h-0"
+              className="relative min-h-[min(52svh,420px)] min-w-0 md:min-h-0"
             >
               <Link
                 href={panel.href}
