@@ -137,7 +137,7 @@ export default function Partners() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Partners &amp; clients
           </span>
-          <h2 className="display mt-1 whitespace-nowrap text-[1.05rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.15rem] lg:text-[1.3rem]">
+          <h2 className="display mt-1 max-sm:whitespace-normal whitespace-nowrap text-[1.05rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.15rem] lg:text-[1.3rem]">
             Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
             makers
           </h2>

@@ -3,8 +3,7 @@
 import Link from "next/link";
 import ProductHero from "@/components/karmo/product/ProductHero";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
-import ProductLifestyle from "@/components/karmo/product/ProductLifestyle";
-import ProductFirmnessGuide from "@/components/karmo/product/ProductFirmnessGuide";
+import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
 import ProductLayers from "@/components/karmo/product/ProductLayers";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
 import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
@@ -33,8 +32,7 @@ export default function ProductDetailPage({ product }) {
     <>
       <ProductHero product={product} />
       <ProductPromiseStrip />
-      <ProductLifestyle />
-      <ProductFirmnessGuide />
+      <ProductMattressBanner />
       <ProductLayers />
       <ProductVideoFeatures features={product.features} />
       <CertifiedBy />
