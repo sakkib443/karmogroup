@@ -101,7 +101,7 @@ export default function DivisionsStrip() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Our Divisions
           </span>
-          <h2 className="display mt-1 whitespace-nowrap text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
+          <h2 className="display mt-1 max-sm:whitespace-normal whitespace-nowrap text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
             One group, <span className="font-bold text-brand">four crafts</span>
           </h2>
         </motion.div>

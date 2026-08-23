@@ -195,8 +195,8 @@ export default function Reels() {
           </p>
 
           <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
-            <span className="block whitespace-nowrap">See comfort.</span>
-            <span className="block whitespace-nowrap text-brand">
+            <span className="block sm:whitespace-nowrap">See comfort.</span>
+            <span className="block text-brand sm:whitespace-nowrap">
               On screen.
             </span>
           </h2>
@@ -249,7 +249,11 @@ export default function Reels() {
           {columns.map((col, i) => (
             <div
               key={`film-col-${i}`}
-              className="flex min-h-0 flex-col gap-1 md:gap-1.5 lg:h-full"
+              className={
+                i === columns.length - 1
+                  ? "col-span-2 grid min-h-0 grid-cols-2 gap-1 md:col-span-1 md:flex md:flex-col md:gap-1.5 lg:h-full"
+                  : "flex min-h-0 flex-col gap-1 md:gap-1.5 lg:h-full"
+              }
             >
               {col.map((film) => (
                 <FilmShot

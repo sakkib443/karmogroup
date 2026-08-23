@@ -1058,10 +1058,17 @@ svg.app-icon[fill="none"] {
   }
 }
 
-/* Home Two — explore split bands (paired panels + full-width) match editorials. */
+/* Home Two — explore split bands match editorials on desktop only.
+   On mobile, auto height so stacked panels aren’t crushed into one viewport. */
 .explore-band {
-  height: var(--explore-band-h, calc(100svh - 32px)) !important;
-  min-height: var(--explore-band-h, calc(100svh - 32px)) !important;
+  height: auto !important;
+  min-height: min(52svh, 420px) !important;
+}
+@media (min-width: 768px) {
+  .explore-band {
+    height: var(--explore-band-h, calc(100svh - 32px)) !important;
+    min-height: var(--explore-band-h, calc(100svh - 32px)) !important;
+  }
 }
 
 /* Gallery and film-strip marquees.
