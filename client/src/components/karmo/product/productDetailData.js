@@ -55,6 +55,22 @@ export const colorOptions = [
   { id: "navy", label: "Navy", hex: "#1E3A5F" },
 ];
 
+/** Fabric pattern swatches — from resource Product-Page.html. */
+export const fabricOptions = [
+  { id: "fabric-1", label: "Fabric 1", image: "/karmo/images/product/fabrics/fabric1.jpg" },
+  { id: "fabric-2", label: "Fabric 2", image: "/karmo/images/product/fabrics/fabric2.jpg" },
+  { id: "fabric-3", label: "Fabric 3", image: "/karmo/images/product/fabrics/fabric3.jpg" },
+  { id: "fabric-4", label: "Fabric 4", image: "/karmo/images/product/fabrics/fabric4.jpg" },
+  { id: "fabric-5", label: "Fabric 5", image: "/karmo/images/product/fabrics/fabric5.jpg" },
+  { id: "fabric-6", label: "Fabric 6", image: "/karmo/images/product/fabrics/fabric6.jpg" },
+  { id: "fabric-7", label: "Fabric 7", image: "/karmo/images/product/fabrics/fabric7.jpg" },
+  { id: "fabric-8", label: "Fabric 8", image: "/karmo/images/product/fabrics/fabric8.jpg" },
+  { id: "fabric-9", label: "Fabric 9", image: "/karmo/images/product/fabrics/fabric9.jpg" },
+  { id: "fabric-10", label: "Fabric 10", image: "/karmo/images/product/fabrics/fabric10.jpg" },
+  { id: "fabric-11", label: "Fabric 11", image: "/karmo/images/product/fabrics/fabric11.jpg" },
+  { id: "fabric-12", label: "Fabric 12", image: "/karmo/images/product/fabrics/fabric12.jpg" },
+];
+
 /** Common sheet sizes in cm — Custom unlocks free W × L × H. */
 export const sizePresets = [
   { id: "72x36x4", label: "72×36×4", note: "Sofa seat" },
@@ -74,6 +90,7 @@ export const sharedProductDetail = {
     "Pure rubber-grade foam with zero fillers — dense, springy and cut to your frame. Trusted for sofa seats and cushions since 1965.",
   category: "furniture",
   gallery: productGallery,
+  fabrics: fabricOptions,
   densities: densityOptions,
   colors: colorOptions,
   sizes: sizePresets,

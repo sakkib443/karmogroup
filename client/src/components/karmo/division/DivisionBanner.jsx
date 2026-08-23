@@ -8,19 +8,22 @@ import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 /**
  * Division hero — the shared carousel for every category page (Foam, HomeTex,
- * Mattress, Chemicals). The whole left column is a FIXED scaffold: the #1 badge
- * line, the headline and the CTAs never move. Only the model name + sub-heading
- * (in a fixed-height, absolutely positioned slot so nothing below it can shift)
- * and the floating product on the right rotate. Auto-plays with a slide/fade;
- * arrows, dots and a per-slide progress bar give explicit manual control.
+ * Mattress, Chemicals). Full-bleed, viewport-tall under the fixed 112px header
+ * (same math as the homepage hero). The whole left column is a FIXED scaffold:
+ * the #1 badge line, the headline and the CTAs never move. Only the model name
+ * + sub-heading (in a fixed-height, absolutely positioned slot so nothing below
+ * it can shift) and the floating product on the right rotate. Auto-plays with a
+ * slide/fade; arrows, dots and a per-slide progress bar give explicit manual
+ * control.
  *
- * This is the design lifted from the mattress page (the client's ideal). Only
- * the CONTENT comes from props — every measurement, colour and animation is
- * fixed here, so editing this file changes the banner on all four pages at once.
+ * Only the CONTENT comes from props — every measurement, colour and animation
+ * is fixed here, so editing this file changes the banner on all four pages at once.
  */
 
 const EASE = [0.22, 1, 0.36, 1];
 const ACCENT = "#FF9A1F";
+/* Matches homepage Hero — fills the screen under the fixed header. */
+const VIEW_H = "h-[calc(100svh-112px+5px)] min-h-[calc(100svh-112px+5px)]";
 
 export default function DivisionBanner({
   bg,
@@ -60,14 +63,14 @@ export default function DivisionBanner({
   const multi = slides.length > 1;
 
   return (
-    <section className="relative min-h-[600px] w-full overflow-hidden bg-ink lg:h-[min(48vw,640px)] lg:min-h-0">
+    <section className={`relative w-full overflow-hidden bg-ink ${VIEW_H}`}>
       <Image
         src={bg}
         alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover object-bottom"
+        className="object-cover object-center"
       />
       {/* Background wash. `warm` is the foam page's gold treatment; `dark` is the
           mattress default. The left-to-right dark fade under both keeps the copy
@@ -85,11 +88,11 @@ export default function DivisionBanner({
         className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent"
       />
 
-      <div className="shell relative z-[1] flex h-full flex-col items-center justify-center gap-8 py-14 text-center lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:py-0 lg:text-left">
+      <div className="shell relative z-[1] flex h-full flex-col items-center justify-center gap-8 py-14 text-center lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:py-0">
         {/* ── Left: fixed scaffold, only the name/sub slot rotates ─────────── */}
         <div className="order-2 lg:order-1">
           {/* Fixed: #1 badge line */}
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 lg:justify-start">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
             <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-white sm:text-[15px]">
               {eyebrowStart}
             </span>
@@ -130,7 +133,7 @@ export default function DivisionBanner({
                 >
                   {slide?.name}
                 </p>
-                <p className="body-copy mx-auto mt-2 max-w-md text-[14px] leading-[1.55] text-white/85 sm:text-[15.5px] lg:mx-0">
+                <p className="body-copy mx-auto mt-2 max-w-md text-[14px] leading-[1.55] text-white/85 sm:text-[15.5px]">
                   {slide?.sub}
                 </p>
               </motion.div>
@@ -138,7 +141,7 @@ export default function DivisionBanner({
           </div>
 
           {/* Fixed: CTAs */}
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             {cta.map((c) =>
               c.primary ? (
                 <Link
@@ -164,7 +167,7 @@ export default function DivisionBanner({
           {/* Fixed: carousel controls — arrows, dots, counter + progress bar.
               Only shown when there is more than one slide. */}
           {multi && (
-            <div className="mt-8 flex flex-col items-center gap-3 lg:items-start">
+            <div className="mt-8 flex flex-col items-center gap-3">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <button
@@ -225,7 +228,7 @@ export default function DivisionBanner({
         </div>
 
         {/* ── Right: rotating floating product (a touch larger) ───────────── */}
-        <div className="relative order-1 flex h-[240px] items-center justify-center sm:h-[300px] lg:order-2 lg:h-full">
+        <div className="relative order-1 flex h-[min(42svh,320px)] items-center justify-center sm:h-[min(46svh,380px)] lg:order-2 lg:h-full lg:max-h-none">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={slide?.id ?? active}
@@ -233,14 +236,14 @@ export default function DivisionBanner({
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={reduce ? {} : { opacity: 0, x: -44, scale: 0.94 }}
               transition={{ duration: 0.55, ease: EASE }}
-              className="relative aspect-square w-[min(100%,580px)]"
+              className="relative aspect-square w-[min(100%,min(72svh,640px))]"
             >
               {slide?.image && (
                 <Image
                   src={slide.image}
                   alt={slide.alt}
                   fill
-                  sizes="(min-width: 1024px) 580px, 76vw"
+                  sizes="(min-width: 1024px) 640px, 76vw"
                   className="object-contain drop-shadow-[0_28px_38px_rgba(0,0,0,0.45)]"
                 />
               )}

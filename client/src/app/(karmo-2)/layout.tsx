@@ -1,17 +1,27 @@
 import {
+  Barlow,
   DM_Sans,
   Figtree,
+  IBM_Plex_Sans,
   Inter,
   Josefin_Sans,
+  Karla,
   Lexend,
+  Libre_Franklin,
   Lora,
   Manrope,
   Montserrat,
+  Mulish,
+  Open_Sans,
   Outfit,
   Playfair_Display,
   Plus_Jakarta_Sans,
   Poppins,
+  Public_Sans,
+  Raleway,
+  Roboto,
   Sora,
+  Source_Sans_3,
   Space_Grotesk,
   Urbanist,
   Work_Sans,
@@ -26,17 +36,11 @@ import HomeTwoSectionSnap from "@/components/karmo/chrome/HomeTwoSectionSnap";
 /**
  * Live homepage chrome — the Home Two header and offset, promoted to `/`.
  *
- * The ten faces below are loaded for the Theme Control panel, which lets the
- * client try a typeface on the real page instead of choosing one from a
- * description. They are scoped to this route group, so the rest of the site is
- * unaffected; when a winner is picked, it goes into `src/config/brand.ts` and
- * the other nine imports (and the panel) come out.
+ * Faces below are loaded for the Theme Control panel. They are scoped to this
+ * route group; when a winner is picked, it goes into `src/config/brand.ts`.
  *
- * Every option is written out in full rather than shared from a constant.
- * `next/font` is resolved at build time by reading the call site, so it needs
- * literal values — passing a spread array fails with "Missing weight" even when
- * the weights are ones the family actually has. Playfair also starts at 400,
- * so it could not have shared a list anyway.
+ * Every option is written out in full — `next/font` needs literal call-site
+ * values (Playfair also starts at 400, so it cannot share a weight list).
  */
 const manrope = Manrope({
   subsets: ["latin"],
@@ -118,6 +122,56 @@ const lora = Lora({
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
+const opensans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const sourcesans = Source_Sans_3({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const ibmplex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const publicsans = Public_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const librefranklin = Libre_Franklin({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const mulish = Mulish({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const raleway = Raleway({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const karla = Karla({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const barlow = Barlow({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
 
 const FACES = [
   manrope,
@@ -136,6 +190,16 @@ const FACES = [
   lexend,
   spacegrotesk,
   lora,
+  opensans,
+  roboto,
+  sourcesans,
+  ibmplex,
+  publicsans,
+  librefranklin,
+  mulish,
+  raleway,
+  karla,
+  barlow,
 ];
 
 export default function KarmoTwoLayout({
@@ -161,6 +225,16 @@ export default function KarmoTwoLayout({
         lexend: lexend.style.fontFamily,
         spacegrotesk: spacegrotesk.style.fontFamily,
         lora: lora.style.fontFamily,
+        opensans: opensans.style.fontFamily,
+        roboto: roboto.style.fontFamily,
+        sourcesans: sourcesans.style.fontFamily,
+        ibmplex: ibmplex.style.fontFamily,
+        publicsans: publicsans.style.fontFamily,
+        librefranklin: librefranklin.style.fontFamily,
+        mulish: mulish.style.fontFamily,
+        raleway: raleway.style.fontFamily,
+        karla: karla.style.fontFamily,
+        barlow: barlow.style.fontFamily,
       }}
     >
       <SmoothScroll />

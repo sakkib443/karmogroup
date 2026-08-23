@@ -37,7 +37,7 @@ import { useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "karmo-theme-control";
 
-/** Sixteen faces, all of them workhorses — nothing script, nothing novelty. */
+/** Twenty-six faces — workhorses only, nothing script or novelty. */
 export const FONT_IDS = [
   "manrope",
   "josefin",
@@ -55,6 +55,16 @@ export const FONT_IDS = [
   "spacegrotesk",
   "playfair",
   "lora",
+  "opensans",
+  "roboto",
+  "sourcesans",
+  "ibmplex",
+  "publicsans",
+  "librefranklin",
+  "mulish",
+  "raleway",
+  "karla",
+  "barlow",
 ];
 
 const LABELS = {
@@ -74,6 +84,16 @@ const LABELS = {
   spacegrotesk: "Space Grotesk",
   playfair: "Playfair Display",
   lora: "Lora",
+  opensans: "Open Sans",
+  roboto: "Roboto",
+  sourcesans: "Source Sans 3",
+  ibmplex: "IBM Plex Sans",
+  publicsans: "Public Sans",
+  librefranklin: "Libre Franklin",
+  mulish: "Mulish",
+  raleway: "Raleway",
+  karla: "Karla",
+  barlow: "Barlow",
 };
 
 /** A short note on what each one is for, so the choice is not blind. */
@@ -94,6 +114,16 @@ const NOTES = {
   spacegrotesk: "Sharp, contemporary",
   playfair: "Editorial serif",
   lora: "Warm reading serif",
+  opensans: "Classic, clear",
+  roboto: "System, familiar",
+  sourcesans: "Adobe, precise",
+  ibmplex: "Corporate, solid",
+  publicsans: "Government, plain",
+  librefranklin: "News, sturdy",
+  mulish: "Quiet, readable",
+  raleway: "Elegant sans",
+  karla: "Soft humanist",
+  barlow: "Condensed, strong",
 };
 
 /**

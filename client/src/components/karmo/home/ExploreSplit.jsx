@@ -17,7 +17,8 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const GAP = "gap-1 md:gap-1.5";
 /* Same desktop height as DivisionEditorials (Iconic brands band). */
 const BAND_H = "calc(100svh - 32px)";
-const VIEW_H = "h-[calc(100svh-32px)] min-h-[calc(100svh-32px)]";
+const VIEW_H =
+  "min-h-[min(52svh,420px)] md:h-[calc(100svh-32px)] md:min-h-[calc(100svh-32px)]";
 
 const panels = [
   {
@@ -28,8 +29,8 @@ const panels = [
     line1: "Mattress made",
     line2: "for deep rest",
     align: "right",
-    // Keep the left of the frame; crop excess on the right.
-    position: "object-left",
+    // Keep the left of the frame on desktop; centre on mobile so the bed isn’t cut.
+    position: "object-[center_40%] md:object-left",
   },
   {
     id: "hometex",
@@ -64,15 +65,15 @@ function Panel({ panel }) {
         className="pointer-events-none absolute inset-0 bg-shade-deep/35"
       />
       <div
-        className={`relative z-[1] flex h-full flex-col justify-start pt-28 sm:pt-32 lg:pt-40 xl:pt-44 p-7 sm:p-9 lg:p-11 xl:p-12 ${
+        className={`relative z-[1] flex h-full flex-col justify-start pt-16 sm:pt-28 lg:pt-40 xl:pt-44 p-7 sm:p-9 lg:p-11 xl:p-12 ${
           isRight
             ? "items-end pr-10 text-right sm:pr-14 lg:pr-16 xl:pr-20"
             : "items-start text-left"
         }`}
       >
         <h2 className="display text-[1.45rem] font-bold uppercase leading-[1.2] tracking-[0.02em] text-white sm:text-[1.65rem] lg:text-[1.85rem] xl:text-[2rem]">
-          <span className="block whitespace-nowrap">{panel.line1}</span>
-          <span className="block whitespace-nowrap">{panel.line2}</span>
+          <span className="block sm:whitespace-nowrap">{panel.line1}</span>
+          <span className="block sm:whitespace-nowrap">{panel.line2}</span>
         </h2>
         <span className="mt-4 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 group-hover:decoration-white sm:mt-5 sm:text-[13px]">
           Explore Now
@@ -127,8 +128,8 @@ export default function ExploreSplit() {
           <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
             <div className="text-right">
               <h2 className="display text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-white sm:text-[2.1rem] lg:text-[2.35rem]">
-                <span className="block whitespace-nowrap">Foam crafted</span>
-                <span className="block whitespace-nowrap">for comfort</span>
+                <span className="block sm:whitespace-nowrap">Foam crafted</span>
+                <span className="block sm:whitespace-nowrap">for comfort</span>
               </h2>
               <Link
                 href="/foam"
