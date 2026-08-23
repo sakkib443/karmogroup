@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="ribbon60" x1="8" y1="54" x2="94" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5B8FBF"/>
+      <stop offset="0.45" stop-color="#9A5F96"/>
+      <stop offset="1" stop-color="#C24A76"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#484848" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M46 24.5C35.2 24.5 27 33.4 27 45.5C27 58.4 36.1 68 47.5 68C57.8 68 65.5 60.2 65.5 50.8C65.5 41.6 58.6 35.2 49.2 35.2C43.2 35.2 38.2 38.6 36.8 44"/>
+    <ellipse cx="79" cy="46.5" rx="13.8" ry="21.2"/>
+  </g>
+  <path fill="url(#ribbon60)" d="M6 57.2C18 50.8 30.5 52.6 40.5 55.8C48.5 58.4 55.5 60.2 63 59.4C72 58.4 80.5 54.2 88.5 50.6L93.2 48.4L97.5 54.8L92.2 58.6C83.5 64.2 73.2 67.2 62.5 67.6C52.5 68 43.2 65.4 34.5 61.8C24.5 57.6 14.5 55.4 6 57.2Z"/>
+  <path d="M14 55.6C28 51.2 42 55 52 58.2C62 61.4 74 62.2 86 57" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" opacity="0.28" fill="none"/>
+</svg>

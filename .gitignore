@@ -24,10 +24,36 @@ client/public/images/MoneyReceipt*
 Thumbs.db
 *.log
 
-# Client reference material — the agency's 32-page company profile, a single
-# 549 MB Illustrator file. Past GitHub's 100 MB per-file limit outright, and
-# once in the history the repo carries the weight even after a delete.
+# Client reference material — Illustrator masters, 500 MB apiece. Past
+# GitHub's 100 MB per-file limit outright, and once in the history the repo
+# carries the weight even after a delete. Named rather than globbed as `*.ai`
+# so a small artwork file can still be committed deliberately.
 Company profile 1-32 page for agency.ai
+Foam Catalogue .ai
+Mattress Catalogue (1).ai
+
+# Client catalogue source (Adobe/PDF) and the lightweight page renders of the
+# mattress catalogue extracted from it. Reference material, kept on disk but
+# out of the repo — the brochure alone is ~68 MB of page PNGs.
+Karmo Adhesive Catalog.pdf
+Mattress Brochure/
+
+# Raw image drops that land in the project root on their way in — generator
+# output, phone photos, screenshots. Anything the site actually uses is
+# converted into client/public/karmo/images/ under a name that says what it
+# is, and the master is filed under recource/originals/ (also ignored). What
+# is left here is a staging area, 3-7 MB a file, and belongs in neither.
+# Any loose image at the repo root, whatever it is called — the named patterns
+# this replaced kept missing new ones (BG1.jpg, a stock filename in Cyrillic
+# transliteration). Nothing is meant to live here: site assets go under
+# client/public/karmo/images/ and masters under recource/originals/.
+/*.png
+/*.jpg
+/*.jpeg
+/*.webp
 
 # Installers and other binaries that land in the working folder by accident.
 *.exe
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

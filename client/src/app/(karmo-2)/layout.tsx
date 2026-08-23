@@ -1,51 +1,176 @@
+import {
+  DM_Sans,
+  Figtree,
+  Inter,
+  Josefin_Sans,
+  Lexend,
+  Lora,
+  Manrope,
+  Montserrat,
+  Outfit,
+  Playfair_Display,
+  Plus_Jakarta_Sans,
+  Poppins,
+  Sora,
+  Space_Grotesk,
+  Urbanist,
+  Work_Sans,
+} from "next/font/google";
+
 import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
-import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
+import Header from "@/components/karmo/header/Header";
+import ThemeControl from "@/components/karmo/chrome/ThemeControl";
+import HomeTwoSectionSnap from "@/components/karmo/chrome/HomeTwoSectionSnap";
 
 /**
- * The homepage runs on its own chrome.
+ * Live homepage chrome — the Home Two header and offset, promoted to `/`.
  *
- * The three homepage designs share a footer and nothing above it. The other
- * two sit in (karmo) and (karmo-3) under their own bars; this group exists so
- * this design can carry the light three-row retail header instead. A nested
- * layout would not have done it — layouts nest rather than replace, so another
- * design's bar would still have rendered above this one.
+ * The ten faces below are loaded for the Theme Control panel, which lets the
+ * client try a typeface on the real page instead of choosing one from a
+ * description. They are scoped to this route group, so the rest of the site is
+ * unaffected; when a winner is picked, it goes into `src/config/brand.ts` and
+ * the other nine imports (and the panel) come out.
  *
- * This group serves `/` as of 5 August 2026, when the client picked this design
- * for the front page; it served `/home-2` before that. Because each design's
- * chrome lives in its own layout, promoting one is a rename of a route segment
- * and nothing else.
- *
- * When the choice is final, the losing groups go.
+ * Every option is written out in full rather than shared from a constant.
+ * `next/font` is resolved at build time by reading the call site, so it needs
+ * literal values — passing a spread array fails with "Missing weight" even when
+ * the weights are ones the family actually has. Playfair also starts at 400,
+ * so it could not have shared a list anyway.
  */
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const josefin = Josefin_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const dmsans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const worksans = Work_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const urbanist = Urbanist({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const figtree = Figtree({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const lexend = Lexend({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const spacegrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+const lora = Lora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const FACES = [
+  manrope,
+  josefin,
+  inter,
+  jakarta,
+  dmsans,
+  outfit,
+  poppins,
+  montserrat,
+  worksans,
+  playfair,
+  sora,
+  urbanist,
+  figtree,
+  lexend,
+  spacegrotesk,
+  lora,
+];
+
 export default function KarmoTwoLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <ThemeControl
+      classNames={FACES.map((f) => f.className).join(" ")}
+      families={{
+        manrope: manrope.style.fontFamily,
+        josefin: josefin.style.fontFamily,
+        inter: inter.style.fontFamily,
+        jakarta: jakarta.style.fontFamily,
+        dmsans: dmsans.style.fontFamily,
+        outfit: outfit.style.fontFamily,
+        poppins: poppins.style.fontFamily,
+        montserrat: montserrat.style.fontFamily,
+        worksans: worksans.style.fontFamily,
+        playfair: playfair.style.fontFamily,
+        sora: sora.style.fontFamily,
+        urbanist: urbanist.style.fontFamily,
+        figtree: figtree.style.fontFamily,
+        lexend: lexend.style.fontFamily,
+        spacegrotesk: spacegrotesk.style.fontFamily,
+        lora: lora.style.fontFamily,
+      }}
+    >
       <SmoothScroll />
-      <HeaderTwo />
-      {/* Clears the fixed header exactly: 3px brand rule + 32px announcement +
-          74px identity row = 109, plus 68px of navigation and the 1px rule
-          above it from lg up = 178. All of them are fixed heights in HeaderTwo
-          for this reason — if a row grew with its contents, every page would
-          start that far underneath the bar.
-          That 1px was missed when these figures were first written, so the top
-          of every page sat a hair under the bar from lg up; measuring the bar
-          to add the brand rule is what turned it up.
-          The announcement rolls away on scroll but the offset does not follow
-          it; the page would jump under the reader if it did. A hero that wants
-          to sit beneath the bar cancels this itself. */}
-      {/* White ground for the whole page. The storefront's `body` runs on the
-          pale blue --color-background (#F8FAFC), which showed through wherever
-          a section is transparent — most visibly in the gutters beside the
-          trust strip, as a pale band between the hero and the sections under
-          it. Set here rather than on `body` so the other 68 storefront pages
-          keep the background they were built on. */}
-      <main className="min-h-screen bg-white pt-[109px] lg:pt-[178px]">
+      <HomeTwoSectionSnap />
+      <Header />
+      {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
+      <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">
         {children}
       </main>
       <Footer />
-    </>
+    </ThemeControl>
   );
 }

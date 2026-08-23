@@ -169,8 +169,8 @@ const CartItemVariants = ({
                                     className="w-6 h-6 rounded-full flex-shrink-0 transition-all disabled:opacity-35 disabled:cursor-not-allowed"
                                     style={{
                                         background: c.hex,
-                                        border: selected ? '2px solid #e60000' : '1.5px solid #d1d5db',
-                                        boxShadow: selected ? '0 0 0 2px rgba(230,0,0,0.2)' : 'none',
+                                        border: selected ? '2px solid #D44348' : '1.5px solid #d1d5db',
+                                        boxShadow: selected ? '0 0 0 2px rgba(212,67,72,0.2)' : 'none',
                                     }}
                                 />
                             );

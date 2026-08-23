@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { FaWhatsapp, FaRobot } from 'react-icons/fa';
-import { LuX, LuSend, LuMessageCircle } from 'react-icons/lu';
+import { LuX, LuSend, LuMessageCircle, LuArrowUp } from 'react-icons/lu';
 import { useRouter } from 'next/navigation';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import { useAppSelector } from '@/redux';
@@ -61,6 +61,17 @@ const FloatingContact: React.FC = () => {
     ]);
     const scrollRef = useRef<HTMLDivElement>(null);
     const hintShownRef = useRef(false);
+    const [showTop, setShowTop] = useState(false);
+
+    // Scroll-to-top — show once the page is well below the first screen.
+    useEffect(() => {
+        const onScroll = () => {
+            setShowTop(window.scrollY > Math.max(480, window.innerHeight * 0.7));
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
 
     // Auto-scroll to newest message
     useEffect(() => {
@@ -305,6 +316,25 @@ const FloatingContact: React.FC = () => {
             {/* ── Floating buttons stack ── */}
             {/* On mobile, sit above the 58px MobileBottomNav so it never covers the Sign In tab; normal position on sm+ */}
             <div className="fixed bottom-[72px] right-4 z-[9999] flex flex-col items-end gap-3 sm:bottom-5">
+                {/* Back to top — above chat; fades in after a deep scroll */}
+                <div
+                    className={`transition-all duration-300 ease-out ${
+                        showTop
+                            ? 'pointer-events-auto translate-y-0 scale-100 opacity-100'
+                            : 'pointer-events-none translate-y-2 scale-90 opacity-0'
+                    }`}
+                >
+                    <button
+                        type="button"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        aria-label="Back to top"
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white shadow-lg transition-transform duration-200 hover:scale-110"
+                        style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.22)' }}
+                    >
+                        <LuArrowUp size={22} />
+                    </button>
+                </div>
+
                 {/* Chat assistant button */}
                 <div className="group relative flex items-center">
                     {/* Hint / tooltip */}

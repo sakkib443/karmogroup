@@ -1,4 +1,5 @@
-import FoamPage from "@/components/karmo/foam/FoamPage";
+import DivisionPage from "@/components/karmo/division/DivisionPage";
+import foam from "@/data/divisions/foam";
 
 export const metadata = {
   title: "Foam — Karmo Group",
@@ -8,8 +9,9 @@ export const metadata = {
 
 /**
  * `/foam` — the Foam division catalogue.
+ * Renders the shared `DivisionPage` template with the foam data.
  * Lives in (karmo-2) so it shares HeaderTwo + Footer with the homepage.
  */
 export default function FoamRoute() {
-  return <FoamPage />;
+  return <DivisionPage data={foam} />;
 }

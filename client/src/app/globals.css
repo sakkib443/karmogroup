@@ -15,6 +15,49 @@ h1, h2, h3, h1 *, h2 *, h3 *,
   font-family: var(--font-heading) !important;
 }
 
+/* Third role for the homepage's Theme Control panel: sub-headings get their
+   own face, between the display lines and the body copy. Scoped to
+   `.home-two-type` so no other page picks it up, and `!important` because the
+   `* { font-family: … !important }` rule above would otherwise win. Falls back
+   to the body face wherever the panel has not set it. */
+.home-two-type h4, .home-two-type h5, .home-two-type h6,
+.home-two-type h4 *, .home-two-type h5 *, .home-two-type h6 *,
+.home-two-type .font-subheading, .home-two-type .font-subheading * {
+  font-family: var(--font-subheading, var(--font-family)) !important;
+}
+
+/* Per-role type scaling for the Theme Control panel.
+ *
+ * `zoom` rather than `font-size`, because every size on this page is written in
+ * rem or px by Tailwind — there is no figure in the CSS to multiply, and a rem
+ * resolves against the root, so a per-role scale cannot come from there.
+ * `zoom` on the element scales the text and reflows the line, which is exactly
+ * what changing a type size should do, and it is contained: a heading's zoom
+ * cannot reach the paragraph next to it.
+ *
+ * Default 1, so with the panel untouched nothing moves. */
+.home-two-type h1, .home-two-type h2, .home-two-type h3 {
+  zoom: var(--type-zoom-heading, 1);
+}
+
+/* Heading weight is NOT set here. It is written as an inline style by
+ * `ThemeControl`, because a rule in this file cannot win.
+ *
+ * Tailwind v4 emits `font-extrabold!` as an `!important` declaration inside
+ * `@layer utilities`, and for `!important` declarations the cascade reverses
+ * layer order: a layered `!important` beats an unlayered one, however specific
+ * the unlayered selector is. Everything in this file is unlayered, so the
+ * override lost silently — the variable was set, the selector matched, and the
+ * weight stayed at 800. An inline `!important` sits above every layer. */
+
+.home-two-type h4, .home-two-type h5, .home-two-type h6 {
+  zoom: var(--type-zoom-sub, 1);
+}
+
+.home-two-type p, .home-two-type li {
+  zoom: var(--type-zoom-body, 1);
+}
+
 /* ===== CSS Variables System for Theme Customization =====
    NOTE: the brand palette (--color-primary and every shade derived from it,
    --color-secondary, --color-sale) is NOT defined here. It is generated from
@@ -967,8 +1010,8 @@ svg.app-icon[fill="none"] {
    two off-whites that step between the white sections. Only --color-brand
    overlaps, and it is set to the same red BRAND_PRIMARY carries. */
 @theme {
-  --color-brand: #e60000;
-  --color-brand-dark: #cc0000;
+  --color-brand: #D44348;
+  --color-brand-dark: #AE373B;
   --color-ink: #222222;
   --color-cream: #f5f5f5;
   --color-sand: #e4e4e4;
@@ -1000,6 +1043,25 @@ svg.app-icon[fill="none"] {
 
 .body-copy {
   font-family: var(--font-family) !important;
+}
+
+/* Home Two — division editorials desktop height (right masonry fills this). */
+@media (min-width: 1024px) {
+  .division-editorials {
+    height: var(--division-h, calc(100svh - 32px)) !important;
+    min-height: var(--division-h, calc(100svh - 32px)) !important;
+  }
+
+  .reels-editorials {
+    height: var(--reels-h, calc(100svh - 32px)) !important;
+    min-height: var(--reels-h, calc(100svh - 32px)) !important;
+  }
+}
+
+/* Home Two — explore split bands (paired panels + full-width) match editorials. */
+.explore-band {
+  height: var(--explore-band-h, calc(100svh - 32px)) !important;
+  min-height: var(--explore-band-h, calc(100svh - 32px)) !important;
 }
 
 /* Gallery and film-strip marquees.
@@ -1097,6 +1159,15 @@ svg.app-icon[fill="none"] {
   animation: marquee-right 52s linear infinite;
 }
 
+/* Partners strip — same loop, slower so the logos can be read. */
+.marquee-left-slow {
+  animation: marquee-left 145s linear infinite;
+}
+
+.marquee-right-slow {
+  animation: marquee-right 158s linear infinite;
+}
+
 /* Holds still under the pointer, so a tile can actually be looked at. */
 .marquee-rows:hover .marquee {
   animation-play-state: paused;
@@ -1123,6 +1194,21 @@ svg.app-icon[fill="none"] {
 
   @media (width >= 64rem) {
     .shell { padding-inline: 5rem; }
+  }
+
+  /* Home Two chrome — header / top bar content width. */
+  .shell-home-two {
+    margin-inline: auto;
+    max-width: 1600px;
+    padding-inline: 1.5rem;
+  }
+
+  @media (width >= 48rem) {
+    .shell-home-two { padding-inline: 3rem; }
+  }
+
+  @media (width >= 64rem) {
+    .shell-home-two { padding-inline: 4rem; }
   }
 
   /* Hero wash. Two gradients stack and their opacities compound, so each
