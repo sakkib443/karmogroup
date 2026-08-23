@@ -20,7 +20,7 @@
 /* ─────────────── COLOUR ─────────────── */
 
 /** ⬇⬇⬇  THE ONE COLOUR VARIABLE  ⬇⬇⬇ */
-export const BRAND_PRIMARY = '#e60000';
+export const BRAND_PRIMARY = '#D44348';
 
 /** Accent used alongside the primary (defaults to the primary itself). */
 export const BRAND_SECONDARY = BRAND_PRIMARY;
@@ -157,7 +157,7 @@ export function brandCssVariables(): string {
  * markup here instead keeps the favicon on the same single source of truth as
  * everything else. Wired up via `metadata.icons` in `src/app/layout.tsx`.
  */
-export function brandFaviconDataUri(letter = 'S'): string {
+export function brandFaviconDataUri(letter = 'K'): string {
     const svg =
         `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">` +
         `<rect width="64" height="64" rx="14" fill="${brand.primary}"/>` +

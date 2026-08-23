@@ -24,7 +24,7 @@ export default function ProductFirmnessGuide() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-b border-ink/8 bg-cream/50 py-14 md:py-20 lg:py-24">
+    <section className="border-b border-ink/8 bg-cream/50 py-8 md:py-10 lg:py-12">
       <motion.div
         variants={group}
         {...reveal}

@@ -6,8 +6,12 @@ import { FiAward, FiCreditCard, FiShield, FiTruck } from "react-icons/fi";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Converts the old `fq0.PNG` promise banner into real Home 02 markup —
- * four clear service claims under the buy box.
+ * Four service claims under the buy box — presented in the homepage
+ * `StandardStrip` / `MattressFeatures` language: a centred icon in an 88px
+ * hover-scale badge area, a bold uppercase title and a note, with `border-l`
+ * dividers between columns. (No illustrated badge art exists for EMI / trial /
+ * warranty, so the line icons are used, sized up and brand-coloured to sit in
+ * the same badge slot.)
  */
 const promises = [
   {
@@ -37,30 +41,32 @@ export default function ProductPromiseStrip() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-b border-ink/8 bg-white">
+    <section className="border-y border-ink/8 bg-white">
       <motion.ul
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell grid gap-px bg-ink/8 sm:grid-cols-2 lg:grid-cols-4"
+        className="grid w-full grid-cols-2 gap-5 px-6 py-8 md:grid-cols-4 md:gap-7 md:px-10 md:py-10 lg:gap-0 lg:px-16 lg:py-12"
       >
-        {promises.map((item) => (
+        {promises.map((item, i) => (
           <motion.li
             key={item.title}
             variants={fade}
-            className="flex items-start gap-3.5 bg-white px-5 py-7 lg:px-6 lg:py-8"
+            className={`group text-center lg:px-4 xl:px-6 ${
+              i === 0 ? "lg:pl-0" : ""
+            } ${i === promises.length - 1 ? "lg:pr-0" : ""} ${
+              i > 0 ? "lg:border-l lg:border-ink/10" : ""
+            }`}
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-brand/25 text-brand">
-              <item.icon className="text-[18px]" strokeWidth={1.75} />
+            <span className="mx-auto flex h-20 w-20 items-center justify-center text-brand transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[5.5rem] sm:w-[5.5rem]">
+              <item.icon className="text-[40px]" strokeWidth={1.5} />
             </span>
-            <span className="min-w-0 pt-0.5">
-              <span className="block text-[13px] font-bold uppercase tracking-[0.06em] text-ink">
-                {item.title}
-              </span>
-              <span className="mt-1.5 block text-[12px] leading-snug text-ink/50">
-                {item.note}
-              </span>
-            </span>
+            <h3 className="display mt-2.5 text-[0.72rem] font-bold uppercase leading-snug tracking-[0.08em] text-ink xl:text-[0.78rem]">
+              {item.title}
+            </h3>
+            <p className="body-copy mx-auto mt-1.5 max-w-[11rem] text-[12px] leading-[1.55] text-ink/55 xl:text-[12.5px]">
+              {item.note}
+            </p>
           </motion.li>
         ))}
       </motion.ul>

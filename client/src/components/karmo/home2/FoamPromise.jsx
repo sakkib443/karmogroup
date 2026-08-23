@@ -462,7 +462,7 @@ export default function FoamPromise({ filmMode = "fixed" }) {
             and the other two are transparent, so any height difference between
             them would read as the white card being misaligned rather than as
             three cards of unequal copy. */}
-        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 lg:gap-7">
+        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 items-stretch gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-7">
           {claims.map((claim) => (
             <motion.div
               key={claim.id}

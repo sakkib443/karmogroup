@@ -146,7 +146,7 @@ export default function OrderAndContact() {
                         index < column.length - 1 ? "border-b border-ink/8" : ""
                       }`}
                     >
-                      <span className="relative z-[1] flex h-11 w-11 shrink-0 items-center justify-center bg-brand text-white shadow-[0_8px_22px_rgba(230,0,0,0.28)]">
+                      <span className="relative z-[1] flex h-11 w-11 shrink-0 items-center justify-center bg-brand text-white shadow-[0_8px_22px_rgba(212,67,72,0.28)]">
                         <step.icon className="text-[18px]" strokeWidth={2.2} />
                       </span>
                       <div className="min-w-0 pt-0.5">
@@ -220,7 +220,7 @@ export default function OrderAndContact() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Name *"
-                  className="w-full border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(230,0,0,0.08)]"
+                  className="w-full border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(212,67,72,0.08)]"
                 />
               </label>
               <label className="block">
@@ -232,7 +232,7 @@ export default function OrderAndContact() {
                   value={telephone}
                   onChange={(e) => setTelephone(e.target.value)}
                   placeholder="Telephone *"
-                  className="w-full border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(230,0,0,0.08)]"
+                  className="w-full border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(212,67,72,0.08)]"
                 />
               </label>
               <label className="block">
@@ -244,7 +244,7 @@ export default function OrderAndContact() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Message *"
-                  className="w-full resize-y border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(230,0,0,0.08)]"
+                  className="w-full resize-y border border-ink/12 bg-white px-4 py-3.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-ink/35 focus:border-brand/50 focus:shadow-[0_0_0_3px_rgba(212,67,72,0.08)]"
                 />
               </label>
 

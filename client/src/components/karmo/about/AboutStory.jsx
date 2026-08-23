@@ -43,7 +43,7 @@ export default function AboutStory() {
           {/* The year, sat on the corner of the frame. It is the one number the
               whole page hangs off, so it gets to be an object rather than a
               line of body copy. */}
-          <div className="absolute -bottom-5 left-5 bg-brand px-6 py-4 text-center shadow-[0_18px_40px_-18px_rgba(230,0,0,0.55)] lg:-bottom-6 lg:left-8">
+          <div className="absolute -bottom-5 left-5 bg-brand px-6 py-4 text-center shadow-[0_18px_40px_-18px_rgba(212,67,72,0.55)] lg:-bottom-6 lg:left-8">
             <span className="block text-[10px] font-bold uppercase tracking-[0.24em] text-white/75">
               {aboutStory.plaque.label}
             </span>
