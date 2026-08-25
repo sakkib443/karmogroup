@@ -37,37 +37,26 @@ import {
   TbDroplet,
   TbTestPipe,
   TbAtom,
-  TbBone,
-  TbShield,
-  TbAward,
-  TbCircles,
-  TbCircleDot,
-  TbLeaf,
-  TbCrown,
-  TbFold,
   TbLayersSubtract,
   TbBoxAlignBottom,
 } from "react-icons/tb";
-import {
-  MattressFirmIcon,
-  MattressMediumIcon,
-  MattressSoftIcon,
-  BedSingleIcon,
-  BedDoubleIcon,
-  BedTripleIcon,
-} from "@/components/karmo/icons/MattressMenuIcons";
 
 /**
  * Main navbar — logo, divisions, tools, search sheet, mobile drawer.
  * Fixed 80px row. Mega menus and drawer live here.
  */
 
+/* Cartoon menu icons — same language as trust / order strips. */
+const MENU = "/karmo/images/header/menu-cartoon";
+
+/* Only Mattress is live for now — other items stay visible but disabled. */
 const nav = [
   {
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
     icon: TbArmchair,
+    disabled: true,
     /* Eight categories from the client's Foam Catalogue (pages 5–23). */
     columns: [
       {
@@ -100,50 +89,33 @@ const nav = [
     line: "Orthopedic, pocket spring",
     href: "/mattress",
     icon: TbBed,
-    panelWidth: "w-[78rem]",
-    /* Old Shop By Comfort / Size / Type + catalogue product lines. */
+    texture: "mattress",
+    /* Catalogue lines + comfort. Size and Type were generic shop-by, not brands. */
     columns: [
       {
         label: "Comfort",
         items: [
-          { name: "Firm Mattress", href: "/mattress/firm", icon: MattressFirmIcon },
-          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: MattressMediumIcon },
-          { name: "Soft Mattress", href: "/mattress/soft", icon: MattressSoftIcon },
-        ],
-      },
-      {
-        label: "Size",
-        items: [
-          { name: "Single", href: "/mattress/size/single", icon: BedSingleIcon },
-          { name: "Queen", href: "/mattress/size/queen", icon: BedDoubleIcon },
-          { name: "King", href: "/mattress/size/king", icon: BedTripleIcon },
-        ],
-      },
-      {
-        label: "Type",
-        items: [
-          { name: "Foam Mattress", href: "/mattress/foam" },
-          { name: "Rubberised Coir Mattress", href: "/mattress/rubberised-coir" },
-          { name: "Spring Mattress", href: "/mattress/spring" },
-          { name: "Latex Mattress", href: "/mattress/latex" },
+          { name: "Firm Mattress", href: "/mattress/firm", icon: `${MENU}/firm.png` },
+          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: `${MENU}/medium.png` },
+          { name: "Soft Mattress", href: "/mattress/soft", icon: `${MENU}/soft.png` },
         ],
       },
       {
         label: "Series",
         items: [
-          { name: "Orthopedic", href: "/mattress/orthopedic", icon: TbBone },
-          { name: "Imperial", href: "/mattress/imperial", icon: TbShield },
-          { name: "Prestige", href: "/mattress/prestige", icon: TbAward },
-          { name: "King Series", href: "/mattress/king", icon: TbCrown },
+          { name: "Orthopedic", href: "/mattress/orthopedic", icon: `${MENU}/orthopedic.png` },
+          { name: "Imperial", href: "/mattress/imperial", icon: `${MENU}/imperial.png` },
+          { name: "Prestige", href: "/mattress/prestige", icon: `${MENU}/prestige.png` },
+          { name: "King Series", href: "/mattress/king", icon: `${MENU}/king.png` },
         ],
       },
       {
         label: "Specialty",
         items: [
-          { name: "Bonnell Spring", href: "/mattress/bonnell-spring", icon: TbCircles },
-          { name: "Pocket Spring", href: "/mattress/pocket-spring", icon: TbCircleDot },
-          { name: "Natural Mattress", href: "/mattress/natural", icon: TbLeaf },
-          { name: "Folding Mattress", href: "/mattress/folding", icon: TbFold },
+          { name: "Bonnell Spring", href: "/mattress/bonnell-spring", icon: `${MENU}/bonnell.png` },
+          { name: "Pocket Spring", href: "/mattress/pocket-spring", icon: `${MENU}/pocket.png` },
+          { name: "Natural Mattress", href: "/mattress/natural", icon: `${MENU}/natural.png` },
+          { name: "Folding Mattress", href: "/mattress/folding", icon: `${MENU}/folding.png` },
         ],
       },
     ],
@@ -153,6 +125,7 @@ const nav = [
     line: "Bed sheets, comforters",
     href: "/hometex",
     icon: TbFeather,
+    disabled: true,
     /* Bedding range from Mattress Catalogue pages 19–27 (HomeTex section). */
     columns: [
       {
@@ -184,6 +157,7 @@ const nav = [
     line: "Adhesives, polymers",
     href: "/chemicals",
     icon: TbFlask,
+    disabled: true,
     columns: [
       {
         label: "Adhesive",
@@ -205,9 +179,22 @@ const nav = [
       },
     ],
   },
-  { name: "About", line: "The group since 1965", href: "/about" },
-  { name: "Contact", line: "Talk to us", href: "/contact" },
+  { name: "About", line: "The group since 1965", href: "/about", disabled: true },
+  { name: "Contact", line: "Talk to us", href: "/contact", disabled: true },
 ];
+
+/** Menu row icon — cartoon PNG path or react-icon component. */
+function MenuGlyph({ icon, alt = "" }) {
+  if (!icon) return null;
+  if (typeof icon === "string") {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={icon} alt={alt} width={36} height={36} className="h-9 w-9 object-contain" />
+    );
+  }
+  const Icon = icon;
+  return <Icon className="text-[20px]" />;
+}
 
 function Tool({ icon: Icon, label, href, count, onClick }) {
   const body = (
@@ -241,37 +228,56 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
 
 function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
   return (
-    <nav aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
-      <ul className="flex items-center">
-        {nav.map((entry) => (
-          <li key={entry.name} className="relative">
-            <Link
-              href={entry.href}
-              onMouseEnter={() => openPanel(entry.name)}
-              onFocus={() => openPanel(entry.name)}
-              className="flex items-center gap-1.5 px-2.5 py-2.5 text-ink transition-colors duration-300 hover:text-brand"
-            >
+    <nav className="flex h-full" aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
+      <ul className="flex h-full items-stretch">
+        {nav.map((entry) => {
+          const isDisabled = Boolean(entry.disabled);
+          const label = (
+            <>
               {entry.icon ? (
                 <entry.icon className="shrink-0 text-[17px] text-ink/55" />
               ) : null}
               <span className="display block text-[13px] font-bold uppercase leading-none tracking-[0.1em]">
                 {entry.name}
               </span>
-              {entry.columns && (
+              {entry.columns ? (
                 <FiChevronDown
                   className={`text-[13px] text-ink/40 transition-transform duration-300 ${
-                    panel === entry.name ? "rotate-180" : ""
+                    !isDisabled && panel === entry.name ? "rotate-180" : ""
                   }`}
                 />
-              )}
-            </Link>
+              ) : null}
+            </>
+          );
 
-            {entry.columns && (
+          return (
+            <li key={entry.name} className="relative flex">
+              {isDisabled ? (
+                <span
+                  aria-disabled="true"
+                  className="flex h-full cursor-default items-center gap-1.5 px-2.5 text-ink"
+                >
+                  {label}
+                </span>
+              ) : (
+                <Link
+                  href={entry.href}
+                  onMouseEnter={() => openPanel(entry.name)}
+                  onFocus={() => openPanel(entry.name)}
+                  className="flex h-full items-center gap-1.5 px-2.5 text-ink transition-colors duration-300 hover:text-brand"
+                >
+                  {label}
+                </Link>
+              )}
+
+              {!isDisabled && entry.columns ? (
               <div
                 data-mega-menu
                 onMouseEnter={() => openPanel(entry.name)}
                 onMouseLeave={leaveMenuZone}
-                className={`absolute top-full left-1/2 z-[1100] hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
+                className={`absolute top-full left-1/2 z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
+                  entry.texture === "mattress" ? "header-mega-mattress" : "bg-white"
+                } ${
                   entry.panelWidth || "w-[52rem]"
                 } ${
                   panel === entry.name
@@ -279,8 +285,18 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                     : "invisible -translate-x-1/2 translate-y-1 opacity-0"
                 }`}
               >
+                {entry.texture === "mattress" ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src="/karmo/images/header/mattress-side-texture.jpg"
+                    alt=""
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"
+                    style={{ opacity: 0.14 }}
+                  />
+                ) : null}
                 <div
-                  className={`grid divide-x divide-ink/6 px-5 py-5 ${
+                  className={`relative z-[1] grid divide-x divide-ink/6 px-5 py-5 ${
                     entry.columns.length >= 5
                       ? "grid-cols-5"
                       : entry.columns.length === 4
@@ -288,51 +304,52 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                         : "grid-cols-3"
                   }`}
                 >
-                  {entry.columns.map((col) => (
-                    <div key={col.label} className="px-4 first:pl-1 last:pr-1">
-                      <div className="flex h-10 items-end border-b border-ink/6 pb-3">
-                        <span className="display text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-ink">
-                          Shop By {col.label}
-                        </span>
-                      </div>
+                    {entry.columns.map((col) => (
+                      <div key={col.label} className="px-4 first:pl-1 last:pr-1">
+                        <div className="flex h-10 items-end border-b border-ink/6 pb-3">
+                          <span className="display text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-ink">
+                            Shop By {col.label}
+                          </span>
+                        </div>
 
-                      <ul className="pt-0.5">
-                        {col.items.map((item, itemIndex) => (
-                          <li
-                            key={item.href}
-                            className={
-                              itemIndex < col.items.length - 1
-                                ? "border-b border-ink/6"
-                                : ""
-                            }
-                          >
-                            <Link
-                              href={item.href}
-                              onClick={dismissPanel}
-                              className="group flex h-11 items-center justify-between gap-2.5 transition-colors duration-200 hover:text-brand"
+                        <ul className="pt-0.5">
+                          {col.items.map((item, itemIndex) => (
+                            <li
+                              key={item.href}
+                              className={
+                                itemIndex < col.items.length - 1
+                                  ? "border-b border-ink/6"
+                                  : ""
+                              }
                             >
-                              <span className="flex min-w-0 items-center gap-2.5">
-                                {item.icon ? (
-                                  <span className="flex h-7 w-7 shrink-0 items-center justify-center text-ink/60">
-                                    <item.icon className="text-[20px]" />
+                              <Link
+                                href={item.href}
+                                onClick={dismissPanel}
+                                className="group flex h-12 items-center justify-between gap-2.5 transition-colors duration-200 hover:text-brand"
+                              >
+                                <span className="flex min-w-0 items-center gap-2.5">
+                                  {item.icon ? (
+                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] border border-ink/20 bg-white/55 text-ink/60">
+                                      <MenuGlyph icon={item.icon} alt="" />
+                                    </span>
+                                  ) : null}
+                                  <span className="truncate text-[11.5px] font-semibold uppercase tracking-[0.06em] text-ink">
+                                    {item.name}
                                   </span>
-                                ) : null}
-                                <span className="truncate text-[11.5px] font-semibold uppercase tracking-[0.06em] text-ink">
-                                  {item.name}
                                 </span>
-                              </span>
-                              <FiChevronRight className="shrink-0 text-[13px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                                <FiChevronRight className="shrink-0 text-[13px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </li>
-        ))}
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -458,7 +475,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <div className="hidden flex-1 justify-center xl:flex">
+        <div className="hidden h-full flex-1 justify-center xl:flex">
           <DivisionNav
             panel={panel}
             openPanel={openPanel}
@@ -532,53 +549,77 @@ export default function Navbar() {
           <div className="absolute inset-x-0 top-full z-[9999] max-h-[calc(100svh-112px)] overflow-y-auto overscroll-contain border-t border-ink/8 bg-white xl:hidden">
             <div className="shell-home-two py-5">
               <ul className="divide-y divide-ink/8">
-                {nav.map((entry) => (
-                  <li key={entry.name} className="py-3.5">
-                    <Link
-                      href={entry.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3.5"
-                    >
-                      {entry.icon ? (
-                        <entry.icon className="shrink-0 text-[18px] text-ink/55" />
-                      ) : null}
-                      <span className="min-w-0 flex-1">
-                        <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
-                          {entry.name}
+                {nav.map((entry) => {
+                  const isDisabled = Boolean(entry.disabled);
+                  return (
+                    <li key={entry.name} className="py-3.5">
+                      {isDisabled ? (
+                        <span
+                          aria-disabled="true"
+                          className="flex cursor-default items-center gap-3.5"
+                        >
+                          {entry.icon ? (
+                            <entry.icon className="shrink-0 text-[18px] text-ink/55" />
+                          ) : null}
+                          <span className="min-w-0 flex-1">
+                            <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                              {entry.name}
+                            </span>
+                            <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                              {entry.line}
+                            </span>
+                          </span>
                         </span>
-                        <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
-                          {entry.line}
-                        </span>
-                      </span>
-                      <FiArrowUpRight className="shrink-0 text-brand" />
-                    </Link>
+                      ) : (
+                        <>
+                          <Link
+                            href={entry.href}
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3.5"
+                          >
+                            {entry.icon ? (
+                              <entry.icon className="shrink-0 text-[18px] text-ink/55" />
+                            ) : null}
+                            <span className="min-w-0 flex-1">
+                              <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                                {entry.name}
+                              </span>
+                              <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                                {entry.line}
+                              </span>
+                            </span>
+                            <FiArrowUpRight className="shrink-0 text-brand" />
+                          </Link>
 
-                    {entry.columns ? (
-                      <div className="mt-3 space-y-3">
-                        {entry.columns.map((col) => (
-                          <div key={col.label}>
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">
-                              Shop by {col.label}
-                            </p>
-                            <ul className="flex flex-wrap gap-2">
-                              {col.items.map((sub) => (
-                                <li key={sub.href}>
-                                  <Link
-                                    href={sub.href}
-                                    onClick={() => setOpen(false)}
-                                    className="block bg-cream px-3 py-1.5 text-[12px] uppercase tracking-[0.06em] text-ink/70"
-                                  >
-                                    {sub.name}
-                                  </Link>
-                                </li>
+                          {entry.columns ? (
+                            <div className="mt-3 space-y-3">
+                              {entry.columns.map((col) => (
+                                <div key={col.label}>
+                                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">
+                                    Shop by {col.label}
+                                  </p>
+                                  <ul className="flex flex-wrap gap-2">
+                                    {col.items.map((sub) => (
+                                      <li key={sub.href}>
+                                        <Link
+                                          href={sub.href}
+                                          onClick={() => setOpen(false)}
+                                          className="block bg-cream px-3 py-1.5 text-[12px] uppercase tracking-[0.06em] text-ink/70"
+                                        >
+                                          {sub.name}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
                               ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </li>
-                ))}
+                            </div>
+                          ) : null}
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="mt-5 grid grid-cols-2 gap-2">

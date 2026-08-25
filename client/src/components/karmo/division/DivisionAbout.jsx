@@ -6,15 +6,39 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
 
 const ORANGE = "#FF9A1F";
 
 /**
- * "Moments that make a house feel like home" — the About split: heading +
- * subline + leaf, then an About paragraph and two CTAs on the left, a lifestyle
- * picture on the right. Design is fixed here; every division feeds its own copy
- * and picture through props.
+ * About band shared by every division. Default is the white split (copy left,
+ * picture right). Mattress sets `layout: "overlay"` for a full-bleed photo
+ * with compact copy; optional `slides` turn that band into a carousel.
  */
+
+function LeafMark({ className = "", size = 20 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      className={`shrink-0 ${className}`}
+    >
+      <path
+        d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
+        fill={ORANGE}
+      />
+      <path
+        d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
+        stroke="#B4651A"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function DivisionAbout({
   headingLead,
   headingAccent,
@@ -24,9 +48,30 @@ export default function DivisionAbout({
   body,
   cta = [],
   image,
+  slides,
+  layout = "split",
+  asHero = false,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+
+  if (layout === "overlay") {
+    const frames =
+      slides?.length > 0
+        ? slides
+        : [
+            {
+              id: "about",
+              align: "left",
+              headingLead,
+              headingAccent,
+              kicker,
+              cta,
+              image,
+            },
+          ];
+    return <OverlayHeroSlider slides={frames} asHero={asHero} size="band" />;
+  }
 
   return (
     <section className="bg-white pt-6 pb-16 lg:pt-8 lg:pb-24">
@@ -48,18 +93,7 @@ export default function DivisionAbout({
 
           <span aria-hidden className="mt-3 flex items-center gap-3">
             <span className="h-px w-16 sm:w-20" style={{ backgroundColor: ORANGE }} />
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
-              <path
-                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
-                fill={ORANGE}
-              />
-              <path
-                d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
-                stroke="#B4651A"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-              />
-            </svg>
+            <LeafMark />
           </span>
 
           <p className="mt-5 text-[13px] font-bold uppercase tracking-[0.16em] text-brand">

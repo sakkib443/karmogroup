@@ -66,7 +66,7 @@ const foam = {
     },
     {
       id: "delivery",
-      icon: "/karmo/images/trust/trusted-families.png",
+      icon: "/karmo/images/trust/delivery-icon.png",
       title: "Safe Delivery",
       note: "Across Bangladesh",
     },

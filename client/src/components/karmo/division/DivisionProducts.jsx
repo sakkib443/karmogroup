@@ -16,6 +16,7 @@ const ORANGE = "#FF9A1F";
  */
 function ProductTile({ item }) {
   const onOffer = Boolean(item.was);
+  const hoverSrc = item.imageHover;
 
   return (
     <motion.div variants={fade} className="group flex flex-col bg-cream/40">
@@ -25,10 +26,22 @@ function ProductTile({ item }) {
           alt={item.alt}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+          className={`object-cover transition-[transform,opacity] duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] ${
+            hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
+          }`}
         />
+        {hoverSrc && (
+          <Image
+            src={hoverSrc}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            aria-hidden
+            className="object-cover opacity-0 transition-[transform,opacity] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] group-hover:opacity-100"
+          />
+        )}
         {onOffer && (
-          <span className="absolute left-4 top-4 bg-brand px-2.5 py-1.5 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-white">
+          <span className="absolute left-4 top-4 z-[1] bg-brand px-2.5 py-1.5 text-[10px] font-bold uppercase leading-none tracking-[0.14em] text-white">
             Sale
           </span>
         )}
@@ -131,7 +144,9 @@ export default function DivisionProducts({
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className="shell grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-8"
+          /* Wider than `.shell` on purpose — same four columns, but a larger
+             max-width and a tighter gutter give the tiles more room to breathe. */
+          className="mx-auto grid w-full max-w-[1760px] grid-cols-1 gap-5 px-6 sm:grid-cols-2 sm:gap-6 md:px-10 lg:grid-cols-4 lg:gap-8 lg:px-12"
         >
           {list.map((item) => (
             <ProductTile key={item.id} item={item} />

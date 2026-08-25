@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import SectionLabel from "./SectionLabel";
 
 /**
  * Shop by material — the four core materials a Karmo mattress is built from,
@@ -123,19 +122,6 @@ export default function ShopByMaterial() {
 
   return (
     <section className="bg-white pt-4 pb-0 md:pt-5 lg:pt-6">
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="pl-4 text-left"
-      >
-        <motion.div variants={fade}>
-          <SectionLabel eyebrow="Built from the inside out">
-            Shop by <span className="font-bold text-brand">material</span>
-          </SectionLabel>
-        </motion.div>
-      </motion.div>
-
       {/* Uneven columns and rows — the asymmetry the client asked for. The
           grid takes a height at lg so the two tall cards and the stacked pair
           end on the same line; below lg each card falls back to its own ratio
@@ -144,7 +130,7 @@ export default function ShopByMaterial() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-3 grid gap-1 px-0 md:mt-3.5 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
+        className="grid gap-1 px-0 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
       >
         {materials.map((item) => (
           <MaterialCard key={item.id} item={item} />

@@ -1,17 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  FiCheck,
-  FiShoppingCart,
-  FiEdit3,
-  FiThumbsUp,
-  FiMail,
-  FiPhone,
-  FiArrowRight,
-} from "react-icons/fi";
+import { FiMail, FiPhone, FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -19,7 +12,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * Order guide + contact — content from the client's live site, rebuilt to
  * sit with Home 02 rather than the old hexagon / boxy WordPress layout.
  *
- * Left: four clear steps on one vertical axis.
+ * Left: four clear steps on one vertical axis (cartoon icons).
  * Right: mail & phone, then a short message form (mailto handoff — no backend
  * on this page yet).
  */
@@ -29,25 +22,25 @@ const ORANGE = "#FF9A1F";
 const steps = [
   {
     n: "01",
-    icon: FiCheck,
+    icon: "/karmo/images/trust/order-cartoon/select.png?v=d44348",
     title: "Select your product",
     body: "Choose the foam, mattress or HomeTex piece that fits the room.",
   },
   {
     n: "02",
-    icon: FiShoppingCart,
+    icon: "/karmo/images/trust/order-cartoon/cart.png?v=d44348",
     title: "Add it to the cart",
     body: "Drop your picks in — sizes and quantities stay with you.",
   },
   {
     n: "03",
-    icon: FiEdit3,
+    icon: "/karmo/images/trust/order-cartoon/checkout.png?v=d44348",
     title: "Complete the checkout",
     body: "Just three details: name, full address, and mobile number.",
   },
   {
     n: "04",
-    icon: FiThumbsUp,
+    icon: "/karmo/images/trust/order-cartoon/enjoy.png?v=d44348",
     title: "Receive & enjoy",
     body: "We deliver. You settle in. Comfort shows up at the door.",
   },
@@ -114,8 +107,21 @@ export default function OrderAndContact() {
   }
 
   return (
-    <section className="bg-white py-16 lg:py-24">
-      <div className="shell">
+    <section className="relative overflow-hidden py-16 lg:py-24">
+      {/* Same mattress damask as Iconic brands / Divisions */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <Image
+          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center opacity-[0.22]"
+          priority={false}
+        />
+        <span className="absolute inset-0 bg-white/50" />
+      </div>
+
+      <div className="shell relative z-[1]">
         <motion.div
           variants={group}
           {...reveal}
@@ -130,39 +136,54 @@ export default function OrderAndContact() {
               accent="an order"
             />
 
-            {/* Same step treatment, split into two short columns so the
-                left side does not run taller than the contact form. */}
-            <div className="mt-10 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-              {[steps.slice(0, 2), steps.slice(2, 4)].map((column, colIndex) => (
-                <ol key={colIndex} className="relative space-y-0">
-                  <span
-                    aria-hidden
-                    className="absolute bottom-6 left-[1.375rem] top-6 w-px bg-ink/10 lg:left-[1.5rem]"
-                  />
-                  {column.map((step, index) => (
-                    <li
-                      key={step.n}
-                      className={`relative flex gap-4 py-4 lg:gap-5 ${
-                        index < column.length - 1 ? "border-b border-ink/8" : ""
+            {/* 2×2 aligned rows: 01|03 on top, 02|04 below — shared row height
+                keeps the horizontal rules level even when copy lengths differ. */}
+            <div className="relative mt-10 grid grid-cols-1 gap-x-8 sm:grid-cols-2 sm:grid-rows-2">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-8 top-8 left-10 hidden w-px bg-ink/10 sm:block lg:left-[2.75rem]"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-8 top-8 left-[calc(50%+3.75rem)] hidden w-px bg-ink/10 sm:block"
+              />
+              {[steps[0], steps[2], steps[1], steps[3]].map((step, index) => (
+                <div
+                  key={step.n}
+                  className={`relative flex items-start gap-4 py-5 lg:gap-5 ${
+                    index < 2 ? "border-b border-ink/8" : ""
+                  }`}
+                >
+                  <span className="relative z-[1] flex h-[5rem] w-[5rem] shrink-0 items-center justify-center overflow-visible bg-white lg:h-[5.5rem] lg:w-[5.5rem]">
+                    <img
+                      src={step.icon}
+                      alt=""
+                      aria-hidden="true"
+                      width={88}
+                      height={88}
+                      loading="lazy"
+                      decoding="async"
+                      className={`object-contain ${
+                        step.n === "04"
+                          ? "h-[5.25rem] w-[5.25rem] lg:h-24 lg:w-24"
+                          : step.n === "03"
+                            ? "h-[4.35rem] w-[4.35rem] lg:h-[4.85rem] lg:w-[4.85rem]"
+                            : "h-[4.65rem] w-[4.65rem] lg:h-[5.15rem] lg:w-[5.15rem]"
                       }`}
-                    >
-                      <span className="relative z-[1] flex h-11 w-11 shrink-0 items-center justify-center bg-brand text-white shadow-[0_8px_22px_rgba(212,67,72,0.28)]">
-                        <step.icon className="text-[18px]" strokeWidth={2.2} />
-                      </span>
-                      <div className="min-w-0 pt-0.5">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand/80">
-                          Step {step.n}
-                        </span>
-                        <h3 className="display mt-1.5 text-[1rem] font-bold uppercase tracking-[0.04em] text-ink lg:text-[1.05rem]">
-                          {step.title}
-                        </h3>
-                        <p className="body-copy mt-1.5 text-[13px] leading-relaxed text-ink/55 lg:text-[14px]">
-                          {step.body}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
+                    />
+                  </span>
+                  <div className="min-w-0 pt-1">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand/80">
+                      Step {step.n}
+                    </span>
+                    <h3 className="display mt-1.5 text-[1rem] font-bold uppercase tracking-[0.04em] text-ink lg:text-[1.05rem]">
+                      {step.title}
+                    </h3>
+                    <p className="body-copy mt-1.5 text-[13px] leading-relaxed text-ink/55 lg:text-[14px]">
+                      {step.body}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           </motion.div>
