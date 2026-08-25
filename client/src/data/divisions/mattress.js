@@ -305,6 +305,13 @@ const mattress = {
       {
         id: "lifestyle",
         align: "left",
+        eyebrowStart: "Bangladesh’s",
+        eyebrowEnd: "Mattress Brand",
+        badge: {
+          src: "/karmo/images/home-02/hero/badge-number-one.webp",
+          width: 420,
+          height: 330,
+        },
         headingLead: "Moments that make a house",
         headingAccent: "feel like home",
         kicker: "We test every mattress, every single one",
@@ -319,6 +326,13 @@ const mattress = {
       {
         id: "float",
         align: "right",
+        eyebrowStart: "Bangladesh’s",
+        eyebrowEnd: "Mattress Brand",
+        badge: {
+          src: "/karmo/images/home-02/hero/badge-number-one.webp",
+          width: 420,
+          height: 330,
+        },
         headingLead: "Crafted for nights",
         headingAccent: "that last",
         kicker: "Every Karmo mattress is tested, one by one",

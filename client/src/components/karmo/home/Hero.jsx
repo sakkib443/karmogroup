@@ -4,10 +4,41 @@ import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
 
 /**
  * Homepage hero — copy follows open space.
- * Order: motion → cat → chemicals → then the rest.
+ * Each slide keeps the classic Bangladesh’s [NO.1 badge] … Brand line
+ * exactly as DivisionBanner / the old hero used it.
  */
 
+const BADGE = {
+  src: "/karmo/images/home-02/hero/badge-number-one.webp",
+  width: 420,
+  height: 330,
+};
+
+const LINE = {
+  foam: {
+    eyebrowStart: "Bangladesh’s",
+    eyebrowEnd: "Foam Brand",
+    badge: BADGE,
+  },
+  mattress: {
+    eyebrowStart: "Bangladesh’s",
+    eyebrowEnd: "Mattress Brand",
+    badge: BADGE,
+  },
+  hometex: {
+    eyebrowStart: "Bangladesh’s",
+    eyebrowEnd: "HomeTex Brand",
+    badge: BADGE,
+  },
+  chemicals: {
+    eyebrowStart: "Bangladesh’s",
+    eyebrowEnd: "Adhesive Brand",
+    badge: BADGE,
+  },
+};
+
 const HEAD_COMFORT = {
+  ...LINE.foam,
   headingLead: "We create the",
   headingAccent: "chemistry of comfort",
   kicker: "Sink in. Stay longer.",
@@ -16,7 +47,6 @@ const HEAD_COMFORT = {
 
 const SLIDES = [
   {
-    /* Was #2 → now #1 */
     id: "home-sofa-motion",
     align: "left",
     breeze: true,
@@ -29,9 +59,9 @@ const SLIDES = [
     },
   },
   {
-    /* Was #5 → now #2 */
     id: "home-mattress-cat",
     align: "right",
+    ...LINE.mattress,
     headingLead: "Crafted for nights",
     headingAccent: "that last",
     kicker: "Every Karmo mattress is tested, one by one",
@@ -47,6 +77,7 @@ const SLIDES = [
     id: "home-mattress-coastal",
     align: "right",
     tone: "light",
+    ...LINE.mattress,
     headingLead: "Rest that feels",
     headingAccent: "like open air",
     kicker: "Sunlit comfort, crafted for deeper nights",
@@ -60,9 +91,9 @@ const SLIDES = [
     },
   },
   {
-    /* Was last → now #3 */
     id: "home-chemicals-warehouse",
     align: "left",
+    ...LINE.chemicals,
     headingLead: "Industrial chemistry",
     headingAccent: "built to last",
     kicker: "We test every batch, every single drum",
@@ -79,10 +110,7 @@ const SLIDES = [
     id: "home-sofa-cool",
     align: "left",
     breeze: true,
-    headingLead: "The new",
-    headingAccent: "comfort range",
-    kicker: "Sink in. Stay longer.",
-    cta: [{ label: "Shop now", href: "/products", primary: true }],
+    ...HEAD_COMFORT,
     image: {
       src: "/karmo/images/home-02/hero/home-hero-slide-01-karmo-cool.jpg",
       alt: "A woman resting on a Karmo-style foam sofa with lavender cushions",
@@ -94,10 +122,7 @@ const SLIDES = [
     id: "home-sofa-yellow",
     align: "left",
     tone: "light",
-    headingLead: "The new",
-    headingAccent: "comfort range",
-    kicker: "Sink in. Stay longer.",
-    cta: [{ label: "Shop now", href: "/products", primary: true }],
+    ...HEAD_COMFORT,
     image: {
       src: "/karmo/images/home-02/hero/home-hero-slide-01-yellow-clean.jpg",
       alt: "A woman resting on a cream sofa against a sunny yellow wall",
@@ -109,6 +134,7 @@ const SLIDES = [
   {
     id: "home-mattress-lifestyle",
     align: "left",
+    ...LINE.mattress,
     headingLead: "Moments that make a house",
     headingAccent: "feel like home",
     kicker: "We test every mattress, every single one",
@@ -123,6 +149,7 @@ const SLIDES = [
   {
     id: "home-hometex-pillows",
     align: "left",
+    ...LINE.hometex,
     headingLead: "Where comfort",
     headingAccent: "meets elegance",
     kicker: "Pillows and linen made for the softest sink-in",
@@ -137,6 +164,7 @@ const SLIDES = [
   {
     id: "home-hometex-luxe",
     align: "right",
+    ...LINE.hometex,
     headingLead: "Soft layers for",
     headingAccent: "deeper rest",
     kicker: "Pillows, quilts and throws — HomeTex comfort",
