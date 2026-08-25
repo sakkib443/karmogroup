@@ -120,24 +120,33 @@ export default function Partners() {
   return (
     <section
       id="partners"
-      className="relative overflow-hidden bg-[#F5F5F5] pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
+      className="relative overflow-hidden pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
       aria-label="Partners and clients"
     >
+      {/* Chemicals polymer texture — same treatment as mattress damask bands */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <Image
+          src="/karmo/images/chemicals/chemicals-section-texture-v1.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center opacity-[0.42]"
+          priority={false}
+        />
+        <span className="absolute inset-0 bg-white/55" />
+      </div>
+
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell-home-two relative text-left"
+        className="relative z-[1] px-4 text-center"
       >
-        {/* Same heading setting as the divisions band above: small red eyebrow,
-            one light uppercase line under it, left-aligned and nothing below
-            it. The centred version with the leaf rule was the odd one out once
-            the other bands lost theirs. */}
         <motion.div variants={fade}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Partners &amp; clients
           </span>
-          <h2 className="display mt-1 max-sm:whitespace-normal whitespace-nowrap text-[1.05rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.15rem] lg:text-[1.3rem]">
+          <h2 className="display mt-1 text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
             Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
             makers
           </h2>
@@ -148,7 +157,7 @@ export default function Partners() {
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-3 space-y-1.5 sm:mt-3.5 lg:mt-4"
+        className="relative z-[1] mt-3 space-y-1.5 sm:mt-3.5 lg:mt-4"
       >
         {rows.map((items, i) => (
           <Row

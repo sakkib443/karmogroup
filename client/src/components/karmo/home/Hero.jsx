@@ -1,137 +1,162 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowRight, FiMapPin } from "react-icons/fi";
-
-import { group, line as lineReveal, rise } from "@/components/karmo/motion";
+import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
 
 /**
- * Homepage hero — fills the viewport under the fixed header (112px).
+ * Homepage hero — copy follows open space.
+ * Order: motion → cat → chemicals → then the rest.
  */
 
-const badge = {
-  src: "/karmo/images/home-02/hero/badge-number-one.webp",
-  width: 420,
-  height: 330,
+const HEAD_COMFORT = {
+  headingLead: "We create the",
+  headingAccent: "chemistry of comfort",
+  kicker: "Sink in. Stay longer.",
+  cta: [{ label: "Shop now", href: "/products", primary: true }],
 };
 
-const SHOW_FOAM_BRAND_CLAIM = true;
-
-const hero = {
-  src: "/karmo/images/home-02/hero/karmo-family-white-outfits.webp",
-  alt: "A family of three in white and yellow sitting together on a cream sofa whose tufted back spells KARMO, against a golden-yellow wall beside a red panel, with an olive tree and a round travertine coffee table",
-};
-
-const VIEW_H = "h-[calc(100svh-112px+5px)] min-h-[calc(100svh-112px+5px)]";
+const SLIDES = [
+  {
+    /* Was #2 → now #1 */
+    id: "home-sofa-motion",
+    align: "left",
+    breeze: true,
+    ...HEAD_COMFORT,
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-01-motion.jpg",
+      alt: "A woman reclining on a terracotta motion sofa with a soft cool air glow",
+      width: 1920,
+      height: 1080,
+    },
+  },
+  {
+    /* Was #5 → now #2 */
+    id: "home-mattress-cat",
+    align: "right",
+    headingLead: "Crafted for nights",
+    headingAccent: "that last",
+    kicker: "Every Karmo mattress is tested, one by one",
+    cta: [{ label: "Find a store", href: "/find-store", primary: true }],
+    image: {
+      src: "/karmo/images/mattress/Gemini_Generated_Image_iyl84kiyl84kiyl8.jpg",
+      alt: "Karmo mattress in a calm bedroom with a sleeping cat",
+      width: 3140,
+      height: 1344,
+    },
+  },
+  {
+    id: "home-mattress-coastal",
+    align: "right",
+    tone: "light",
+    headingLead: "Rest that feels",
+    headingAccent: "like open air",
+    kicker: "Sunlit comfort, crafted for deeper nights",
+    cta: [{ label: "Explore mattress", href: "/mattress", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-mattress-coastal-v1.jpg",
+      alt: "A plush mattress on a wooden bed overlooking a sunny coastal patio",
+      width: 1920,
+      height: 1080,
+      position: "object-center",
+    },
+  },
+  {
+    /* Was last → now #3 */
+    id: "home-chemicals-warehouse",
+    align: "left",
+    headingLead: "Industrial chemistry",
+    headingAccent: "built to last",
+    kicker: "We test every batch, every single drum",
+    cta: [{ label: "Explore Chemicals", href: "/chemicals", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-chemicals-hero.jpg",
+      alt: "Organized Karmo chemicals warehouse with blue drums in cinematic light",
+      width: 1920,
+      height: 1080,
+      position: "object-center",
+    },
+  },
+  {
+    id: "home-sofa-cool",
+    align: "left",
+    breeze: true,
+    headingLead: "The new",
+    headingAccent: "comfort range",
+    kicker: "Sink in. Stay longer.",
+    cta: [{ label: "Shop now", href: "/products", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-01-karmo-cool.jpg",
+      alt: "A woman resting on a Karmo-style foam sofa with lavender cushions",
+      width: 1920,
+      height: 1080,
+    },
+  },
+  {
+    id: "home-sofa-yellow",
+    align: "left",
+    tone: "light",
+    headingLead: "The new",
+    headingAccent: "comfort range",
+    kicker: "Sink in. Stay longer.",
+    cta: [{ label: "Shop now", href: "/products", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-01-yellow-clean.jpg",
+      alt: "A woman resting on a cream sofa against a sunny yellow wall",
+      width: 1920,
+      height: 1080,
+      position: "object-[center_55%]",
+    },
+  },
+  {
+    id: "home-mattress-lifestyle",
+    align: "left",
+    headingLead: "Moments that make a house",
+    headingAccent: "feel like home",
+    kicker: "We test every mattress, every single one",
+    cta: [{ label: "Explore mattress", href: "/mattress", primary: true }],
+    image: {
+      src: "/karmo/images/mattress/chatgpt-about-hero.png",
+      alt: "A Karmo mattress styled in a calm bedroom",
+      width: 1916,
+      height: 821,
+    },
+  },
+  {
+    id: "home-hometex-pillows",
+    align: "left",
+    headingLead: "Where comfort",
+    headingAccent: "meets elegance",
+    kicker: "Pillows and linen made for the softest sink-in",
+    cta: [{ label: "Explore HomeTex", href: "/hometex", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-pillows.jpg",
+      alt: "A woman resting among soft HomeTex pillows in morning light",
+      width: 1920,
+      height: 1080,
+    },
+  },
+  {
+    id: "home-hometex-luxe",
+    align: "right",
+    headingLead: "Soft layers for",
+    headingAccent: "deeper rest",
+    kicker: "Pillows, quilts and throws — HomeTex comfort",
+    cta: [{ label: "Shop HomeTex", href: "/hometex", primary: true }],
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-luxe-v6.jpg",
+      alt: "A woman resting under a Karmo Ivory Flower comforter in a bright navy bedroom",
+      width: 1920,
+      height: 1080,
+    },
+  },
+];
 
 export default function Hero() {
-  const reduceMotion = useReducedMotion();
-
   return (
-    <section
-      data-home-two-snap
-      className={`relative w-full overflow-hidden bg-[#f4efe8] ${VIEW_H}`}
-    >
-      <Image
-        src={hero.src}
-        alt={hero.alt}
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-[48%_38%] sm:object-[74%_30%] lg:object-[80%_28%]"
-      />
-
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(105deg, rgba(8,8,10,0.58) 0%, rgba(8,8,10,0.50) 35%, rgba(8,8,10,0.42) 60%, rgba(8,8,10,0.38) 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/18 to-transparent"
-      />
-
-      <div className="shell relative flex h-full items-center py-14 sm:py-16 lg:pb-20 lg:pt-10">
-        <motion.div
-          variants={group}
-          initial={reduceMotion ? false : "hidden"}
-          animate="show"
-          className="relative max-w-[40rem] text-left sm:max-w-[42rem] lg:max-w-[44rem] lg:-translate-y-6"
-        >
-          {SHOW_FOAM_BRAND_CLAIM ? (
-            <motion.div variants={rise}>
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:gap-x-3">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 sm:text-[12px]">
-                  Bangladesh&rsquo;s
-                </span>
-                <Image
-                  src={badge.src}
-                  alt=""
-                  width={badge.width}
-                  height={badge.height}
-                  className="h-9 w-auto shrink-0 -translate-y-[10%] sm:h-10"
-                />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/90 sm:text-[12px]">
-                  Foam Brand
-                </span>
-              </div>
-              <span
-                aria-hidden
-                className="mt-5 block h-px w-12 bg-white/40 sm:mt-6 sm:w-14"
-              />
-            </motion.div>
-          ) : null}
-
-          <h1
-            className={`display text-[clamp(1.6rem,4.3vw,3.4rem)] font-bold! uppercase leading-[1.02]! tracking-[-0.015em] text-white [text-shadow:0_2px_28px_rgba(10,6,2,0.35)] ${
-              SHOW_FOAM_BRAND_CLAIM ? "mt-5 sm:mt-6" : "mt-0"
-            }`}
-          >
-            {["We create the", "Chemistry of Comfort"].map((ln) => (
-              <span key={ln} className="block overflow-hidden pb-[0.04em]">
-                <motion.span variants={lineReveal} className="block">
-                  {ln}
-                </motion.span>
-              </span>
-            ))}
-          </h1>
-
-          <motion.p
-            variants={rise}
-            className="mt-5 max-w-[22rem] text-[12.5px] font-medium leading-[1.65] tracking-[0.01em] text-white/78 sm:mt-6 sm:text-[13.5px]"
-          >
-            Foam, mattress and HomeTex — crafted in Bangladesh since 1965.
-          </motion.p>
-
-          <motion.div
-            initial={reduceMotion ? false : rise.hidden}
-            whileInView={rise.show}
-            viewport={{ once: true }}
-            className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:flex-row sm:flex-wrap sm:items-center"
-          >
-            <Link
-              href="/products"
-              className="btn-primary group inline-flex h-[50px] w-full items-center justify-center gap-2.5 bg-brand px-8 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_-12px_rgba(212,67,72,0.65)] transition-colors duration-300 hover:bg-brand-dark sm:h-[52px] sm:w-auto sm:justify-start sm:px-9 sm:text-[12px] sm:tracking-[0.12em]"
-            >
-              Shop the range
-              <FiArrowRight className="text-[15px] transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-
-            <Link
-              href="/find-store"
-              className="group inline-flex h-[50px] w-full items-center justify-center gap-2.5 border border-white/55 bg-white/5 px-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white backdrop-blur-[2px] transition-colors duration-300 hover:border-white hover:bg-white hover:text-ink sm:h-[52px] sm:w-auto sm:justify-start sm:px-8 sm:text-[12px] sm:tracking-[0.12em]"
-            >
-              <FiMapPin className="text-[15px]" />
-              Find a store
-            </Link>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
+    <OverlayHeroSlider
+      slides={SLIDES}
+      asHero
+      size="viewport"
+      className="mb-0"
+    />
   );
 }

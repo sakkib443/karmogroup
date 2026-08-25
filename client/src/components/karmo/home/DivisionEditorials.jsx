@@ -9,19 +9,11 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Home Two — third section. Screen-tall band: left copy (shell-aligned) +
- * right masonry that meets the viewport right edge with a light pad.
- *
- * On desktop, shots flex-fill the viewport height so the three columns stay
- * level (same top/bottom). `grow` weights keep the modern masonry rhythm.
- * Mobile keeps fixed aspect ratios and stacks normally.
+ * right masonry. Soft mattress damask texture behind the whole band.
  */
 
 const ORANGE = "#FF9A1F";
-/* Same white gutter as ExploreSplit (fourth section) between image tiles. */
 const GAP = "gap-1 md:gap-1.5";
-/* Desktop band height — set as an inline style too so the masonry
-   cannot miss a Tailwind rebuild / stale class. ~80px taller than the
-   original calc(100svh-112px). */
 const DESKTOP_H = "calc(100svh - 32px)";
 
 const columns = [
@@ -29,15 +21,17 @@ const columns = [
     {
       id: "foam-studio",
       href: "/mattress",
-      src: "/karmo/images/home-02/divisions/mattress-karmo-magnific-SyOgGVtUb8.jpg",
-      alt: "A Karmo floral quilted mattress on a channel-tufted taupe bed, styled with green and ochre cushions between potted plants",
+      label: "Mattress",
+      src: "/karmo/images/mattress/products/orthopedic-room.jpg",
+      alt: "Karmo Orthopedic Mattress in a rustic brick bedroom with garden light",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
     },
     {
       id: "foam-lavender",
       href: "/hometex",
-      src: "/karmo/images/home-02/divisions/hometex-karmo-bedding-set.png",
+      label: "HomeTex",
+      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-bedding.jpg",
       alt: "Karmo HomeTex bedding set with pillows and comforter",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
@@ -47,16 +41,18 @@ const columns = [
     {
       id: "mattress-bedroom",
       href: "/foam",
-      src: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
-      alt: "A Karmo Foam sofa with lavender cushions and stacked foam blocks in a studio setting",
+      label: "Foam",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-sofa.jpg",
+      alt: "A Karmo Foam sofa with lavender cushions in a cozy living room",
       ratio: "aspect-[12/11]",
       grow: "md:flex-[11]",
     },
     {
       id: "mattress-grey",
       href: "/mattress",
-      src: "/karmo/images/home-02/divisions/mattress-karmo-magnific-huuqthnvqL.jpg",
-      alt: "A Karmo Magnific mattress in a bedroom setting",
+      label: "Mattress",
+      src: "/karmo/images/home-02/divisions/editorial-v2/sleep-portrait.jpg",
+      alt: "A woman resting peacefully on a Karmo mattress",
       ratio: "aspect-[3/5]",
       grow: "md:flex-[20]",
     },
@@ -65,15 +61,17 @@ const columns = [
     {
       id: "foam-campaign",
       href: "/foam",
-      src: "/karmo/images/home-02/divisions/scandinavian-interior.jpg",
-      alt: "A Scandinavian-style interior living space",
+      label: "Foam",
+      src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi.jpg",
+      alt: "A modern living room with a plush foam sofa",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
     },
     {
       id: "mattress-floral",
       href: "/chemicals",
-      src: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
+      label: "Chemicals",
+      src: "/karmo/images/home-02/divisions/editorial-v2/chemicals-tins.jpg",
       alt: "Karmo adhesive tins from the chemicals division",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
@@ -82,15 +80,6 @@ const columns = [
 ];
 
 function Shot({ shot }) {
-  if (shot.placeholder) {
-    return (
-      <div
-        aria-hidden
-        className={`relative block w-full min-h-0 bg-gray-100 ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
-      />
-    );
-  }
-
   return (
     <Link
       href={shot.href}
@@ -103,15 +92,19 @@ function Shot({ shot }) {
         sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
         className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
       />
+
       <span
         aria-hidden
-        className="photo-veil pointer-events-none absolute inset-0 transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-50"
+        className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-500 ease-out group-hover:bg-black/45"
       />
       <span
         aria-hidden
-        className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 bg-shade-deep/80 text-white transition-colors duration-300 group-hover:border-brand group-hover:bg-brand sm:h-10 sm:w-10"
-      >
-        <FiArrowUpRight />
+        className="pointer-events-none absolute inset-[10%] border-2 border-white/0 transition-all duration-500 ease-out group-hover:border-white/95 sm:inset-[12%] lg:inset-[13%]"
+      />
+      <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <span className="display translate-y-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:text-[14px] lg:text-[15px]">
+          {shot.label}
+        </span>
       </span>
     </Link>
   );
@@ -124,21 +117,29 @@ export default function DivisionEditorials() {
   return (
     <section
       data-home-two-snap
-      className="division-editorials overflow-x-clip bg-white py-14 lg:mt-0 lg:overflow-visible lg:py-0"
+      className="division-editorials relative overflow-x-clip py-14 lg:mt-0 lg:overflow-visible lg:py-0"
       style={{
-        // Inline so desktop height always applies even if a utility class is stale.
         ["--division-h"]: DESKTOP_H,
       }}
     >
-      {/*
-        Left aligns with .shell; right meets the screen edge with a light pad.
-        Height locks to the viewport under the header on lg+.
-      */}
+      {/* Soft mattress damask — readable pattern, no blur */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <Image
+          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center opacity-[0.38]"
+          priority={false}
+        />
+        <span className="absolute inset-0 bg-white/50" />
+      </div>
+
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
+        className="relative z-[1] grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
       >
         <motion.div
           variants={fade}
@@ -165,7 +166,14 @@ export default function DivisionEditorials() {
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
               Crafted to last
             </span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="shrink-0"
+              aria-hidden
+            >
               <path
                 d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
                 fill={ORANGE}
@@ -185,10 +193,7 @@ export default function DivisionEditorials() {
             for years.
           </p>
 
-          <Link
-            href="/foam"
-            className="group mt-8 inline-flex items-center gap-3"
-          >
+          <Link href="/foam" className="group mt-8 inline-flex items-center gap-3">
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Explore foam
             </span>

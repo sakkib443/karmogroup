@@ -3,15 +3,15 @@
 import Link from "next/link";
 import ProductHero from "@/components/karmo/product/ProductHero";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
+import ProductLifestyleSlider from "@/components/karmo/product/ProductLifestyleSlider";
 import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
 import ProductLayers from "@/components/karmo/product/ProductLayers";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
 import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
 
 /**
- * Karmo product detail — buy box, then organised story sections
- * (no third-party demo image strips).
+ * Karmo product detail — buy box, then one Helix-style pose morph band,
+ * then organised product sections.
  */
 export default function ProductDetailPage({ product }) {
   if (!product) {
@@ -32,10 +32,11 @@ export default function ProductDetailPage({ product }) {
     <>
       <ProductHero product={product} />
       <ProductPromiseStrip />
+      {/* Same frame: side → back → sit, ~1s soft crossfade */}
+      <ProductLifestyleSlider />
       <ProductMattressBanner />
       <ProductLayers />
       <ProductVideoFeatures features={product.features} />
-      <CertifiedBy />
       <OrderAndContact />
     </>
   );

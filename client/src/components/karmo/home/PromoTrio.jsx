@@ -21,8 +21,8 @@ const feature = {
   eyebrow: "Our popular products",
   titleLines: ["Foam seating", "collection"],
   href: "/foam",
-  src: "/karmo/images/home-02/promo-trio/feature-left-lJJ3nW8gv9.png",
-  alt: "Karmo foam seating lifestyle",
+  src: "/karmo/images/home-02/promo-trio/feature-left-v2.jpg",
+  alt: "Stacked Karmo foam seating blocks with a palm plant in a bright studio",
   cta: "Shop the collection",
 };
 
@@ -71,12 +71,14 @@ function SideCard({ item }) {
           ) : null}
         </>
       ) : null}
-      <h3 className="display relative z-10 text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
-        {item.title}
-      </h3>
-      <span className="relative z-10 mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
-        Shop now
-      </span>
+      <div className="relative z-10 -translate-y-3 sm:-translate-y-4 lg:-translate-y-5">
+        <h3 className="display text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
+          {item.title}
+        </h3>
+        <span className="mt-3 block text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
+          Shop now
+        </span>
+      </div>
     </Link>
   );
 }
@@ -117,20 +119,22 @@ export default function PromoTrio() {
             href={feature.href}
             className="group absolute inset-0 z-20 flex flex-col items-end justify-center py-8 pl-6 pr-10 text-right sm:pl-8 sm:pr-14 lg:pl-10 lg:pr-20 xl:pr-24"
           >
-            <span className="relative z-20 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
-              {feature.eyebrow}
-            </span>
-            <h2 className="display relative z-20 mt-3 text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
-              {feature.titleLines.map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <span className="relative z-20 mt-6 inline-flex h-11 w-fit items-center gap-2 bg-white px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-12 sm:px-7 sm:text-[12px]">
-              {feature.cta}
-              <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
-            </span>
+            <div className="relative z-20 -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 xl:-translate-y-12">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
+                {feature.eyebrow}
+              </span>
+              <h2 className="display mt-3 text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
+                {feature.titleLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </h2>
+              <span className="mt-6 inline-flex h-11 w-fit items-center gap-2 bg-white px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-12 sm:px-7 sm:text-[12px]">
+                {feature.cta}
+                <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
+              </span>
+            </div>
           </Link>
         </motion.div>
 
