@@ -15,7 +15,7 @@ import DivisionProducts from "@/components/karmo/division/DivisionProducts";
 import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionRecommended from "@/components/karmo/division/DivisionRecommended";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 function ZonesIcon({ id, className = "" }) {
   const stroke = {

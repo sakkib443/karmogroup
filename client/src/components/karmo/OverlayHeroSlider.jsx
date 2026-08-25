@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
@@ -116,6 +117,41 @@ export default function OverlayHeroSlider({
                   } ${right ? "text-right" : ""}`}
                   aria-hidden={!on}
                 >
+                  {(s.eyebrowStart || s.eyebrowEnd) && (
+                    <div
+                      className={`mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 sm:mb-4 ${
+                        right ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {s.eyebrowStart ? (
+                        <span
+                          className={`text-[13px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                            light ? "text-ink" : "text-white"
+                          }`}
+                        >
+                          {s.eyebrowStart}
+                        </span>
+                      ) : null}
+                      {s.badge ? (
+                        <Image
+                          src={s.badge.src}
+                          alt=""
+                          width={s.badge.width ?? 420}
+                          height={s.badge.height ?? 330}
+                          className="h-9 w-auto shrink-0 -translate-y-[8%] sm:h-11"
+                        />
+                      ) : null}
+                      {s.eyebrowEnd ? (
+                        <span
+                          className={`text-[13px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                            light ? "text-ink" : "text-white"
+                          }`}
+                        >
+                          {s.eyebrowEnd}
+                        </span>
+                      ) : null}
+                    </div>
+                  )}
                   <Heading className="display text-[1.95rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
                     <span className="block whitespace-nowrap">{s.headingLead}</span>
                     <span className="block whitespace-nowrap font-bold text-brand">
