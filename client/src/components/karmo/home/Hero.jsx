@@ -105,6 +105,7 @@ export default function Hero() {
       slides={SLIDES}
       asHero
       size="viewport"
+      autoplayMs={2000}
       className="mb-0"
     />
   );
