@@ -7,14 +7,13 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Awards & trust — above the footer on every karmo-2 page.
- * Tempur-style three-column band: hero NO.1 badge, awards mark,
- * certified seal — with short proof copy under each.
+ * Three-column proof band; section tone bleeds into the footer.
  */
 
 const BADGE = {
-  src: "/karmo/images/home-02/hero/badge-number-one.webp",
-  width: 420,
-  height: 330,
+  src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.png",
+  width: 1024,
+  height: 1024,
 };
 
 const pillars = [
@@ -24,27 +23,24 @@ const pillars = [
     width: BADGE.width,
     height: BADGE.height,
     alt: "Bangladesh’s number one comfort brand badge",
-    fit: "contain",
     title: "Most highly recommended",
     body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
   },
   {
     id: "awards",
-    src: "/karmo/images/home-02/trust/awards-trophies-v1.png",
+    src: "/karmo/images/home-02/trust/awards-trophies-v2.png",
     width: 1024,
     height: 1024,
     alt: "Recognition and awards for Karmo Group",
-    fit: "contain",
     title: "Recognised for six decades",
     body: "Founded in 1965 as the country’s first polyurethane producer. Super Brand recognition built on consistency, not campaigns.",
   },
   {
     id: "certified",
-    src: "/karmo/images/home-02/trust/certified-seal-v1.png",
+    src: "/karmo/images/home-02/trust/certified-seal-gold-v2.png",
     width: 1024,
     height: 1024,
     alt: "Certified quality seal — ISO accredited standards",
-    fit: "contain",
     title: "Internationally certified quality",
     body: "ISO 9001 quality management with UKAS and Moody International approval — every batch held to certified standards.",
   },
@@ -56,16 +52,16 @@ export default function CertifiedBy() {
 
   return (
     <section
-      className="relative overflow-hidden bg-[#141414] pt-16 pb-12 md:pt-20 md:pb-14 lg:pt-24 lg:pb-16"
+      className="relative overflow-hidden bg-[#0a0a0a] pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24"
       aria-label="Awards and trust"
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(212,67,72,0.14),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_18%_0%,rgba(212,67,72,0.12),transparent_48%)]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-black/70"
       />
 
       <motion.div
@@ -74,24 +70,15 @@ export default function CertifiedBy() {
         viewport={VIEWPORT}
         className="shell relative z-[1]"
       >
-        <motion.header variants={fade} className="mx-auto max-w-3xl text-center">
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-white sm:text-[15px]">
-              Bangladesh’s
-            </span>
-            <Image
-              src={BADGE.src}
-              alt=""
-              width={BADGE.width}
-              height={BADGE.height}
-              className="h-9 w-auto shrink-0 -translate-y-[8%] sm:h-11"
-            />
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-white sm:text-[15px]">
-              Comfort Brand
-            </span>
-          </div>
+        <motion.header
+          variants={fade}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <h2 className="display text-[1.55rem] font-bold uppercase leading-[1.15] tracking-[0.04em] text-white sm:text-[1.85rem] lg:text-[2.1rem]">
+            Built on trust since 1965
+          </h2>
           <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]">
-            Trusted proof — recommendation, recognition and certified quality.
+            Recommendation, recognition and certified quality — proof that lasts.
           </p>
         </motion.header>
 
@@ -104,10 +91,10 @@ export default function CertifiedBy() {
               key={id}
               variants={fade}
               className={`flex flex-col items-center px-4 text-center md:px-8 lg:px-10 ${
-                i > 0 ? "md:border-l md:border-white/15" : ""
+                i > 0 ? "md:border-l md:border-white/12" : ""
               }`}
             >
-              <div className="relative flex h-[8.5rem] w-[8.5rem] items-center justify-center sm:h-40 sm:w-40">
+              <div className="relative flex h-[11rem] w-[11rem] items-center justify-center sm:h-[13rem] sm:w-[13rem] lg:h-[14.5rem] lg:w-[14.5rem]">
                 <Image
                   src={src}
                   alt={alt}
