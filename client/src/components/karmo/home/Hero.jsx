@@ -25,11 +25,6 @@ const LINE = {
     eyebrowEnd: "Mattress Brand",
     badge: BADGE,
   },
-  hometex: {
-    eyebrowStart: "Bangladesh’s",
-    eyebrowEnd: "HomeTex Brand",
-    badge: BADGE,
-  },
   chemicals: {
     eyebrowStart: "Bangladesh’s",
     eyebrowEnd: "Adhesive Brand",
@@ -37,20 +32,16 @@ const LINE = {
   },
 };
 
-const HEAD_COMFORT = {
-  ...LINE.foam,
-  headingLead: "We create the",
-  headingAccent: "chemistry of comfort",
-  kicker: "Sink in. Stay longer.",
-  cta: [{ label: "Shop now", href: "/products", primary: true }],
-};
-
 const SLIDES = [
   {
     id: "home-sofa-motion",
     align: "left",
     breeze: true,
-    ...HEAD_COMFORT,
+    ...LINE.foam,
+    headingLead: "We create the",
+    headingAccent: "chemistry of comfort",
+    kicker: "Sink in. Stay longer.",
+    cta: [{ label: "Shop now", href: "/products", primary: true }],
     image: {
       src: "/karmo/images/home-02/hero/home-hero-slide-01-motion.jpg",
       alt: "A woman reclining on a terracotta motion sofa with a soft cool air glow",
@@ -74,23 +65,6 @@ const SLIDES = [
     },
   },
   {
-    id: "home-mattress-coastal",
-    align: "right",
-    tone: "light",
-    ...LINE.mattress,
-    headingLead: "Rest that feels",
-    headingAccent: "like open air",
-    kicker: "Sunlit comfort, crafted for deeper nights",
-    cta: [{ label: "Explore mattress", href: "/mattress", primary: true }],
-    image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-mattress-coastal-v1.jpg",
-      alt: "A plush mattress on a wooden bed overlooking a sunny coastal patio",
-      width: 1920,
-      height: 1080,
-      position: "object-center",
-    },
-  },
-  {
     id: "home-chemicals-warehouse",
     align: "left",
     ...LINE.chemicals,
@@ -107,73 +81,20 @@ const SLIDES = [
     },
   },
   {
-    id: "home-sofa-cool",
+    id: "home-mattress-summer-cool-real",
     align: "left",
     breeze: true,
-    ...HEAD_COMFORT,
-    image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-01-karmo-cool.jpg",
-      alt: "A woman resting on a Karmo-style foam sofa with lavender cushions",
-      width: 1920,
-      height: 1080,
-    },
-  },
-  {
-    id: "home-sofa-yellow",
-    align: "left",
-    tone: "light",
-    ...HEAD_COMFORT,
-    image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-01-yellow-clean.jpg",
-      alt: "A woman resting on a cream sofa against a sunny yellow wall",
-      width: 1920,
-      height: 1080,
-      position: "object-[center_55%]",
-    },
-  },
-  {
-    id: "home-mattress-lifestyle",
-    align: "left",
     ...LINE.mattress,
-    headingLead: "Moments that make a house",
-    headingAccent: "feel like home",
-    kicker: "We test every mattress, every single one",
+    headingLead: "The mattress",
+    headingAccent: "your summer needs",
+    kicker: "Powered by advanced cooling technology",
     cta: [{ label: "Explore mattress", href: "/mattress", primary: true }],
     image: {
-      src: "/karmo/images/mattress/chatgpt-about-hero.png",
-      alt: "A Karmo mattress styled in a calm bedroom",
-      width: 1916,
-      height: 821,
-    },
-  },
-  {
-    id: "home-hometex-pillows",
-    align: "left",
-    ...LINE.hometex,
-    headingLead: "Where comfort",
-    headingAccent: "meets elegance",
-    kicker: "Pillows and linen made for the softest sink-in",
-    cta: [{ label: "Explore HomeTex", href: "/hometex", primary: true }],
-    image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-pillows.jpg",
-      alt: "A woman resting among soft HomeTex pillows in morning light",
+      src: "/karmo/images/home-02/hero/home-hero-slide-mattress-summer-cool-v3.jpg",
+      alt: "A woman sleeping under a floral Karmo comforter with a cool glow along the mattress",
       width: 1920,
       height: 1080,
-    },
-  },
-  {
-    id: "home-hometex-luxe",
-    align: "right",
-    ...LINE.hometex,
-    headingLead: "Soft layers for",
-    headingAccent: "deeper rest",
-    kicker: "Pillows, quilts and throws — HomeTex comfort",
-    cta: [{ label: "Shop HomeTex", href: "/hometex", primary: true }],
-    image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-luxe-v6.jpg",
-      alt: "A woman resting under a Karmo Ivory Flower comforter in a bright navy bedroom",
-      width: 1920,
-      height: 1080,
+      position: "object-center",
     },
   },
 ];

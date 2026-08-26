@@ -1,108 +1,172 @@
 /**
- * Shared Karmo product-detail page (not per-SKU yet).
+ * Matrexx / Mattress product-detail data.
  *
- * Gallery: the five images in `/public/products/product-01/`.
+ * `/mattress/[slug]` resolves a catalogue SKU from the mattress division list.
+ * Without a match, returns null (route calls notFound).
  */
 
-const IMG = "/karmo/images/product";
-const VID = "/karmo/video";
-const GALLERY = "/products/product-01";
+import mattress from "@/data/divisions/mattress";
 
-export const productGallery = [
-  `${GALLERY}/gallery-1.jpg`,
-  `${GALLERY}/gallery-2.jpg`,
-  `${GALLERY}/gallery-3.jpg`,
-  `${GALLERY}/gallery-4.jpg`,
-  `${GALLERY}/gallery-5.jpg`,
-];
+const VID = "/karmo/video";
 
 export const productFeatures = [
   {
-    title: "Pure rubber grade",
-    body: "Made from 100% pure rubber-grade materials with zero fillers. Every block is poured for real density, clean cut edges and lasting strength that will not crumble under daily furniture use.",
+    title: "Layered for real rest",
+    body: "Hi-density foam, felt and — depending on the model — pocket springs or coir, stacked so pressure relief and support work together through the night.",
     video: `${VID}/s.mp4`,
   },
   {
-    title: "High resilience",
-    body: "Engineered bounce and recovery so cushions and seats spring back after every sit. High-resilience foam keeps its shape across years of heavy household and commercial use.",
+    title: "Spine-aware support",
+    body: "Ergonomic construction that keeps your back aligned whether you sleep on your side, back or sit up to read. Built for healthy sleep, not just a soft surface.",
     video: `${VID}/m.mp4`,
     reverse: true,
   },
   {
-    title: "Custom cut to size",
-    body: "Order the exact width, length and height your frame needs. Karmo cuts furniture, footwear and automotive grades to measure so the fit is part of the product, not an afterthought.",
+    title: "Tested one by one",
+    body: "Every Karmo mattress is checked for comfort and build before it leaves the plant — the same discipline that has kept the brand trusted since 1965.",
     video: `${VID}/l.mp4`,
   },
   {
-    title: "Karmo lab tested",
-    body: "Every grade is checked for density, compression and long-term wear. From pressure mapping to batch testing, the foam that leaves Motijheel has already been put through the paces.",
+    title: "Anti-dust, lasting cover",
+    body: "Breathable damask and quilted tops chosen for everyday Bangladesh homes — anti-allergic, easy to live with, and made to hold their look for years.",
     video: `${VID}/p.mp4`,
     reverse: true,
   },
 ];
 
-export const densityOptions = [
-  { id: "soft", label: "Soft", note: "Cushions & backrests" },
-  { id: "medium", label: "Medium", note: "Everyday seating" },
-  { id: "firm", label: "Firm", note: "Heavy-duty seats" },
+/** Cover / damask swatches — same fabric set as the buy box. */
+export const fabricOptions = [
+  { id: "fabric-1", label: "Damask 1", image: "/karmo/images/product/fabrics/fabric1.jpg" },
+  { id: "fabric-2", label: "Damask 2", image: "/karmo/images/product/fabrics/fabric2.jpg" },
+  { id: "fabric-3", label: "Damask 3", image: "/karmo/images/product/fabrics/fabric3.jpg" },
+  { id: "fabric-4", label: "Damask 4", image: "/karmo/images/product/fabrics/fabric4.jpg" },
+  { id: "fabric-5", label: "Damask 5", image: "/karmo/images/product/fabrics/fabric5.jpg" },
+  { id: "fabric-6", label: "Damask 6", image: "/karmo/images/product/fabrics/fabric6.jpg" },
 ];
 
 export const colorOptions = [
-  { id: "natural", label: "Natural", hex: "#E8DCC8" },
   { id: "ivory", label: "Ivory", hex: "#F4F0E6" },
-  { id: "grey", label: "Cool Grey", hex: "#9AA0A6" },
+  { id: "pearl", label: "Pearl", hex: "#E8E4DC" },
+  { id: "grey", label: "Soft Grey", hex: "#9AA0A6" },
   { id: "charcoal", label: "Charcoal", hex: "#3D3D3D" },
-  { id: "navy", label: "Navy", hex: "#1E3A5F" },
 ];
 
-/** Fabric pattern swatches — from resource Product-Page.html. */
-export const fabricOptions = [
-  { id: "fabric-1", label: "Fabric 1", image: "/karmo/images/product/fabrics/fabric1.jpg" },
-  { id: "fabric-2", label: "Fabric 2", image: "/karmo/images/product/fabrics/fabric2.jpg" },
-  { id: "fabric-3", label: "Fabric 3", image: "/karmo/images/product/fabrics/fabric3.jpg" },
-  { id: "fabric-4", label: "Fabric 4", image: "/karmo/images/product/fabrics/fabric4.jpg" },
-  { id: "fabric-5", label: "Fabric 5", image: "/karmo/images/product/fabrics/fabric5.jpg" },
-  { id: "fabric-6", label: "Fabric 6", image: "/karmo/images/product/fabrics/fabric6.jpg" },
-  { id: "fabric-7", label: "Fabric 7", image: "/karmo/images/product/fabrics/fabric7.jpg" },
-  { id: "fabric-8", label: "Fabric 8", image: "/karmo/images/product/fabrics/fabric8.jpg" },
-  { id: "fabric-9", label: "Fabric 9", image: "/karmo/images/product/fabrics/fabric9.jpg" },
-  { id: "fabric-10", label: "Fabric 10", image: "/karmo/images/product/fabrics/fabric10.jpg" },
-  { id: "fabric-11", label: "Fabric 11", image: "/karmo/images/product/fabrics/fabric11.jpg" },
-  { id: "fabric-12", label: "Fabric 12", image: "/karmo/images/product/fabrics/fabric12.jpg" },
-];
-
-/** Common sheet sizes in cm — Custom unlocks free W × L × H. */
+/** Standard mattress sizes (cm) — Queen is the catalogue price reference. */
 export const sizePresets = [
-  { id: "72x36x4", label: "72×36×4", note: "Sofa seat" },
-  { id: "75x48x5", label: "75×48×5", note: "Deep seat" },
-  { id: "90x60x6", label: "90×60×6", note: "Topper" },
-  { id: "custom", label: "Custom", note: "Enter cm" },
+  { id: "single", label: "90×190", note: "Single", w: 90, l: 190, h: 20 },
+  { id: "double", label: "120×190", note: "Double", w: 120, l: 190, h: 20 },
+  { id: "queen", label: "150×200", note: "Queen", w: 150, l: 200, h: 22 },
+  { id: "king", label: "180×200", note: "King", w: 180, l: 200, h: 25 },
+  { id: "custom", label: "Custom", note: "Enter cm", w: 150, l: 200, h: 22 },
 ];
 
-export const sharedProductDetail = {
-  slug: "karmo-180",
-  sku: "KF-180-FRN",
-  division: "Foam",
-  divisionHref: "/foam",
-  name: "Karmo 180 Furniture Foam",
-  line: "Soft-to-medium rubber-grade sheet for sofas and everyday seating",
-  description:
-    "Pure rubber-grade foam with zero fillers — dense, springy and cut to your frame. Trusted for sofa seats and cushions since 1965.",
-  category: "furniture",
-  gallery: productGallery,
-  fabrics: fabricOptions,
-  densities: densityOptions,
-  colors: colorOptions,
-  sizes: sizePresets,
-  showCustomSize: true,
-  price: 6700,
-  mrp: 7500,
-  priceLabel: "৳ 6,700",
-  wasLabel: "৳ 7,500",
-  unitNote: "Starting price · final quote by size",
-  features: productFeatures,
-};
+/** Queen area — catalogue `price` is quoted against this size. */
+export const REF_AREA = 150 * 200;
+export const REF_HEIGHT = 22;
 
-export function getSharedProductDetail() {
-  return sharedProductDetail;
+/**
+ * Estimate Matrexx price from size vs the catalogue base (Queen reference).
+ * Area drives most of the quote; thickness adds a light uplift.
+ */
+export function estimateMattressPrice(basePrice, w, l, h = REF_HEIGHT) {
+  const width = Math.max(60, Number(w) || 0);
+  const length = Math.max(120, Number(l) || 0);
+  const height = Math.max(8, Math.min(40, Number(h) || REF_HEIGHT));
+  if (!basePrice) return 0;
+  const areaFactor = (width * length) / REF_AREA;
+  const heightFactor = 0.85 + (height / REF_HEIGHT) * 0.15;
+  return Math.round(basePrice * areaFactor * heightFactor);
 }
+
+export function formatTaka(n) {
+  if (!n || !Number.isFinite(n)) return "৳ —";
+  return `৳ ${Math.round(n).toLocaleString("en-BD")}`;
+}
+
+function parseTaka(label) {
+  if (!label) return 0;
+  const n = Number(String(label).replace(/[^\d]/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+
+const catalog = mattress.products?.items || [];
+
+/** Shared K-A-R-M-O campaign thumbs — same five on every Matrexx PDP. */
+export const KARMO_LETTER_GALLERY = [
+  "/products/product-01/gallery-3.jpg", // K
+  "/products/product-01/gallery-5.jpg", // A
+  "/products/product-01/gallery-4.jpg", // R
+  "/products/product-01/gallery-1.jpg", // M
+  "/products/product-01/gallery-2.jpg", // O
+];
+
+export function getMattressProductSlugs() {
+  return catalog.map((p) => p.id);
+}
+
+function buildRealGallery(item) {
+  /* Cover (room) first, then studio/web packshot, then a shared Matrexx still. */
+  const shots = [
+    item.image,
+    item.imageHover,
+    "/karmo/images/mattress/products/matrex-p1.jpg",
+  ].filter(Boolean);
+  return [...new Set(shots)];
+}
+
+function toDetail(item) {
+  const price = parseTaka(item.now);
+  const mrp = parseTaka(item.was) || price;
+  const cover = item.image;
+  const realGallery = buildRealGallery(item);
+
+  return {
+    slug: item.id,
+    sku: `KM-${String(item.id).toUpperCase().slice(0, 12)}`,
+    division: "Mattress",
+    divisionHref: "/mattress",
+    brand: "Matrexx",
+    name: item.name,
+    line: item.line || "Karmo Matrexx — crafted for nights that last",
+    description:
+      item.line ||
+      "Luxury in sensational comfort — engineered for peaceful, healthy sleep. Anti-allergic, ergonomically shaped, and tested one by one.",
+    category: item.category || "mattress",
+    /** Default large image — catalogue cover / room thumbnail. */
+    cover,
+    /** Vertical K-A-R-M-O strip (shared). */
+    letterGallery: KARMO_LETTER_GALLERY,
+    /** Horizontal real-product row under the main frame. */
+    realGallery,
+    /** Legacy combined list (buy-box still works if anything reads `gallery`). */
+    gallery: realGallery,
+    fabrics: fabricOptions,
+    densities: null,
+    colors: colorOptions,
+    sizes: sizePresets,
+    showCustomSize: true,
+    price,
+    mrp,
+    priceLabel: item.now,
+    wasLabel: item.was,
+    unitNote: "Starting price · final quote by size",
+    features: productFeatures,
+    imageAlt: item.alt,
+  };
+}
+
+const DEFAULT_ID = "euro-top-pocket-spring";
+
+export function getMattressProductDetail(productId) {
+  if (!productId) return null;
+  const item = catalog.find((p) => p.id === productId);
+  if (!item) return null;
+  return toDetail(item);
+}
+
+/** Default Matrexx PDP (legacy `/product-detail` redirect target). */
+export function getSharedProductDetail() {
+  return getMattressProductDetail(DEFAULT_ID);
+}
+
+export const sharedProductDetail = getMattressProductDetail(DEFAULT_ID);

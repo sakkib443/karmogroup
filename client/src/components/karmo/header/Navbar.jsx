@@ -90,32 +90,33 @@ const nav = [
     href: "/mattress",
     icon: TbBed,
     texture: "mattress",
-    /* Catalogue lines + comfort. Size and Type were generic shop-by, not brands. */
+    /* All mega-menu rows land on the mattress catalogue product grid.
+       Individual filter pages come later — for now every click opens offers. */
     columns: [
       {
         label: "Comfort",
         items: [
-          { name: "Firm Mattress", href: "/mattress/firm", icon: `${MENU}/firm.png` },
-          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: `${MENU}/medium.png` },
-          { name: "Soft Mattress", href: "/mattress/soft", icon: `${MENU}/soft.png` },
+          { name: "Firm Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/firm.png` },
+          { name: "Medium Firm Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/medium.png` },
+          { name: "Soft Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/soft.png` },
         ],
       },
       {
         label: "Series",
         items: [
-          { name: "Orthopedic", href: "/mattress/orthopedic", icon: `${MENU}/orthopedic.png` },
-          { name: "Imperial", href: "/mattress/imperial", icon: `${MENU}/imperial.png` },
-          { name: "Prestige", href: "/mattress/prestige", icon: `${MENU}/prestige.png` },
-          { name: "King Series", href: "/mattress/king", icon: `${MENU}/king.png` },
+          { name: "Orthopedic", href: "/mattress#mattress-offers", icon: `${MENU}/orthopedic.png` },
+          { name: "Imperial", href: "/mattress#mattress-offers", icon: `${MENU}/imperial.png` },
+          { name: "Prestige", href: "/mattress#mattress-offers", icon: `${MENU}/prestige.png` },
+          { name: "King Series", href: "/mattress#mattress-offers", icon: `${MENU}/king.png` },
         ],
       },
       {
         label: "Specialty",
         items: [
-          { name: "Bonnell Spring", href: "/mattress/bonnell-spring", icon: `${MENU}/bonnell.png` },
-          { name: "Pocket Spring", href: "/mattress/pocket-spring", icon: `${MENU}/pocket.png` },
-          { name: "Natural Mattress", href: "/mattress/natural", icon: `${MENU}/natural.png` },
-          { name: "Folding Mattress", href: "/mattress/folding", icon: `${MENU}/folding.png` },
+          { name: "Bonnell Spring", href: "/mattress#mattress-offers", icon: `${MENU}/bonnell.png` },
+          { name: "Pocket Spring", href: "/mattress#mattress-offers", icon: `${MENU}/pocket.png` },
+          { name: "Natural Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/natural.png` },
+          { name: "Folding Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/folding.png` },
         ],
       },
     ],
@@ -315,7 +316,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                         <ul className="pt-0.5">
                           {col.items.map((item, itemIndex) => (
                             <li
-                              key={item.href}
+                              key={item.name}
                               className={
                                 itemIndex < col.items.length - 1
                                   ? "border-b border-ink/6"
@@ -600,7 +601,7 @@ export default function Navbar() {
                                   </p>
                                   <ul className="flex flex-wrap gap-2">
                                     {col.items.map((sub) => (
-                                      <li key={sub.href}>
+                                      <li key={sub.name}>
                                         <Link
                                           href={sub.href}
                                           onClick={() => setOpen(false)}

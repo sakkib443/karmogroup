@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
@@ -17,6 +17,31 @@ import DivisionRecommended from "@/components/karmo/division/DivisionRecommended
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
+/** Scroll to `#hash` after navigation (Next client router often skips this). */
+function useHashScroll() {
+  useEffect(() => {
+    const go = () => {
+      const id = window.location.hash?.replace(/^#/, "");
+      if (!id) return;
+      const run = () => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+      /* Two frames + short delay so hero/images finish laying out. */
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          run();
+          window.setTimeout(run, 120);
+        });
+      });
+    };
+
+    go();
+    window.addEventListener("hashchange", go);
+    return () => window.removeEventListener("hashchange", go);
+  }, []);
+}
 function ZonesIcon({ id, className = "" }) {
   const stroke = {
     fill: "none",
@@ -76,6 +101,7 @@ function ZonesIcon({ id, className = "" }) {
  */
 export default function DivisionPage({ data }) {
   const [categoryId, setCategoryId] = useState("all");
+  useHashScroll();
 
   return (
     <>
@@ -109,24 +135,14 @@ export default function DivisionPage({ data }) {
         />
       )}
       {data.zones && (
-        <section className="relative mb-1.5 w-full overflow-hidden bg-[#d8e8f4]">
-          <Image
-            src={data.zones.src}
-            alt={data.zones.alt}
-            width={data.zones.width}
-            height={data.zones.height}
-            className="h-auto w-full"
-            sizes="100vw"
-            priority={false}
-          />
-          {/* Hard-edged solid rail on the left — mirrored from the reference
-              right panel: one flat colour, copy + icons + CTA. */}
-          <div className="absolute inset-y-0 left-0 z-[1] flex w-[42%] max-w-[420px] flex-col justify-center bg-[#0b1a33] px-5 py-6 sm:w-[36%] sm:px-7 lg:w-[32%] lg:max-w-[460px] lg:px-9">
+        <section className="relative mb-1.5 grid w-full overflow-hidden bg-[#0b1a33] lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)] lg:aspect-[3.2/1]">
+          {/* Left rail — copy + icons + CTA */}
+          <div className="relative z-[1] flex flex-col items-center justify-center px-5 py-8 text-center sm:px-7 lg:px-9 lg:py-6">
             <h2 className="display text-[1.35rem] font-bold uppercase leading-[1.12] tracking-[0.02em] text-white sm:text-[1.65rem] lg:text-[1.95rem]">
               {data.zones.heading}
             </h2>
             {data.zones.icons?.length > 0 && (
-              <ul className="mt-5 grid grid-cols-3 gap-3 sm:mt-6 sm:gap-4">
+              <ul className="mt-5 grid w-full grid-cols-3 gap-3 sm:mt-6 sm:gap-4">
                 {data.zones.icons.map((icon) => (
                   <li key={icon.id} className="flex flex-col items-center text-center">
                     <ZonesIcon id={icon.id} className="h-9 w-9 text-white sm:h-10 sm:w-10" />
@@ -146,6 +162,18 @@ export default function DivisionPage({ data }) {
                 <FiArrowRight className="text-[15px]" />
               </Link>
             )}
+          </div>
+
+          {/* Right — cutaway fills the remaining space, no empty blue gap */}
+          <div className="relative min-h-[220px] bg-[#c7d9e8] sm:min-h-[280px] lg:min-h-0">
+            <Image
+              src={data.zones.src}
+              alt={data.zones.alt}
+              fill
+              className="object-cover object-[72%_center]"
+              sizes="(min-width: 1024px) 68vw, 100vw"
+              priority={false}
+            />
           </div>
         </section>
       )}

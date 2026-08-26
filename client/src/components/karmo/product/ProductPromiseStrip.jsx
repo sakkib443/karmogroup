@@ -5,30 +5,30 @@ import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Four service claims under the buy box — same illustrated-icon language as
- * the homepage `StandardStrip` New pack (trust/v2).
+ * Four service claims under the buy box — illustrated icons (cartoon-v3),
+ * same language as the mattress trust strip / reference promise bar.
  */
 const promises = [
   {
-    src: "/karmo/images/trust/v2/trusted.png",
-    scale: 0.82,
+    src: "/karmo/images/trust/cartoon-v3/trusted.png",
+    scale: 0.92,
     title: "No Cost EMI",
     note: "Flexible monthly plans on eligible orders",
   },
   {
-    src: "/karmo/images/trust/v2/recognised.png",
-    scale: 0.82,
+    src: "/karmo/images/trust/cartoon-v3/superbrand.png",
+    scale: 0.92,
     title: "30 Nights Free Trial",
     note: "Sleep on it — return within 30 nights if it is not right",
   },
   {
-    src: "/karmo/images/trust/v2/free-delivery.png",
+    src: "/karmo/images/trust/cartoon-v3/delivery.png",
     scale: 1,
     title: "Free Delivery",
     note: "Doorstep delivery across Bangladesh on this range",
   },
   {
-    src: "/karmo/images/trust/v2/legacy-60.png",
+    src: "/karmo/images/trust/cartoon-v3/legacy-60.png",
     scale: 1,
     title: "Up to 20 Years Warranty",
     note: "Covered for long-term durability and manufacturing defects",

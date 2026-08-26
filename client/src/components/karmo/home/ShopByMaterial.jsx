@@ -19,11 +19,9 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * are unequal — Rebonded Foam is the widest because foam is the craft the
  * company is known for, Pocket Spring the narrowest.
  *
- * ⚠ **The pictures are stand-ins.** These still point at the old product shots.
- * Each card wants a macro close-up of the *material itself* (foam chips, PE
- * foam, coil springs, coir fibre). Drop the new files under
- * `/karmo/images/home-02/materials/` and swap the four `src` lines — the
- * generation prompts live in `Mattress Brochure/MATERIAL-IMAGE-PROMPTS.md`.
+ * Macro close-ups of the four brochure materials live under
+ * `/karmo/images/home-02/materials/` (prompts in
+ * `Mattress Brochure/MATERIAL-IMAGE-PROMPTS.md`).
  */
 
 const materials = [
@@ -32,7 +30,7 @@ const materials = [
     name: "Rebonded Foam",
     line: "Finest hi-density foam chips, steam-bonded for support that lasts.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
+    src: "/karmo/images/home-02/materials/rebonded-foam.jpg",
     alt: "Close-up of Karmo rebonded foam — bonded hi-density foam chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
@@ -44,7 +42,7 @@ const materials = [
     name: "Polyethylene Foam",
     line: "Load-bearing hi-density core — made only by Karmo.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/mattress-karmo-grey-bedroom.webp",
+    src: "/karmo/images/home-02/materials/pe-foam.jpg",
     alt: "Close-up of Karmo hi-density polyethylene (PE) foam",
     span: "lg:col-start-2 lg:row-start-1",
     ratio: "aspect-[16/9]",
@@ -55,7 +53,7 @@ const materials = [
     name: "Natural Coir",
     line: "100% coconut-husk fibre — breathable, cool, biodegradable.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
+    src: "/karmo/images/home-02/materials/natural-coir.jpg",
     alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
     span: "lg:col-start-2 lg:row-start-2",
     ratio: "aspect-[16/9]",
@@ -66,7 +64,7 @@ const materials = [
     name: "Pocket Spring",
     line: "Vanadium-coated coils that move independently, contouring to you.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/mattress-karmo-magnific-SyOgGVtUb8.jpg",
+    src: "/karmo/images/home-02/materials/pocket-spring.jpg",
     alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
     span: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
