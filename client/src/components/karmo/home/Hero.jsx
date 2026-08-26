@@ -105,7 +105,8 @@ export default function Hero() {
       slides={SLIDES}
       asHero
       size="viewport"
-      autoplayMs={2000}
+      autoplayMs={3000}
+      fadeDuration={1.15}
       className="mb-0"
     />
   );

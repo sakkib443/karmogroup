@@ -6,8 +6,9 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
-const EASE = [0.22, 1, 0.36, 1];
+const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
+const FADE_S = 1.1;
 
 /**
  * Full-bleed overlay hero carousel — same pattern as the mattress about/hero
@@ -21,6 +22,7 @@ export default function OverlayHeroSlider({
   size = "band",
   className = "",
   autoplayMs = AUTOPLAY_MS,
+  fadeDuration = FADE_S,
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -39,7 +41,12 @@ export default function OverlayHeroSlider({
   if (!slides.length) return null;
 
   const multi = slides.length > 1;
-  const fadeMs = reduce ? { duration: 0 } : { duration: 0.9, ease: EASE };
+  const fadeMs = reduce
+    ? { duration: 0 }
+    : { duration: fadeDuration, ease: EASE };
+  const copyMs = reduce
+    ? { duration: 0 }
+    : { duration: fadeDuration * 0.9, ease: EASE };
   const frameClass =
     size === "viewport"
       ? "relative h-[calc(100svh-112px)] min-h-[calc(100svh-112px)] w-full"
@@ -68,9 +75,12 @@ export default function OverlayHeroSlider({
                 width={s.image.width}
                 height={s.image.height}
                 initial={false}
-                animate={{ opacity: on ? 1 : 0 }}
+                animate={{
+                  opacity: on ? 1 : 0,
+                  scale: on ? 1 : 1.04,
+                }}
                 transition={fadeMs}
-                className={`absolute inset-0 h-full w-full object-cover ${
+                className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
                   s.image.position || "object-center"
                 }`}
               />
@@ -105,8 +115,14 @@ export default function OverlayHeroSlider({
               ) : null}
               <motion.div
                 initial={false}
-                animate={{ opacity: on ? 1 : 0, y: on ? 0 : 8 }}
-                transition={fadeMs}
+                animate={{
+                  opacity: on ? 1 : 0,
+                  y: on ? 0 : 14,
+                }}
+                transition={{
+                  ...copyMs,
+                  delay: reduce ? 0 : on ? 0.1 : 0,
+                }}
                 className={`shell pointer-events-none absolute inset-0 z-[1] flex items-center ${
                   right ? "justify-end" : ""
                 }`}
