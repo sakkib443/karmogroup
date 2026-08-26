@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
@@ -14,6 +14,9 @@ const FADE_S = 1.1;
  * Full-bleed overlay hero carousel — same pattern as the mattress about/hero
  * band: photo fills the frame, copy sits left or right per slide, autoplay +
  * dots. Used on the homepage (viewport tall) and division overlay bands.
+ *
+ * Images use next/image and only the active + next slide mount at first so
+ * production does not download every full-bleed frame on first paint.
  */
 export default function OverlayHeroSlider({
   slides = [],
@@ -26,6 +29,11 @@ export default function OverlayHeroSlider({
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
+  const [loaded, setLoaded] = useState(() => {
+    const first = new Set([0]);
+    if (slides.length > 1) first.add(1);
+    return first;
+  });
 
   const go = useCallback(
     (i) => setActive(((i % slides.length) + slides.length) % slides.length),
@@ -38,15 +46,33 @@ export default function OverlayHeroSlider({
     return () => clearTimeout(t);
   }, [active, reduce, slides.length, autoplayMs]);
 
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const next = (active + 1) % slides.length;
+    setLoaded((prev) => {
+      if (prev.has(active) && prev.has(next)) return prev;
+      const copy = new Set(prev);
+      copy.add(active);
+      copy.add(next);
+      return copy;
+    });
+  }, [active, slides.length]);
+
+  const fadeMs = useMemo(
+    () => (reduce ? { duration: 0 } : { duration: fadeDuration, ease: EASE }),
+    [reduce, fadeDuration]
+  );
+  const copyMs = useMemo(
+    () =>
+      reduce
+        ? { duration: 0 }
+        : { duration: fadeDuration * 0.85, ease: EASE },
+    [reduce, fadeDuration]
+  );
+
   if (!slides.length) return null;
 
   const multi = slides.length > 1;
-  const fadeMs = reduce
-    ? { duration: 0 }
-    : { duration: fadeDuration, ease: EASE };
-  const copyMs = reduce
-    ? { duration: 0 }
-    : { duration: fadeDuration * 0.85, ease: EASE };
   const frameClass =
     size === "viewport"
       ? "relative h-[calc(100svh-112px)] min-h-[calc(100svh-112px)] w-full"
@@ -66,24 +92,34 @@ export default function OverlayHeroSlider({
           const light = s.tone === "light";
           const primary = s.cta?.find((c) => c.primary) ?? s.cta?.[0];
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
+          const showImage = loaded.has(i);
 
           return (
             <div key={s.id} className="absolute inset-0">
-              <motion.img
-                src={s.image.src}
-                alt={on ? s.image.alt : ""}
-                width={s.image.width}
-                height={s.image.height}
-                initial={false}
-                animate={{
-                  opacity: on ? 1 : 0,
-                  scale: on ? 1 : 1.03,
-                }}
-                transition={fadeMs}
-                className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
-                  s.image.position || "object-center"
-                }`}
-              />
+              {showImage ? (
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: on ? 1 : 0,
+                    scale: on ? 1 : 1.03,
+                  }}
+                  transition={fadeMs}
+                  className="absolute inset-0 will-change-transform"
+                >
+                  <Image
+                    src={s.image.src}
+                    alt={on ? s.image.alt : ""}
+                    fill
+                    sizes="100vw"
+                    quality={72}
+                    priority={i === 0}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    className={`object-cover ${
+                      s.image.position || "object-center"
+                    }`}
+                  />
+                </motion.div>
+              ) : null}
               {s.breeze && !reduce ? (
                 <motion.span
                   aria-hidden
@@ -154,6 +190,8 @@ export default function OverlayHeroSlider({
                           alt=""
                           width={s.badge.width ?? 420}
                           height={s.badge.height ?? 330}
+                          sizes="88px"
+                          quality={70}
                           className="h-9 w-auto shrink-0 -translate-y-[8%] sm:h-11"
                         />
                       ) : null}

@@ -11,9 +11,9 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 
 const BADGE = {
-  src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.png",
-  width: 1024,
-  height: 1024,
+  src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.webp",
+  width: 512,
+  height: 512,
 };
 
 const pillars = [
@@ -28,18 +28,18 @@ const pillars = [
   },
   {
     id: "awards",
-    src: "/karmo/images/home-02/trust/awards-trophies-v2.png",
-    width: 1024,
-    height: 1024,
+    src: "/karmo/images/home-02/trust/awards-trophies-v2.webp",
+    width: 512,
+    height: 512,
     alt: "Recognition and awards for Karmo Group",
     title: "Recognised for six decades",
     body: "Founded in 1965 as the country’s first polyurethane producer. Super Brand recognition built on consistency, not campaigns.",
   },
   {
     id: "certified",
-    src: "/karmo/images/home-02/trust/certified-seal-gold-v2.png",
-    width: 1024,
-    height: 1024,
+    src: "/karmo/images/home-02/trust/certified-seal-gold-v2.webp",
+    width: 512,
+    height: 512,
     alt: "Certified quality seal — ISO accredited standards",
     title: "Internationally certified quality",
     body: "ISO 9001 quality management with UKAS and Moody International approval — every batch held to certified standards.",
@@ -100,6 +100,8 @@ export default function CertifiedBy() {
                   alt={alt}
                   width={width}
                   height={height}
+                  sizes="(min-width: 1024px) 232px, (min-width: 640px) 208px, 176px"
+                  quality={70}
                   className="h-full w-full object-contain"
                 />
               </div>
