@@ -46,7 +46,7 @@ export default function OverlayHeroSlider({
     : { duration: fadeDuration, ease: EASE };
   const copyMs = reduce
     ? { duration: 0 }
-    : { duration: fadeDuration * 0.9, ease: EASE };
+    : { duration: fadeDuration * 0.85, ease: EASE };
   const frameClass =
     size === "viewport"
       ? "relative h-[calc(100svh-112px)] min-h-[calc(100svh-112px)] w-full"
@@ -77,7 +77,7 @@ export default function OverlayHeroSlider({
                 initial={false}
                 animate={{
                   opacity: on ? 1 : 0,
-                  scale: on ? 1 : 1.04,
+                  scale: on ? 1 : 1.03,
                 }}
                 transition={fadeMs}
                 className={`absolute inset-0 h-full w-full object-cover will-change-transform ${
@@ -117,11 +117,11 @@ export default function OverlayHeroSlider({
                 initial={false}
                 animate={{
                   opacity: on ? 1 : 0,
-                  y: on ? 0 : 14,
+                  y: on ? 0 : 10,
                 }}
                 transition={{
                   ...copyMs,
-                  delay: reduce ? 0 : on ? 0.1 : 0,
+                  delay: reduce ? 0 : on ? 0.08 : 0,
                 }}
                 className={`shell pointer-events-none absolute inset-0 z-[1] flex items-center ${
                   right ? "justify-end" : ""
@@ -213,7 +213,7 @@ export default function OverlayHeroSlider({
                   onClick={() => go(i)}
                   aria-label={`Go to slide ${i + 1}`}
                   aria-current={i === active}
-                  className={`h-[3px] rounded-full transition-all duration-300 ${
+                  className={`h-[3px] rounded-full transition-all duration-500 ${
                     i === active ? "w-8 bg-brand" : "w-5 bg-white/45 hover:bg-white/80"
                   }`}
                 />
