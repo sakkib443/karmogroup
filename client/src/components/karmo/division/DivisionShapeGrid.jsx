@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import { FiChevronDown } from "react-icons/fi";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { TbCertificate, TbFeather, TbShieldCheck } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Mattress feature mosaic — Sleep Well claims (short) on top-left,
- * lifestyle spotlight below; certs + FAQ on the right. 6px gutters.
+ * lifestyle spotlight below; certs + Sleep Well film on the right.
  */
 
 const NAVY =
@@ -196,46 +195,52 @@ function CertCard({ item }) {
   );
 }
 
-function FaqPanel({ items = [] }) {
-  const [openId, setOpenId] = useState(null);
+function FilmPanel({ film, still, filmAlt = "" }) {
+  const reduceMotion = useReducedMotion();
+  const videoRef = useRef(null);
+  const wrapRef = useRef(null);
+  const inView = useInView(wrapRef, { amount: 0.2 });
+
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node || reduceMotion || !film) return undefined;
+    if (inView) {
+      node.play().catch(() => {});
+    } else {
+      node.pause();
+    }
+    return undefined;
+  }, [inView, reduceMotion, film]);
+
+  if (!film && !still) return null;
 
   return (
-    <motion.div variants={fade} className={`flex flex-col overflow-hidden bg-white ${LIGHT}`}>
-      <ul className="flex min-h-0 flex-1 flex-col">
-        {items.map((item, i) => {
-          const open = openId === item.id;
-          return (
-            <li
-              key={item.id}
-              className={`flex min-h-0 flex-1 flex-col justify-center ${
-                i > 0 ? "border-t border-[#0b1a33]/10" : ""
-              }`}
-            >
-              <button
-                type="button"
-                aria-expanded={open}
-                onClick={() => setOpenId(open ? null : item.id)}
-                className="flex w-full flex-1 items-center gap-3 px-5 py-3 text-left transition-colors duration-200 hover:bg-[#f7f7f8] sm:px-6 sm:py-3.5"
-              >
-                <span className="display min-w-0 flex-1 text-[13px] font-bold leading-snug tracking-[0.02em] text-[#0b1a33] sm:text-[14px]">
-                  {item.question}
-                </span>
-                <FiChevronDown
-                  className={`shrink-0 text-[17px] text-brand transition-transform duration-300 ${
-                    open ? "rotate-180" : ""
-                  }`}
-                  aria-hidden
-                />
-              </button>
-              {open && item.answer ? (
-                <p className="body-copy px-5 pb-3.5 text-[12.5px] leading-[1.55] text-[#0b1a33]/58 sm:px-6 sm:pb-4 sm:text-[13px]">
-                  {item.answer}
-                </p>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+    <motion.div
+      ref={wrapRef}
+      variants={fade}
+      className="relative h-full min-h-0 overflow-hidden rounded-none bg-[#0b1a33]"
+    >
+      {still ? (
+        <Image
+          src={still}
+          alt={filmAlt}
+          fill
+          sizes="(min-width: 768px) 30vw, 100vw"
+          className="object-cover object-center"
+        />
+      ) : null}
+      {!reduceMotion && film ? (
+        <video
+          ref={videoRef}
+          src={film}
+          muted
+          playsInline
+          loop
+          preload="auto"
+          aria-label={filmAlt || "Karmo mattress film"}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+      ) : null}
     </motion.div>
   );
 }
@@ -246,7 +251,9 @@ export default function DivisionShapeGrid({
   highlights = [],
   spotlight,
   certifications = [],
-  faqs = [],
+  film,
+  still,
+  filmAlt = "",
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -255,6 +262,7 @@ export default function DivisionShapeGrid({
 
   const primary = highlights[0];
   const pair = highlights.slice(1, 3);
+  const hasFilm = Boolean(film || still);
 
   return (
     <section className={`relative w-full overflow-hidden ${className}`}>
@@ -287,7 +295,9 @@ export default function DivisionShapeGrid({
             {certifications.slice(0, 2).map((item) => (
               <CertCard key={item.id} item={item} />
             ))}
-            <FaqPanel items={faqs} />
+            {hasFilm ? (
+              <FilmPanel film={film} still={still} filmAlt={filmAlt} />
+            ) : null}
           </div>
         </motion.div>
       </div>

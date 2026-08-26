@@ -7,11 +7,11 @@ import ProductLifestyleSlider from "@/components/karmo/product/ProductLifestyleS
 import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
 import ProductLayers from "@/components/karmo/product/ProductLayers";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 /**
- * Karmo product detail — buy box, then one Helix-style pose morph band,
- * then organised product sections.
+ * Matrexx mattress product detail — buy box, promise strip, lifestyle morph,
+ * then organised product story sections.
  */
 export default function ProductDetailPage({ product }) {
   if (!product) {
@@ -19,10 +19,10 @@ export default function ProductDetailPage({ product }) {
       <div className="shell py-24 text-center">
         <p className="text-sm text-ink/50">Product not found.</p>
         <Link
-          href="/foam"
+          href="/mattress"
           className="mt-4 inline-block text-[12px] font-bold uppercase tracking-[0.14em] text-brand"
         >
-          Back to foam
+          Back to mattress
         </Link>
       </div>
     );
