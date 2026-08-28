@@ -125,7 +125,7 @@ export default function DivisionEditorials() {
       {/* Soft mattress damask — readable pattern, no blur */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
           alt=""
           fill
           sizes="100vw"
@@ -143,6 +143,8 @@ export default function DivisionEditorials() {
       >
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="min-w-0 max-w-md self-center text-left lg:max-w-[28rem]"
         >
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -150,15 +152,17 @@ export default function DivisionEditorials() {
               60+ Years
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
-              Since 1965
+              The Journey Since 1965
             </span>
           </p>
 
-          <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
-            <span className="block sm:whitespace-nowrap">Iconic brands.</span>
-            <span className="block text-brand sm:whitespace-nowrap">
-              Lasting craft.
-            </span>
+          {/* Client About-Us / Generic #15 tagline, exact words. Size eased a
+              step from the old two-line head so the longer third line still
+              fits the left column. */}
+          <h2 className="display section-heading mt-3 uppercase text-ink">
+            <span className="block">Iconic brands,</span>
+            <span className="block">storied history,</span>
+            <span className="block text-brand">industry leading innovation</span>
           </h2>
 
           <span className="mt-4 flex items-center gap-3">

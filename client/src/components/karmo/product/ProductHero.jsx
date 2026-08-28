@@ -324,7 +324,7 @@ export default function ProductHero({ product }) {
       {/* Mattress damask — full hero band, same asset as Divisions / Order */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
           alt=""
           fill
           sizes="100vw"
@@ -453,7 +453,7 @@ export default function ProductHero({ product }) {
               </p>
             ) : null}
 
-            <div className="mt-4 border-y border-ink/10 py-2.5">
+            <div className="mt-4 border-t border-ink/10 pt-2.5 pb-2.5">
               <div className="flex flex-wrap items-end gap-3">
                 {mrpUnit > unitPrice ? (
                   <s className="text-[15px] tabular-nums text-ink/35">
@@ -480,6 +480,48 @@ export default function ProductHero({ product }) {
                 {formatTaka(unitPrice)} each · {sizeLabel}
               </p>
             </div>
+
+            <ul
+              className="grid grid-cols-4 gap-1 border border-ink/10 bg-white px-1.5 py-2 sm:gap-1.5 sm:px-2 sm:py-2"
+              aria-label="Product highlights"
+            >
+              {[
+                {
+                  src: "/karmo/images/product/buybox-icons/warranty-10.png",
+                  label: "10-years warranty",
+                },
+                {
+                  src: "/karmo/images/product/buybox-icons/dual-side.png",
+                  label: "Dual side usage",
+                },
+                {
+                  src: "/karmo/images/product/buybox-icons/antimicrobial.png",
+                  label: "Anti Microbial Fabric",
+                },
+                {
+                  src: "/karmo/images/product/buybox-icons/nights-100.png",
+                  label: "100 night returns",
+                },
+              ].map((item) => (
+                <li
+                  key={item.label}
+                  className="flex min-w-0 flex-col items-center text-center"
+                >
+                  <span className="relative flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">
+                    <Image
+                      src={item.src}
+                      alt=""
+                      width={36}
+                      height={36}
+                      className="h-full w-full object-contain"
+                    />
+                  </span>
+                  <span className="mt-1 text-[8px] font-semibold leading-[1.2] text-brand sm:text-[9px]">
+                    {item.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
 
             <div className="mt-1">
               {product.fabrics?.length ? (

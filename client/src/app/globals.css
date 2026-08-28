@@ -40,6 +40,48 @@ h1, h2, h3, h1 *, h2 *, h3 *,
   zoom: var(--type-zoom-heading, 1);
 }
 
+/* ── Hero heading vs section heading ───────────────────────────────────────
+ *
+ * The hero line and the section titles are two different jobs: one sits over a
+ * photograph at the top of the page and is read at a glance, the others label
+ * the bands below it and are read in sequence. The Theme Control panel now
+ * treats them as separate roles, so each gets its own face, scale and weight.
+ *
+ * `.hero-heading` is the opt-in marker (set on the slider's heading element);
+ * everything else keeps the plain `--font-heading` / `--type-zoom-heading`
+ * pair. Two class levels of specificity beats the single-class rules above,
+ * and both are unlayered `!important`, so this lands over the Tailwind
+ * utilities in `@layer utilities`. */
+.home-two-type .hero-heading,
+.home-two-type .hero-heading * {
+  font-family: var(--font-hero, var(--font-heading)) !important;
+}
+
+.home-two-type .hero-heading {
+  zoom: var(--type-zoom-hero, 1);
+  max-width: var(--hero-heading-max, none);
+}
+
+/* ── One shape for every section heading ───────────────────────────────────
+ *
+ * Each band had grown its own size, weight and tracking — 1.25rem light next
+ * to 1.75rem extrabold — so the page read as a stack of unrelated sections.
+ * This is the single definition they all now share; the per-section utilities
+ * that used to set size/weight/leading/tracking have been removed from the
+ * components, and only colour and margin stay local (those legitimately
+ * differ: white on the dark bands, ink on the light ones).
+ *
+ * Sized with `clamp()` rather than three breakpoint utilities so it scales
+ * continuously instead of stepping. */
+.home-two-type .section-heading {
+  font-size: clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: uppercase;
+  max-width: var(--section-heading-max, none);
+}
+
 /* Heading weight is NOT set here. It is written as an inline style by
  * `ThemeControl`, because a rule in this file cannot win.
  *

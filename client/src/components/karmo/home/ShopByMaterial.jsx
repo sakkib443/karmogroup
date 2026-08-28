@@ -21,7 +21,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *
  * Macro close-ups of the four brochure materials live under
  * `/karmo/images/home-02/materials/` (prompts in
- * `Mattress Brochure/MATERIAL-IMAGE-PROMPTS.md`).
+ * `karmo-library/02-catalogues/mattress-brochure/MATERIAL-IMAGE-PROMPTS.md`).
  */
 
 const materials = [

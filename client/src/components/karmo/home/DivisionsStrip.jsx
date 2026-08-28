@@ -82,7 +82,7 @@ export default function DivisionsStrip() {
       {/* Same mattress damask as Iconic brands — readable pattern, no blur */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
           alt=""
           fill
           sizes="100vw"
@@ -98,11 +98,11 @@ export default function DivisionsStrip() {
         viewport={VIEWPORT}
         className="relative z-[1] px-4 text-center"
       >
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Our Divisions
           </span>
-          <h2 className="display mt-1 text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
+          <h2 className="display section-heading mt-1 uppercase text-ink">
             One group, <span className="font-bold text-brand">four crafts</span>
           </h2>
         </motion.div>

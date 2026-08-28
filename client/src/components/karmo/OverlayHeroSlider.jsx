@@ -206,7 +206,10 @@ export default function OverlayHeroSlider({
                       ) : null}
                     </div>
                   )}
-                  <Heading className="display text-[1.95rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
+                  {/* `hero-heading` marks this as the hero role for the Theme
+                      Control panel — it carries its own face, scale and weight,
+                      separate from the section titles below the fold. */}
+                  <Heading className="display hero-heading text-[1.95rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
                     <span className="block whitespace-nowrap">{s.headingLead}</span>
                     <span className="block whitespace-nowrap font-bold text-brand">
                       {s.headingAccent}

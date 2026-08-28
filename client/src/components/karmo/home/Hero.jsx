@@ -58,7 +58,7 @@ const SLIDES = [
     kicker: "Every Karmo mattress is tested, one by one",
     cta: [{ label: "Find a store", href: "/find-store", primary: true }],
     image: {
-      src: "/karmo/images/mattress/Gemini_Generated_Image_iyl84kiyl84kiyl8.jpg",
+      src: "/karmo/images/mattress/hero/cooling-cat-snowy-window.jpg",
       alt: "Karmo mattress in a calm bedroom with a sleeping cat",
       width: 3140,
       height: 1344,

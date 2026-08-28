@@ -142,11 +142,11 @@ export default function Partners() {
         viewport={VIEWPORT}
         className="relative z-[1] px-4 text-center"
       >
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Partners &amp; clients
           </span>
-          <h2 className="display mt-1 text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
+          <h2 className="display section-heading mt-1 uppercase text-ink">
             Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
             makers
           </h2>
@@ -155,6 +155,8 @@ export default function Partners() {
 
       <motion.div
         variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
         {...reveal}
         viewport={VIEWPORT}
         className="relative z-[1] mt-3 space-y-1.5 sm:mt-3.5 lg:mt-4"

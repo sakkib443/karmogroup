@@ -101,6 +101,8 @@ export default function PromoTrio() {
         {/* Left — popular products feature */}
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="relative min-h-[min(48svh,400px)] w-full overflow-hidden bg-[#f3f3f3] lg:min-h-0 lg:h-full"
         >
           <Image
@@ -123,7 +125,7 @@ export default function PromoTrio() {
               <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
                 {feature.eyebrow}
               </span>
-              <h2 className="display mt-3 text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
+              <h2 className="display section-heading mt-3 uppercase text-white">
                 {feature.titleLines.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -141,6 +143,8 @@ export default function PromoTrio() {
         {/* Right — original layout: mattress top, HomeTex bottom */}
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className={`grid min-h-0 w-full grid-rows-2 ${GAP}`}
         >
           {side.map((item) => (

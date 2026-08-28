@@ -369,8 +369,8 @@ function HeaderCtaButton({ compact = false }) {
         <FiMapPin className="text-[16px]" />
       </span>
       <span className="block text-left">
-        <span className="display block text-[12.5px] font-bold leading-tight">
-          Find a Store
+        <span className="display block text-[12.5px] font-bold uppercase leading-tight tracking-[0.04em]">
+          FIND A STORE
         </span>
         {!compact && (
           <span className="block text-[10.5px] leading-tight text-white/60">
@@ -669,8 +669,8 @@ export default function Navbar() {
                   <FiMapPin className="text-[16px]" />
                 </span>
                 <span className="block text-left">
-                  <span className="display block text-[12.5px] font-bold leading-tight">
-                    Find a Store
+                  <span className="display block text-[12.5px] font-bold uppercase leading-tight tracking-[0.04em]">
+                    FIND A STORE
                   </span>
                   <span className="block text-[10.5px] leading-tight text-white/60">
                     Showrooms nationwide

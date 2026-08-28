@@ -72,9 +72,11 @@ export default function CertifiedBy() {
       >
         <motion.header
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="mx-auto max-w-3xl text-center"
         >
-          <h2 className="display text-[1.55rem] font-bold uppercase leading-[1.15] tracking-[0.04em] text-white sm:text-[1.85rem] lg:text-[2.1rem]">
+          <h2 className="display section-heading uppercase text-white">
             Built on trust since 1965
           </h2>
           <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]">
@@ -115,6 +117,8 @@ export default function CertifiedBy() {
 
         <motion.p
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="mx-auto mt-12 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-14 sm:text-[11px]"
         >
           Reflects Karmo Group’s position since 1965, Super Brand recognition,

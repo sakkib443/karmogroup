@@ -78,7 +78,7 @@ function ColumnHeading({ eyebrow, title, accent }) {
       <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
         {eyebrow}
       </span>
-      <h2 className="display mt-3 text-[1.55rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink lg:text-[1.85rem]">
+      <h2 className="display section-heading mt-3 uppercase text-ink">
         {title}{" "}
         <span className="font-bold text-brand">{accent}</span>
       </h2>
@@ -111,7 +111,7 @@ export default function OrderAndContact() {
       {/* Same mattress damask as Iconic brands / Divisions */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic-karmo-pattern.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
           alt=""
           fill
           sizes="100vw"
@@ -129,7 +129,7 @@ export default function OrderAndContact() {
           className="grid gap-14 lg:grid-cols-2 lg:gap-16 xl:gap-24"
         >
           {/* ── Order steps ─────────────────────────────────────────────── */}
-          <motion.div variants={fade}>
+          <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
             <ColumnHeading
               eyebrow="Simple path"
               title="How to make"
@@ -189,7 +189,7 @@ export default function OrderAndContact() {
           </motion.div>
 
           {/* ── Contact ─────────────────────────────────────────────────── */}
-          <motion.div variants={fade}>
+          <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
             <ColumnHeading
               eyebrow="Talk to us"
               title="Have any"
