@@ -64,9 +64,11 @@ export default function ChemicalsBand() {
             aria-hidden
             className="absolute inset-0 bg-gradient-to-br from-black/45 via-black/15 to-transparent"
           />
-          <p className="absolute left-5 top-5 max-w-[16rem] text-[15px] font-medium leading-snug tracking-[-0.01em] text-white sm:left-7 sm:top-7 sm:max-w-xs sm:text-[17px] lg:left-9 lg:top-9 lg:text-[18px]">
-            Adhesives, resins and specialty chemistry — stocked for the craft.
-          </p>
+          <h2 className="absolute left-5 top-[16%] max-w-[18rem] display section-heading uppercase text-white sm:left-7 sm:top-[18%] sm:max-w-md lg:left-9 lg:top-[20%] lg:max-w-lg">
+            <span className="block">Adhesives, resins</span>
+            <span className="block">and specialty chemistry —</span>
+            <span className="block text-brand">stocked for the craft.</span>
+          </h2>
         </motion.div>
 
         {/* Right — navy info panel, vertically + horizontally centered */}

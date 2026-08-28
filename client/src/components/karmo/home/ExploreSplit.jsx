@@ -213,16 +213,16 @@ function Panel({ panel, compact = false }) {
         }`}
       >
         <h2
-          className={`display font-bold uppercase leading-[1.2] tracking-[0.02em] text-white ${
+          className={`display font-bold uppercase leading-[1.15] tracking-[0.02em] text-white ${
             compact
-              ? "text-[1.2rem] sm:text-[1.35rem] lg:text-[1.5rem] xl:text-[1.65rem]"
-              : "text-[1.45rem] sm:text-[1.65rem] lg:text-[1.85rem] xl:text-[2rem]"
+              ? "text-[1.35rem] sm:text-[1.5rem] lg:text-[1.7rem] xl:text-[1.85rem]"
+              : "text-[1.65rem] sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.3rem]"
           }`}
         >
           <span className="block sm:whitespace-nowrap">{panel.line1}</span>
           <span className="block sm:whitespace-nowrap">{panel.line2}</span>
         </h2>
-        <span className="mt-3 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 group-hover:decoration-white sm:mt-4 sm:text-[13px]">
+        <span className="mt-3 inline-block text-[13px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 group-hover:decoration-white sm:mt-4 sm:text-[14px]">
           Explore Now
         </span>
       </div>
@@ -282,13 +282,13 @@ export default function ExploreSplit({
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
               <div className="text-right">
-                <h2 className="display section-heading uppercase text-white">
+                <h2 className="display section-heading text-[1.75rem] uppercase leading-[1.12] text-white sm:text-[2.1rem] lg:text-[2.45rem] xl:text-[2.7rem]">
                   <span className="block sm:whitespace-nowrap">Foam crafted</span>
                   <span className="block sm:whitespace-nowrap">for comfort</span>
                 </h2>
                 <Link
                   href="/foam"
-                  className="mt-5 inline-block text-[12px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 hover:decoration-white sm:mt-6 sm:text-[13px]"
+                  className="mt-5 inline-block text-[13px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 hover:decoration-white sm:mt-6 sm:text-[14px]"
                 >
                   Explore Now
                 </Link>
