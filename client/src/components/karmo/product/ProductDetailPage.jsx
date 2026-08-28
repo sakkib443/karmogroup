@@ -7,10 +7,11 @@ import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlide
 import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 /**
- * Matrexx mattress product detail — buy box, promise icons, comfort morph,
- * firmness, then one editorial build / features / order band.
+ * Matrexx mattress product detail — buy box through build band, then the same
+ * order/contact strip as home and /mattress (above Built on trust / CertifiedBy).
  */
 export default function ProductDetailPage({ product }) {
   if (!product) {
@@ -35,6 +36,7 @@ export default function ProductDetailPage({ product }) {
       <ProductMattressBanner />
       <ProductFirmnessScale highlight={product.firmness || "Medium Firm"} />
       <ProductBuildAside />
+      <OrderAndContact />
     </>
   );
 }

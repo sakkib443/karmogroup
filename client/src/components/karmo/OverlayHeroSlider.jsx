@@ -29,11 +29,6 @@ export default function OverlayHeroSlider({
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
-  const [loaded, setLoaded] = useState(() => {
-    const first = new Set([0]);
-    if (slides.length > 1) first.add(1);
-    return first;
-  });
 
   const go = useCallback(
     (i) => setActive(((i % slides.length) + slides.length) % slides.length),
@@ -46,17 +41,24 @@ export default function OverlayHeroSlider({
     return () => clearTimeout(t);
   }, [active, reduce, slides.length, autoplayMs]);
 
-  useEffect(() => {
-    if (slides.length < 2) return;
-    const next = (active + 1) % slides.length;
-    setLoaded((prev) => {
-      if (prev.has(active) && prev.has(next)) return prev;
-      const copy = new Set(prev);
-      copy.add(active);
-      copy.add(next);
-      return copy;
-    });
-  }, [active, slides.length]);
+  /*
+   * Every slide's picture is mounted from the first render.
+   *
+   * This used to hold a `loaded` set — slide 0 and 1 to begin with, then the
+   * current and next one added as the carousel advanced — and a slide whose
+   * index was not in it rendered no <Image> at all. The saving was real but so
+   * were the holes: jumping straight to the last slide on a dot painted the
+   * copy over an empty frame while the picture was still being fetched, and
+   * with `prefers-reduced-motion` the autoplay never runs, so `active` stays 0
+   * and slides 2 and 3 were never added to the set at all — their images
+   * simply never existed. The last slide was the one that showed it most,
+   * because it is the furthest from where the set starts.
+   *
+   * Four viewport-sized photographs is a fair weight to carry for a hero that
+   * is the first thing on the page; correctness wins over the saving here.
+   * `priority` still marks only the first as the LCP candidate, so the rest
+   * queue behind it rather than competing with it.
+   */
 
   const fadeMs = useMemo(
     () => (reduce ? { duration: 0 } : { duration: fadeDuration, ease: EASE }),
@@ -92,34 +94,36 @@ export default function OverlayHeroSlider({
           const light = s.tone === "light";
           const primary = s.cta?.find((c) => c.primary) ?? s.cta?.[0];
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
-          const showImage = loaded.has(i);
 
           return (
             <div key={s.id} className="absolute inset-0">
-              {showImage ? (
-                <motion.div
-                  initial={false}
-                  animate={{
-                    opacity: on ? 1 : 0,
-                    scale: on ? 1 : 1.03,
-                  }}
-                  transition={fadeMs}
-                  className="absolute inset-0 will-change-transform"
-                >
-                  <Image
-                    src={s.image.src}
-                    alt={on ? s.image.alt : ""}
-                    fill
-                    sizes="100vw"
-                    quality={72}
-                    priority={i === 0}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    className={`object-cover ${
-                      s.image.position || "object-center"
-                    }`}
-                  />
-                </motion.div>
-              ) : null}
+              <motion.div
+                initial={false}
+                animate={{
+                  opacity: on ? 1 : 0,
+                  scale: on ? 1 : 1.03,
+                }}
+                transition={fadeMs}
+                className="absolute inset-0 will-change-transform"
+              >
+                <Image
+                  src={s.image.src}
+                  alt={on ? s.image.alt : ""}
+                  fill
+                  sizes="100vw"
+                  quality={72}
+                  priority={i === 0}
+                  /* `eager` on all of them, not just the first: a lazy image
+                     inside a slide sitting at opacity 0 is still in the
+                     viewport, so the browser is free to defer it right up to
+                     the moment the slide is revealed — which is exactly when
+                     it is too late to fetch a viewport-sized photograph. */
+                  loading="eager"
+                  className={`object-cover ${
+                    s.image.position || "object-center"
+                  }`}
+                />
+              </motion.div>
               {s.breeze && !reduce ? (
                 <motion.span
                   aria-hidden
