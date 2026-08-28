@@ -25,9 +25,9 @@ const HOLD_MS = 2000;
 const FADE_S = 0.18;
 const ZOOM_MS = 14000;
 const ZOOM_FROM = 1;
-const ZOOM_TO = 1.05;
+const ZOOM_TO = 1.03;
 const Y_FROM = "0%";
-const Y_TO = "-1.2%";
+const Y_TO = "-0.6%";
 
 const SLIDES = [
   {
@@ -181,7 +181,7 @@ function TallMorph() {
                 sizes="(min-width: 1024px) 32vw, 60vw"
                 quality={85}
                 priority={i === 0}
-                className="object-cover object-center"
+                className="object-cover object-[center_18%]"
               />
             </motion.div>
           );
@@ -256,12 +256,24 @@ export default function ProductBuildAside() {
 
           <LeafRule />
 
-          <p className="body-copy mt-5 text-[15px] leading-[1.7] text-ink/55 sm:text-[16px] lg:text-[17px]">
+          <p className="body-copy mt-4 text-[15px] leading-[1.7] text-ink/55 sm:text-[16px] lg:text-[17px]">
             Five layered construction — quilted cover to motion-isolation base —
             with spine-aware support and a cover made for Bangladesh homes.
           </p>
 
-          <Link href="/contact" className="group mt-8 inline-flex items-center gap-3">
+          <div className="relative mt-3 w-full max-w-[20rem]">
+            <Image
+              src="/karmo/images/product/sketches/mattress-5-layer-sketch-v5b.png"
+              alt="Hand-drawn Karmo mattress cutaway with five distinct construction layers"
+              width={880}
+              height={520}
+              sizes="(min-width: 1024px) 20rem, 75vw"
+              className="h-auto w-full object-contain object-left"
+              priority={false}
+            />
+          </div>
+
+          <Link href="/contact" className="group mt-1.5 inline-flex items-center gap-3 sm:mt-2">
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Talk to us
             </span>
@@ -273,17 +285,21 @@ export default function ProductBuildAside() {
 
         <motion.div
           variants={fade}
-          className={`grid h-[min(52svh,380px)] w-full min-w-0 grid-cols-[1.15fr_0.9fr] grid-rows-2 ${GAP} lg:h-full lg:min-h-0`}
+          className="flex h-[min(52svh,380px)] w-full min-w-0 justify-end self-stretch lg:h-full lg:min-h-0"
         >
-          <TallMorph />
-          <VideoTile
-            src={productFeatures[0]?.video}
-            label="Spine-aware support"
-          />
-          <VideoTile
-            src={productFeatures[1]?.video}
-            label="Anti-dust cover"
-          />
+          <div
+            className={`grid h-full w-full max-w-[min(100%,48rem)] grid-cols-[0.78fr_0.9fr] grid-rows-2 sm:max-w-[min(100%,54rem)] ${GAP} lg:max-w-[min(100%,62rem)]`}
+          >
+            <TallMorph />
+            <VideoTile
+              src={productFeatures[0]?.video}
+              label="Spine-aware support"
+            />
+            <VideoTile
+              src={productFeatures[1]?.video}
+              label="Anti-dust cover"
+            />
+          </div>
         </motion.div>
       </motion.div>
     </section>

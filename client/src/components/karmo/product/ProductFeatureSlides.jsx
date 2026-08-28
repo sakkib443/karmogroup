@@ -12,8 +12,8 @@ import { motion, useReducedMotion } from "framer-motion";
  */
 
 const EASE = [0.33, 1, 0.68, 1];
-/** First visible swap — snappy so the morph starts as soon as you arrive. */
-const FIRST_HOLD_MS = 550;
+/** First visible swap — fire almost immediately once the section hits the screen. */
+const FIRST_HOLD_MS = 80;
 const HOLD_MS = 2000;
 const FADE_S = 0.18;
 /** Full loop zoom duration — slower than three slide holds, barely drifts. */
@@ -65,7 +65,7 @@ export default function ProductFeatureSlides() {
           setIndex(0);
         }
       },
-      { threshold: 0.35 }
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" }
     );
     io.observe(el);
     return () => io.disconnect();
