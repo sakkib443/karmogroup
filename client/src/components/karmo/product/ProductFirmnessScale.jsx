@@ -6,19 +6,17 @@ import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Full-bleed firmness scale — heading above, organic kettlebell graphic below.
- * About half a viewport tall so the chart reads as a hero band, not a strip.
+ * Firmness scale band — short centred heading, then a full-bleed graphic
+ * (same height as before) with level labels and THIS mattress highlighted
+ * inside the artwork.
  */
 
-export default function ProductFirmnessScale() {
+export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section
-      className="bg-white"
-      aria-label="Mattress firmness scale"
-    >
+    <section className="bg-white" aria-label="Mattress firmness scale">
       <motion.div
         variants={group}
         {...reveal}
@@ -41,20 +39,22 @@ export default function ProductFirmnessScale() {
           variants={fade}
           className="body-copy mx-auto mt-3 max-w-xl text-[14px] leading-[1.6] text-ink/55"
         >
-          The same weight, seven responses — see how a Karmo surface holds you
-          from extra soft through medium firm to extra firm.
+          Several softness levels on one scale — this mattress sits at{" "}
+          <span className="font-semibold text-brand">{highlight}</span>, marked
+          on the chart below.
         </motion.p>
       </motion.div>
 
-      <div className="relative w-full overflow-hidden bg-[#f7f5f2]">
+      <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
         <div className="relative h-[min(50svh,520px)] w-full min-h-[280px] sm:min-h-[340px] lg:h-[min(52svh,580px)]">
           <Image
-            src="/karmo/images/product/karmo-firmness-scale-v1.png"
-            alt="Firmness scale from extra soft to extra firm, with medium firm highlighted"
+            src="/karmo/images/product/Medium_Soft.webp"
+            alt={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
             fill
             sizes="100vw"
-            quality={85}
+            quality={88}
             className="object-cover object-center"
+            priority={false}
           />
         </div>
       </div>

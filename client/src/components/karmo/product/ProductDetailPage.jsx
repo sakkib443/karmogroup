@@ -33,7 +33,7 @@ export default function ProductDetailPage({ product }) {
       <ProductPromiseStrip />
       <ProductFeatureSlides />
       <ProductMattressBanner />
-      <ProductFirmnessScale />
+      <ProductFirmnessScale highlight={product.firmness || "Medium Firm"} />
       <ProductBuildAside />
     </>
   );

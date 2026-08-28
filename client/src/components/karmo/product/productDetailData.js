@@ -148,6 +148,10 @@ function toDetail(item) {
       item.line ||
       "Luxury in sensational comfort — engineered for peaceful, healthy sleep. Anti-allergic, ergonomically shaped, and tested one by one.",
     category: item.category || "mattress",
+    firmness:
+      (item.specs || []).find((s) =>
+        /soft|firm|medium/i.test(String(s))
+      ) || "Medium Firm",
     /** Default large image — catalogue thumbnail / first bottom thumb. */
     cover,
     /** Vertical K-A-R-M-O strip. */
