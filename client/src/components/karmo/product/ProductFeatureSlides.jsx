@@ -84,10 +84,22 @@ export default function ProductFeatureSlides() {
   return (
     <section
       ref={sectionRef}
-      className="border-b border-ink/8 bg-white"
+      className="relative overflow-hidden border-b border-ink/8 bg-white"
       aria-label="Comfort on a Karmo mattress"
     >
-      <div className="shell py-10 sm:py-12 lg:py-14">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+        <Image
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center opacity-[0.38]"
+          priority={false}
+        />
+        <span className="absolute inset-0 bg-white/55" />
+      </div>
+
+      <div className="shell relative z-[1] py-10 sm:py-12 lg:py-14">
         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12 xl:gap-16">
           <div
             className="relative mx-auto w-full max-w-[560px] lg:mx-0 lg:max-w-none"

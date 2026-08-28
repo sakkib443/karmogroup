@@ -5,14 +5,12 @@ import ProductHero from "@/components/karmo/product/ProductHero";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
 import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlides";
 import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
-import ProductLayers from "@/components/karmo/product/ProductLayers";
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
-import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import OrderAndContact from "@/components/karmo/home/OrderAndContact";
+import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
 
 /**
  * Matrexx mattress product detail — buy box, promise icons, comfort morph,
- * then firmness scale and build layers as separate full-width sections.
+ * firmness, then one editorial build / features / order band.
  */
 export default function ProductDetailPage({ product }) {
   if (!product) {
@@ -36,9 +34,7 @@ export default function ProductDetailPage({ product }) {
       <ProductFeatureSlides />
       <ProductMattressBanner />
       <ProductFirmnessScale />
-      <ProductLayers />
-      <ProductVideoFeatures features={product.features} />
-      <OrderAndContact />
+      <ProductBuildAside />
     </>
   );
 }
