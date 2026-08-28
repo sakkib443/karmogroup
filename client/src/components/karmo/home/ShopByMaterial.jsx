@@ -28,7 +28,7 @@ const materials = [
   {
     id: "rebonded-foam",
     name: "Rebonded Foam",
-    line: "Finest hi-density foam chips, steam-bonded for support that lasts.",
+    line: "Steam-bonded chips. Support that lasts.",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/rebonded-foam.jpg",
     alt: "Close-up of Karmo rebonded foam — bonded hi-density foam chips",
@@ -40,7 +40,7 @@ const materials = [
   {
     id: "pe-foam",
     name: "Polyethylene Foam",
-    line: "Load-bearing hi-density core — made only by Karmo.",
+    line: "Hi-density core. Made only by Karmo.",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/pe-foam.jpg",
     alt: "Close-up of Karmo hi-density polyethylene (PE) foam",
@@ -51,7 +51,7 @@ const materials = [
   {
     id: "natural-coir",
     name: "Natural Coir",
-    line: "100% coconut-husk fibre — breathable, cool, biodegradable.",
+    line: "Coconut fibre. Cool and breathable.",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/natural-coir.jpg",
     alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
@@ -62,7 +62,7 @@ const materials = [
   {
     id: "pocket-spring",
     name: "Pocket Spring",
-    line: "Vanadium-coated coils that move independently, contouring to you.",
+    line: "Independent coils. Contours to you.",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/pocket-spring.jpg",
     alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
@@ -78,35 +78,30 @@ function MaterialCard({ item }) {
       variants={fade}
       className={`group relative overflow-hidden bg-[#EFE9E3] ${item.ratio} ${item.span} lg:aspect-auto lg:h-full`}
     >
-      <Link href={item.href} className="block h-full">
+      <Link href={item.href} className="group relative block h-full overflow-hidden">
         <Image
           src={item.src}
           alt={item.alt}
           fill
           sizes={item.sizes}
-          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
         />
 
-        {/* Bottom-weighted, because the copy sits low and the pictures are
-            light at the top. Deeper than the gallery's because this one has a
-            sentence to carry, not just a name. */}
         <span
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/28 to-transparent"
+          className="absolute inset-0 bg-black/30"
         />
 
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 sm:p-6">
-          <div className="min-w-0">
-            <h3 className="display text-[1.05rem] font-bold! uppercase leading-[1.15]! tracking-[0.01em] text-white sm:text-[1.2rem]">
-              {item.name}
-            </h3>
-            <p className="body-copy mt-1.5 max-w-[20rem] text-[12px] leading-[1.55] text-white/75 sm:text-[12.5px]">
-              {item.line}
-            </p>
-          </div>
-
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-10 sm:w-10">
-            <FiArrowRight className="text-[15px]" />
+        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start p-6 sm:p-7 lg:p-8">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] sm:text-[13px] lg:text-[14px]">
+            {item.name}
+          </span>
+          <h3 className="mt-3 max-w-[16ch] text-[1.55rem] font-bold uppercase leading-[1.2] tracking-[-0.01em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)] sm:text-[1.75rem] lg:text-[1.95rem]">
+            {item.line}
+          </h3>
+          <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.02em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-colors duration-300 group-hover:text-brand sm:mt-6 sm:text-[14px] lg:text-[15px]">
+            Explore
+            <FiArrowRight className="text-[16px] transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>
       </Link>
