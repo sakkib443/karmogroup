@@ -2,7 +2,7 @@
  * Mattress (Matrexx) division — the client's IDEAL page, now expressed as data.
  * Design lives in `components/karmo/division/`; this file is only content.
  *
- * Content gathered from the Mattress Brochure (`Mattress Brochure/`, 28 pages)
+ * Content gathered from the Mattress Brochure (`karmo-library/02-catalogues/mattress-brochure/`, 28 pages)
  * and the client's own product artwork (`matrexx products/`).
  *
  * `promise.claims[].icon` is a STRING key (resolved to a real icon inside the
@@ -16,7 +16,7 @@ const mattress = {
     /* Split-sides product hero kept in data; the overlay about band sits
        in its place as the page hero. Flip this to restore the old banner. */
     hidden: true,
-    bg: "/karmo/images/mattress/mattress-sleep-well-bg.jpg",
+    bg: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
     badge: {
       src: "/karmo/images/home-02/hero/badge-number-one.webp",
       width: 420,
@@ -37,21 +37,21 @@ const mattress = {
         id: "eurotop",
         name: "Euro Top Pocket Spring",
         sub: "Pocketed coils under a plush memory-foam pillow top.",
-        image: "/karmo/images/mattress/hero-eurotop-pocket.png",
+        image: "/karmo/images/mattress/hero/product-eurotop-pocket-spring.png",
         alt: "Karmo Euro Top Pocket Spring mattress",
       },
       {
         id: "bonnell",
         name: "Bonnell Spring",
         sub: "Breathable open-coil support, crafted to perfection.",
-        image: "/karmo/images/mattress/hero-bonnell.png",
+        image: "/karmo/images/mattress/hero/product-bonnell-spring.png",
         alt: "Karmo Bonnell Spring mattress",
       },
       {
         id: "pillowtop",
         name: "Pillow Top Pocket Spring",
         sub: "Bedding excellence since 1965 — luxury you can feel.",
-        image: "/karmo/images/mattress/hero-pillowtop-pocket.png",
+        image: "/karmo/images/mattress/hero/product-pillowtop-pocket-spring.png",
         alt: "Karmo Pillow Top Pocket Spring mattress",
       },
     ],
@@ -99,7 +99,7 @@ const mattress = {
 
   /* Why-buy band — half-screen tall; photos only in assets, copy in HTML. */
   recommended: {
-    heading: "Recommended Best",
+    heading: "Which Karmo is right for you",
     columns: [
       {
         id: "pain",
@@ -124,7 +124,7 @@ const mattress = {
 
   /* Feature mosaic — Sleep Well claims (short) + lifestyle + certs + FAQs. */
   shapeGrid: {
-    background: "/karmo/images/mattress/mosaic-karmo-pattern.jpg",
+    background: "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg",
     highlights: [
       {
         id: "long-lasting",
@@ -133,7 +133,7 @@ const mattress = {
         title: "Long Lasting",
         overview:
           "Premium materials and non-sag fill — shape and comfort that hold for years of restful sleep.",
-        background: "/karmo/images/mattress/mattress-sleep-well-bg.jpg",
+        background: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
       },
       {
         id: "anti-allergic",
@@ -149,11 +149,11 @@ const mattress = {
         badge: "green",
         title: "Quality Certified",
         overview:
-          "Premium cotton and high-density microfibre — gentle, breathable rest you can trust.",
+          "ISO 9001 quality management with UKAS accreditation — every mattress tested, one by one.",
       },
     ],
     spotlight: {
-      image: "/karmo/images/mattress/mosaic-destress.jpg",
+      image: "/karmo/images/mattress/mosaic/designed-to-destress.jpg",
       alt: "Peaceful sleep on a Karmo mattress",
       headingLead: "Designed",
       headingAccent: "to",
@@ -211,11 +211,12 @@ const mattress = {
 
   /* Full-width pocket-spring cutaway: solid left rail + image (brochure facts). */
   zones: {
-    src: "/karmo/images/mattress/karmo-mattress-layers-band-v4.jpg",
+    src: "/karmo/images/mattress/bands/layers-cutaway-pocket-spring.jpg",
     alt: "Karmo pillow-top pocket-spring mattress cutaway showing real layered construction",
     width: 1536,
     height: 1024,
     heading: "Built layer by layer",
+    subheading: "Hi-density rebonded, Turkey-imported conjugate felt and pocket springs — pressed, stacked and tested as one.",
     icons: [
       { id: "foam", label: "Foam wadding" },
       { id: "pillow", label: "Pillow top" },
@@ -234,7 +235,7 @@ const mattress = {
     kicker: "Sink into a Karmo mattress",
     cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
     image: {
-      src: "/karmo/images/mattress/karmo-mattress-lounge-band.jpg",
+      src: "/karmo/images/mattress/bands/lounge-woman-resting.jpg",
       alt: "A woman resting on a Karmo mattress in a calm bedroom",
       width: 1916,
       height: 821,
@@ -248,7 +249,7 @@ const mattress = {
         kicker: "Sink into a Karmo mattress",
         cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
         image: {
-          src: "/karmo/images/mattress/karmo-mattress-lounge-band.jpg",
+          src: "/karmo/images/mattress/bands/lounge-woman-resting.jpg",
           alt: "A woman resting on a Karmo mattress in a calm bedroom",
           width: 1916,
           height: 821,
@@ -274,7 +275,7 @@ const mattress = {
       { label: "Contact us", href: "/contact" },
     ],
     image: {
-      src: "/karmo/images/mattress/chatgpt-about-hero.png",
+      src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room.png",
       alt: "A Karmo mattress styled in a calm bedroom",
       width: 1916,
       height: 821,
@@ -295,7 +296,7 @@ const mattress = {
         kicker: "We test every mattress, every single one",
         cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
         image: {
-          src: "/karmo/images/mattress/chatgpt-about-hero.png",
+          src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room.png",
           alt: "A Karmo mattress styled in a calm bedroom",
           width: 1916,
           height: 821,
@@ -316,7 +317,7 @@ const mattress = {
         kicker: "Every Karmo mattress is tested, one by one",
         cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
         image: {
-          src: "/karmo/images/mattress/Gemini_Generated_Image_iyl84kiyl84kiyl8.jpg",
+          src: "/karmo/images/mattress/hero/cooling-cat-snowy-window.jpg",
           alt: "Karmo mattress in a calm bedroom with a sleeping cat",
           width: 3140,
           height: 1344,
@@ -391,8 +392,8 @@ const mattress = {
     /* Claims already live in the feature mosaic above — hide this video band. */
     hidden: true,
     heading: "Sleep Well, Live Well",
-    subline: "Everyone Assures Quality, But Not Everyone Can Promise Experience",
-    still: "/karmo/images/mattress/mattress-sleep-well-bg.jpg",
+    subline: "Everyone Assures Quality, But Not Everyone Can Promise Experiences",
+    still: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
     film: "/karmo/videos/mattress-sleep-well.mp4",
     showFilm: true,
     claims: [
@@ -417,7 +418,7 @@ const mattress = {
         icon: "certificate",
         badge: "bg-[#2F9E44]",
         title: "Quality Certified",
-        body: "Experience exceptional rest built with premium cotton fabric and high-density microfibre filling. Gentle on the skin and breathable — a naturally cosy rest for a peaceful night's sleep.",
+        body: "International quality certification you can check: ISO 9001 quality management, accredited by UKAS and approved by Moody International. Every Karmo mattress is tested one by one before it leaves the plant — not sampled, not assumed.",
       },
     ],
   },
@@ -443,7 +444,7 @@ const mattress = {
         href: "/mattress/king",
         image: "/karmo/images/mattress/products/king-room.jpg",
         imageHover: "/karmo/images/mattress/products/king-hover-v3.jpg",
-        alt: "Karmo King Mattress in a calm blue bedroom",
+        alt: "Karmo King Mattress on a blue tufted bed",
         was: "৳ 11,339",
         now: "৳ 9,622",
         line: "Spacious comfort for deeper, shared rest",

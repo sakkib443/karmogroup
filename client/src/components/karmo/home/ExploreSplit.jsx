@@ -263,6 +263,8 @@ export default function ExploreSplit({
         {flagship && (
           <motion.div
             variants={fade}
+            {...reveal}
+            viewport={VIEWPORT}
             className={`explore-band relative overflow-hidden bg-[#d8d8d8] ${bandH}`}
           >
             <Image
@@ -280,7 +282,7 @@ export default function ExploreSplit({
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
               <div className="text-right">
-                <h2 className="display text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-white sm:text-[2.1rem] lg:text-[2.35rem]">
+                <h2 className="display section-heading uppercase text-white">
                   <span className="block sm:whitespace-nowrap">Foam crafted</span>
                   <span className="block sm:whitespace-nowrap">for comfort</span>
                 </h2>

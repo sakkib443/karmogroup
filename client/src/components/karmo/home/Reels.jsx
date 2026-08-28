@@ -209,6 +209,8 @@ export default function Reels() {
       >
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="min-w-0 max-w-md self-center text-left lg:max-w-[28rem]"
         >
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -220,7 +222,7 @@ export default function Reels() {
             </span>
           </p>
 
-          <h2 className="display mt-3 text-[1.75rem] font-extrabold! uppercase leading-[1.02]! tracking-[-0.015em] text-ink sm:text-[2rem] lg:text-[2.35rem]">
+          <h2 className="display section-heading mt-3 uppercase text-ink">
             <span className="block sm:whitespace-nowrap">See comfort.</span>
             <span className="block text-brand sm:whitespace-nowrap">
               On screen.

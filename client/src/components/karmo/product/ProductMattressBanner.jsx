@@ -11,7 +11,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * three layer thumbs stay stacked on the left.
  */
 
-const BG = "/karmo/images/mattress/mattress-sleep-well-bg.jpg";
+const BG = "/karmo/images/mattress/bands/sleep-well-film-still.jpg";
 const SHELL =
   "relative min-h-[min(78svh,640px)] md:min-h-[min(72svh,700px)]";
 
@@ -21,11 +21,11 @@ const layers = [
     label: "Hi-Density Foam",
   },
   {
-    src: "/karmo/images/mattress/hero-eurotop-pocket.png",
+    src: "/karmo/images/mattress/hero/product-eurotop-pocket-spring.png",
     label: "Euro Top Comfort",
   },
   {
-    src: "/karmo/images/mattress/hero-bonnell.png",
+    src: "/karmo/images/mattress/hero/product-bonnell-spring.png",
     label: "Ortho Spring Support",
   },
 ];

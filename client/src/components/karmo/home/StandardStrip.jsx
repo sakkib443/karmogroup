@@ -16,14 +16,18 @@ const items = [
     icon: "/karmo/images/trust/cartoon-v3/legacy-60.png?v=d44348",
   },
   {
-    title: "Trusted By Million",
-    note: "families worldwide.",
-    icon: "/karmo/images/trust/cartoon-v3/trusted.png?v=d44348",
+    // Client Home-page tagline #2 — kept verbatim, split title/note the same
+    // way "Natural and / Sustainable Products" is.
+    title: "Largest Raw Material",
+    note: "Stock",
+    icon: "/karmo/images/trust/cartoon-v3/chem-stock.png?v=nobg",
   },
   {
-    title: "Recognised By",
-    note: "Super Brand",
-    icon: "/karmo/images/trust/cartoon-v3/superbrand.png?v=d44348",
+    // Client Home-page tagline #3 — the exact wording ("Certification", not
+    // "Certified"). Replaces the old "Recognised By / Super Brand" pillar.
+    title: "International Quality",
+    note: "Certification",
+    icon: "/karmo/images/trust/cartoon-v3/chem-certified.png?v=nobg",
   },
   {
     title: "Natural and",

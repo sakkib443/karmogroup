@@ -13,24 +13,24 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * (transparent PNGs so they sit cleanly on the navy panel).
  */
 
-const DESKTOP_H = "min(560px, 62svh)";
+const DESKTOP_H = "min(660px, 74svh)";
 const PANEL = "#0B1A33";
 
 const claims = [
   {
     id: "stock",
     title: "Largest raw material stock",
-    icon: "/karmo/images/trust/cartoon-v3/chem-stock.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/chem-stock.png?v=nobg",
   },
   {
     id: "quality",
     title: "International quality certified",
-    icon: "/karmo/images/trust/cartoon-v3/chem-certified.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/chem-certified.png?v=nobg",
   },
   {
     id: "poly",
     title: "Specialized polyurethanes & polymers",
-    icon: "/karmo/images/trust/cartoon-v3/chem-polymer.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/chem-polymer.png?v=nobg",
   },
 ];
 
@@ -48,10 +48,10 @@ export default function ChemicalsBand() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid min-h-[min(48svh,400px)] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.72fr)]"
+        className="grid min-h-[min(58svh,470px)] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.72fr)]"
       >
         {/* Left — warehouse photography + top-left line */}
-        <motion.div variants={fade} className="relative min-h-[min(36svh,300px)] lg:min-h-0">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="relative min-h-[min(36svh,300px)] lg:min-h-0">
           <Image
             src="/karmo/images/home-02/hero/home-hero-slide-chemicals-hero.jpg"
             alt="Organized Karmo chemicals warehouse with blue industrial drums"
@@ -72,18 +72,23 @@ export default function ChemicalsBand() {
         {/* Right — navy info panel, vertically + horizontally centered */}
         <motion.aside
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="relative flex flex-col items-center justify-center px-7 py-10 text-center text-white sm:px-9 lg:px-10 lg:py-12"
           style={{ backgroundColor: PANEL }}
         >
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60">
             Karmo Chemicals
           </span>
-          <h2 className="display mt-3 text-[1.65rem] font-extrabold! uppercase leading-[1.05]! tracking-[-0.015em] sm:text-[1.9rem] lg:text-[2.05rem]">
+          <h2 className="display section-heading mt-3 uppercase">
             <span className="block font-semibold! text-white/90">The world of</span>
             <span className="block">polyurethane</span>
           </h2>
 
-          <ul className="mt-8 grid w-full grid-cols-3 gap-3 sm:mt-9 sm:gap-4">
+          {/* Tight gap on purpose: the three icons read as one row of claims,
+              not three separate cards. The caption under each is what needs
+              the room, so the columns sit close and the text wraps instead. */}
+          <ul className="mt-8 grid w-full grid-cols-3 gap-x-1 gap-y-3 sm:mt-9 sm:gap-x-1.5">
             {claims.map((claim) => (
               <li key={claim.id} className="group flex flex-col items-center text-center">
                 <span className="relative mx-auto flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[4.75rem] sm:w-[4.75rem]">

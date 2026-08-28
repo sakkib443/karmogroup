@@ -141,6 +141,13 @@ export default function DivisionPage({ data }) {
             <h2 className="display text-[1.35rem] font-bold uppercase leading-[1.12] tracking-[0.02em] text-white sm:text-[1.65rem] lg:text-[1.95rem]">
               {data.zones.heading}
             </h2>
+            {/* Optional — only the mattress division sets it. The other three
+                omit the field, so nothing renders and their rail is unchanged. */}
+            {data.zones.subheading && (
+              <p className="body-copy mt-3 max-w-[26rem] text-[12.5px] leading-[1.6] text-white/65 sm:text-[13px]">
+                {data.zones.subheading}
+              </p>
+            )}
             {data.zones.icons?.length > 0 && (
               <ul className="mt-5 grid w-full grid-cols-3 gap-3 sm:mt-6 sm:gap-4">
                 {data.zones.icons.map((icon) => (

@@ -117,6 +117,8 @@ export default function LivingLookbook() {
         {/* Still band — hero-style living room */}
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className={`relative overflow-hidden bg-shade-deep ${BAND_H}`}
         >
           <Image

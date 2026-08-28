@@ -11,26 +11,14 @@ const VID = "/karmo/video";
 
 export const productFeatures = [
   {
-    title: "Layered for real rest",
-    body: "Hi-density foam, felt and — depending on the model — pocket springs or coir, stacked so pressure relief and support work together through the night.",
-    video: `${VID}/s.mp4`,
-  },
-  {
     title: "Spine-aware support",
     body: "Ergonomic construction that keeps your back aligned whether you sleep on your side, back or sit up to read. Built for healthy sleep, not just a soft surface.",
     video: `${VID}/m.mp4`,
-    reverse: true,
-  },
-  {
-    title: "Tested one by one",
-    body: "Every Karmo mattress is checked for comfort and build before it leaves the plant — the same discipline that has kept the brand trusted since 1965.",
-    video: `${VID}/l.mp4`,
   },
   {
     title: "Anti-dust, lasting cover",
     body: "Breathable damask and quilted tops chosen for everyday Bangladesh homes — anti-allergic, easy to live with, and made to hold their look for years.",
     video: `${VID}/p.mp4`,
-    reverse: true,
   },
 ];
 
@@ -91,7 +79,7 @@ function parseTaka(label) {
 
 const catalog = mattress.products?.items || [];
 
-/** Shared K-A-R-M-O campaign thumbs — same five on every Matrexx PDP. */
+/** Shared K-A-R-M-O campaign thumbs — fallback when a SKU has no own set. */
 export const KARMO_LETTER_GALLERY = [
   "/products/product-01/gallery-3.jpg", // K
   "/products/product-01/gallery-5.jpg", // A
@@ -100,11 +88,37 @@ export const KARMO_LETTER_GALLERY = [
   "/products/product-01/gallery-2.jpg", // O
 ];
 
+/** King Mattress — locked plate: same backdrop + letter position; only bed/props change. */
+export const KING_LETTER_GALLERY = [
+  "/karmo/images/mattress/products/king-gallery/letter-K-v3.png",
+  "/karmo/images/mattress/products/king-gallery/letter-A-v3.png",
+  "/karmo/images/mattress/products/king-gallery/letter-R-v3.png",
+  "/karmo/images/mattress/products/king-gallery/letter-M-v3.png",
+  "/karmo/images/mattress/products/king-gallery/letter-O-v3.png",
+];
+
+/** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
+export const KING_REAL_GALLERY = [
+  "/karmo/images/mattress/products/king-room.jpg",
+  "/karmo/images/mattress/products/king-gallery/angle-front.png",
+  "/karmo/images/mattress/products/king-gallery/angle-side.png",
+  "/karmo/images/mattress/products/king-gallery/angle-detail.png",
+];
+
+const LETTER_BY_ID = {
+  king: KING_LETTER_GALLERY,
+};
+
+const REAL_BY_ID = {
+  king: KING_REAL_GALLERY,
+};
+
 export function getMattressProductSlugs() {
   return catalog.map((p) => p.id);
 }
 
 function buildRealGallery(item) {
+  if (REAL_BY_ID[item.id]) return REAL_BY_ID[item.id];
   /* Cover (room) first, then studio/web packshot, then a shared Matrexx still. */
   const shots = [
     item.image,
@@ -117,8 +131,10 @@ function buildRealGallery(item) {
 function toDetail(item) {
   const price = parseTaka(item.now);
   const mrp = parseTaka(item.was) || price;
-  const cover = item.image;
   const realGallery = buildRealGallery(item);
+  const letterGallery = LETTER_BY_ID[item.id] || KARMO_LETTER_GALLERY;
+  /* PDP opens on the catalogue thumbnail (first real gallery shot). */
+  const cover = item.image || realGallery[0] || letterGallery[0];
 
   return {
     slug: item.id,
@@ -132,10 +148,10 @@ function toDetail(item) {
       item.line ||
       "Luxury in sensational comfort — engineered for peaceful, healthy sleep. Anti-allergic, ergonomically shaped, and tested one by one.",
     category: item.category || "mattress",
-    /** Default large image — catalogue cover / room thumbnail. */
+    /** Default large image — catalogue thumbnail / first bottom thumb. */
     cover,
-    /** Vertical K-A-R-M-O strip (shared). */
-    letterGallery: KARMO_LETTER_GALLERY,
+    /** Vertical K-A-R-M-O strip. */
+    letterGallery,
     /** Horizontal real-product row under the main frame. */
     realGallery,
     /** Legacy combined list (buy-box still works if anything reads `gallery`). */

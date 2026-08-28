@@ -258,7 +258,7 @@ export default function DivisionShapeGrid({
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const bg =
-    background || "/karmo/images/mattress/mosaic-karmo-pattern.jpg";
+    background || "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg";
 
   const primary = highlights[0];
   const pair = highlights.slice(1, 3);

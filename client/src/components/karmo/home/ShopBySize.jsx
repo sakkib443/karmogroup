@@ -154,7 +154,7 @@ export default function ShopBySize() {
         viewport={VIEWPORT}
         className="shell-home-two"
       >
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <SectionLabel eyebrow="Perfect fit, perfect sleep">
             Shop by <span className="font-bold text-brand">mattress size</span>
           </SectionLabel>

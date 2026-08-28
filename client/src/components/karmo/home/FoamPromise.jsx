@@ -461,8 +461,8 @@ export default function FoamPromise({
         viewport={VIEWPORT}
         className="shell relative z-[2]"
       >
-        <motion.div variants={fade} className="text-center">
-          <h2 className="display text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-white lg:text-[2.3rem]">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="text-center">
+          <h2 className="display section-heading uppercase text-white">
             {heading}
           </h2>
           <p className="body-copy mt-3 text-[15px] text-white/90">
