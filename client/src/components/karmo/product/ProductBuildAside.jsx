@@ -227,10 +227,10 @@ export default function ProductBuildAside() {
           alt=""
           fill
           sizes="100vw"
-          className="object-cover object-center opacity-[0.32]"
+          className="object-cover object-center opacity-[0.2]"
           priority={false}
         />
-        <span className="absolute inset-0 bg-white/55" />
+        <span className="absolute inset-0 bg-white/58" />
       </div>
 
       <motion.div
