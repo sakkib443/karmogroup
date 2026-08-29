@@ -70,7 +70,13 @@ export default function DivisionAbout({
               image,
             },
           ];
-    return <OverlayHeroSlider slides={frames} asHero={asHero} size="band" />;
+    return (
+      <OverlayHeroSlider
+        slides={frames}
+        asHero={asHero}
+        size={asHero ? "viewport" : "band"}
+      />
+    );
   }
 
   return (

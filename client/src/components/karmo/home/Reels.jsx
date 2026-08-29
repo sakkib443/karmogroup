@@ -18,8 +18,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const ORANGE = "#FF9A1F";
 const DESKTOP_H = "calc(100svh - 32px)";
 const GAP_PX = 6;
-/* Exactly 3 tiles fit the viewport; width = (100cqw - 2 gaps) / 3 */
-const TILE_W = `calc((100cqw - ${GAP_PX * 2}px) / 3)`;
+/* Desktop: 3 tiles in view. Mobile: ~1.15 so reels stay watchable, not skinny. */
 
 const films = [
   {
@@ -280,7 +279,7 @@ export default function Reels() {
         >
           {reduceMotion ? (
             <div
-              className="grid h-full w-full grid-cols-2 md:grid-cols-3"
+              className="grid h-full w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
               style={{ gap: GAP_PX }}
             >
               {staticFilms.map((film) => (
@@ -302,8 +301,7 @@ export default function Reels() {
               {loopFilms.map((film) => (
                 <div
                   key={film.key}
-                  className="h-full shrink-0"
-                  style={{ width: TILE_W }}
+                  className="h-full w-[calc((100cqw-6px)/1.15)] shrink-0 lg:w-[calc((100cqw-12px)/3)]"
                 >
                   <ReelTile
                     film={film}

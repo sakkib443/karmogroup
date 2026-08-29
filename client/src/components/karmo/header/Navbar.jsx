@@ -593,21 +593,38 @@ export default function Navbar() {
                           </Link>
 
                           {entry.columns ? (
-                            <div className="mt-3 space-y-3">
+                            <div className="mt-3 space-y-4">
                               {entry.columns.map((col) => (
                                 <div key={col.label}>
                                   <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">
                                     Shop by {col.label}
                                   </p>
-                                  <ul className="flex flex-wrap gap-2">
-                                    {col.items.map((sub) => (
-                                      <li key={sub.name}>
+                                  <ul className="overflow-hidden rounded-[4px] border border-ink/10 bg-white">
+                                    {col.items.map((sub, itemIndex) => (
+                                      <li
+                                        key={sub.name}
+                                        className={
+                                          itemIndex < col.items.length - 1
+                                            ? "border-b border-ink/8"
+                                            : ""
+                                        }
+                                      >
                                         <Link
                                           href={sub.href}
                                           onClick={() => setOpen(false)}
-                                          className="block bg-cream px-3 py-1.5 text-[12px] uppercase tracking-[0.06em] text-ink/70"
+                                          className="group flex min-h-12 items-center justify-between gap-2.5 px-2.5 py-1.5 transition-colors duration-200 hover:bg-cream/70"
                                         >
-                                          {sub.name}
+                                          <span className="flex min-w-0 items-center gap-2.5">
+                                            {sub.icon ? (
+                                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-cream/80 text-ink/60">
+                                                <MenuGlyph icon={sub.icon} alt="" />
+                                              </span>
+                                            ) : null}
+                                            <span className="truncate text-[12px] font-semibold uppercase tracking-[0.06em] text-ink">
+                                              {sub.name}
+                                            </span>
+                                          </span>
+                                          <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
                                         </Link>
                                       </li>
                                     ))}

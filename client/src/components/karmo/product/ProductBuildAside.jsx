@@ -98,7 +98,6 @@ function TallMorph() {
   const rootRef = useRef(null);
   const firstSwapDone = useRef(false);
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
@@ -123,21 +122,19 @@ function TallMorph() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion || paused || !inView) return undefined;
+    if (reduceMotion || !inView) return undefined;
     const delay = firstSwapDone.current ? HOLD_MS : FIRST_HOLD_MS;
     const id = window.setTimeout(() => {
       firstSwapDone.current = true;
       setIndex((i) => (i + 1) % SLIDES.length);
     }, delay);
     return () => window.clearTimeout(id);
-  }, [reduceMotion, paused, inView, index]);
+  }, [reduceMotion, inView, index]);
 
   return (
     <div
       ref={rootRef}
       className="group relative row-span-2 min-h-0 overflow-hidden bg-[#ebe7e1]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       <motion.div
         className="absolute inset-0 origin-[50%_40%] will-change-transform"
