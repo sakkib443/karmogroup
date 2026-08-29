@@ -445,7 +445,7 @@ const mattress = {
         image: "/karmo/images/mattress/products/king-room.jpg",
         imageHover: "/karmo/images/mattress/products/king-hover-v3.jpg",
         alt: "Karmo King Mattress on a blue tufted bed",
-        was: "৳ 11,339",
+        was: "৳ 11,320",
         now: "৳ 9,622",
         line: "Spacious comfort for deeper, shared rest",
         badge: "Best Seller",

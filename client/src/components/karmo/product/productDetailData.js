@@ -6,6 +6,18 @@
  */
 
 import mattress from "@/data/divisions/mattress";
+import {
+  defaultHeightFor,
+  quoteMattressPrice,
+  sizePresetsFor,
+} from "@/components/karmo/product/mattressPricing";
+
+export {
+  quoteMattressPrice,
+  sizePresetsFor,
+  DISCOUNT_OPTIONS,
+  getPricingRule,
+} from "@/components/karmo/product/mattressPricing";
 
 const VID = "/karmo/video";
 
@@ -32,39 +44,24 @@ export const fabricOptions = [
   { id: "fabric-6", label: "Damask 6", image: "/karmo/images/product/fabrics/fabric6.jpg" },
 ];
 
-export const colorOptions = [
-  { id: "ivory", label: "Ivory", hex: "#F4F0E6" },
-  { id: "pearl", label: "Pearl", hex: "#E8E4DC" },
-  { id: "grey", label: "Soft Grey", hex: "#9AA0A6" },
-  { id: "charcoal", label: "Charcoal", hex: "#3D3D3D" },
-];
+/** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
+export const sizePresets = sizePresetsFor("euro-top-pocket-spring");
 
-/** Standard mattress sizes (cm) — Queen is the catalogue price reference. */
-export const sizePresets = [
-  { id: "single", label: "90×190", note: "Single", w: 90, l: 190, h: 20 },
-  { id: "double", label: "120×190", note: "Double", w: 120, l: 190, h: 20 },
-  { id: "queen", label: "150×200", note: "Queen", w: 150, l: 200, h: 22 },
-  { id: "king", label: "180×200", note: "King", w: 180, l: 200, h: 25 },
-  { id: "custom", label: "Custom", note: "Enter cm", w: 150, l: 200, h: 22 },
-];
-
-/** Queen area — catalogue `price` is quoted against this size. */
-export const REF_AREA = 150 * 200;
-export const REF_HEIGHT = 22;
-
-/**
- * Estimate Matrexx price from size vs the catalogue base (Queen reference).
- * Area drives most of the quote; thickness adds a light uplift.
- */
-export function estimateMattressPrice(basePrice, w, l, h = REF_HEIGHT) {
-  const width = Math.max(60, Number(w) || 0);
-  const length = Math.max(120, Number(l) || 0);
-  const height = Math.max(8, Math.min(40, Number(h) || REF_HEIGHT));
+/** @deprecated Prefer quoteMattressPrice(slug, dims). */
+export function estimateMattressPrice(basePrice, w, l, h) {
+  const quote = quoteMattressPrice("euro-top-pocket-spring", {
+    width: w,
+    length: l,
+    height: h,
+    discountPct: 0,
+  });
+  if (quote.ok) return quote.total;
   if (!basePrice) return 0;
-  const areaFactor = (width * length) / REF_AREA;
-  const heightFactor = 0.85 + (height / REF_HEIGHT) * 0.15;
-  return Math.round(basePrice * areaFactor * heightFactor);
+  return Math.round(Number(basePrice) || 0);
 }
+
+export const REF_AREA = 60 * 80;
+export const REF_HEIGHT = 9;
 
 export function formatTaka(n) {
   if (!n || !Number.isFinite(n)) return "৳ —";
@@ -162,14 +159,15 @@ function toDetail(item) {
     gallery: realGallery,
     fabrics: fabricOptions,
     densities: null,
-    colors: colorOptions,
-    sizes: sizePresets,
+    colors: null,
+    sizes: sizePresetsFor(item.id),
     showCustomSize: true,
     price,
     mrp,
     priceLabel: item.now,
     wasLabel: item.was,
-    unitNote: "Starting price · final quote by size",
+    unitNote: "Sales calculator · final quote by size (inch)",
+    defaultHeight: defaultHeightFor(item.id),
     features: productFeatures,
     imageAlt: item.alt,
   };
