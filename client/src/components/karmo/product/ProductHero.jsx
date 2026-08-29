@@ -31,11 +31,11 @@ const EASE = [0.22, 1, 0.36, 1];
 const OFFER_DISCOUNT_PCT = 15;
 
 const SIZE_ICONS = {
-  single: "/karmo/images/product/size-icons/single.png",
-  double: "/karmo/images/product/size-icons/double.png",
-  queen: "/karmo/images/product/size-icons/queen.png",
-  king: "/karmo/images/product/size-icons/king.png",
-  custom: "/karmo/images/product/size-icons/custom.png",
+  single: "/karmo/images/product/size-icons/single.webp",
+  double: "/karmo/images/product/size-icons/double.webp",
+  queen: "/karmo/images/product/size-icons/queen.webp",
+  king: "/karmo/images/product/size-icons/king.webp",
+  custom: "/karmo/images/product/size-icons/custom.webp",
 };
 
 function OptionBlock({ title, children }) {
@@ -293,6 +293,7 @@ export default function ProductHero({ product }) {
                             alt={product.name}
                             fill
                             priority
+                            quality={90}
                             sizes="(min-width: 1024px) 48vw, 100vw"
                             className="object-cover object-center"
                           />

@@ -22,7 +22,7 @@ const columns = [
       id: "foam-studio",
       href: "/mattress",
       label: "Mattress",
-      src: "/karmo/images/mattress/products/orthopedic-room.jpg",
+      src: "/karmo/images/mattress/products/orthopedic-room-hq.jpg",
       alt: "Karmo Orthopedic Mattress in a rustic brick bedroom with garden light",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
@@ -31,7 +31,7 @@ const columns = [
       id: "foam-lavender",
       href: "/hometex",
       label: "HomeTex",
-      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-bedding.jpg",
+      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-bedding-hq.jpg",
       alt: "Karmo HomeTex bedding set with pillows and comforter",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
@@ -42,7 +42,7 @@ const columns = [
       id: "mattress-bedroom",
       href: "/foam",
       label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/foam-sofa.jpg",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-sofa-hq.jpg",
       alt: "A Karmo Foam sofa with lavender cushions in a cozy living room",
       ratio: "aspect-[12/11]",
       grow: "md:flex-[11]",
@@ -51,7 +51,7 @@ const columns = [
       id: "mattress-grey",
       href: "/mattress",
       label: "Mattress",
-      src: "/karmo/images/home-02/divisions/editorial-v2/sleep-portrait.jpg",
+      src: "/karmo/images/home-02/divisions/editorial-v2/sleep-portrait-hq.jpg",
       alt: "A woman resting peacefully on a Karmo mattress",
       ratio: "aspect-[3/5]",
       grow: "md:flex-[20]",
@@ -62,7 +62,7 @@ const columns = [
       id: "foam-campaign",
       href: "/foam",
       label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi.jpg",
+      src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi-hq.jpg",
       alt: "A modern living room with a plush foam sofa",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
@@ -71,7 +71,7 @@ const columns = [
       id: "mattress-floral",
       href: "/chemicals",
       label: "Chemicals",
-      src: "/karmo/images/home-02/divisions/editorial-v2/chemicals-tins.jpg",
+      src: "/karmo/images/home-02/divisions/editorial-v2/chemicals-tins-hq.jpg",
       alt: "Karmo adhesive tins from the chemicals division",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
@@ -89,6 +89,7 @@ function Shot({ shot }) {
         src={shot.src}
         alt={shot.alt}
         fill
+        quality={85}
         sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
         className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
       />

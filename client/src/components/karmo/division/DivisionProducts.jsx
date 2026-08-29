@@ -272,7 +272,7 @@ function MattressFloatCard({ item }) {
               className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
             >
               <img
-                src="/karmo/images/trust/order-cartoon/cart.png?v=d44348"
+                src="/karmo/images/trust/order-cartoon/cart-v2.webp"
                 alt=""
                 aria-hidden
                 width={22}
@@ -437,7 +437,7 @@ function MattressCatalogueCard({ item }) {
             className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
           >
             <img
-              src="/karmo/images/trust/order-cartoon/cart.png?v=d44348"
+              src="/karmo/images/trust/order-cartoon/cart-v2.webp"
               alt=""
               aria-hidden
               width={22}

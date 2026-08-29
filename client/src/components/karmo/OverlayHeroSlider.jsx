@@ -113,7 +113,7 @@ export default function OverlayHeroSlider({
                   alt={on ? s.image.alt : ""}
                   fill
                   sizes="100vw"
-                  quality={72}
+                  quality={90}
                   priority={i === 0}
                   /* `eager` on all of them, not just the first: a lazy image
                      inside a slide sitting at opacity 0 is still in the

@@ -20,14 +20,14 @@ const items = [
     // way "Natural and / Sustainable Products" is.
     title: "Largest Raw Material",
     note: "Stock",
-    icon: "/karmo/images/trust/cartoon-v3/chem-stock.png?v=nobg",
+    icon: "/karmo/images/trust/cartoon-v3/chem-stock-v2.webp",
   },
   {
     // Client Home-page tagline #3 — the exact wording ("Certification", not
     // "Certified"). Replaces the old "Recognised By / Super Brand" pillar.
     title: "International Quality",
     note: "Certification",
-    icon: "/karmo/images/trust/cartoon-v3/chem-certified.png?v=nobg",
+    icon: "/karmo/images/trust/cartoon-v3/chem-certified-v2.webp",
   },
   {
     title: "Natural and",

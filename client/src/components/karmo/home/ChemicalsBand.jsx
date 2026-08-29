@@ -20,17 +20,17 @@ const claims = [
   {
     id: "stock",
     title: "Largest raw material stock",
-    icon: "/karmo/images/trust/cartoon-v3/chem-stock.png?v=nobg",
+    icon: "/karmo/images/trust/cartoon-v3/chem-stock-v2.webp",
   },
   {
     id: "quality",
     title: "International quality certified",
-    icon: "/karmo/images/trust/cartoon-v3/chem-certified.png?v=nobg",
+    icon: "/karmo/images/trust/cartoon-v3/chem-certified-v2.webp",
   },
   {
     id: "poly",
     title: "Specialized polyurethanes & polymers",
-    icon: "/karmo/images/trust/cartoon-v3/chem-polymer.png?v=nobg",
+    icon: "/karmo/images/trust/cartoon-v3/chem-polymer-v2.webp",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function ChemicalsBand() {
         {/* Left — warehouse photography + top-left line */}
         <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="relative min-h-[min(36svh,300px)] lg:min-h-0">
           <Image
-            src="/karmo/images/home-02/hero/home-hero-slide-chemicals-hero.jpg"
+            src="/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.jpg"
             alt="Organized Karmo chemicals warehouse with blue industrial drums"
             fill
             sizes="(min-width: 1024px) 68vw, 100vw"

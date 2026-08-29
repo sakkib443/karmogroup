@@ -52,7 +52,7 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
             alt={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
             fill
             sizes="100vw"
-            quality={88}
+            quality={90}
             className="object-cover object-center"
             priority={false}
           />

@@ -22,25 +22,25 @@ const ORANGE = "#FF9A1F";
 const steps = [
   {
     n: "01",
-    icon: "/karmo/images/trust/order-cartoon/select.png?v=d44348",
+    icon: "/karmo/images/trust/order-cartoon/select-v2.webp",
     title: "Select your product",
     body: "Choose the foam, mattress or HomeTex piece that fits the room.",
   },
   {
     n: "02",
-    icon: "/karmo/images/trust/order-cartoon/cart.png?v=d44348",
+    icon: "/karmo/images/trust/order-cartoon/cart-v2.webp",
     title: "Add it to the cart",
     body: "Drop your picks in — sizes and quantities stay with you.",
   },
   {
     n: "03",
-    icon: "/karmo/images/trust/order-cartoon/checkout.png?v=d44348",
+    icon: "/karmo/images/trust/order-cartoon/checkout-v2.webp",
     title: "Complete the checkout",
     body: "Just three details: name, full address, and mobile number.",
   },
   {
     n: "04",
-    icon: "/karmo/images/trust/order-cartoon/enjoy.png?v=d44348",
+    icon: "/karmo/images/trust/order-cartoon/enjoy-v2.webp",
     title: "Receive & enjoy",
     body: "We deliver. You settle in. Comfort shows up at the door.",
   },
