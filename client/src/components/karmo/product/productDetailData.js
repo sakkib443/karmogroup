@@ -87,19 +87,19 @@ export const KARMO_LETTER_GALLERY = [
 
 /** King Mattress — locked plate: same backdrop + letter position; only bed/props change. */
 export const KING_LETTER_GALLERY = [
-  "/karmo/images/mattress/products/king-gallery/letter-K-v3.png",
-  "/karmo/images/mattress/products/king-gallery/letter-A-v3.png",
-  "/karmo/images/mattress/products/king-gallery/letter-R-v3.png",
-  "/karmo/images/mattress/products/king-gallery/letter-M-v3.png",
-  "/karmo/images/mattress/products/king-gallery/letter-O-v3.png",
+  "/karmo/images/mattress/products/king-gallery/letter-K-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/letter-A-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/letter-R-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/letter-M-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/letter-O-v4.webp",
 ];
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/karmo/images/mattress/products/king-room.jpg",
-  "/karmo/images/mattress/products/king-gallery/angle-front.png",
-  "/karmo/images/mattress/products/king-gallery/angle-side.png",
-  "/karmo/images/mattress/products/king-gallery/angle-detail.png",
+  "/karmo/images/mattress/products/king-room-hq.jpg",
+  "/karmo/images/mattress/products/king-gallery/angle-front-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/angle-side-v4.webp",
+  "/karmo/images/mattress/products/king-gallery/angle-detail-v4.webp",
 ];
 
 const LETTER_BY_ID = {

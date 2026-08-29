@@ -34,7 +34,7 @@ const bands = [
     eyebrow: "Made to last",
     title: "Tested, one by one",
     body: "Every Karmo mattress is checked for feel and finish before it leaves — craft you can feel on the first night.",
-    src: "/karmo/images/mattress/products/orthopedic-room.jpg",
+    src: "/karmo/images/mattress/products/orthopedic-room-hq.jpg",
     alt: "Karmo Orthopedic mattress in a calm bedroom",
     imageLeft: true,
   },

@@ -34,7 +34,7 @@ const panels = [
   {
     id: "living",
     href: "/foam",
-    src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi.jpg",
+    src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi-hq.jpg",
     alt: "A modern living room with a plush foam sofa and warm orange cushion",
     eyebrow: "Karmo Foam",
     title: "Living rooms made for real rest",
