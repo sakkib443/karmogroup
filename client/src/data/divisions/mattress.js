@@ -16,7 +16,7 @@ const mattress = {
     /* Split-sides product hero kept in data; the overlay about band sits
        in its place as the page hero. Flip this to restore the old banner. */
     hidden: true,
-    bg: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
+    bg: "/karmo/images/mattress/bands/sleep-well-film-still-hq.jpg",
     badge: {
       src: "/karmo/images/home-02/hero/badge-number-one.webp",
       width: 420,
@@ -61,37 +61,37 @@ const mattress = {
   features: [
     {
       id: "legacy",
-      icon: "/karmo/images/trust/cartoon-v3/legacy-60.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
       title: "A legacy of 60 years",
       note: "of healthy sleep",
     },
     {
       id: "trusted",
-      icon: "/karmo/images/trust/cartoon-v3/trusted.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
       title: "Trusted By Million",
       note: "families worldwide.",
     },
     {
       id: "recognised",
-      icon: "/karmo/images/trust/cartoon-v3/superbrand.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/superbrand-v2.webp",
       title: "Recognised By",
       note: "Super Brand",
     },
     {
       id: "natural",
-      icon: "/karmo/images/trust/cartoon-v3/natural.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/natural-v2.webp",
       title: "Natural and",
       note: "Sustainable Products",
     },
     {
       id: "delivery",
-      icon: "/karmo/images/trust/cartoon-v3/delivery.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
       title: "Free Delivery",
       note: "Available",
     },
     {
       id: "stores",
-      icon: "/karmo/images/trust/cartoon-v3/stores.png?v=d44348",
+      icon: "/karmo/images/trust/cartoon-v3/stores-v2.webp",
       title: "5k+ Stores",
       note: "Pan Bangladesh",
     },
@@ -103,19 +103,19 @@ const mattress = {
     columns: [
       {
         id: "pain",
-        image: "/karmo/images/mattress/why/why-back-pain.jpg",
+        image: "/karmo/images/mattress/why/why-back-pain-hq.jpg",
         alt: "Half-body rear view on a Karmo mattress with a soft wellness glow along the spine",
         caption: "If you have chronic neck & back pain",
       },
       {
         id: "posture",
-        image: "/karmo/images/mattress/why/why-posture-v5.jpg",
+        image: "/karmo/images/mattress/why/why-posture-v5-hq.jpg",
         alt: "Side-profile aligned sleep on a Karmo mattress with posture-support light",
         caption: "If you need firm support to correct your posture",
       },
       {
         id: "cool",
-        image: "/karmo/images/mattress/why/why-sweaty-v5.jpg",
+        image: "/karmo/images/mattress/why/why-sweaty-v5-hq.jpg",
         alt: "Cool comfortable sleep on a Karmo mattress",
         caption: "If you are a sweaty sleeper",
       },
@@ -133,7 +133,7 @@ const mattress = {
         title: "Long Lasting",
         overview:
           "Premium materials and non-sag fill — shape and comfort that hold for years of restful sleep.",
-        background: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
+        background: "/karmo/images/mattress/bands/sleep-well-film-still-hq.jpg",
       },
       {
         id: "anti-allergic",
@@ -235,10 +235,10 @@ const mattress = {
     kicker: "Sink into a Karmo mattress",
     cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
     image: {
-      src: "/karmo/images/mattress/bands/lounge-woman-resting.jpg",
+      src: "/karmo/images/mattress/bands/lounge-woman-resting-hq.jpg",
       alt: "A woman resting on a Karmo mattress in a calm bedroom",
-      width: 1916,
-      height: 821,
+      width: 2000,
+      height: 848,
     },
     slides: [
       {
@@ -249,10 +249,10 @@ const mattress = {
         kicker: "Sink into a Karmo mattress",
         cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
         image: {
-          src: "/karmo/images/mattress/bands/lounge-woman-resting.jpg",
+          src: "/karmo/images/mattress/bands/lounge-woman-resting-hq.jpg",
           alt: "A woman resting on a Karmo mattress in a calm bedroom",
-          width: 1916,
-          height: 821,
+          width: 2000,
+          height: 848,
         },
       },
     ],
@@ -275,7 +275,7 @@ const mattress = {
       { label: "Contact us", href: "/contact" },
     ],
     image: {
-      src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room.png",
+      src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room-hq.jpg",
       alt: "A Karmo mattress styled in a calm bedroom",
       width: 1916,
       height: 821,
@@ -296,7 +296,7 @@ const mattress = {
         kicker: "We test every mattress, every single one",
         cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
         image: {
-          src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room.png",
+          src: "/karmo/images/mattress/hero/about-lifestyle-woman-cat-navy-room-hq.jpg",
           alt: "A Karmo mattress styled in a calm bedroom",
           width: 1916,
           height: 821,
@@ -393,7 +393,7 @@ const mattress = {
     hidden: true,
     heading: "Sleep Well, Live Well",
     subline: "Everyone Assures Quality, But Not Everyone Can Promise Experiences",
-    still: "/karmo/images/mattress/bands/sleep-well-film-still.jpg",
+    still: "/karmo/images/mattress/bands/sleep-well-film-still-hq.jpg",
     film: "/karmo/videos/mattress-sleep-well.mp4",
     showFilm: true,
     claims: [

@@ -13,7 +13,7 @@ const items = [
   {
     title: "A legacy of 60 years",
     note: "of healthy sleep",
-    icon: "/karmo/images/trust/cartoon-v3/legacy-60.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
   },
   {
     // Client Home-page tagline #2 — kept verbatim, split title/note the same
@@ -32,17 +32,17 @@ const items = [
   {
     title: "Natural and",
     note: "Sustainable Products",
-    icon: "/karmo/images/trust/cartoon-v3/natural.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/natural-v2.webp",
   },
   {
     title: "Free Delivery",
     note: "Available",
-    icon: "/karmo/images/trust/cartoon-v3/delivery.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
   },
   {
     title: "5k+ Stores",
     note: "Pan Bangladesh",
-    icon: "/karmo/images/trust/cartoon-v3/stores.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/stores-v2.webp",
   },
 ];
 

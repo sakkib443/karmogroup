@@ -13,22 +13,22 @@ const SIZE_OPTIONS = [
   {
     id: "Single",
     label: "Single",
-    icon: "/karmo/images/trust/cartoon-v3/size-single.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/size-single-v2.webp",
   },
   {
     id: "Double",
     label: "Double",
-    icon: "/karmo/images/trust/cartoon-v3/size-double.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/size-double-v2.webp",
   },
   {
     id: "Queen",
     label: "Queen",
-    icon: "/karmo/images/trust/cartoon-v3/size-queen.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/size-queen-v2.webp",
   },
   {
     id: "King",
     label: "King",
-    icon: "/karmo/images/trust/cartoon-v3/size-king.png?v=d44348",
+    icon: "/karmo/images/trust/cartoon-v3/size-king-v2.webp",
   },
 ];
 
