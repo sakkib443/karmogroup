@@ -141,23 +141,13 @@ export function defaultHeightFor(slug) {
 export function sizePresetsFor(slug) {
   const h = defaultHeightFor(slug);
 
-  /* King list price (৳11,320 / ৳9,622 @ 15%) is quoted on Queen 81×69×H. */
-  if (slug === "king") {
-    return [
-      { id: "single", label: "36×75", note: "Single", w: 36, l: 75, h },
-      { id: "double", label: "48×75", note: "Double", w: 48, l: 75, h },
-      { id: "queen", label: "69×81", note: "Queen", w: 69, l: 81, h },
-      { id: "king", label: "72×80", note: "King", w: 72, l: 80, h },
-      { id: "custom", label: "Custom", note: "Enter inch", w: 69, l: 81, h },
-    ];
-  }
-
+  /* Catalogue Queen base footprint for all SKUs (King list price uses 81×69). */
   return [
     { id: "single", label: "36×75", note: "Single", w: 36, l: 75, h },
     { id: "double", label: "48×75", note: "Double", w: 48, l: 75, h },
-    { id: "queen", label: "60×80", note: "Queen", w: 60, l: 80, h },
+    { id: "queen", label: "69×81", note: "Queen", w: 69, l: 81, h },
     { id: "king", label: "72×80", note: "King", w: 72, l: 80, h },
-    { id: "custom", label: "Custom", note: "Enter inch", w: 60, l: 80, h },
+    { id: "custom", label: "Custom", note: "Enter inch", w: 69, l: 81, h },
   ];
 }
 
