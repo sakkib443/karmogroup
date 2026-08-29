@@ -46,7 +46,6 @@ export default function ProductFeatureSlides() {
   const sectionRef = useRef(null);
   const firstSwapDone = useRef(false);
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
@@ -72,14 +71,14 @@ export default function ProductFeatureSlides() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion || paused || !inView) return undefined;
+    if (reduceMotion || !inView) return undefined;
     const delay = firstSwapDone.current ? HOLD_MS : FIRST_HOLD_MS;
     const id = window.setTimeout(() => {
       firstSwapDone.current = true;
       setIndex((i) => (i + 1) % SLIDES.length);
     }, delay);
     return () => window.clearTimeout(id);
-  }, [reduceMotion, paused, inView, index]);
+  }, [reduceMotion, inView, index]);
 
   return (
     <section
@@ -101,12 +100,8 @@ export default function ProductFeatureSlides() {
 
       <div className="shell relative z-[1] py-10 sm:py-12 lg:py-14">
         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-12 xl:gap-16">
-          <div
-            className="relative mx-auto w-full max-w-[560px] lg:mx-0 lg:max-w-none"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-[#ebe7e1] shadow-[0_18px_50px_rgba(11,26,51,0.08)]">
+          <div className="relative mx-auto w-full max-w-[560px] lg:mx-0 lg:max-w-none">
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#ebe7e1] shadow-[0_18px_50px_rgba(11,26,51,0.08)]">
               <motion.div
                 className="absolute inset-0 origin-[50%_42%] will-change-transform"
                 initial={false}

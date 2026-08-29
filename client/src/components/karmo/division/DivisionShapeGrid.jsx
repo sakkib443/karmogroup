@@ -41,7 +41,7 @@ function ClaimPanel({ item, solid = false }) {
       className={`relative flex flex-col justify-center overflow-hidden px-5 py-5 sm:px-6 sm:py-6 lg:px-7 ${
         solid
           ? "h-full min-h-0 rounded-none border border-[#e2e2e4] bg-white text-[#0b1a33]"
-          : NAVY
+          : `min-h-[220px] md:min-h-0 ${NAVY}`
       }`}
     >
       {item.background && !solid ? (
@@ -50,7 +50,7 @@ function ClaimPanel({ item, solid = false }) {
             src={item.background}
             alt=""
             fill
-            sizes="(min-width: 768px) 30vw, 50vw"
+            sizes="(min-width: 768px) 30vw, 100vw"
             className="object-cover object-center"
             aria-hidden
           />
@@ -86,14 +86,14 @@ function ClaimPanel({ item, solid = false }) {
   );
 }
 
-/* ——— Two claims side-by-side (top-right) ——— */
+/* ——— Two claims: stacked on mobile, side-by-side from md ——— */
 function ClaimsPairPanel({ items = [] }) {
   if (!items.length) return null;
 
   return (
     <motion.article
       variants={fade}
-      className={`grid grid-cols-2 gap-0 ${NAVY}`}
+      className={`grid grid-cols-1 gap-0 md:grid-cols-2 ${NAVY}`}
     >
       {items.map((item, i) => {
         const Icon = CLAIM_ICONS[item.icon] || TbShieldCheck;
@@ -101,8 +101,10 @@ function ClaimsPairPanel({ items = [] }) {
         return (
           <div
             key={item.id}
-            className={`flex flex-col justify-center px-4 py-5 sm:px-5 sm:py-6 ${
-              i > 0 ? "border-l border-white/15" : ""
+            className={`flex min-h-[200px] flex-col justify-center px-5 py-5 sm:px-5 sm:py-6 md:min-h-0 ${
+              i > 0
+                ? "border-t border-white/15 md:border-l md:border-t-0"
+                : ""
             }`}
           >
             <span
@@ -131,7 +133,7 @@ function SpotlightPanel({ data }) {
   return (
     <motion.article
       variants={fade}
-      className="relative col-span-2 min-h-0 overflow-hidden rounded-none bg-[#dfe7ef]"
+      className="relative col-span-1 min-h-[240px] overflow-hidden rounded-none bg-[#dfe7ef] md:col-span-2 md:min-h-0"
     >
       <Image
         src={data.image}
@@ -285,18 +287,20 @@ export default function DivisionShapeGrid({
           viewport={VIEWPORT}
           className="grid w-full grid-cols-1 gap-[6px] md:h-[min(78svh,820px)] md:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] md:grid-rows-1"
         >
-          <div className="grid h-[560px] grid-cols-2 grid-rows-[minmax(0,1fr)_minmax(0,1.2fr)] gap-[6px] md:h-full">
+          <div className="grid grid-cols-1 gap-[6px] md:h-full md:grid-cols-2 md:grid-rows-[minmax(0,1fr)_minmax(0,1.2fr)]">
             <ClaimPanel item={primary} />
             <ClaimsPairPanel items={pair} />
             <SpotlightPanel data={spotlight} />
           </div>
 
-          <div className="grid h-[560px] grid-rows-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2.4fr)] gap-[6px] md:h-full">
+          <div className="grid min-h-0 grid-rows-none gap-[6px] md:h-full md:grid-rows-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,2.4fr)]">
             {certifications.slice(0, 2).map((item) => (
               <CertCard key={item.id} item={item} />
             ))}
             {hasFilm ? (
-              <FilmPanel film={film} still={still} filmAlt={filmAlt} />
+              <div className="h-[min(56svh,440px)] w-full md:h-full md:min-h-0">
+                <FilmPanel film={film} still={still} filmAlt={filmAlt} />
+              </div>
             ) : null}
           </div>
         </motion.div>

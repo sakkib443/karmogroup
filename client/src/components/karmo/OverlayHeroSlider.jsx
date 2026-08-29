@@ -75,10 +75,12 @@ export default function OverlayHeroSlider({
   if (!slides.length) return null;
 
   const multi = slides.length > 1;
+  /* Desktop keeps the original full-bleed math. Mobile gets a taller usable
+     frame so copy and photo both read (band aspect alone collapses to ~170px). */
   const frameClass =
     size === "viewport"
-      ? "relative h-[calc(100svh-112px)] min-h-[calc(100svh-112px)] w-full"
-      : "relative aspect-[1916/821] w-full";
+      ? "relative h-[min(78svh,620px)] min-h-[520px] w-full md:h-[calc(100svh-112px)] md:min-h-[calc(100svh-112px)]"
+      : "relative h-[min(68svh,520px)] min-h-[420px] w-full md:h-auto md:min-h-0 md:aspect-[1916/821]";
 
   return (
     <section
@@ -141,17 +143,26 @@ export default function OverlayHeroSlider({
                 />
               ) : null}
               {!light ? (
-                <motion.span
-                  aria-hidden
-                  initial={false}
-                  animate={{ opacity: on ? 1 : 0 }}
-                  transition={fadeMs}
-                  className={`pointer-events-none absolute inset-0 ${
-                    right
-                      ? "bg-gradient-to-l from-[#0c0c0c]/55 via-transparent to-transparent"
-                      : "bg-gradient-to-r from-[#0b1528]/40 via-transparent to-transparent"
-                  }`}
-                />
+                <>
+                  <motion.span
+                    aria-hidden
+                    initial={false}
+                    animate={{ opacity: on ? 1 : 0 }}
+                    transition={fadeMs}
+                    className={`pointer-events-none absolute inset-0 hidden md:block ${
+                      right
+                        ? "bg-gradient-to-l from-[#0c0c0c]/55 via-transparent to-transparent"
+                        : "bg-gradient-to-r from-[#0b1528]/40 via-transparent to-transparent"
+                    }`}
+                  />
+                  <motion.span
+                    aria-hidden
+                    initial={false}
+                    animate={{ opacity: on ? 1 : 0 }}
+                    transition={fadeMs}
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b1528]/75 via-[#0b1528]/35 to-transparent md:hidden"
+                  />
+                </>
               ) : null}
               <motion.div
                 initial={false}
@@ -163,25 +174,25 @@ export default function OverlayHeroSlider({
                   ...copyMs,
                   delay: reduce ? 0 : on ? 0.08 : 0,
                 }}
-                className={`shell pointer-events-none absolute inset-0 z-[1] flex items-center ${
-                  right ? "justify-end" : ""
+                className={`shell pointer-events-none absolute inset-0 z-[1] flex items-end pb-16 md:items-center md:pb-0 ${
+                  right ? "md:justify-end" : ""
                 }`}
               >
                 <div
-                  className={`max-w-[min(92vw,22rem)] sm:max-w-[min(90vw,34rem)] lg:max-w-[min(55vw,44rem)] ${
+                  className={`w-full max-w-[min(92vw,22rem)] sm:max-w-[min(90vw,34rem)] lg:max-w-[min(55vw,44rem)] ${
                     on ? "pointer-events-auto" : "pointer-events-none"
-                  } ${right ? "text-right" : ""}`}
+                  } ${right ? "md:text-right" : ""}`}
                   aria-hidden={!on}
                 >
                   {(s.eyebrowStart || s.eyebrowEnd) && (
                     <div
-                      className={`mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 sm:mb-4 ${
-                        right ? "justify-end" : "justify-start"
+                      className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
+                        right ? "md:justify-end" : "justify-start"
                       }`}
                     >
                       {s.eyebrowStart ? (
                         <span
-                          className={`text-[13px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                          className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
                             light ? "text-ink" : "text-white"
                           }`}
                         >
@@ -196,12 +207,12 @@ export default function OverlayHeroSlider({
                           height={s.badge.height ?? 330}
                           sizes="88px"
                           quality={70}
-                          className="h-9 w-auto shrink-0 -translate-y-[8%] sm:h-11"
+                          className="h-8 w-auto shrink-0 -translate-y-[8%] sm:h-11"
                         />
                       ) : null}
                       {s.eyebrowEnd ? (
                         <span
-                          className={`text-[13px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                          className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
                             light ? "text-ink" : "text-white"
                           }`}
                         >
@@ -213,14 +224,16 @@ export default function OverlayHeroSlider({
                   {/* `hero-heading` marks this as the hero role for the Theme
                       Control panel — it carries its own face, scale and weight,
                       separate from the section titles below the fold. */}
-                  <Heading className="display hero-heading text-[1.95rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
-                    <span className="block whitespace-nowrap">{s.headingLead}</span>
-                    <span className="block whitespace-nowrap font-bold text-brand">
+                  <Heading className="display hero-heading text-[1.7rem] font-light uppercase leading-[1.1] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
+                    <span className="block whitespace-normal sm:whitespace-nowrap">
+                      {s.headingLead}
+                    </span>
+                    <span className="block whitespace-normal font-bold text-brand sm:whitespace-nowrap">
                       {s.headingAccent}
                     </span>
                   </Heading>
                   {s.kicker ? (
-                    <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.3em] text-white/80">
+                    <p className="mt-2 max-w-[28ch] text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:max-w-none sm:text-[12px] sm:tracking-[0.3em]">
                       {s.kicker}
                     </p>
                   ) : null}
@@ -228,7 +241,7 @@ export default function OverlayHeroSlider({
                     <Link
                       href={primary.href}
                       tabIndex={on ? 0 : -1}
-                      className="mt-5 inline-flex h-[48px] items-center gap-2 bg-brand px-8 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark"
+                      className="mt-5 inline-flex h-[44px] items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[48px] sm:px-8"
                     >
                       {primary.label}
                       <FiArrowRight className="text-[15px]" />
@@ -241,7 +254,7 @@ export default function OverlayHeroSlider({
         })}
 
         {multi ? (
-          <div className="absolute inset-x-0 bottom-4 z-[2] flex items-center justify-center gap-4 lg:bottom-6">
+          <div className="absolute inset-x-0 bottom-3 z-[2] flex items-center justify-center gap-3 sm:gap-4 lg:bottom-6">
             <button
               type="button"
               onClick={() => go(active - 1)}
