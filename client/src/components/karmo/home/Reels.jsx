@@ -18,82 +18,145 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const ORANGE = "#FF9A1F";
 const DESKTOP_H = "calc(100svh - 32px)";
 const GAP_PX = 6;
-/* Desktop: 3 tiles in view. Mobile: ~1.15 so reels stay watchable, not skinny. */
+/* Desktop: ~2.55 tiles in view (wider than strict 3). Mobile: ~1.05. */
 
 const films = [
+  {
+    id: "fb-karmo-mattress-offer",
+    src: "/karmo/videos/shorts/fb-karmo-mattress-offer.mp4",
+    title: "ঘুম নিয়ে সিরিয়াস?",
+    tag: "Offer",
+  },
+  {
+    id: "fb-reel-921228060438784",
+    src: "/karmo/videos/shorts/fb-reel-921228060438784.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-845505688502810",
+    src: "/karmo/videos/shorts/fb-reel-845505688502810.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-785013297942063",
+    src: "/karmo/videos/shorts/fb-reel-785013297942063.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-747210751746270",
+    src: "/karmo/videos/shorts/fb-reel-747210751746270.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-3242808395880988",
+    src: "/karmo/videos/shorts/fb-reel-3242808395880988.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-1822025445099889",
+    src: "/karmo/videos/shorts/fb-reel-1822025445099889.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
+  {
+    id: "fb-reel-759339363519767",
+    src: "/karmo/videos/shorts/fb-reel-759339363519767.mp4",
+    title: "Karmo Reel",
+    tag: "Reel",
+  },
   {
     id: "v1-tisa",
     src: "/karmo/videos/shorts/v1-tisa.mp4",
     title: "Tisa — a quiet moment",
     tag: "Short",
+    hidden: true,
   },
   {
     id: "v2",
     src: "/karmo/videos/shorts/v2.mp4",
     title: "Comfort on camera",
     tag: "Short",
+    hidden: true,
   },
   {
     id: "v3",
     src: "/karmo/videos/shorts/v3.mp4",
     title: "Lived-in rooms",
     tag: "Short",
+    hidden: true,
   },
   {
     id: "v4",
     src: "/karmo/videos/shorts/v4.mp4",
     title: "Soft light, soft rest",
     tag: "Short",
+    hidden: true,
   },
   {
     id: "v5",
     src: "/karmo/videos/shorts/v5.mp4",
     title: "Everyday Karmo",
     tag: "Short",
+    hidden: true,
   },
   {
     id: "tvc-mattress",
     src: "/karmo/videos/tvc-mattress.mp4",
     title: "Karmo Mattress, the commercial",
     tag: "Commercial",
+    hidden: true,
   },
   {
     id: "product-film",
     src: "/karmo/videos/product-film.mp4",
     title: "A room built on Karmo",
     tag: "Interiors",
+    hidden: true,
   },
   {
     id: "reel-4",
     src: "/karmo/videos/reel-4.mp4",
     title: "Pocketed spring array",
     tag: "Inside the product",
+    hidden: true,
   },
   {
     id: "reel-3",
     src: "/karmo/videos/reel-3.mp4",
     title: "Rebound on the quilted top",
     tag: "Inside the product",
+    hidden: true,
   },
   {
     id: "reel-1",
     src: "/karmo/videos/reel-1.mp4",
     title: "CertiGuard germ protection",
     tag: "Certification",
+    hidden: true,
   },
   {
     id: "tvc-foam",
     src: "/karmo/videos/tvc-foam.mp4",
     title: "Karmo Foam, from the archive",
     tag: "Archive",
+    hidden: true,
   },
   {
     id: "sleep-well",
     src: "/karmo/videos/mattress-sleep-well.mp4",
     title: "Sleep well, live well",
     tag: "Lifestyle",
+    hidden: true,
   },
 ];
+
+/** Visible reels only — others stay in `films` with `hidden: true`. */
+const activeFilms = films.filter((f) => !f.hidden);
 
 function ReelTile({ film, still, onOpen, active }) {
   const tileRef = useRef(null);
@@ -170,14 +233,14 @@ export default function Reels() {
   /* Two copies for a seamless -50% loop. */
   const loopFilms = useMemo(
     () => [
-      ...films.map((f) => ({ ...f, key: `${f.id}-a` })),
-      ...films.map((f) => ({ ...f, key: `${f.id}-b` })),
+      ...activeFilms.map((f) => ({ ...f, key: `${f.id}-a` })),
+      ...activeFilms.map((f) => ({ ...f, key: `${f.id}-b` })),
     ],
     [],
   );
 
-  /* Static fallback when reduced motion: first 3 only. */
-  const staticFilms = films.slice(0, 3);
+  /* Static fallback when reduced motion. */
+  const staticFilms = activeFilms.slice(0, 3);
 
   return (
     <section
@@ -204,7 +267,7 @@ export default function Reels() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="relative z-[1] grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
+        className="relative z-[1] grid items-center gap-8 px-6 md:px-14 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.85fr)] lg:h-full lg:min-h-0 lg:items-stretch lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
       >
         <motion.div
           variants={fade}
@@ -272,7 +335,7 @@ export default function Reels() {
           </Link>
         </motion.div>
 
-        {/* Right — continuous marquee; always ~3 tiles in view */}
+        {/* Right — continuous marquee; wider tiles (~2.55 in view on desktop) */}
         <div
           className="reels-marquee-viewport relative h-[min(64svh,520px)] min-h-0 w-full overflow-hidden lg:h-full"
           style={{ containerType: "inline-size" }}
@@ -301,7 +364,7 @@ export default function Reels() {
               {loopFilms.map((film) => (
                 <div
                   key={film.key}
-                  className="h-full w-[calc((100cqw-6px)/1.15)] shrink-0 lg:w-[calc((100cqw-12px)/3)]"
+                  className="h-full w-[calc((100cqw-6px)/1.05)] shrink-0 lg:w-[calc((100cqw-12px)/2.55)]"
                 >
                   <ReelTile
                     film={film}

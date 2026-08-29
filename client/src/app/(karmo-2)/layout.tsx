@@ -242,7 +242,7 @@ export default function KarmoTwoLayout({
       <HomeTwoSectionSnap />
       <Header />
       {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
-      <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">
+      <main className="min-h-screen overflow-x-clip bg-white pt-[112px]">
         {children}
       </main>
       {/* Always glued above the footer on every karmo-2 page */}

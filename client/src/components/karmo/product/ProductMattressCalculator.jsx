@@ -65,7 +65,7 @@ export default function ProductMattressCalculator({
       width: nextDims.w,
       length: nextDims.l,
       height: nextDims.h,
-      sizeLabel: `${nextDims.w} × ${nextDims.l} × ${nextDims.h} cm`,
+      sizeLabel: `${nextDims.w} × ${nextDims.l} × ${nextDims.h} inch`,
       unitPrice: price,
       mrpUnit: mrp,
     });
@@ -143,7 +143,7 @@ export default function ProductMattressCalculator({
                 <span className="mt-0.5 block text-[15px] font-bold tabular-nums">
                   {dims[f.id] || "—"}
                   <span className="ml-0.5 text-[10px] font-semibold text-white/35">
-                    cm
+                    inch
                   </span>
                 </span>
               </button>
