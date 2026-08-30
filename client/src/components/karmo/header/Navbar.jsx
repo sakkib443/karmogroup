@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
@@ -18,10 +19,6 @@ import {
   FiX,
 } from "react-icons/fi";
 import {
-  TbArmchair,
-  TbBed,
-  TbFeather,
-  TbFlask,
   TbStack,
   TbSquareRounded,
   TbDiamond,
@@ -49,7 +46,7 @@ const nav = [
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
-    icon: TbArmchair,
+    icon: `${MENU}/nav-foam.png?v=2`,
     texture: "foam",
     textureSrc: "/karmo/images/header/foam-side-texture.jpg",
     /* Catalogue categories — cartoon icons + textured mega panel like Mattress.
@@ -84,7 +81,7 @@ const nav = [
     name: "Mattress",
     line: "Orthopedic, pocket spring",
     href: "/mattress",
-    icon: TbBed,
+    icon: `${MENU}/nav-mattress.png?v=2`,
     texture: "mattress",
     textureSrc: "/karmo/images/header/mattress-side-texture.jpg",
     /* All mega-menu rows land on the mattress catalogue product grid.
@@ -122,7 +119,7 @@ const nav = [
     name: "HomeTex",
     line: "Bed sheets, comforters",
     href: "/hometex",
-    icon: TbFeather,
+    icon: `${MENU}/nav-hometex.png?v=2`,
     disabled: true,
     /* Bedding range from Mattress Catalogue pages 19–27 (HomeTex section). */
     columns: [
@@ -154,7 +151,7 @@ const nav = [
     name: "Chemicals",
     line: "Adhesives, polymers",
     href: "/chemicals",
-    icon: TbFlask,
+    icon: `${MENU}/nav-chemicals.png?v=2`,
     disabled: true,
     columns: [
       {
@@ -182,16 +179,24 @@ const nav = [
 ];
 
 /** Menu row icon — cartoon PNG path or react-icon component. */
-function MenuGlyph({ icon, alt = "" }) {
+function MenuGlyph({ icon, alt = "", size = "md" }) {
   if (!icon) return null;
   if (typeof icon === "string") {
+    const isNav = size === "nav";
+    const box = isNav ? "h-[26px] w-[26px]" : size === "sm" ? "h-7 w-7" : "h-9 w-9";
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={icon} alt={alt} width={36} height={36} className="h-9 w-9 object-contain" />
+      <img
+        src={icon}
+        alt={alt}
+        width={isNav ? 26 : 36}
+        height={isNav ? 26 : 36}
+        className={`${box} shrink-0 object-contain object-top`}
+      />
     );
   }
   const Icon = icon;
-  return <Icon className="text-[20px]" />;
+  return <Icon className={size === "nav" ? "text-[17px]" : "text-[20px]"} />;
 }
 
 function Tool({ icon: Icon, label, href, count, onClick }) {
@@ -225,26 +230,39 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
 }
 
 function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
+  const pathname = usePathname() || "";
+
   return (
     <nav className="flex h-full" aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
-      <ul className="flex h-full items-stretch">
+      <ul className="flex h-full items-stretch gap-x-0.5">
         {nav.map((entry) => {
           const isDisabled = Boolean(entry.disabled);
+          const isActive =
+            !isDisabled &&
+            (pathname === entry.href || pathname.startsWith(`${entry.href}/`));
+          const isOpen = !isDisabled && panel === entry.name;
+
           const label = (
             <>
               {entry.icon ? (
-                <entry.icon className="shrink-0 text-[17px] text-ink/55" />
+                <MenuGlyph icon={entry.icon} alt="" size="nav" />
               ) : null}
-              <span className="display block text-[13px] font-bold uppercase leading-none tracking-[0.1em]">
-                {entry.name}
-              </span>
-              {entry.columns ? (
-                <FiChevronDown
-                  className={`text-[13px] text-ink/40 transition-transform duration-300 ${
-                    !isDisabled && panel === entry.name ? "rotate-180" : ""
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className={`display block text-[13px] uppercase leading-none tracking-[0.1em] transition-[color,font-weight] duration-300 ${
+                    isActive ? "font-extrabold text-brand" : "font-bold"
                   }`}
-                />
-              ) : null}
+                >
+                  {entry.name}
+                </span>
+                {entry.columns ? (
+                  <FiChevronDown
+                    className={`text-[13px] transition-[color,transform] duration-300 ${
+                      isActive ? "text-brand" : "text-ink/40"
+                    } ${isOpen ? "rotate-180" : ""}`}
+                  />
+                ) : null}
+              </span>
             </>
           );
 
@@ -253,16 +271,19 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
               {isDisabled ? (
                 <span
                   aria-disabled="true"
-                  className="flex h-full cursor-default items-center gap-1.5 px-2.5 text-ink"
+                  className="flex h-full cursor-default items-center gap-2 px-3 text-ink"
                 >
                   {label}
                 </span>
               ) : (
                 <Link
                   href={entry.href}
+                  aria-current={isActive ? "page" : undefined}
                   onMouseEnter={() => openPanel(entry.name)}
                   onFocus={() => openPanel(entry.name)}
-                  className="flex h-full items-center gap-1.5 px-2.5 text-ink transition-colors duration-300 hover:text-brand"
+                  className={`relative flex h-full items-center gap-2 px-3 transition-colors duration-300 ${
+                    isActive ? "text-brand" : "text-ink hover:text-brand"
+                  }`}
                 >
                   {label}
                 </Link>
@@ -473,7 +494,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="shell-home-two flex h-[80px] items-center gap-4">
+      <div className="shell-home-two relative z-[2] flex h-[80px] items-center gap-4 translate-y-[3px]">
         <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
           <Logo
             src="/karmo/logo-ink.png"
@@ -566,7 +587,7 @@ export default function Navbar() {
                           className="flex cursor-default items-center gap-3.5"
                         >
                           {entry.icon ? (
-                            <entry.icon className="shrink-0 text-[18px] text-ink/55" />
+                            <MenuGlyph icon={entry.icon} alt="" size="nav" />
                           ) : null}
                           <span className="min-w-0 flex-1">
                             <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
@@ -585,7 +606,7 @@ export default function Navbar() {
                             className="flex items-center gap-3.5"
                           >
                             {entry.icon ? (
-                              <entry.icon className="shrink-0 text-[18px] text-ink/55" />
+                              <MenuGlyph icon={entry.icon} alt="" size="nav" />
                             ) : null}
                             <span className="min-w-0 flex-1">
                               <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">

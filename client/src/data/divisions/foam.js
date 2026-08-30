@@ -172,7 +172,7 @@ const foam = {
           "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. For cut sheets, store flat and away from prolonged sun.",
       },
     ],
-    film: "/karmo/videos/shorts/v1-tisa.mp4",
+    film: "/karmo/videos/shorts/v1-tisa-trim.mp4",
     still: `${IMG}/mosaic/tisha-film-still-hq.jpg`,
     filmAlt: "Tanzin Tisha for Karmo Foam",
   },
