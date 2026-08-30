@@ -1229,16 +1229,19 @@ svg.app-icon[fill="none"] {
   opacity: 0.1;
 }
 
-/* Mattress mega menu — same side-panel damask as the bar.
+/* Division mega menus (Mattress, Foam) — soft textured panel.
    Must stay `absolute` (not relative): this class sits on the dropdown, and
    relative would drop it into the nav flex and shove the rest of the links.
    Texture is an <img> in Navbar.jsx so it cannot vanish behind a cached
    stylesheet. Do not force `> * { position: relative }` — that unsticks the film. */
+.header-mega-textured,
 .header-mega-mattress {
   position: absolute;
   isolation: isolate;
   overflow: hidden;
-  background-color: #fffefb;
+  /* Cream panel — also set as Tailwind `bg-[#fffefb]` on the node so a
+     missed stylesheet never leaves the mega menu see-through over the hero. */
+  background-color: #fffefb !important;
 }
 
 .header-mattress-band::after {

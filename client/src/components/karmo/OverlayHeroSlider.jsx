@@ -93,6 +93,10 @@ export default function OverlayHeroSlider({
         {slides.map((s, i) => {
           const on = i === active;
           const right = s.align === "right";
+          /* `copyAlign: "start"` keeps type left-aligned even when the block
+             sits on the right (Foam craft slide). Default stays end-aligned. */
+          const copyEnd = right && s.copyAlign !== "start";
+          const copyStart = right && s.copyAlign === "start";
           const light = s.tone === "light";
           const primary = s.cta?.find((c) => c.primary) ?? s.cta?.[0];
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
@@ -179,15 +183,19 @@ export default function OverlayHeroSlider({
                 }`}
               >
                 <div
-                  className={`w-full max-w-[min(92vw,22rem)] sm:max-w-[min(90vw,34rem)] lg:max-w-[min(55vw,44rem)] ${
+                  className={`w-full max-w-[min(92vw,22rem)] sm:max-w-[min(90vw,34rem)] ${
+                    copyStart
+                      ? "lg:max-w-[min(38vw,30rem)] lg:mr-[max(1.5rem,calc((100vw-1600px)/2+1.5rem))]"
+                      : "lg:max-w-[min(55vw,44rem)]"
+                  } ${
                     on ? "pointer-events-auto" : "pointer-events-none"
-                  } ${right ? "md:text-right" : ""}`}
+                  } ${copyEnd ? "md:text-right" : "text-left"}`}
                   aria-hidden={!on}
                 >
                   {(s.eyebrowStart || s.eyebrowEnd) && (
                     <div
                       className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
-                        right ? "md:justify-end" : "justify-start"
+                        copyEnd ? "md:justify-end" : "justify-start"
                       }`}
                     >
                       {s.eyebrowStart ? (
@@ -225,15 +233,27 @@ export default function OverlayHeroSlider({
                       Control panel — it carries its own face, scale and weight,
                       separate from the section titles below the fold. */}
                   <Heading className="display hero-heading text-[1.7rem] font-light uppercase leading-[1.1] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
-                    <span className="block whitespace-normal sm:whitespace-nowrap">
+                    <span
+                      className={`block whitespace-normal ${
+                        copyStart ? "" : "sm:whitespace-nowrap"
+                      }`}
+                    >
                       {s.headingLead}
                     </span>
-                    <span className="block whitespace-normal font-bold text-brand sm:whitespace-nowrap">
+                    <span
+                      className={`block whitespace-normal font-bold text-brand ${
+                        copyStart ? "" : "sm:whitespace-nowrap"
+                      }`}
+                    >
                       {s.headingAccent}
                     </span>
                   </Heading>
                   {s.kicker ? (
-                    <p className="mt-2 max-w-[28ch] text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:max-w-none sm:text-[12px] sm:tracking-[0.3em]">
+                    <p
+                      className={`mt-2 text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:text-[12px] sm:tracking-[0.3em] ${
+                        copyStart ? "max-w-[34ch]" : "max-w-[28ch] sm:max-w-none"
+                      }`}
+                    >
                       {s.kicker}
                     </p>
                   ) : null}

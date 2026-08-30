@@ -172,9 +172,9 @@ const foam = {
           "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. For cut sheets, store flat and away from prolonged sun.",
       },
     ],
-    film: null,
-    still: `${IMG}/products/sofa-olive-hq.jpg`,
-    filmAlt: "Karmo Foam living comfort",
+    film: "/karmo/videos/shorts/v1-tisa.mp4",
+    still: `${IMG}/mosaic/tisha-film-still-hq.jpg`,
+    filmAlt: "Tanzin Tisha for Karmo Foam",
   },
 
   zones: {
@@ -272,10 +272,10 @@ const foam = {
         kicker: "Every grade cut, tested and ready for makers",
         cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
         image: {
-          src: `${IMG}/hero/craft-blocks-hq.jpg`,
-          alt: "Stacked high-density Karmo foam blocks in a clean studio",
-          width: 1920,
-          height: 1080,
+          src: `${IMG}/hero/craft-karmo-grades-v9-hq.jpg`,
+          alt: "Karmo 280, Signature and 1965 foam on the left of a living room; clear navy wall on the right for headline copy",
+          width: 2560,
+          height: 1096,
         },
       },
     ],

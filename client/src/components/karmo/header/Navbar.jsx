@@ -22,14 +22,7 @@ import {
   TbBed,
   TbFeather,
   TbFlask,
-  TbBox,
-  TbRecycle,
-  TbShape,
-  TbWaveSine,
   TbStack,
-  TbShoe,
-  TbCar,
-  TbCloud,
   TbSquareRounded,
   TbDiamond,
   TbBedFlat,
@@ -57,29 +50,32 @@ const nav = [
     line: "Furniture, footwear, automotive",
     href: "/foam",
     icon: TbArmchair,
-    /* Eight categories from the client's Foam Catalogue (pages 5–23). */
+    texture: "foam",
+    textureSrc: "/karmo/images/header/foam-side-texture.jpg",
+    /* Catalogue categories — cartoon icons + textured mega panel like Mattress.
+       Category pages come later; clicks land on the foam offers grid for now. */
     columns: [
       {
         label: "Form",
         items: [
-          { name: "Set / Block Foam", href: "/foam/set-foam", icon: TbBox },
-          { name: "Peeling Roll Foam", href: "/foam/peeling-roll", icon: TbStack },
-          { name: "Contour Design Foam", href: "/foam/contour-design", icon: TbShape },
+          { name: "Set / Block Foam", href: "/foam#foam-offers", icon: `${MENU}/set-block.png` },
+          { name: "Peeling Roll Foam", href: "/foam#foam-offers", icon: `${MENU}/peeling-roll.png` },
+          { name: "Contour Design Foam", href: "/foam#foam-offers", icon: `${MENU}/contour.png` },
         ],
       },
       {
         label: "Use",
         items: [
-          { name: "Footwear / Load Bearing", href: "/foam/footwear", icon: TbShoe },
-          { name: "Bed & Automotive", href: "/foam/bed-automotive", icon: TbCar },
-          { name: "Acoustic Foam", href: "/foam/acoustic", icon: TbWaveSine },
+          { name: "Footwear / Load Bearing", href: "/foam#foam-offers", icon: `${MENU}/footwear.png` },
+          { name: "Bed & Automotive", href: "/foam#foam-offers", icon: `${MENU}/bed-auto.png` },
+          { name: "Acoustic Foam", href: "/foam#foam-offers", icon: `${MENU}/acoustic.png` },
         ],
       },
       {
         label: "Grade",
         items: [
-          { name: "Rebonded Foam", href: "/foam/rebonded", icon: TbRecycle },
-          { name: "Memory Foam", href: "/foam/memory-foam", icon: TbCloud },
+          { name: "Rebonded Foam", href: "/foam#foam-offers", icon: `${MENU}/rebonded.png` },
+          { name: "Memory Foam", href: "/foam#foam-offers", icon: `${MENU}/memory.png` },
         ],
       },
     ],
@@ -90,6 +86,7 @@ const nav = [
     href: "/mattress",
     icon: TbBed,
     texture: "mattress",
+    textureSrc: "/karmo/images/header/mattress-side-texture.jpg",
     /* All mega-menu rows land on the mattress catalogue product grid.
        Individual filter pages come later — for now every click opens offers. */
     columns: [
@@ -277,7 +274,9 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                 onMouseEnter={() => openPanel(entry.name)}
                 onMouseLeave={leaveMenuZone}
                 className={`absolute top-full left-1/2 z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
-                  entry.texture === "mattress" ? "header-mega-mattress" : "bg-white"
+                  entry.textureSrc
+                    ? "header-mega-textured bg-[#fffefb]"
+                    : "bg-white"
                 } ${
                   entry.panelWidth || "w-[52rem]"
                 } ${
@@ -286,15 +285,22 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                     : "invisible -translate-x-1/2 translate-y-1 opacity-0"
                 }`}
               >
-                {entry.texture === "mattress" ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src="/karmo/images/header/mattress-side-texture.jpg"
-                    alt=""
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center"
-                    style={{ opacity: 0.14 }}
-                  />
+                {entry.textureSrc ? (
+                  <>
+                    {/* Solid cream under the damask — without this the panel is
+                        see-through and the hero navy reads as a dark overlay. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0 bg-[#fffefb]"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={entry.textureSrc}
+                      alt=""
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center opacity-[0.16]"
+                    />
+                  </>
                 ) : null}
                 <div
                   className={`relative z-[1] grid divide-x divide-ink/6 px-5 py-5 ${
