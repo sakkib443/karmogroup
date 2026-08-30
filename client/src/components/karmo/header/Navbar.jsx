@@ -49,14 +49,14 @@ import {
 /* Cartoon menu icons — same language as trust / order strips. */
 const MENU = "/karmo/images/header/menu-cartoon";
 
-/* Only Mattress is live for now — other items stay visible but disabled. */
+/* Mattress and Foam are live; HomeTex, Chemicals and About stay visible but
+   disabled until their pages exist. */
 const nav = [
   {
     name: "Foam",
     line: "Furniture, footwear, automotive",
     href: "/foam",
     icon: TbArmchair,
-    disabled: true,
     /* Eight categories from the client's Foam Catalogue (pages 5–23). */
     columns: [
       {
