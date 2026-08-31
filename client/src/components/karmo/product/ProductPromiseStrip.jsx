@@ -8,7 +8,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * Four service claims under the buy box — illustrated icons (cartoon-v3),
  * same language as the mattress trust strip / reference promise bar.
  */
-const promises = [
+const DEFAULT_PROMISES = [
   {
     src: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
     scale: 0.92,
@@ -35,9 +35,37 @@ const promises = [
   },
 ];
 
-export default function ProductPromiseStrip() {
+export const FOAM_PROMISES = [
+  {
+    src: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
+    scale: 0.92,
+    title: "No Cost EMI",
+    note: "Flexible monthly plans on eligible foam orders",
+  },
+  {
+    src: "/karmo/images/trust/cartoon-v3/superbrand-v2.webp",
+    scale: 0.92,
+    title: "Cut to your size",
+    note: "Sheets and blocks cut clean to the inch for makers",
+  },
+  {
+    src: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
+    scale: 1,
+    title: "Free Delivery",
+    note: "Doorstep delivery across Bangladesh on this range",
+  },
+  {
+    src: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
+    scale: 1,
+    title: "Long durability",
+    note: "Rubber-grade foam built to hold for years of use",
+  },
+];
+
+export default function ProductPromiseStrip({ items } = {}) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const promises = items?.length ? items : DEFAULT_PROMISES;
 
   return (
     <section className="border-y border-ink/8 bg-white">

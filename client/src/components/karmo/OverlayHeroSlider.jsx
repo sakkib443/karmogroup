@@ -121,7 +121,7 @@ export default function OverlayHeroSlider({
                   loading="eager"
                   className={`object-cover ${
                     s.image.position || "object-center"
-                  }`}
+                  } ${s.image.className || ""}`}
                 />
               </motion.div>
               {s.breeze && !reduce ? (
