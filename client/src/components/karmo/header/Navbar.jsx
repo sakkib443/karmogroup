@@ -294,7 +294,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                 data-mega-menu
                 onMouseEnter={() => openPanel(entry.name)}
                 onMouseLeave={leaveMenuZone}
-                className={`absolute top-full left-1/2 z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
+                className={`absolute left-1/2 top-[calc(100%-4px)] z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
                   entry.textureSrc
                     ? "header-mega-textured bg-[#fffefb]"
                     : "bg-white"
