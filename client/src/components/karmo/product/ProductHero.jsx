@@ -24,6 +24,30 @@ import {
   quoteMattressListPrice,
   quoteMattressPrice,
 } from "@/components/karmo/product/mattressPricing";
+import {
+  getFoamPricingRule,
+  quoteFoamListPrice,
+  quoteFoamPrice,
+} from "@/components/karmo/product/foamPricing";
+
+const DEFAULT_BUYBOX_ICONS = [
+  {
+    src: "/karmo/images/product/buybox-icons/warranty-10.png",
+    label: "10-years warranty",
+  },
+  {
+    src: "/karmo/images/product/buybox-icons/dual-side.png",
+    label: "Dual side usage",
+  },
+  {
+    src: "/karmo/images/product/buybox-icons/antimicrobial.png",
+    label: "Anti Microbial Fabric",
+  },
+  {
+    src: "/karmo/images/product/buybox-icons/nights-100.png",
+    label: "100 night returns",
+  },
+];
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -80,9 +104,19 @@ export default function ProductHero({ product }) {
   const cover = product.cover || realGallery[0] || letterGallery[0];
   const sizes = product.sizes || [];
   const defaultSize = sizes.find((s) => s.id === "queen") || sizes[0];
-  const pricingRule = getPricingRule(product.slug);
+  const isFoam = product.pricingFamily === "foam";
+  const pricingRule = isFoam
+    ? getFoamPricingRule(product.slug)
+    : getPricingRule(product.slug);
   const heightLocked = pricingRule?.heightFixed != null;
   const heightChoices = pricingRule?.heightOptions || null;
+  const buyboxIcons = product.buyboxIcons?.length
+    ? product.buyboxIcons
+    : DEFAULT_BUYBOX_ICONS;
+  const fabricTitle = product.fabricTitle || "Fabric";
+  const textureSrc =
+    product.textureSrc ||
+    "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg";
 
   const [mainSrc, setMainSrc] = useState(cover);
   const [fabric, setFabric] = useState(product.fabrics?.[0]?.id || "");
@@ -138,9 +172,9 @@ export default function ProductHero({ product }) {
       return { ok: true, base, total, discountPct };
     }
 
-    /* Anchor to catalogue was/now at Queen base (King: 81×69 → ৳11,320 / ৳9,622). */
+    /* Anchor to catalogue was/now at Queen / sofa-set base. */
     if (listMrp) {
-      return quoteMattressListPrice(product.slug, {
+      const listArgs = {
         length,
         width,
         height,
@@ -150,16 +184,17 @@ export default function ProductHero({ product }) {
         refLength: defaultSize?.l,
         refWidth: defaultSize?.w,
         refHeight: defaultSize?.h || product.defaultHeight,
-      });
+      };
+      return isFoam
+        ? quoteFoamListPrice(product.slug, listArgs)
+        : quoteMattressListPrice(product.slug, listArgs);
     }
 
-    return quoteMattressPrice(product.slug, {
-      length,
-      width,
-      height,
-      discountPct,
-    });
+    return isFoam
+      ? quoteFoamPrice(product.slug, { length, width, height, discountPct })
+      : quoteMattressPrice(product.slug, { length, width, height, discountPct });
   }, [
+    isFoam,
     pricingRule,
     product.slug,
     product.price,
@@ -228,10 +263,9 @@ export default function ProductHero({ product }) {
 
   return (
     <section className="relative overflow-x-clip border-b border-ink/8 bg-white">
-      {/* Mattress damask — full hero band, same asset as Divisions / Order */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+          src={textureSrc}
           alt=""
           fill
           sizes="100vw"
@@ -367,24 +401,7 @@ export default function ProductHero({ product }) {
               className="mt-4 grid grid-cols-4 gap-1 border border-ink/10 bg-white px-1.5 py-2 sm:gap-1.5 sm:px-2 sm:py-2"
               aria-label="Product highlights"
             >
-              {[
-                {
-                  src: "/karmo/images/product/buybox-icons/warranty-10.png",
-                  label: "10-years warranty",
-                },
-                {
-                  src: "/karmo/images/product/buybox-icons/dual-side.png",
-                  label: "Dual side usage",
-                },
-                {
-                  src: "/karmo/images/product/buybox-icons/antimicrobial.png",
-                  label: "Anti Microbial Fabric",
-                },
-                {
-                  src: "/karmo/images/product/buybox-icons/nights-100.png",
-                  label: "100 night returns",
-                },
-              ].map((item) => (
+              {buyboxIcons.map((item) => (
                 <li
                   key={item.label}
                   className="flex min-w-0 flex-col items-center text-center"
@@ -407,7 +424,7 @@ export default function ProductHero({ product }) {
 
             <div className="mt-1">
               {product.fabrics?.length ? (
-                <OptionBlock title="Fabric">
+                <OptionBlock title={fabricTitle}>
                   <ul className="flex flex-wrap gap-1.5">
                     {product.fabrics.map((f) => {
                       const on = fabric === f.id;
