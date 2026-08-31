@@ -75,6 +75,8 @@ export default function DivisionAbout({
         slides={frames}
         asHero={asHero}
         size={asHero ? "viewport" : "band"}
+        firstSlideMs={asHero ? 2600 : undefined}
+        autoplayMs={asHero ? 4800 : undefined}
       />
     );
   }
