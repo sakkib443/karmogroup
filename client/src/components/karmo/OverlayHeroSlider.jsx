@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
@@ -8,15 +8,30 @@ import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
+/** First advance after landing — quick so the hero does not feel stuck. */
+const FIRST_SLIDE_MS = 2600;
 const FADE_S = 1.1;
+
+const copyContainer = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.11, delayChildren: 0.14 },
+  },
+};
+
+const copyItem = {
+  hidden: { opacity: 0, y: 26 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.72, ease: EASE },
+  },
+};
 
 /**
  * Full-bleed overlay hero carousel — same pattern as the mattress about/hero
  * band: photo fills the frame, copy sits left or right per slide, autoplay +
  * dots. Used on the homepage (viewport tall) and division overlay bands.
- *
- * Images use next/image and only the active + next slide mount at first so
- * production does not download every full-bleed frame on first paint.
  */
 export default function OverlayHeroSlider({
   slides = [],
@@ -25,10 +40,13 @@ export default function OverlayHeroSlider({
   size = "band",
   className = "",
   autoplayMs = AUTOPLAY_MS,
+  /** Delay before leaving slide 0 the first time (home / mattress landings). */
+  firstSlideMs = FIRST_SLIDE_MS,
   fadeDuration = FADE_S,
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
+  const firstAdvanceDone = useRef(false);
 
   const go = useCallback(
     (i) => setActive(((i % slides.length) + slides.length) % slides.length),
@@ -37,38 +55,19 @@ export default function OverlayHeroSlider({
 
   useEffect(() => {
     if (reduce || slides.length < 2) return undefined;
-    const t = setTimeout(() => setActive((a) => (a + 1) % slides.length), autoplayMs);
+    const delay =
+      !firstAdvanceDone.current && active === 0
+        ? firstSlideMs
+        : autoplayMs;
+    const t = setTimeout(() => {
+      firstAdvanceDone.current = true;
+      setActive((a) => (a + 1) % slides.length);
+    }, delay);
     return () => clearTimeout(t);
-  }, [active, reduce, slides.length, autoplayMs]);
-
-  /*
-   * Every slide's picture is mounted from the first render.
-   *
-   * This used to hold a `loaded` set — slide 0 and 1 to begin with, then the
-   * current and next one added as the carousel advanced — and a slide whose
-   * index was not in it rendered no <Image> at all. The saving was real but so
-   * were the holes: jumping straight to the last slide on a dot painted the
-   * copy over an empty frame while the picture was still being fetched, and
-   * with `prefers-reduced-motion` the autoplay never runs, so `active` stays 0
-   * and slides 2 and 3 were never added to the set at all — their images
-   * simply never existed. The last slide was the one that showed it most,
-   * because it is the furthest from where the set starts.
-   *
-   * Four viewport-sized photographs is a fair weight to carry for a hero that
-   * is the first thing on the page; correctness wins over the saving here.
-   * `priority` still marks only the first as the LCP candidate, so the rest
-   * queue behind it rather than competing with it.
-   */
+  }, [active, reduce, slides.length, autoplayMs, firstSlideMs]);
 
   const fadeMs = useMemo(
     () => (reduce ? { duration: 0 } : { duration: fadeDuration, ease: EASE }),
-    [reduce, fadeDuration]
-  );
-  const copyMs = useMemo(
-    () =>
-      reduce
-        ? { duration: 0 }
-        : { duration: fadeDuration * 0.85, ease: EASE },
     [reduce, fadeDuration]
   );
 
@@ -119,11 +118,6 @@ export default function OverlayHeroSlider({
                   sizes="100vw"
                   quality={90}
                   priority={i === 0}
-                  /* `eager` on all of them, not just the first: a lazy image
-                     inside a slide sitting at opacity 0 is still in the
-                     viewport, so the browser is free to defer it right up to
-                     the moment the slide is revealed — which is exactly when
-                     it is too late to fetch a viewport-sized photograph. */
                   loading="eager"
                   className={`object-cover ${
                     s.image.position || "object-center"
@@ -168,107 +162,116 @@ export default function OverlayHeroSlider({
                   />
                 </>
               ) : null}
-              <motion.div
-                initial={false}
-                animate={{
-                  opacity: on ? 1 : 0,
-                  y: on ? 0 : 10,
-                }}
-                transition={{
-                  ...copyMs,
-                  delay: reduce ? 0 : on ? 0.08 : 0,
-                }}
-                className={`shell pointer-events-none absolute inset-0 z-[1] flex items-end pb-16 md:items-center md:pb-0 ${
-                  right ? "md:justify-end" : ""
+              {/* Full-bleed stage — do NOT put `.shell` on `absolute inset-0`
+                  (max-width + left:0 pins copy left on wide monitors and makes
+                  the hero feel “small” on live). Shell only wraps the copy. */}
+              <div
+                className={`pointer-events-none absolute inset-0 z-[1] ${
+                  on ? "" : "invisible"
                 }`}
+                aria-hidden={!on}
               >
                 <div
-                  className={`w-full max-w-[min(92vw,22rem)] sm:max-w-[min(90vw,34rem)] ${
-                    copyStart
-                      ? "lg:max-w-[min(38vw,30rem)] lg:mr-[max(1.5rem,calc((100vw-1600px)/2+1.5rem))]"
-                      : "lg:max-w-[min(55vw,44rem)]"
-                  } ${
-                    on ? "pointer-events-auto" : "pointer-events-none"
-                  } ${copyEnd ? "md:text-right" : "text-left"}`}
-                  aria-hidden={!on}
+                  className={`shell flex h-full items-end pb-16 md:items-center md:pb-0 ${
+                    right ? "md:justify-end" : ""
+                  }`}
                 >
-                  {(s.eyebrowStart || s.eyebrowEnd) && (
-                    <div
-                      className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
-                        copyEnd ? "md:justify-end" : "justify-start"
-                      }`}
-                    >
-                      {s.eyebrowStart ? (
+                  <motion.div
+                    key={`${s.id}-${on ? "on" : "off"}`}
+                    initial={reduce ? false : "hidden"}
+                    animate={on && !reduce ? "show" : reduce && on ? "show" : "hidden"}
+                    variants={copyContainer}
+                    className={`w-full max-w-[min(92vw,24rem)] sm:max-w-[min(90vw,36rem)] ${
+                      copyStart
+                        ? "lg:max-w-[min(40vw,32rem)]"
+                        : "lg:max-w-[min(55vw,46rem)]"
+                    } ${
+                      on ? "pointer-events-auto" : "pointer-events-none"
+                    } ${copyEnd ? "md:text-right" : "text-left"}`}
+                  >
+                    {(s.eyebrowStart || s.eyebrowEnd) && (
+                      <motion.div
+                        variants={copyItem}
+                        className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
+                          copyEnd ? "md:justify-end" : "justify-start"
+                        }`}
+                      >
+                        {s.eyebrowStart ? (
+                          <span
+                            className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                              light ? "text-ink" : "text-white"
+                            }`}
+                          >
+                            {s.eyebrowStart}
+                          </span>
+                        ) : null}
+                        {s.badge ? (
+                          <Image
+                            src={s.badge.src}
+                            alt=""
+                            width={s.badge.width ?? 420}
+                            height={s.badge.height ?? 330}
+                            sizes="88px"
+                            quality={70}
+                            className="h-8 w-auto shrink-0 -translate-y-[8%] sm:h-11"
+                          />
+                        ) : null}
+                        {s.eyebrowEnd ? (
+                          <span
+                            className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                              light ? "text-ink" : "text-white"
+                            }`}
+                          >
+                            {s.eyebrowEnd}
+                          </span>
+                        ) : null}
+                      </motion.div>
+                    )}
+                    <motion.div variants={copyItem}>
+                      <Heading className="display hero-heading text-[1.85rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.65rem] lg:text-[3.15rem]">
                         <span
-                          className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
-                            light ? "text-ink" : "text-white"
+                          className={`block whitespace-normal ${
+                            copyStart ? "" : "sm:whitespace-nowrap"
                           }`}
                         >
-                          {s.eyebrowStart}
+                          {s.headingLead}
                         </span>
-                      ) : null}
-                      {s.badge ? (
-                        <Image
-                          src={s.badge.src}
-                          alt=""
-                          width={s.badge.width ?? 420}
-                          height={s.badge.height ?? 330}
-                          sizes="88px"
-                          quality={70}
-                          className="h-8 w-auto shrink-0 -translate-y-[8%] sm:h-11"
-                        />
-                      ) : null}
-                      {s.eyebrowEnd ? (
                         <span
-                          className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
-                            light ? "text-ink" : "text-white"
+                          className={`block whitespace-normal font-bold text-brand ${
+                            copyStart ? "" : "sm:whitespace-nowrap"
                           }`}
                         >
-                          {s.eyebrowEnd}
+                          {s.headingAccent}
                         </span>
-                      ) : null}
-                    </div>
-                  )}
-                  {/* `hero-heading` marks this as the hero role for the Theme
-                      Control panel — it carries its own face, scale and weight,
-                      separate from the section titles below the fold. */}
-                  <Heading className="display hero-heading text-[1.7rem] font-light uppercase leading-[1.1] tracking-[0.01em] text-white sm:text-[2.45rem] lg:text-[2.95rem]">
-                    <span
-                      className={`block whitespace-normal ${
-                        copyStart ? "" : "sm:whitespace-nowrap"
-                      }`}
-                    >
-                      {s.headingLead}
-                    </span>
-                    <span
-                      className={`block whitespace-normal font-bold text-brand ${
-                        copyStart ? "" : "sm:whitespace-nowrap"
-                      }`}
-                    >
-                      {s.headingAccent}
-                    </span>
-                  </Heading>
-                  {s.kicker ? (
-                    <p
-                      className={`mt-2 text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:text-[12px] sm:tracking-[0.3em] ${
-                        copyStart ? "max-w-[34ch]" : "max-w-[28ch] sm:max-w-none"
-                      }`}
-                    >
-                      {s.kicker}
-                    </p>
-                  ) : null}
-                  {primary ? (
-                    <Link
-                      href={primary.href}
-                      tabIndex={on ? 0 : -1}
-                      className="mt-5 inline-flex h-[44px] items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[48px] sm:px-8"
-                    >
-                      {primary.label}
-                      <FiArrowRight className="text-[15px]" />
-                    </Link>
-                  ) : null}
+                      </Heading>
+                    </motion.div>
+                    {s.kicker ? (
+                      <motion.p
+                        variants={copyItem}
+                        className={`mt-2.5 text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:text-[12px] sm:tracking-[0.3em] ${
+                          copyStart
+                            ? "max-w-[34ch]"
+                            : "max-w-[28ch] sm:max-w-none"
+                        }`}
+                      >
+                        {s.kicker}
+                      </motion.p>
+                    ) : null}
+                    {primary ? (
+                      <motion.div variants={copyItem}>
+                        <Link
+                          href={primary.href}
+                          tabIndex={on ? 0 : -1}
+                          className="mt-5 inline-flex h-[44px] items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[48px] sm:px-8"
+                        >
+                          {primary.label}
+                          <FiArrowRight className="text-[15px]" />
+                        </Link>
+                      </motion.div>
+                    ) : null}
+                  </motion.div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           );
         })}
@@ -292,7 +295,9 @@ export default function OverlayHeroSlider({
                   aria-label={`Go to slide ${i + 1}`}
                   aria-current={i === active}
                   className={`h-[3px] rounded-full transition-all duration-500 ${
-                    i === active ? "w-8 bg-brand" : "w-5 bg-white/45 hover:bg-white/80"
+                    i === active
+                      ? "w-8 bg-brand"
+                      : "w-5 bg-white/45 hover:bg-white/80"
                   }`}
                 />
               ))}
