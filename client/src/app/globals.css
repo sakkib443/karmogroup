@@ -1100,8 +1100,8 @@ svg.app-icon[fill="none"] {
   }
 
   .chemicals-band {
-    height: var(--chemicals-h, calc(100svh - 32px)) !important;
-    min-height: var(--chemicals-h, calc(100svh - 32px)) !important;
+    height: var(--chemicals-h, calc(100svh - 112px)) !important;
+    min-height: var(--chemicals-h, calc(100svh - 112px)) !important;
   }
 }
 
@@ -1199,9 +1199,9 @@ svg.app-icon[fill="none"] {
   animation: foam-drift 30s ease-in-out infinite alternate;
 }
 
-/* Site navbar as a mattress side wall: faint damask + welt piping.
-   Texture sits behind the chrome (negative z-index inside isolate) at low
-   opacity so the ink logo and menu type stay readable. */
+/* Site navbar: quilted mattress texture + welt piping.
+   Fit-to-height + repeat-x — NEVER cover-scale (that zooms squares huge).
+   Previous damask kept as mattress-side-texture-HIDDEN.jpg / -KEEP.jpg. */
 .header-mattress-band {
   position: relative;
   isolation: isolate;
@@ -1217,16 +1217,17 @@ svg.app-icon[fill="none"] {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("/karmo/images/header/mattress-side-texture.jpg");
-  background-size: 100% auto;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.16;
+  background-image: url("/karmo/images/header/mattress-quilt-damask-blend-hq.jpg");
+  /* Match bar height; tile sideways so pattern stays fine, not zoomed. */
+  background-size: auto 100%;
+  background-position: center top;
+  background-repeat: repeat-x;
+  opacity: 0.32;
   transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .header-mattress-band.is-scrolled::before {
-  opacity: 0.1;
+  opacity: 0.18;
 }
 
 /* Division mega menus (Mattress, Foam) — soft textured panel.

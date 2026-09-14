@@ -12,24 +12,27 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * centred division name (furniture-catalogue pattern).
  */
 
+// Previous tiles kept on disk (hidden): foam-catalog-v6, mattress-catalog-v6,
+// hometex-catalog-v5, chemicals-catalog-v6.
 const divisions = [
   {
     name: "Foam",
     href: "/foam",
-    image: "/karmo/images/home-02/divisions/foam-catalog-v4.jpg",
-    alt: "Angled side view of a Karmo Foam sofa",
+    image: "/karmo/images/home-02/divisions/foam-catalog-match-v1.jpg",
+    alt: "Blue Karmo letter-cushion sofa in a cream catalog studio",
   },
   {
     name: "Mattress",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-catalog-v4.jpg",
-    alt: "Angled close-up of a Karmo mattress and headboard",
+    image: "/karmo/images/home-02/divisions/mattress-catalog-v8.jpg",
+    alt: "Hand reaching from the side onto a quilted Karmo mattress",
+    position: "object-[center_58%]",
   },
   {
     name: "HomeTex",
     href: "/hometex",
-    image: "/karmo/images/home-02/divisions/hometex-catalog-v4.jpg",
-    alt: "Angled view of Karmo HomeTex bedding layers",
+    image: "/karmo/images/home-02/divisions/hometex-catalog-match-v1.jpg",
+    alt: "Stacked floral Karmo HomeTex quilts in a cream catalog studio",
   },
   {
     name: "Chemicals",
@@ -51,7 +54,7 @@ function DivisionCard({ division }) {
           alt={division.alt}
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+          className={`object-cover ${division.position || "object-center"} transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
         />
 
         {/* Hover: dim wash + inset white frame + centred name */}

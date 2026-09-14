@@ -30,8 +30,8 @@ const materials = [
     name: "Rebonded Foam",
     line: "Steam-bonded chips. Support that lasts.",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/rebonded-foam.jpg",
-    alt: "Close-up of Karmo rebonded foam — bonded hi-density foam chips",
+    src: "/karmo/images/home-02/materials/rebonded-foam-v4.jpg",
+    alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
@@ -42,8 +42,8 @@ const materials = [
     name: "Polyethylene Foam",
     line: "Hi-density core. Made only by Karmo.",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/pe-foam.jpg",
-    alt: "Close-up of Karmo hi-density polyethylene (PE) foam",
+    src: "/karmo/images/home-02/materials/pe-foam-v2.jpg",
+    alt: "Close-up of charcoal egg-crate contour foam",
     span: "lg:col-start-2 lg:row-start-1",
     ratio: "aspect-[16/9]",
     sizes: "(min-width: 1024px) 36vw, 100vw",
@@ -92,7 +92,7 @@ function MaterialCard({ item }) {
           className="absolute inset-0 bg-black/30"
         />
 
-        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start p-6 sm:p-7 lg:p-8">
+        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-6 pb-6 pt-16 sm:px-7 sm:pb-7 sm:pt-[4.5rem] lg:px-8 lg:pb-8 lg:pt-24">
           <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] sm:text-[13px] lg:text-[14px]">
             {item.name}
           </span>

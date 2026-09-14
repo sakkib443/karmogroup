@@ -63,6 +63,56 @@ export const upload = multer({
     },
 });
 
+/**
+ * ── Document upload — CVs, cover letters, certificates, job descriptions ───
+ *
+ * Separate from `upload` above rather than widening it: that one is the product
+ * image pipeline, and it resizes and re-encodes everything it touches. Running
+ * a PDF through an image transformation destroys it.
+ *
+ * Cloudinary needs `resource_type: 'raw'` for anything that is not an image, so
+ * the two cannot share a storage config either. Limit is 20MB — a CV with
+ * scanned certificates attached runs well past the 10MB the image path allows.
+ */
+const DOC_MIMES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+];
+
+const docCloudStorage = new CloudinaryStorage({
+    cloudinary,
+    params: async (_req: any, file: any) => ({
+        folder: 'karmo/career',
+        resource_type: file.mimetype === 'application/pdf' || file.mimetype.startsWith('application/') ? 'raw' : 'image',
+        public_id: `cv_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
+    }),
+});
+
+const docDiskStorage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+    filename: (_req, file, cb) => {
+        const ext = (path.extname(file.originalname) || '.pdf').toLowerCase();
+        cb(null, `cv_${Date.now()}_${Math.random().toString(36).substr(2, 6)}${ext}`);
+    },
+});
+
+export const uploadDocument = multer({
+    storage: isCloudinaryEnabled ? (docCloudStorage as any) : docDiskStorage,
+    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+    fileFilter: (_req, file, cb) => {
+        if (DOC_MIMES.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Only PDF, DOC, DOCX or image files are allowed'));
+        }
+    },
+});
+
 // ── Resolve the public URL for an uploaded file ────────────
 // Cloudinary sets `file.path` to the full secure URL. For disk storage we
 // build an absolute URL to the statically-served /uploads route, using the

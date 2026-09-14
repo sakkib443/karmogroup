@@ -18,7 +18,7 @@ export default function ChairmanMessage() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="relative overflow-hidden bg-shade-deep py-16 lg:py-24">
+    <section className="relative mb-1.5 overflow-hidden bg-shade-deep py-14 lg:py-16">
       {/* An oversized quote mark, cropped by the section. Decorative — the
           `aria-hidden` keeps a stray punctuation glyph out of the reading
           order. */}
@@ -37,6 +37,8 @@ export default function ChairmanMessage() {
       >
         <motion.span
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand"
         >
           <span className="h-px w-8 bg-brand" />
@@ -45,12 +47,14 @@ export default function ChairmanMessage() {
 
         <motion.blockquote
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="display mt-6 text-[1.25rem] font-light leading-[1.5] tracking-[0.01em] text-white sm:text-[1.5rem] lg:text-[1.8rem]"
         >
           {chairmanMessage.quote}
         </motion.blockquote>
 
-        <motion.div variants={fade} className="mt-8 space-y-4">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="mt-8 space-y-4">
           {chairmanMessage.body.map((text) => (
             <p
               key={text.slice(0, 24)}
@@ -63,6 +67,8 @@ export default function ChairmanMessage() {
 
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="mt-10 flex items-center gap-4 border-t border-white/10 pt-7"
         >
           <span aria-hidden className="h-10 w-[3px] shrink-0 bg-brand" />

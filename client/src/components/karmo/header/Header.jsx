@@ -7,14 +7,15 @@ import Navbar from "@/components/karmo/header/Navbar";
 
 /**
  * Site header for the live marketing chrome — TopHeader + Navbar.
- * Fixed 112px (32 + 80). Layout offsets the page by that height.
- * The 80px bar sits on a mattress side-panel texture (damask + welt piping).
+ * Page offset stays 112px (32 + 80 compact bar). At rest the menu bar
+ * is taller so the factory mark can breathe; it overlaps the hero a
+ * little, then eases down on scroll. Quilt texture via CSS.
  */
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 48);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -30,7 +31,7 @@ export default function Header() {
     >
       <TopHeader />
       <div className={`header-mattress-band ${scrolled ? "is-scrolled" : ""}`}>
-        <Navbar />
+        <Navbar scrolled={scrolled} />
       </div>
     </header>
   );

@@ -83,7 +83,7 @@ export default function ContactFormSection({
   };
 
   return (
-    <section className="bg-white py-14 md:py-20 lg:py-24">
+    <section className="relative mb-1.5 bg-white py-10 md:py-12 lg:py-14">
       <motion.div
         variants={group}
         {...reveal}
@@ -91,11 +91,11 @@ export default function ContactFormSection({
         className="shell grid gap-14 lg:grid-cols-12 lg:gap-16"
       >
         {/* ── Form ───────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="lg:col-span-7">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="lg:col-span-7">
           <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
             Write to us
           </span>
-          <h2 className="display mt-3 text-[1.55rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink lg:text-[1.85rem]">
+          <h2 className="display section-heading mt-3 uppercase text-ink">
             Send a{" "}
             <span className="font-bold text-brand">message</span>
           </h2>
@@ -214,11 +214,11 @@ export default function ContactFormSection({
         </motion.div>
 
         {/* ── Side info ──────────────────────────────────────────────────── */}
-        <motion.aside variants={fade} className="lg:col-span-5">
+        <motion.aside variants={fade} {...reveal} viewport={VIEWPORT} className="lg:col-span-5">
           <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
             Visit & hours
           </span>
-          <h2 className="display mt-3 text-[1.45rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink lg:text-[1.65rem]">
+          <h2 className="display section-heading mt-3 uppercase text-ink">
             Head{" "}
             <span className="font-bold text-brand">office</span>
           </h2>

@@ -92,6 +92,7 @@ export default function OverlayHeroSlider({
         {slides.map((s, i) => {
           const on = i === active;
           const right = s.align === "right";
+          const center = s.align === "center";
           /* `copyAlign: "start"` keeps type left-aligned even when the block
              sits on the right (Foam craft slide). Default stays end-aligned. */
           const copyEnd = right && s.copyAlign !== "start";
@@ -99,6 +100,7 @@ export default function OverlayHeroSlider({
           const light = s.tone === "light";
           const primary = s.cta?.find((c) => c.primary) ?? s.cta?.[0];
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
+          const hasAccent = Boolean(s.headingAccent);
 
           return (
             <div key={s.id} className="absolute inset-0">
@@ -119,7 +121,7 @@ export default function OverlayHeroSlider({
                   quality={90}
                   priority={i === 0}
                   loading="eager"
-                  className={`object-cover ${
+                  className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"
                   } ${s.image.className || ""}`}
                 />
@@ -140,6 +142,15 @@ export default function OverlayHeroSlider({
                   className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_60%_55%,rgba(140,197,255,0.22),transparent_55%)]"
                 />
               ) : null}
+              {s.veil ? (
+                <motion.span
+                  aria-hidden
+                  initial={false}
+                  animate={{ opacity: on ? 1 : 0 }}
+                  transition={fadeMs}
+                  className="pointer-events-none absolute inset-0 bg-black/32"
+                />
+              ) : null}
               {!light ? (
                 <>
                   <motion.span
@@ -148,9 +159,11 @@ export default function OverlayHeroSlider({
                     animate={{ opacity: on ? 1 : 0 }}
                     transition={fadeMs}
                     className={`pointer-events-none absolute inset-0 hidden md:block ${
-                      right
-                        ? "bg-gradient-to-l from-[#0c0c0c]/55 via-transparent to-transparent"
-                        : "bg-gradient-to-r from-[#0b1528]/40 via-transparent to-transparent"
+                      center
+                        ? "bg-gradient-to-b from-black/25 via-transparent to-black/40"
+                        : right
+                          ? "bg-gradient-to-l from-[#0c0c0c]/55 via-transparent to-transparent"
+                          : "bg-gradient-to-r from-[#0b1528]/40 via-transparent to-transparent"
                     }`}
                   />
                   <motion.span
@@ -172,8 +185,12 @@ export default function OverlayHeroSlider({
                 aria-hidden={!on}
               >
                 <div
-                  className={`shell flex h-full items-end pb-16 md:items-center md:pb-0 ${
-                    right ? "md:justify-end" : ""
+                  className={`shell flex h-full ${
+                    center
+                      ? "items-start justify-center pt-[min(30vh,13rem)] md:pt-[min(32vh,15rem)]"
+                      : `items-end pb-16 md:items-center md:pb-0 ${
+                          right ? "md:justify-end" : ""
+                        }`
                   }`}
                 >
                   <motion.div
@@ -181,13 +198,15 @@ export default function OverlayHeroSlider({
                     initial={reduce ? false : "hidden"}
                     animate={on && !reduce ? "show" : reduce && on ? "show" : "hidden"}
                     variants={copyContainer}
-                    className={`w-full max-w-[min(92vw,24rem)] sm:max-w-[min(90vw,36rem)] ${
-                      copyStart
-                        ? "lg:max-w-[min(40vw,32rem)]"
-                        : "lg:max-w-[min(55vw,46rem)]"
-                    } ${
-                      on ? "pointer-events-auto" : "pointer-events-none"
-                    } ${copyEnd ? "md:text-right" : "text-left"}`}
+                    className={`w-full ${
+                      center
+                        ? "max-w-[min(94vw,52rem)] text-center"
+                        : `max-w-[min(92vw,24rem)] sm:max-w-[min(90vw,36rem)] ${
+                            copyStart
+                              ? "lg:max-w-[min(40vw,32rem)]"
+                              : "lg:max-w-[min(55vw,46rem)]"
+                          } ${copyEnd ? "md:text-right" : "text-left"}`
+                    } ${on ? "pointer-events-auto" : "pointer-events-none"}`}
                   >
                     {(s.eyebrowStart || s.eyebrowEnd) && (
                       <motion.div
@@ -228,21 +247,29 @@ export default function OverlayHeroSlider({
                       </motion.div>
                     )}
                     <motion.div variants={copyItem}>
-                      <Heading className="display hero-heading text-[1.85rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-white sm:text-[2.65rem] lg:text-[3.15rem]">
+                      <Heading
+                        className={`display hero-heading uppercase leading-[1.08] tracking-[0.04em] text-white ${
+                          center
+                            ? "text-[1.45rem] font-semibold text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.55)] sm:text-[2rem] lg:text-[2.35rem] lg:tracking-[0.06em]"
+                            : "text-[1.85rem] font-light sm:text-[2.65rem] lg:text-[3.15rem]"
+                        }`}
+                      >
                         <span
                           className={`block whitespace-normal ${
-                            copyStart ? "" : "sm:whitespace-nowrap"
+                            center || copyStart ? "" : "sm:whitespace-nowrap"
                           }`}
                         >
                           {s.headingLead}
                         </span>
-                        <span
-                          className={`block whitespace-normal font-bold text-brand ${
-                            copyStart ? "" : "sm:whitespace-nowrap"
-                          }`}
-                        >
-                          {s.headingAccent}
-                        </span>
+                        {hasAccent ? (
+                          <span
+                            className={`block whitespace-normal font-bold text-brand ${
+                              center || copyStart ? "" : "sm:whitespace-nowrap"
+                            }`}
+                          >
+                            {s.headingAccent}
+                          </span>
+                        ) : null}
                       </Heading>
                     </motion.div>
                     {s.kicker ? (

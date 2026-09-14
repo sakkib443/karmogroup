@@ -10,13 +10,13 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 const DEFAULT_PROMISES = [
   {
-    src: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
+    src: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
     scale: 0.92,
     title: "No Cost EMI",
     note: "Flexible monthly plans on eligible orders",
   },
   {
-    src: "/karmo/images/trust/cartoon-v3/superbrand-v2.webp",
+    src: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
     scale: 0.92,
     title: "30 Nights Free Trial",
     note: "Sleep on it — return within 30 nights if it is not right",
@@ -37,13 +37,13 @@ const DEFAULT_PROMISES = [
 
 export const FOAM_PROMISES = [
   {
-    src: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
+    src: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
     scale: 0.92,
     title: "No Cost EMI",
     note: "Flexible monthly plans on eligible foam orders",
   },
   {
-    src: "/karmo/images/trust/cartoon-v3/superbrand-v2.webp",
+    src: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
     scale: 0.92,
     title: "Cut to your size",
     note: "Sheets and blocks cut clean to the inch for makers",

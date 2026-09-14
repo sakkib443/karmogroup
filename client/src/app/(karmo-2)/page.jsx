@@ -5,7 +5,8 @@ import PartnerPromoBand from "@/components/karmo/home/PartnerPromoBand";
 import DivisionsStrip from "@/components/karmo/home/DivisionsStrip";
 import Reels from "@/components/karmo/home/Reels";
 import ShopByMaterial from "@/components/karmo/home/ShopByMaterial";
-import LivingLookbook from "@/components/karmo/home/LivingLookbook";
+import ShopBySize from "@/components/karmo/home/ShopBySize";
+import ShoeSole from "@/components/karmo/home/ShoeSole";
 import FoamPromise from "@/components/karmo/home/FoamPromise";
 import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionEditorials from "@/components/karmo/home/DivisionEditorials";
@@ -41,10 +42,11 @@ export default function HomePage() {
       <ShopByMaterial />
 
       <PromoTrio />
+      <ShopBySize />
       <FoamPromise filmMode="fixed" />
 
       <Reels />
-      <LivingLookbook />
+      <ShoeSole />
       <Partners />
 
       <PartnerPromoBand />

@@ -59,7 +59,7 @@ export const portfolioItems = [
     division: "mattress",
     title: "Floral bedroom suite",
     line: "Mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.png",
     alt: "A Karmo floral mattress on an upholstered bed in an elegant bedroom",
     href: "/mattress",
   },

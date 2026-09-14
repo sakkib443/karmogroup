@@ -21,18 +21,18 @@ export default function AboutDivisions() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-t border-ink/8 bg-white py-14 md:py-20 lg:py-24">
+    <section className="relative mb-1.5 bg-white py-10 md:py-12 lg:py-14">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
         className="shell text-center"
       >
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
             The group
           </span>
-          <h2 className="display mt-2 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
+          <h2 className="display section-heading mt-2 uppercase text-ink">
             Four industries,{" "}
             <span className="font-bold text-brand">one group</span>
           </h2>
@@ -44,7 +44,12 @@ export default function AboutDivisions() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell mt-10 grid gap-8 sm:grid-cols-2 lg:mt-14 lg:grid-cols-4 lg:gap-6"
+        /* Edge to edge on a 6px gutter, the way every image grid on the
+           homepage runs. It used to sit inside `shell` on a 32/24px gap, which
+           is why this page read as a text page with pictures in it rather than
+           part of the same band. The heading above keeps its shell — copy is
+           measured, pictures are not. */
+        className="mt-10 grid grid-cols-2 gap-1.5 lg:mt-14 lg:grid-cols-4"
       >
         {aboutDivisions.map((division) => (
           <motion.article key={division.name} variants={fade} className="min-w-0">
@@ -62,15 +67,15 @@ export default function AboutDivisions() {
                 </span>
               </div>
 
-              <h3 className="display mt-4 text-[15px] font-bold uppercase tracking-[0.06em] text-ink transition-colors duration-300 group-hover:text-brand lg:text-[16px]">
+              <h3 className="display mt-4 px-3 lg:px-4 text-[15px] font-bold uppercase tracking-[0.06em] text-ink transition-colors duration-300 group-hover:text-brand lg:text-[16px]">
                 {division.name}
               </h3>
-              <p className="body-copy mt-1.5 text-[13px] italic leading-snug text-ink/45">
+              <p className="body-copy mt-1.5 px-3 lg:px-4 text-[13px] italic leading-snug text-ink/45">
                 {division.line}
               </p>
             </Link>
 
-            <ul className="mt-4 space-y-2 border-t border-ink/8 pt-4">
+            <ul className="mx-3 mt-4 space-y-2 border-t border-ink/8 pt-4 lg:mx-4">
               {division.points.map((point) => (
                 <li
                   key={point}
@@ -92,7 +97,7 @@ export default function AboutDivisions() {
         viewport={VIEWPORT}
         className="shell mt-14 lg:mt-20"
       >
-        <motion.div variants={fade} className="border border-ink/10 bg-white">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="border border-ink/10 bg-white">
           <div className="border-b border-ink/8 px-6 py-5 lg:px-8">
             <h3 className="display text-[13px] font-bold uppercase tracking-[0.16em] text-ink">
               Inside Karmo Chemical &amp; Adhesives

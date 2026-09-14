@@ -81,11 +81,11 @@ export default function AboutPartners() {
         viewport={VIEWPORT}
         className="shell relative"
       >
-        <motion.div variants={fade} className="mx-auto max-w-2xl text-center">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="mx-auto max-w-2xl text-center">
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
             {aboutPartners.eyebrow}
           </span>
-          <h2 className="display mt-3 text-[1.75rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.95rem] lg:text-[2.35rem]">
+          <h2 className="display section-heading mt-3 uppercase text-ink">
             {aboutPartners.titleLead}{" "}
             <span className="font-bold text-brand">{aboutPartners.titleAccent}</span>
           </h2>
@@ -98,6 +98,8 @@ export default function AboutPartners() {
 
       <motion.div
         variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
         {...reveal}
         viewport={VIEWPORT}
         className="marquee-rows relative mt-10 space-y-3 sm:mt-12 sm:space-y-4 lg:mt-14"

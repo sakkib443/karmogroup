@@ -21,16 +21,24 @@ export default function AboutStory() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white py-14 lg:py-20">
+    <section id="history" className="relative mb-1.5 scroll-mt-[140px] bg-white">
+      {/* Split band: the picture runs off the left screen edge and the copy
+          keeps a measured column on the right — the shape `ChemicalsBand` uses
+          on the homepage.
+
+          This was a `shell` two-column with a 40/64px gap, which held the photo
+          in a 684px box floating in white. On a page whose neighbours all run
+          edge to edge that reads as a different site; the picture is the band
+          here, not an illustration inside one. */}
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
+        className="grid items-center gap-8 lg:grid-cols-2 lg:gap-0"
       >
         {/* ── Picture ─────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="relative">
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-cream">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="relative">
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-cream lg:aspect-auto lg:h-full lg:min-h-[560px]">
             <Image
               src={aboutStory.image.src}
               alt={aboutStory.image.alt}
@@ -54,11 +62,18 @@ export default function AboutStory() {
         </motion.div>
 
         {/* ── Copy ────────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="pt-6 lg:pt-0">
+        {/* Carries its own padding now that the grid has left `shell`: the
+            picture is allowed to touch the screen edge, the words are not. */}
+        <motion.div
+          variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="px-6 pb-12 pt-6 md:px-12 lg:max-w-[46rem] lg:py-16 lg:pl-14 lg:pr-16"
+        >
           <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
             {aboutStory.eyebrow}
           </span>
-          <h2 className="display mt-3 text-[1.65rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.85rem] lg:text-[2.15rem]">
+          <h2 className="display section-heading mt-3 uppercase text-ink">
             {aboutStory.titleLead}{" "}
             <span className="font-bold text-brand">{aboutStory.titleAccent}</span>
           </h2>

@@ -8,6 +8,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 import VideoModal from "@/components/karmo/VideoModal";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import { homeReels } from "@/data/films";
 
 /**
  * Home films / shorts band — same shell split as DivisionEditorials
@@ -20,143 +21,7 @@ const DESKTOP_H = "calc(100svh - 32px)";
 const GAP_PX = 6;
 /* Desktop: ~2.55 tiles in view (wider than strict 3). Mobile: ~1.05. */
 
-const films = [
-  {
-    id: "fb-karmo-mattress-offer",
-    src: "/karmo/videos/shorts/fb-karmo-mattress-offer.mp4",
-    title: "ঘুম নিয়ে সিরিয়াস?",
-    tag: "Offer",
-  },
-  {
-    id: "fb-reel-921228060438784",
-    src: "/karmo/videos/shorts/fb-reel-921228060438784.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-845505688502810",
-    src: "/karmo/videos/shorts/fb-reel-845505688502810.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-785013297942063",
-    src: "/karmo/videos/shorts/fb-reel-785013297942063.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-747210751746270",
-    src: "/karmo/videos/shorts/fb-reel-747210751746270.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-3242808395880988",
-    src: "/karmo/videos/shorts/fb-reel-3242808395880988.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-1822025445099889",
-    src: "/karmo/videos/shorts/fb-reel-1822025445099889.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "fb-reel-759339363519767",
-    src: "/karmo/videos/shorts/fb-reel-759339363519767.mp4",
-    title: "Karmo Reel",
-    tag: "Reel",
-  },
-  {
-    id: "v1-tisa",
-    src: "/karmo/videos/shorts/v1-tisa.mp4",
-    title: "Tisa — a quiet moment",
-    tag: "Short",
-    hidden: true,
-  },
-  {
-    id: "v2",
-    src: "/karmo/videos/shorts/v2.mp4",
-    title: "Comfort on camera",
-    tag: "Short",
-    hidden: true,
-  },
-  {
-    id: "v3",
-    src: "/karmo/videos/shorts/v3.mp4",
-    title: "Lived-in rooms",
-    tag: "Short",
-    hidden: true,
-  },
-  {
-    id: "v4",
-    src: "/karmo/videos/shorts/v4.mp4",
-    title: "Soft light, soft rest",
-    tag: "Short",
-    hidden: true,
-  },
-  {
-    id: "v5",
-    src: "/karmo/videos/shorts/v5.mp4",
-    title: "Everyday Karmo",
-    tag: "Short",
-    hidden: true,
-  },
-  {
-    id: "tvc-mattress",
-    src: "/karmo/videos/tvc-mattress.mp4",
-    title: "Karmo Mattress, the commercial",
-    tag: "Commercial",
-    hidden: true,
-  },
-  {
-    id: "product-film",
-    src: "/karmo/videos/product-film.mp4",
-    title: "A room built on Karmo",
-    tag: "Interiors",
-    hidden: true,
-  },
-  {
-    id: "reel-4",
-    src: "/karmo/videos/reel-4.mp4",
-    title: "Pocketed spring array",
-    tag: "Inside the product",
-    hidden: true,
-  },
-  {
-    id: "reel-3",
-    src: "/karmo/videos/reel-3.mp4",
-    title: "Rebound on the quilted top",
-    tag: "Inside the product",
-    hidden: true,
-  },
-  {
-    id: "reel-1",
-    src: "/karmo/videos/reel-1.mp4",
-    title: "CertiGuard germ protection",
-    tag: "Certification",
-    hidden: true,
-  },
-  {
-    id: "tvc-foam",
-    src: "/karmo/videos/tvc-foam.mp4",
-    title: "Karmo Foam, from the archive",
-    tag: "Archive",
-    hidden: true,
-  },
-  {
-    id: "sleep-well",
-    src: "/karmo/videos/mattress-sleep-well.mp4",
-    title: "Sleep well, live well",
-    tag: "Lifestyle",
-    hidden: true,
-  },
-];
-
-/** Visible reels only — others stay in `films` with `hidden: true`. */
-const activeFilms = films.filter((f) => !f.hidden);
+const activeFilms = homeReels;
 
 function ReelTile({ film, still, onOpen, active }) {
   const tileRef = useRef(null);
@@ -323,7 +188,7 @@ export default function Reels() {
           </p>
 
           <Link
-            href="/media/video-ads"
+            href="/media/ads"
             className="group mt-8 inline-flex items-center gap-3"
           >
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">

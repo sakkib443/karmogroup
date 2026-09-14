@@ -15,11 +15,6 @@ const BADGE = {
 };
 
 const LINE = {
-  foam: {
-    eyebrowStart: "Bangladesh’s",
-    eyebrowEnd: "Foam Brand",
-    badge: BADGE,
-  },
   mattress: {
     eyebrowStart: "Bangladesh’s",
     eyebrowEnd: "Mattress Brand",
@@ -30,38 +25,41 @@ const LINE = {
     eyebrowEnd: "Adhesive Brand",
     badge: BADGE,
   },
+  hometex: {
+    eyebrowStart: "Bangladesh’s",
+    eyebrowEnd: "HomeTex Brand",
+    badge: BADGE,
+  },
 };
 
 const SLIDES = [
   {
-    id: "home-sofa-motion",
-    align: "left",
-    breeze: true,
-    ...LINE.foam,
-    headingLead: "We create the",
-    headingAccent: "chemistry of comfort",
-    kicker: "Sink in. Stay longer.",
-    cta: [{ label: "Shop now", href: "/products", primary: true }],
+    id: "home-journey-1965",
+    align: "center",
+    /* Site tagline — same line as Iconic brands / About */
+    headingLead: "The Journey Since 1965",
+    headingAccent: "",
+    veil: true,
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-01-motion-hq.jpg",
-      alt: "A woman reclining on a terracotta motion sofa with a soft cool air glow",
-      width: 1536,
-      height: 1024,
+      src: "/karmo/images/home-02/hero/home-hero-slide-01-mustard-room-hq.png",
+      alt: "Mustard sofa in a blue-walled living room with plants and wood shelves",
+      width: 1979,
+      height: 795,
+      position: "object-center",
     },
   },
   {
-    id: "home-mattress-cat",
-    align: "right",
-    ...LINE.mattress,
-    headingLead: "Crafted for nights",
-    headingAccent: "that last",
-    kicker: "Every Karmo mattress is tested, one by one",
-    cta: [{ label: "Find a store", href: "/find-store", primary: true }],
+    id: "home-living-scandi",
+    align: "center",
+    headingLead: "The Journey Since 1965",
+    headingAccent: "",
+    veil: true,
     image: {
-      src: "/karmo/images/mattress/hero/cooling-cat-snowy-window-hq.jpg",
-      alt: "Karmo mattress in a calm bedroom with a sleeping cat",
-      width: 2560,
-      height: 1096,
+      src: "/karmo/images/home-02/hero/home-hero-slide-living-scandi-v3-hq.png",
+      alt: "Warm living room with a cream sofa, wood shelves and round coffee table",
+      width: 1978,
+      height: 795,
+      position: "object-center",
     },
   },
   {
@@ -81,20 +79,48 @@ const SLIDES = [
     },
   },
   {
-    id: "home-mattress-summer-cool-real",
+    id: "home-hometex-quilts",
     align: "left",
-    breeze: true,
-    ...LINE.mattress,
-    headingLead: "The mattress",
-    headingAccent: "your summer needs",
-    kicker: "Powered by advanced cooling technology",
-    cta: [{ label: "Explore mattress", href: "/mattress", primary: true }],
+    ...LINE.hometex,
+    headingLead: "Moments that make a house",
+    headingAccent: "feel like home",
+    kicker: "We finish every set, every single stitch",
+    cta: [{ label: "Explore HomeTex", href: "/hometex", primary: true }],
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-mattress-summer-cool-hq.jpg",
-      alt: "A woman sleeping under a floral Karmo comforter with a cool glow along the mattress",
-      width: 1536,
-      height: 1024,
+      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-quilts-v2-hq.jpg",
+      alt: "Stacked Karmo HomeTex floral quilts on a sunlit bed",
+      width: 2560,
+      height: 1019,
       position: "object-center",
+    },
+  },
+  {
+    id: "home-foam-room",
+    align: "center",
+    headingLead: "Foam crafted for living",
+    headingAccent: "",
+    veil: true,
+    image: {
+      src: "/karmo/images/home-02/hero/home-hero-slide-foam-real-v23-hq.jpg",
+      alt: "KARMO HD and KARMO 280 foam stacks in a sunlit mustard living room",
+      width: 2560,
+      height: 1017,
+      position: "object-left",
+    },
+  },
+  {
+    id: "home-mattress-cat",
+    align: "right",
+    ...LINE.mattress,
+    headingLead: "Crafted for nights",
+    headingAccent: "that last",
+    kicker: "Every Karmo mattress is tested, one by one",
+    cta: [{ label: "Find a store", href: "/find-store", primary: true }],
+    image: {
+      src: "/karmo/images/mattress/hero/cooling-cat-snowy-window-hq.jpg",
+      alt: "Karmo mattress in a calm bedroom with a sleeping cat",
+      width: 2560,
+      height: 1096,
     },
   },
 ];
@@ -105,7 +131,7 @@ export default function Hero() {
       slides={SLIDES}
       asHero
       size="viewport"
-      firstSlideMs={2600}
+      firstSlideMs={5200}
       autoplayMs={4500}
       fadeDuration={1.25}
       className="mb-0"

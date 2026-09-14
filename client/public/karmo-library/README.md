@@ -12,7 +12,7 @@
 | ফোল্ডার | কী আছে | git |
 |---|---|---|
 | `01-taglines/` | ক্লায়েন্ট-অনুমোদিত ট্যাগলাইন — **কপির সোর্স অব ট্রুথ**। Company / Website / Mattress — তিনটা PDF | ✅ ট্র্যাকড |
-| `02-catalogues/` | Adhesive Catalog PDF · `mattress-brochure/` (২৮ পেজ + টেক্সট) · `source-ai-files/` (৩টা Illustrator মাস্টার) | ignored (ভারী) |
+| `02-catalogues/` | Adhesive Catalog PDF · `mattress-brochure/` (২৮ পেজ + টেক্সট) · `foam-catalogue/karmo-foam-catalogue.pdf` (২৭ পেজ, A4 — `.ai` থেকে রূপান্তরিত) · `source-ai-files/` (৩টা Illustrator মাস্টার) | ignored (ভারী) |
 | `03-image-candidates/` | এখনো সাইটে বসেনি এমন ছবি — নিচে দেখুন | ignored |
 | `04-website-reference/` | ক্লায়েন্টের পুরোনো স্ট্যাটিক সাইট · BluePrint PDF · Site Reference xlsx | ignored |
 | `05-originals-masters/` | `karmo/images/`-এ ব্যবহৃত ছবিগুলোর হাই-রেজ মাস্টার | ignored |

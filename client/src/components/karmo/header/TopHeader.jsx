@@ -58,7 +58,7 @@ export default function TopHeader() {
                 key={label}
                 href="#"
                 aria-label={`Karmo Group on ${label}`}
-                className="transition-opacity duration-300 hover:opacity-70"
+                className="inline-flex origin-center transition-transform duration-300 ease-out hover:-translate-y-0.5 hover:scale-110"
               >
                 <Icon className="text-[12px] sm:text-[13px]" />
               </a>
