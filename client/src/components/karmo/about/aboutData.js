@@ -110,7 +110,7 @@ export const aboutDivisions = [
     name: "Karmo Mattress",
     line: "Your perfect partner for complete bedding",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.png",
     alt: "A Karmo floral mattress on an upholstered bed",
     points: [
       "Pocket springs that move independently, head to toe",

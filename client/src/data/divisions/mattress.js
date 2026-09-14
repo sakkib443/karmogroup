@@ -67,13 +67,13 @@ const mattress = {
     },
     {
       id: "trusted",
-      icon: "/karmo/images/trust/cartoon-v3/trusted-v2.webp",
+      icon: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
       title: "Trusted By Million",
       note: "families worldwide.",
     },
     {
       id: "recognised",
-      icon: "/karmo/images/trust/cartoon-v3/superbrand-v2.webp",
+      icon: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
       title: "Recognised By",
       note: "Super Brand",
     },

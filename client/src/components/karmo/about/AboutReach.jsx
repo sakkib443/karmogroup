@@ -19,7 +19,7 @@ export default function AboutReach() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-t border-ink/8 bg-white py-14 md:py-20 lg:py-24">
+    <section className="relative mb-1.5 bg-white py-10 md:py-12 lg:py-14">
       <motion.div
         variants={group}
         {...reveal}
@@ -27,12 +27,12 @@ export default function AboutReach() {
         className="shell grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-20"
       >
         {/* ── Copy ────────────────────────────────────────────────────────── */}
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
             <span className="h-px w-8 bg-brand" />
             {aboutReach.eyebrow}
           </span>
-          <h2 className="display mt-4 text-[1.65rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.85rem] lg:text-[2.15rem]">
+          <h2 className="display section-heading mt-4 uppercase text-ink">
             {aboutReach.titleLead}{" "}
             <span className="font-bold text-brand">{aboutReach.titleAccent}</span>
           </h2>
@@ -64,7 +64,7 @@ export default function AboutReach() {
         </motion.div>
 
         {/* ── Figure + the seven divisions ─────────────────────────────────── */}
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <div className="border border-ink/10">
             <div className="border-b border-ink/8 bg-brand px-7 py-8 text-center lg:py-10">
               <span className="display block text-[3.2rem] font-bold leading-none tabular-nums tracking-[-0.02em] text-white lg:text-[4rem]">

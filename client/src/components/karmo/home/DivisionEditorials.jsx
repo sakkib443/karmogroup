@@ -3,16 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowUpRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Home Two — third section. Screen-tall band: left copy (shell-aligned) +
+ * Home Two — third section. Screen-tall band: left tagline (shell-aligned) +
  * right masonry. Soft mattress damask texture behind the whole band.
  */
 
-const ORANGE = "#FF9A1F";
 const GAP = "gap-1 md:gap-1.5";
 const DESKTOP_H = "calc(100svh - 32px)";
 
@@ -22,19 +20,22 @@ const columns = [
       id: "foam-studio",
       href: "/mattress",
       label: "Mattress",
-      src: "/karmo/images/mattress/products/orthopedic-room-hq.jpg",
-      alt: "Karmo Orthopedic Mattress in a rustic brick bedroom with garden light",
+      src: "/karmo/images/home-02/divisions/editorial-v2/mattress-press-pro-fill-hq.jpg",
+      alt: "Hand pressing a quilted Karmo mattress on a bright bed",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
+      position: "object-[center_62%]",
+      zoom: true,
     },
     {
       id: "foam-lavender",
       href: "/hometex",
       label: "HomeTex",
-      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-bedding-hq.jpg",
-      alt: "Karmo HomeTex bedding set with pillows and comforter",
+      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-pillows-sideboard-hq.jpg",
+      alt: "White pillows and down feathers styled on a cane sideboard",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
+      position: "object-[72%_center]",
     },
   ],
   [
@@ -42,17 +43,18 @@ const columns = [
       id: "mattress-bedroom",
       href: "/foam",
       label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/foam-sofa-hq.jpg",
-      alt: "A Karmo Foam sofa with lavender cushions in a cozy living room",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-luxury-arch-sofa-hq.jpg",
+      alt: "Charcoal foam sofa in a quiet luxury room with an arched forest mural",
       ratio: "aspect-[12/11]",
       grow: "md:flex-[11]",
+      position: "object-[center_58%]",
     },
     {
       id: "mattress-grey",
-      href: "/mattress",
-      label: "Mattress",
-      src: "/karmo/images/home-02/divisions/editorial-v2/sleep-portrait-hq.jpg",
-      alt: "A woman resting peacefully on a Karmo mattress",
+      href: "/hometex",
+      label: "HomeTex",
+      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-quilt-stack-hq.jpg",
+      alt: "Stacked floral Karmo HomeTex quilts with floating feathers on a white bed",
       ratio: "aspect-[3/5]",
       grow: "md:flex-[20]",
     },
@@ -62,8 +64,8 @@ const columns = [
       id: "foam-campaign",
       href: "/foam",
       label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/living-scandi-hq.jpg",
-      alt: "A modern living room with a plush foam sofa",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-karmo-letter-sofa-hq.jpg",
+      alt: "Blue Karmo letter-cushion sofa in a quiet living room",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
     },
@@ -91,7 +93,11 @@ function Shot({ shot }) {
         fill
         quality={85}
         sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
-        className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+        className={`object-cover ${shot.position || "object-center"} origin-center transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          shot.zoom
+            ? "scale-[1.28] group-hover:scale-[1.32]"
+            : "group-hover:scale-[1.04]"
+        }`}
       />
 
       <span
@@ -118,7 +124,7 @@ export default function DivisionEditorials() {
   return (
     <section
       data-home-two-snap
-      className="division-editorials relative overflow-x-clip py-14 lg:mt-0 lg:overflow-visible lg:py-0"
+      className="division-editorials relative my-[6px] overflow-x-clip py-14 lg:overflow-visible lg:py-0"
       style={{
         ["--division-h"]: DESKTOP_H,
       }}
@@ -146,66 +152,18 @@ export default function DivisionEditorials() {
           variants={fade}
           {...reveal}
           viewport={VIEWPORT}
-          className="min-w-0 max-w-md self-center text-left lg:max-w-[28rem]"
+          className="min-w-0 self-center text-left"
         >
-          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
-              60+ Years
+          {/* Tagline only. "We create the" sits a step left of the
+              chemistry line so the pair still reads left-aligned. */}
+          <h2 className="display section-heading uppercase text-ink">
+            <span className="block whitespace-nowrap -ml-[1.55em]">
+              We create the
             </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
-              The Journey Since 1965
+            <span className="block whitespace-nowrap text-brand">
+              Chemistry of comfort
             </span>
-          </p>
-
-          {/* Client About-Us / Generic #15 tagline, exact words. Size eased a
-              step from the old two-line head so the longer third line still
-              fits the left column. */}
-          <h2 className="display section-heading mt-3 uppercase text-ink">
-            <span className="block">Iconic brands,</span>
-            <span className="block">storied history,</span>
-            <span className="block text-brand">industry leading innovation</span>
           </h2>
-
-          <span className="mt-4 flex items-center gap-3">
-            <span className="h-px w-10 bg-brand" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
-              Crafted to last
-            </span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              className="shrink-0"
-              aria-hidden
-            >
-              <path
-                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
-                fill={ORANGE}
-              />
-              <path
-                d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
-                stroke="#B4651A"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
-
-          <p className="body-copy mt-5 text-[16px] leading-[1.7] text-ink/55 lg:text-[17px]">
-            Karmo Foam delivers high-density resilience and lasting body
-            support — pure rubber grade, no fillers, firm air flow that holds
-            for years.
-          </p>
-
-          <Link href="/foam" className="group mt-8 inline-flex items-center gap-3">
-            <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
-              Explore foam
-            </span>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
-              <FiArrowUpRight />
-            </span>
-          </Link>
         </motion.div>
 
         <div

@@ -16,18 +16,14 @@ const items = [
     icon: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
   },
   {
-    // Client Home-page tagline #2 — kept verbatim, split title/note the same
-    // way "Natural and / Sustainable Products" is.
-    title: "Largest Raw Material",
-    note: "Stock",
-    icon: "/karmo/images/trust/cartoon-v3/chem-stock-v2.webp",
+    title: "Trusted By Million",
+    note: "families worldwide.",
+    icon: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
   },
   {
-    // Client Home-page tagline #3 — the exact wording ("Certification", not
-    // "Certified"). Replaces the old "Recognised By / Super Brand" pillar.
-    title: "International Quality",
-    note: "Certification",
-    icon: "/karmo/images/trust/cartoon-v3/chem-certified-v2.webp",
+    title: "Recognised By",
+    note: "Super Brand",
+    icon: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
   },
   {
     title: "Natural and",
@@ -51,7 +47,7 @@ export default function StandardStrip() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="relative mb-1 bg-white md:mb-1.5">
+    <section className="relative bg-white">
       <motion.ul
         variants={group}
         {...reveal}

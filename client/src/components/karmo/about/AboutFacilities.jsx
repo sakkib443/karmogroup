@@ -28,18 +28,18 @@ export default function AboutFacilities() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-t border-ink/8 bg-white py-14 md:py-20 lg:py-24">
+    <section className="relative mb-1.5 bg-white py-10 md:py-12 lg:py-14">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
         className="shell"
       >
-        <motion.div variants={fade} className="text-center">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="text-center">
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
             {aboutFacilities.eyebrow}
           </span>
-          <h2 className="display mt-2 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
+          <h2 className="display section-heading mt-2 uppercase text-ink">
             {aboutFacilities.titleLead}{" "}
             <span className="font-bold text-brand">{aboutFacilities.titleAccent}</span>
           </h2>

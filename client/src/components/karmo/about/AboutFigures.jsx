@@ -15,7 +15,7 @@ export default function AboutFigures() {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="border-b border-ink/8 bg-white py-10 lg:py-12">
+    <section className="relative mb-1.5 bg-white py-10 lg:py-12">
       <motion.ul
         variants={group}
         {...reveal}
