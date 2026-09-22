@@ -258,13 +258,13 @@ export default function ProductBuildAside() {
             with spine-aware support and a cover made for Bangladesh homes.
           </p>
 
-          <div className="relative mt-3 w-full max-w-[20rem]">
+          <div className="relative mt-5 w-full max-w-[24rem]">
             <Image
-              src="/karmo/images/product/sketches/mattress-5-layer-sketch-v5b.png"
-              alt="Hand-drawn Karmo mattress cutaway with five distinct construction layers"
-              width={880}
-              height={520}
-              sizes="(min-width: 1024px) 20rem, 75vw"
+              src="/karmo/images/mattress/brochure/inside/pocket-cutaway-cutout.png"
+              alt="Karmo pocket-spring mattress with the pillow top peeled back to show foam wadding and coils"
+              width={1280}
+              height={720}
+              sizes="(min-width: 1024px) 24rem, 80vw"
               className="h-auto w-full object-contain object-left"
               priority={false}
             />

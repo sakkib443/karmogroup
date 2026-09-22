@@ -121,7 +121,7 @@ export default function PromoTrio() {
               <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/55">
                 {feature.eyebrow}
               </span>
-              <h2 className="display section-heading mt-3 uppercase text-ink">
+              <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
                 {feature.titleLines.map((line) => (
                   <span key={line} className="block">
                     {line}

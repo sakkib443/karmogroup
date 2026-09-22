@@ -1,13 +1,12 @@
-import FoamCategoryPage from "@/components/karmo/division/FoamCategoryPage";
-import { foamCategoryMeta } from "@/components/karmo/division/FoamCategoryPage";
-
-const cat = foamCategoryMeta.furniture;
+import DivisionPage from "@/components/karmo/division/DivisionPage";
+import foamFurniture from "@/data/divisions/foamFurniture";
 
 export const metadata = {
-  title: `${cat.title} — Karmo Group`,
-  description: cat.description,
+  title: "Furniture & Upholstery Foam — Karmo Group",
+  description:
+    "Karmo set foam for furniture and upholstery — Poly, 280, 480, 2001, HD, 4G, 1965 and Signature. No filler used. Made in Bangladesh since 1965.",
 };
 
 export default function FoamFurnitureRoute() {
-  return <FoamCategoryPage categoryKey="furniture" />;
+  return <DivisionPage data={foamFurniture} />;
 }
