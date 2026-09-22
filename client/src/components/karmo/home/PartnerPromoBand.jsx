@@ -18,15 +18,17 @@ import { rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const GAP = "gap-1.5";
 
 const leftPane = {
-  src: "/karmo/images/home-02/divisions/scandinavian-interior.jpg",
+  src: "/karmo/images/home-02/promo-band/promo-living-room-hq.png",
   alt: "A calm Karmo living room with soft seating and natural light",
   href: "/foam",
+  crop: "object-[center_40%]",
 };
 
 const rightPane = {
-  src: "/karmo/images/hero/slide-1-hometex-couple.png",
+  src: "/karmo/images/home-02/promo-band/promo-couple-bedroom-hq.png",
   alt: "A couple reading on the floor beside a Karmo bed dressed in HomeTex bedding",
   href: "/mattress",
+  crop: "object-[center_58%]",
 };
 
 function OfferPanels() {
@@ -67,11 +69,7 @@ function ImagePane({ pane, priority, showOffer }) {
         fill
         priority={priority}
         sizes="(max-width: 1024px) 100vw, 40vw"
-        className={`object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] ${
-          showOffer
-            ? "object-[center_30%] md:object-center"
-            : "object-[center_25%] md:object-center"
-        }`}
+        className={`object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] ${pane.crop || "object-center"}`}
       />
       <div
         aria-hidden
@@ -106,10 +104,7 @@ export default function PartnerPromoBand() {
           <ImagePane pane={rightPane} priority />
         </div>
 
-        {/* EMI bank partners — a single supplied artwork (the "12 months EMI"
-            panel with every partner bank's logo) rather than the text cards it
-            replaced. `object-contain` so no logo is cropped; the panel keeps
-            the same min-height as the two image panes beside it. */}
+        {/* EMI bank partners — original logo artwork, fully visible. */}
         <motion.aside
           variants={fade}
           initial={reduceMotion ? false : "hidden"}
@@ -118,11 +113,11 @@ export default function PartnerPromoBand() {
           className="relative col-span-full min-h-[min(52svh,360px)] border border-ink/8 bg-white md:min-h-[460px] lg:col-span-1 lg:min-h-[460px] xl:min-h-[500px]"
         >
           <Image
-            src="/karmo/images/home-02/emi-banks-panel.png"
+            src="/karmo/images/home-02/promo-band/emi-banks-panel-v3.png"
             alt="Up to 12 months EMI available with BRAC Bank, City Bank, MTB, Prime Bank, UCB, One Bank, Jamuna Bank and other partner banks"
             fill
             sizes="(min-width: 1280px) 264px, (min-width: 1024px) 248px, 100vw"
-            className="object-contain p-3"
+            className="object-contain p-4"
           />
         </motion.aside>
       </div>

@@ -21,8 +21,8 @@ const feature = {
   eyebrow: "Our popular products",
   titleLines: ["Foam seating", "collection"],
   href: "/foam",
-  src: "/karmo/images/home-02/promo-trio/feature-left-lJJ3nW8gv9.png",
-  alt: "Karmo foam seating lifestyle",
+  src: "/karmo/images/home-02/promo-trio/feature-left-v10-hq.png",
+  alt: "Grey armchair with Karmo foam blocks and a red foam chair",
   cta: "Shop the collection",
 };
 
@@ -71,12 +71,14 @@ function SideCard({ item }) {
           ) : null}
         </>
       ) : null}
-      <h3 className="display relative z-10 text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
-        {item.title}
-      </h3>
-      <span className="relative z-10 mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
-        Shop now
-      </span>
+      <div className="relative z-10 -translate-y-3 sm:-translate-y-4 lg:-translate-y-5">
+        <h3 className="display text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
+          {item.title}
+        </h3>
+        <span className="mt-3 block text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
+          Shop now
+        </span>
+      </div>
     </Link>
   );
 }
@@ -99,6 +101,8 @@ export default function PromoTrio() {
         {/* Left — popular products feature */}
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className="relative min-h-[min(48svh,400px)] w-full overflow-hidden bg-[#f3f3f3] lg:min-h-0 lg:h-full"
         >
           <Image
@@ -106,37 +110,37 @@ export default function PromoTrio() {
             alt={feature.alt}
             fill
             sizes="(max-width: 1024px) 100vw, 66vw"
-            className="object-cover object-center"
+            className="object-cover object-[26%_center]"
             priority
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-l from-black/20 via-black/10 to-black/[0.04]"
           />
           <Link
             href={feature.href}
             className="group absolute inset-0 z-20 flex flex-col items-end justify-center py-8 pl-6 pr-10 text-right sm:pl-8 sm:pr-14 lg:pl-10 lg:pr-20 xl:pr-24"
           >
-            <span className="relative z-20 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80">
-              {feature.eyebrow}
-            </span>
-            <h2 className="display relative z-20 mt-3 text-[1.55rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.25rem]">
-              {feature.titleLines.map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </h2>
-            <span className="relative z-20 mt-6 inline-flex h-11 w-fit items-center gap-2 bg-white px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-12 sm:px-7 sm:text-[12px]">
-              {feature.cta}
-              <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
-            </span>
+            <div className="relative z-20 w-[min(22rem,46%)] -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 xl:-translate-y-12">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/55">
+                {feature.eyebrow}
+              </span>
+              <h2 className="display section-heading mt-3 uppercase text-ink">
+                {feature.titleLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </h2>
+              <span className="mt-6 inline-flex h-11 w-fit items-center gap-2 bg-ink px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 group-hover:bg-brand sm:h-12 sm:px-7 sm:text-[12px]">
+                {feature.cta}
+                <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
+              </span>
+            </div>
           </Link>
         </motion.div>
 
         {/* Right — original layout: mattress top, HomeTex bottom */}
         <motion.div
           variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
           className={`grid min-h-0 w-full grid-rows-2 ${GAP}`}
         >
           {side.map((item) => (

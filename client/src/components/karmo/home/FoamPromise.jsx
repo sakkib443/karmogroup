@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { TbDropletOff, TbShieldCheck, TbArrowBigDownLines } from "react-icons/tb";
+import { TbDropletOff, TbShieldCheck, TbArrowBigDownLines, TbAward } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -61,7 +61,7 @@ const DEFAULT_CLAIMS = [
     badge: "bg-[#1C7ED6]",
     title: "Long Lasting",
     body: "Engineered for everyday use without sagging or losing shape. Karmo foam, mattresses and HomeTex are built to hold their support and comfort for years — not just the first few nights.",
-    /* The one solid card. See the note above on why it is the middle one. */
+    /* Alternating pair: 2nd and 4th are solid white. */
     solid: true,
   },
   {
@@ -70,6 +70,14 @@ const DEFAULT_CLAIMS = [
     badge: "bg-[#2F9E44]",
     title: "Certified Comfort",
     body: "Breathable, resilient and quality-checked for a healthier rest. Soft where you need it, supportive where it counts — comfort you can trust across the whole Karmo range.",
+  },
+  {
+    id: "trusted-legacy",
+    icon: TbAward,
+    badge: "bg-[#E67700]",
+    title: "Trusted Legacy",
+    body: "Founded in 1965 as the country’s first polyurethane producer. Super Brand recognition built on six decades of consistency — not campaigns.",
+    solid: true,
   },
 ];
 
@@ -461,8 +469,8 @@ export default function FoamPromise({
         viewport={VIEWPORT}
         className="shell relative z-[2]"
       >
-        <motion.div variants={fade} className="text-center">
-          <h2 className="display text-[1.75rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-white lg:text-[2.3rem]">
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="text-center">
+          <h2 className="display section-heading uppercase text-white">
             {heading}
           </h2>
           <p className="body-copy mt-3 text-[15px] text-white/90">
@@ -471,24 +479,21 @@ export default function FoamPromise({
           <LeafRule />
         </motion.div>
 
-        {/* Three across from lg, two from sm, one below. `items-stretch` is the
-            whole reason the odd card out works: the middle one is solid white
-            and the other two are transparent, so any height difference between
-            them would read as the white card being misaligned rather than as
-            three cards of unequal copy. */}
-        <div className="mx-auto mt-12 grid max-w-5xl grid-cols-1 items-stretch gap-6 lg:mt-14 lg:grid-cols-3 lg:gap-7">
+        {/* Equal-width columns; `items-stretch` keeps every card the same
+            height however long the copy runs. Four homepage claims sit a
+            little wider than the old three-up row. */}
+        <div
+          className={`mx-auto mt-12 grid w-full grid-cols-1 items-stretch gap-5 sm:grid-cols-2 sm:gap-6 lg:mt-14 lg:gap-6 ${
+            claims.length >= 4
+              ? "max-w-7xl lg:grid-cols-4"
+              : "max-w-5xl lg:grid-cols-3"
+          }`}
+        >
           {claims.map((claim) => (
             <motion.div
               key={claim.id}
               variants={fade}
-              /* All three carry a border, including the solid one — its own is
-                 white, so it is invisible against its background and exists
-                 only to make the box geometry identical. Without it the solid
-                 card's content box was 2px taller than its bordered
-                 neighbours', which put its icon, title and rule a pixel out of
-                 line across the row. Measured: rule tops at 966.45 / 967.45 /
-                 966.45 before this. */
-              className={`flex flex-col items-center border px-7 py-10 text-center lg:px-8 ${
+              className={`flex h-full min-h-0 flex-col items-center border px-6 py-9 text-center lg:px-7 ${
                 claim.solid ? "bg-white" : "bg-shade-deep/25"
               }`}
               style={{ borderColor: claim.solid ? "#ffffff" : ORANGE }}

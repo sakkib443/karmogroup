@@ -28,6 +28,7 @@ import {
 } from "next/font/google";
 
 import Footer from "@/components/karmo/Footer";
+import CertifiedBy from "@/components/karmo/home/CertifiedBy";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 import Header from "@/components/karmo/header/Header";
 import ThemeControl from "@/components/karmo/chrome/ThemeControl";
@@ -241,9 +242,11 @@ export default function KarmoTwoLayout({
       <HomeTwoSectionSnap />
       <Header />
       {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
-      <main className="min-h-screen overflow-x-hidden bg-white pt-[112px]">
+      <main className="min-h-screen overflow-x-clip bg-white pt-[112px]">
         {children}
       </main>
+      {/* Always glued above the footer on every karmo-2 page */}
+      <CertifiedBy />
       <Footer />
     </ThemeControl>
   );

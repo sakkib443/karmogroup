@@ -1,18 +1,12 @@
 /**
  * One motion system for the homepage.
  *
- * Every section grew its own reveal as it was built, and they drifted: five
- * different trigger points (0.12 through 0.5), seven travel distances (14px to
- * 60px), eight durations. No single one of those looks wrong on its own, but
- * scrolling the page end to end, each section arrives with a slightly different
- * weight and timing — which is what reads as unfinished.
- *
- * These are the shared values. Sections import them rather than declaring their
- * own, so the whole page moves on one rhythm and a change here is a change
- * everywhere. The hero is deliberately excluded: it is a stage-setting
- * animation on load, not a scroll reveal, and it keeps its own slower timing.
+ * IKEA-style scroll reveal: content starts clearly below its resting place,
+ * then eases up with a long soft settle so the lift is obvious to the eye —
+ * not a micro-fade. Hero stays excluded (load theatre, not scroll reveal).
  */
 
+<<<<<<< HEAD
 // Arrive and stop. Fast out of the gate, long settle, no bounce.
 /** @type {const} */
 export const SETTLE = [0.22, 1, 0.36, 1];
@@ -20,26 +14,66 @@ export const SETTLE = [0.22, 1, 0.36, 1];
 // Curtains, wipes and pans — eases at both ends, for things that travel a
 // long way across the frame.
 /** @type {const} */
+=======
+// Soft ease-out with a long settle (IKEA-like, no bounce).
+export const SETTLE = [0.05, 0.7, 0.1, 1];
+
+// Curtains, wipes and pans — eases at both ends.
+>>>>>>> accb941d2ba61dc3180973abdbbd8f465755095b
 export const SWEEP = [0.76, 0, 0.24, 1];
 
-// Durations, in seconds.
-export const RISE_S = 0.72; // fade-and-lift
-export const LINE_S = 0.82; // a line uncovering itself
-export const SLOW_S = 1.3; // curtains and photograph scale
+// Longer so the travel reads clearly while scrolling.
+export const RISE_S = 1.15;
+export const LINE_S = 1.05;
+export const SLOW_S = 1.4;
 
-// How a group hands off to its children.
-export const STAGGER = 0.07;
-export const LEAD = 0.05;
+// Clear hand-off between siblings.
+export const STAGGER = 0.12;
+export const LEAD = 0.1;
 
 /**
- * The single trigger point.
+ * Trigger when the block's own top edge crosses ~86% of the viewport — the
+ * point where it is just appearing from below, so the lift is still running
+ * while you read it.
  *
- * A fifth of the element has to be showing. That is early enough that a block
- * is already moving as it rises into the frame — with the eased scrolling it
- * settles about when the eye reaches it — and late enough that something barely
- * peeking over the fold does not fire and finish unseen.
+ * This used to be `amount: 0.12` with a -12% bottom margin, which asked for
+ * 12% of the *element* to be visible. On a section a full viewport tall that
+ * is 12vh, so a screen-height band fired the moment it peeked over the fold —
+ * and the 1.15s rise had finished long before the section was actually in
+ * front of the reader. The animation was running correctly and nobody could
+ * ever see it, which is exactly the "it isn't happening" this fixes.
+ *
+ * `amount: 0` removes the element-size dependency: tall bands and short cards
+ * now trigger at the same place on screen, which is what makes the cascade
+ * read as one system rather than per-section guesswork.
  */
-export const VIEWPORT = { once: true, amount: 0.2 };
+export const VIEWPORT = {
+  once: true,
+  amount: 0,
+  margin: "0px 0px -14% 0px",
+};
+
+/**
+ * Spread onto a child that should reveal on its own arrival rather than with
+ * its parent's stagger.
+ *
+ * Sections used to animate as one slab: the parent held `group`, every block
+ * inside carried `rise`, and all of them fired together on the parent's
+ * trigger. Scrolling into a section therefore showed nothing moving, because
+ * the whole thing had already resolved on the way in. Blocks that carry this
+ * are independent — each lifts as it reaches the trigger line, so content
+ * keeps arriving the whole way down the section.
+ *
+ * Grid items (anything rendered from a `map` with a `key`) deliberately do NOT
+ * take this: they sit side by side at the same height, so an independent
+ * trigger would fire them all at once and lose the stagger that reads as a
+ * hand-off along the row.
+ */
+export const SELF = {
+  initial: "hidden",
+  whileInView: "show",
+  viewport: VIEWPORT,
+};
 
 /** Parent of a staggered set. Carries no visual state of its own. */
 export const group = {
@@ -48,22 +82,24 @@ export const group = {
 };
 
 /**
- * A line of type pushed up from behind its own edge. The parent has to clip
- * (`overflow-hidden`) or the text simply starts low and slides up in the open.
+ * A line of type pushed up from behind its own edge. Parent must clip
+ * (`overflow-hidden`) or the text slides in the open.
  */
 export const line = {
-  hidden: { y: "110%" },
+  hidden: { y: "115%" },
   show: { y: "0%", transition: { duration: LINE_S, ease: SETTLE } },
 };
 
 /**
- * The workhorse: fade and lift. 22px, because a long throw reads as the block
- * being dragged into place rather than settling into it — the old 60px version
- * on the divisions deck was the clearest example.
+ * Noticeable lift from below — ~72px so the rise is visible, not a blink.
  */
 export const rise = {
-  hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: RISE_S, ease: SETTLE } },
+  hidden: { opacity: 0, y: 72 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: RISE_S, ease: SETTLE },
+  },
 };
 
 /** A photograph easing out of an over-scale as its curtain clears. */

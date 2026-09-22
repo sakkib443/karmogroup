@@ -220,7 +220,7 @@ export default function ShopByFilters() {
         viewport={VIEWPORT}
         className="shell-home-two"
       >
-        <motion.div variants={fade}>
+        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <SectionLabel eyebrow="Find yours">
             Shop by <span className="font-bold text-brand">what matters</span>
           </SectionLabel>

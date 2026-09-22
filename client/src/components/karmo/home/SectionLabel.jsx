@@ -14,7 +14,7 @@ export default function SectionLabel({ eyebrow, children, className = "" }) {
       <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
         {eyebrow}
       </span>
-      <h2 className="display mt-1 text-[1.25rem] font-light uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.4rem] lg:text-[1.55rem]">
+      <h2 className="display section-heading mt-1 uppercase text-ink">
         {children}
       </h2>
     </div>

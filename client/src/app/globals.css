@@ -40,6 +40,48 @@ h1, h2, h3, h1 *, h2 *, h3 *,
   zoom: var(--type-zoom-heading, 1);
 }
 
+/* ── Hero heading vs section heading ───────────────────────────────────────
+ *
+ * The hero line and the section titles are two different jobs: one sits over a
+ * photograph at the top of the page and is read at a glance, the others label
+ * the bands below it and are read in sequence. The Theme Control panel now
+ * treats them as separate roles, so each gets its own face, scale and weight.
+ *
+ * `.hero-heading` is the opt-in marker (set on the slider's heading element);
+ * everything else keeps the plain `--font-heading` / `--type-zoom-heading`
+ * pair. Two class levels of specificity beats the single-class rules above,
+ * and both are unlayered `!important`, so this lands over the Tailwind
+ * utilities in `@layer utilities`. */
+.home-two-type .hero-heading,
+.home-two-type .hero-heading * {
+  font-family: var(--font-hero, var(--font-heading)) !important;
+}
+
+.home-two-type .hero-heading {
+  zoom: var(--type-zoom-hero, 1);
+  max-width: var(--hero-heading-max, none);
+}
+
+/* ── One shape for every section heading ───────────────────────────────────
+ *
+ * Each band had grown its own size, weight and tracking — 1.25rem light next
+ * to 1.75rem extrabold — so the page read as a stack of unrelated sections.
+ * This is the single definition they all now share; the per-section utilities
+ * that used to set size/weight/leading/tracking have been removed from the
+ * components, and only colour and margin stay local (those legitimately
+ * differ: white on the dark bands, ink on the light ones).
+ *
+ * Sized with `clamp()` rather than three breakpoint utilities so it scales
+ * continuously instead of stepping. */
+.home-two-type .section-heading {
+  font-size: clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem) !important;
+  font-weight: 800 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: uppercase;
+  max-width: var(--section-heading-max, none);
+}
+
 /* Heading weight is NOT set here. It is written as an inline style by
  * `ThemeControl`, because a rule in this file cannot win.
  *
@@ -1056,6 +1098,11 @@ svg.app-icon[fill="none"] {
     height: var(--reels-h, calc(100svh - 32px)) !important;
     min-height: var(--reels-h, calc(100svh - 32px)) !important;
   }
+
+  .chemicals-band {
+    height: var(--chemicals-h, calc(100svh - 112px)) !important;
+    min-height: var(--chemicals-h, calc(100svh - 112px)) !important;
+  }
 }
 
 /* Home Two — explore split bands match editorials on desktop only.
@@ -1083,6 +1130,27 @@ svg.app-icon[fill="none"] {
 @keyframes marquee-right {
   from { transform: translateX(-50%); }
   to { transform: translateX(0); }
+}
+
+/* Reels band — continuous horizontal film strip (3 tiles visible). */
+@keyframes reels-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.reels-marquee-track {
+  animation: reels-marquee 95s linear infinite;
+  will-change: transform;
+}
+
+.reels-marquee-track.is-paused {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reels-marquee-track {
+    animation: none;
+  }
 }
 
 /* The film band's circular label. Declared here rather than reached for as
@@ -1129,6 +1197,65 @@ svg.app-icon[fill="none"] {
 
 .foam-drift {
   animation: foam-drift 30s ease-in-out infinite alternate;
+}
+
+/* Site navbar: quilted mattress texture + welt piping.
+   Fit-to-height + repeat-x — NEVER cover-scale (that zooms squares huge).
+   Previous damask kept as mattress-side-texture-HIDDEN.jpg / -KEEP.jpg. */
+.header-mattress-band {
+  position: relative;
+  isolation: isolate;
+  background-color: #fff;
+  box-shadow:
+    0 1px 0 rgba(34, 34, 34, 0.08),
+    0 12px 28px -20px rgba(70, 50, 30, 0.28);
+}
+
+.header-mattress-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("/karmo/images/header/mattress-quilt-damask-blend-hq.jpg");
+  /* Match bar height; tile sideways so pattern stays fine, not zoomed. */
+  background-size: auto 100%;
+  background-position: center top;
+  background-repeat: repeat-x;
+  opacity: 0.32;
+  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.header-mattress-band.is-scrolled::before {
+  opacity: 0.18;
+}
+
+/* Division mega menus (Mattress, Foam) — soft textured panel.
+   Must stay `absolute` (not relative): this class sits on the dropdown, and
+   relative would drop it into the nav flex and shove the rest of the links.
+   Texture is an <img> in Navbar.jsx so it cannot vanish behind a cached
+   stylesheet. Do not force `> * { position: relative }` — that unsticks the film. */
+.header-mega-textured,
+.header-mega-mattress {
+  position: absolute;
+  isolation: isolate;
+  overflow: hidden;
+  /* Cream panel — also set as Tailwind `bg-[#fffefb]` on the node so a
+     missed stylesheet never leaves the mega menu see-through over the hero. */
+  background-color: #fffefb !important;
+}
+
+.header-mattress-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 3px 0 0 rgba(212, 196, 168, 0.45),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.9),
+    inset 0 -3px 0 0 rgba(196, 165, 116, 0.4);
 }
 
 /* Held still, not stripped: the band keeps its film and its still, it simply

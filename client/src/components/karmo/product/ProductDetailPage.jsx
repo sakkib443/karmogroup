@@ -3,15 +3,15 @@
 import Link from "next/link";
 import ProductHero from "@/components/karmo/product/ProductHero";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
+import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlides";
 import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
-import ProductLayers from "@/components/karmo/product/ProductLayers";
-import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import CertifiedBy from "@/components/karmo/home2/CertifiedBy";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
+import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 /**
- * Karmo product detail — buy box, then organised story sections
- * (no third-party demo image strips).
+ * Matrexx mattress product detail — buy box through build band, then the same
+ * order/contact strip as home and /mattress (above Built on trust / CertifiedBy).
  */
 export default function ProductDetailPage({ product }) {
   if (!product) {
@@ -19,10 +19,10 @@ export default function ProductDetailPage({ product }) {
       <div className="shell py-24 text-center">
         <p className="text-sm text-ink/50">Product not found.</p>
         <Link
-          href="/foam"
+          href="/mattress"
           className="mt-4 inline-block text-[12px] font-bold uppercase tracking-[0.14em] text-brand"
         >
-          Back to foam
+          Back to mattress
         </Link>
       </div>
     );
@@ -32,10 +32,10 @@ export default function ProductDetailPage({ product }) {
     <>
       <ProductHero product={product} />
       <ProductPromiseStrip />
+      <ProductFeatureSlides />
       <ProductMattressBanner />
-      <ProductLayers />
-      <ProductVideoFeatures features={product.features} />
-      <CertifiedBy />
+      <ProductFirmnessScale highlight={product.firmness || "Medium Firm"} />
+      <ProductBuildAside />
       <OrderAndContact />
     </>
   );

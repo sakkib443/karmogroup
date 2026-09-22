@@ -6,140 +6,125 @@ import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * "Certified By" — same three accreditations as the client's site, tightened
- * to sit with the rest of Home 02: centred heading rhythm, even soft wash,
- * quieter frames, light hover, short labels under each certificate.
+ * Awards & trust — above the footer on every karmo-2 page.
+ * Three-column proof band; section tone bleeds into the footer.
  */
 
-const ORANGE = "#FF9A1F";
+const BADGE = {
+  src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.webp",
+  width: 512,
+  height: 512,
+};
 
-const certificates = [
+const pillars = [
   {
-    src: "/karmo/images/home-02/certified/01-iso-9001.jpg",
-    alt: "ISO 9001 — International Organization for Standardization",
-    name: "ISO 9001",
-    detail: "Quality management",
+    id: "recommended",
+    src: BADGE.src,
+    width: BADGE.width,
+    height: BADGE.height,
+    alt: "Bangladesh’s number one comfort brand badge",
+    title: "Most highly recommended",
+    body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
   },
   {
-    src: "/karmo/images/home-02/certified/02-ukas.jpg",
-    alt: "UKAS Quality Management — Karmo Foam & Adhesive Industries Ltd.",
-    name: "UKAS",
-    detail: "Accredited body",
+    id: "awards",
+    src: "/karmo/images/home-02/trust/awards-trophies-v2.webp",
+    width: 512,
+    height: 512,
+    alt: "Recognition and awards for Karmo Group",
+    title: "Recognised for six decades",
+    body: "Founded in 1965 as the country’s first polyurethane producer. Super Brand recognition built on consistency, not campaigns.",
   },
   {
-    src: "/karmo/images/home-02/certified/03-moody.jpg",
-    alt: "Moody International Certification — ISO 9001 Approved",
-    name: "Moody International",
-    detail: "ISO 9001 approved",
+    id: "certified",
+    src: "/karmo/images/home-02/trust/certified-seal-gold-v2.webp",
+    width: 512,
+    height: 512,
+    alt: "Certified quality seal — ISO accredited standards",
+    title: "Internationally certified quality",
+    body: "ISO 9001 quality management with UKAS and Moody International approval — every batch held to certified standards.",
   },
 ];
-
-function LeafRule() {
-  return (
-    <span aria-hidden className="mt-6 flex items-center justify-center gap-3">
-      <span className="h-px w-16 sm:w-20" style={{ backgroundColor: ORANGE }} />
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0">
-        <path
-          d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
-          fill={ORANGE}
-        />
-        <path
-          d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
-          stroke="#B4651A"
-          strokeWidth="1.3"
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="h-px w-16 sm:w-20" style={{ backgroundColor: ORANGE }} />
-    </span>
-  );
-}
 
 export default function CertifiedBy() {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="relative overflow-hidden py-20 lg:py-28">
-      <Image
-        src="/karmo/images/home-02/certified/bg-living-room.jpg"
-        alt=""
-        fill
-        sizes="100vw"
-        className="scale-[1.02] object-cover"
-        aria-hidden
-      />
-      {/* One even wash — same depth edge to edge, slightly deeper than the
-          reference so the white frames and type sit cleaner. */}
-      <span aria-hidden className="absolute inset-0 bg-[rgba(10,14,20,0.62)]" />
-      {/* Soft top/bottom fade so the section meets the page without a hard cut. */}
+    <section
+      className="relative overflow-hidden bg-[#0a0a0a] pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24"
+      aria-label="Awards and trust"
+    >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/25 to-transparent"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_18%_0%,rgba(212,67,72,0.12),transparent_48%)]"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/25 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent to-black/70"
       />
 
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell relative z-[1] text-center"
+        className="shell relative z-[1]"
       >
-        <motion.div variants={fade}>
-          <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-white/70">
-            Certified By
-          </span>
-          <h2 className="display mt-4 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-white lg:text-[2.4rem]">
-            International{" "}
-            <span className="font-bold" style={{ color: ORANGE }}>
-              Accreditations
-            </span>
+        <motion.header
+          variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <h2 className="display section-heading uppercase text-white">
+            Built on trust since 1965
           </h2>
-          <LeafRule />
-        </motion.div>
+          <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]">
+            Recommendation, recognition and certified quality — proof that lasts.
+          </p>
+        </motion.header>
 
         <motion.ul
           variants={group}
-          className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 lg:mt-16 lg:gap-8"
+          className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 md:mt-16 md:grid-cols-3 md:gap-0"
         >
-          {certificates.map((cert) => (
+          {pillars.map(({ id, src, width, height, alt, title, body }, i) => (
             <motion.li
-              key={cert.src}
+              key={id}
               variants={fade}
-              className="group flex flex-col items-center"
+              className={`flex flex-col items-center px-4 text-center md:px-8 lg:px-10 ${
+                i > 0 ? "md:border-l md:border-white/12" : ""
+              }`}
             >
-              {/* Quiet frame: thin white mat + light lift on hover — not a
-                  thick poster border. The cert artwork already carries its own
-                  wood frame, so we only need a clean edge against the room. */}
-              <div className="relative w-full max-w-[17.5rem] overflow-hidden bg-white p-2 shadow-[0_18px_48px_rgba(0,0,0,0.32)] transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1.5 group-hover:shadow-[0_26px_56px_rgba(0,0,0,0.4)] sm:max-w-none">
-                <div className="relative aspect-[371/464] w-full overflow-hidden bg-[#f4f1ea]">
-                  <Image
-                    src={cert.src}
-                    alt={cert.alt}
-                    fill
-                    sizes="(max-width: 640px) 70vw, 22vw"
-                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-                  />
-                </div>
-                {/* Brand hairline under the frame — ties the three as a set. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-x-2 bottom-2 h-[2px] origin-center scale-x-0 bg-brand transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
+              <div className="relative flex h-[11rem] w-[11rem] items-center justify-center sm:h-[13rem] sm:w-[13rem] lg:h-[14.5rem] lg:w-[14.5rem]">
+                <Image
+                  src={src}
+                  alt={alt}
+                  width={width}
+                  height={height}
+                  sizes="(min-width: 1024px) 232px, (min-width: 640px) 208px, 176px"
+                  quality={70}
+                  className="h-full w-full object-contain"
                 />
               </div>
-
-              <p className="display mt-5 text-[13px] font-bold uppercase tracking-[0.16em] text-white">
-                {cert.name}
-              </p>
-              <p className="mt-1.5 text-[12px] uppercase tracking-[0.14em] text-white/55">
-                {cert.detail}
+              <p className="body-copy mt-6 max-w-[20rem] text-[13px] leading-[1.65] text-white/70 sm:mt-7 sm:text-[14px]">
+                <span className="sr-only">{title}. </span>
+                {body}
               </p>
             </motion.li>
           ))}
         </motion.ul>
+
+        <motion.p
+          variants={fade}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="mx-auto mt-12 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-14 sm:text-[11px]"
+        >
+          Reflects Karmo Group’s position since 1965, Super Brand recognition,
+          and ISO 9001 / UKAS / Moody International accreditation held by Karmo
+          Foam &amp; Adhesive Industries Ltd.
+        </motion.p>
       </motion.div>
     </section>
   );

@@ -10,14 +10,23 @@ import { useEffect, useRef, useState } from "react";
  * the three roles, nudge the scale, look at the real page. It replaces the
  * two-option switcher that was here.
  *
- * ── The three roles ────────────────────────────────────────────────────────
- *   Heading      h1, h2, h3        the big display lines
- *   Sub-heading  h4, h5, h6        section labels and card titles
- *   Description  everything else   body copy, buttons, captions
+ * ── The four roles ─────────────────────────────────────────────────────────
+ *   Hero Section Heading   `.hero-heading`   the hero slide line
+ *   Section Heading        `.section-heading` + h1/h2/h3 elsewhere
+ *   Sub-heading            h4, h5, h6        card titles and small labels
+ *   Description            everything else   body copy, buttons, captions
  *
  * They are separate variables rather than one, because the pairing is the
  * decision — a display face that works over a photograph is usually the wrong
  * thing to read a paragraph in.
+ *
+ * Hero and Section split out of a single "Heading" role at the client's ask.
+ * The hero line sits over a photograph and is read at a glance; the section
+ * titles label the bands below it and are read in sequence, so a scale that
+ * suits one overshoots the other. Each now carries its own face, scale, weight
+ * and width. The section titles themselves were levelled at the same time —
+ * every band's `h2` shares one `.section-heading` rule in `globals.css`
+ * instead of the eleven different sizes and weights they had grown.
  *
  * ── Why the scale moves the root font size ─────────────────────────────────
  * Not a `zoom` on the wrapper: that would scale the photographs and the layout
@@ -147,24 +156,56 @@ const WEIGHTS = [
 
 const SCALES = [0.8, 0.85, 0.9, 0.95, 1, 1.05, 1.1, 1.2, 1.3, 1.4];
 
-/** The three roles, in the order they read down the panel. */
+/** Max-width for a heading block — caps the measure so a long line wraps
+ *  where the client wants it, rather than running the width of the column.
+ *  "Full" removes the cap, which is how every heading was drawn. */
+const WIDTHS = [
+  { value: "none", label: "Full width" },
+  { value: "38rem", label: "Wide · 38rem" },
+  { value: "30rem", label: "Medium · 30rem" },
+  { value: "24rem", label: "Narrow · 24rem" },
+  { value: "18rem", label: "Tight · 18rem" },
+];
+
+/**
+ * The four roles, in the order they read down the panel.
+ *
+ * Hero and Section were one "Heading" role until the client asked to size them
+ * apart: the hero line sits over a photograph and is read at a glance, the
+ * section titles label the bands below and are read in sequence, so a scale
+ * that suits one usually overshoots the other. They are now separate faces,
+ * separate scales, separate weights and separate widths.
+ */
 const ROLES = [
-  { key: "heading", label: "Heading", hint: "h1 · h2 · h3" },
+  { key: "hero", label: "Hero Section Heading", hint: "the hero slide line" },
+  { key: "heading", label: "Section Heading", hint: "every section title" },
   { key: "sub", label: "Sub-heading", hint: "h4 · h5 · h6" },
   { key: "body", label: "Description", hint: "body, buttons, captions" },
 ];
 
 const DEFAULTS = {
+  hero: "josefin",
   heading: "josefin",
   sub: "josefin",
   body: "manrope",
+  sizeHero: 1,
   sizeHeading: 1,
   sizeSub: 1,
   sizeBody: 1,
+  weightHero: "auto",
   weightHeading: "auto",
+  widthHero: "none",
+  widthHeading: "none",
 };
 
-const SIZE_KEY = { heading: "sizeHeading", sub: "sizeSub", body: "sizeBody" };
+const SIZE_KEY = {
+  hero: "sizeHero",
+  heading: "sizeHeading",
+  sub: "sizeSub",
+  body: "sizeBody",
+};
+const WEIGHT_KEY = { hero: "weightHero", heading: "weightHeading" };
+const WIDTH_KEY = { hero: "widthHero", heading: "widthHeading" };
 
 export default function ThemeControl({ children, families, classNames }) {
   const [open, setOpen] = useState(false);
@@ -177,16 +218,22 @@ export default function ThemeControl({ children, families, classNames }) {
       if (saved && typeof saved === "object") {
         const face = (v, d) => (FONT_IDS.includes(v) ? v : d);
         const size = (v, d) => (SCALES.includes(v) ? v : d);
+        const weight = (v, d) =>
+          WEIGHTS.some((w) => w.value === v) ? v : d;
+        const width = (v, d) => (WIDTHS.some((w) => w.value === v) ? v : d);
         setCfg({
+          hero: face(saved.hero, DEFAULTS.hero),
           heading: face(saved.heading, DEFAULTS.heading),
           sub: face(saved.sub, DEFAULTS.sub),
           body: face(saved.body, DEFAULTS.body),
+          sizeHero: size(saved.sizeHero, DEFAULTS.sizeHero),
           sizeHeading: size(saved.sizeHeading, DEFAULTS.sizeHeading),
           sizeSub: size(saved.sizeSub, DEFAULTS.sizeSub),
           sizeBody: size(saved.sizeBody, DEFAULTS.sizeBody),
-          weightHeading: WEIGHTS.some((w) => w.value === saved.weightHeading)
-            ? saved.weightHeading
-            : DEFAULTS.weightHeading,
+          weightHero: weight(saved.weightHero, DEFAULTS.weightHero),
+          weightHeading: weight(saved.weightHeading, DEFAULTS.weightHeading),
+          widthHero: width(saved.widthHero, DEFAULTS.widthHero),
+          widthHeading: width(saved.widthHeading, DEFAULTS.widthHeading),
         });
       }
     } catch {
@@ -210,16 +257,33 @@ export default function ThemeControl({ children, families, classNames }) {
     const root = rootRef.current;
     if (!root) return undefined;
 
-    const nodes = root.querySelectorAll("h1, h2, h3, h1 *, h2 *, h3 *");
-    for (const node of nodes) {
-      if (cfg.weightHeading === "auto") node.style.removeProperty("font-weight");
-      else node.style.setProperty("font-weight", cfg.weightHeading, "important");
+    // The hero line carries `.hero-heading`; everything else is a section
+    // title. Split so the two weights can differ.
+    const all = [...root.querySelectorAll("h1, h2, h3, h1 *, h2 *, h3 *")];
+    const isHero = (n) => n.closest(".hero-heading");
+    const groups = [
+      [all.filter(isHero), cfg.weightHero],
+      [all.filter((n) => !isHero(n)), cfg.weightHeading],
+    ];
+
+    for (const [nodes, weight] of groups) {
+      for (const node of nodes) {
+        if (weight === "auto") node.style.removeProperty("font-weight");
+        else node.style.setProperty("font-weight", weight, "important");
+      }
     }
 
     return () => {
-      for (const node of nodes) node.style.removeProperty("font-weight");
+      for (const node of all) node.style.removeProperty("font-weight");
     };
-  }, [cfg.weightHeading, cfg.heading, cfg.sizeHeading]);
+  }, [
+    cfg.weightHero,
+    cfg.weightHeading,
+    cfg.hero,
+    cfg.heading,
+    cfg.sizeHero,
+    cfg.sizeHeading,
+  ]);
 
   const set = (patch) => {
     const next = { ...cfg, ...patch };
@@ -235,11 +299,15 @@ export default function ThemeControl({ children, families, classNames }) {
 
   const style = {
     "--font-family": stack(cfg.body),
+    "--font-hero": stack(cfg.hero),
     "--font-heading": stack(cfg.heading),
     "--font-subheading": stack(cfg.sub),
+    "--type-zoom-hero": cfg.sizeHero,
     "--type-zoom-heading": cfg.sizeHeading,
     "--type-zoom-sub": cfg.sizeSub,
     "--type-zoom-body": cfg.sizeBody,
+    "--hero-heading-max": cfg.widthHero,
+    "--section-heading-max": cfg.widthHeading,
   };
 
   const step = (role, dir) => {
@@ -322,20 +390,40 @@ export default function ThemeControl({ children, families, classNames }) {
                     </Step>
                   </div>
 
-                  {/* Weight, headings only — see the note by WEIGHTS. */}
-                  {key === "heading" ? (
-                    <select
-                      value={cfg.weightHeading}
-                      onChange={(e) => set({ weightHeading: e.target.value })}
-                      aria-label="Heading weight"
-                      className="mt-1.5 w-full cursor-pointer rounded border border-ink/15 bg-white px-2 py-1.5 text-[11px] text-ink outline-none focus:border-brand"
-                    >
-                      {WEIGHTS.map((w) => (
-                        <option key={w.value} value={w.value}>
-                          {w.label}
-                        </option>
-                      ))}
-                    </select>
+                  {/* Weight and width, headings only — see the note by
+                      WEIGHTS. Hero and Section each carry their own pair. */}
+                  {WEIGHT_KEY[key] ? (
+                    <>
+                      <select
+                        value={cfg[WEIGHT_KEY[key]]}
+                        onChange={(e) =>
+                          set({ [WEIGHT_KEY[key]]: e.target.value })
+                        }
+                        aria-label={`${label} weight`}
+                        className="mt-1.5 w-full cursor-pointer rounded border border-ink/15 bg-white px-2 py-1.5 text-[11px] text-ink outline-none focus:border-brand"
+                      >
+                        {WEIGHTS.map((w) => (
+                          <option key={w.value} value={w.value}>
+                            {w.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      <select
+                        value={cfg[WIDTH_KEY[key]]}
+                        onChange={(e) =>
+                          set({ [WIDTH_KEY[key]]: e.target.value })
+                        }
+                        aria-label={`${label} width`}
+                        className="mt-1.5 w-full cursor-pointer rounded border border-ink/15 bg-white px-2 py-1.5 text-[11px] text-ink outline-none focus:border-brand"
+                      >
+                        {WIDTHS.map((w) => (
+                          <option key={w.value} value={w.value}>
+                            {w.label}
+                          </option>
+                        ))}
+                      </select>
+                    </>
                   ) : null}
                 </div>
               );

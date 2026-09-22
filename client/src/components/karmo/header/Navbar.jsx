@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
 import {
@@ -17,197 +18,286 @@ import {
   FiMenu,
   FiX,
 } from "react-icons/fi";
-import {
-  TbArmchair,
-  TbBed,
-  TbFeather,
-  TbFlask,
-  TbBox,
-  TbRecycle,
-  TbShape,
-  TbWaveSine,
-  TbStack,
-  TbShoe,
-  TbCar,
-  TbCloud,
-  TbSquareRounded,
-  TbDiamond,
-  TbBedFlat,
-  TbLayoutGrid,
-  TbDroplet,
-  TbTestPipe,
-  TbAtom,
-  TbBone,
-  TbShield,
-  TbAward,
-  TbCircles,
-  TbCircleDot,
-  TbLeaf,
-  TbCrown,
-  TbFold,
-  TbLayersSubtract,
-  TbBoxAlignBottom,
-} from "react-icons/tb";
-import {
-  MattressFirmIcon,
-  MattressMediumIcon,
-  MattressSoftIcon,
-  BedSingleIcon,
-  BedDoubleIcon,
-  BedTripleIcon,
-} from "@/components/karmo/icons/MattressMenuIcons";
+
+const LOGO_EASE = "duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 /**
  * Main navbar — logo, divisions, tools, search sheet, mobile drawer.
- * Fixed 80px row. Mega menus and drawer live here.
+ * Resting row is taller so the factory mark reads; compact 80px on scroll.
+ * Mega menus and drawer live here.
  */
 
+/* Cartoon menu icons — same language as trust / order strips. */
+const MENU = "/karmo/images/header/menu-cartoon";
+
+/*
+ * Header menu — client sheet (Sep 2026), organised for how the pages work:
+ *
+ *   · Mattress → one division page (`/mattress`). Sub-rows go to product PDPs.
+ *   · Foam → three main categories = three pages (`/foam/furniture`,
+ *     `/foam/bed-automotive`, `/foam/footwear`). Column headers open those
+ *     pages; sub-rows go to a product when one exists, otherwise the category.
+ *   · HomeTex / Chemicals → division page for now; sub-rows stay on-division
+ *     until product PDPs exist.
+ *   · Company → About / Media / Contact / Dealership block.
+ *
+ * Cartoon icons live in `menu-cartoon/`. Every row that can carry one does.
+ */
 const nav = [
   {
     name: "Foam",
-    line: "Furniture, footwear, automotive",
+    line: "Furniture, bed, automotive, footwear",
     href: "/foam",
-    icon: TbArmchair,
-    /* Eight categories from the client's Foam Catalogue (pages 5–23). */
+    icon: `${MENU}/nav-foam.png?v=2`,
+    texture: "foam",
+    textureSrc: "/karmo/images/header/foam-side-texture.jpg",
+    panelAlign: "left",
     columns: [
       {
-        label: "Form",
+        label: "Furniture & Upholstery",
+        href: "/foam/furniture",
+        icon: `${MENU}/set-block.png`,
         items: [
-          { name: "Set / Block Foam", href: "/foam/set-foam", icon: TbBox },
-          { name: "Peeling Roll Foam", href: "/foam/peeling-roll", icon: TbStack },
-          { name: "Contour Design Foam", href: "/foam/contour-design", icon: TbShape },
+          { name: "Karmo Poly", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-poly.png` },
+          { name: "Karmo 280", href: "/foam/combo-280", icon: `${MENU}/grade-280.png` },
+          { name: "Karmo 480", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-480.png` },
+          { name: "Karmo 2001", href: "/foam/combo-2001", icon: `${MENU}/grade-2001.png` },
+          { name: "Karmo HD", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-hd.png` },
+          { name: "Karmo 4G", href: "/foam/combo-4g", icon: `${MENU}/grade-4g.png` },
+          { name: "Karmo 1965", href: "/foam/combo-1965", icon: `${MENU}/grade-1965.png` },
+          { name: "Karmo Signature", href: "/foam/combo-signature", icon: `${MENU}/grade-signature.png` },
         ],
       },
       {
-        label: "Use",
+        label: "Bed & Automotive",
+        href: "/foam/bed-automotive",
+        icon: `${MENU}/bed-auto.png`,
         items: [
-          { name: "Footwear / Load Bearing", href: "/foam/footwear", icon: TbShoe },
-          { name: "Bed & Automotive", href: "/foam/bed-automotive", icon: TbCar },
-          { name: "Acoustic Foam", href: "/foam/acoustic", icon: TbWaveSine },
+          { name: "Contour Design Foam Chattogram", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
+          { name: "Contour Design Foam Sylhet", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
+          { name: "Contour Design Foam Dhaka", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
+          { name: "Contour Design Foam Karmo", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
+          { name: "Contour Design Foam Catalog", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/set-block.png` },
+          { name: "Acoustic Foam", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/acoustic.png` },
+          { name: "Bed Foam", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/bed-auto.png` },
         ],
       },
       {
-        label: "Grade",
+        label: "Footwear",
+        href: "/foam/footwear",
+        icon: `${MENU}/footwear.png`,
         items: [
-          { name: "Rebonded Foam", href: "/foam/rebonded", icon: TbRecycle },
-          { name: "Memory Foam", href: "/foam/memory-foam", icon: TbCloud },
+          { name: "Peeling Roll Foam", href: "/foam/footwear#foam-offers", icon: `${MENU}/peeling-roll.png` },
+          { name: "Load Bearing High Density Foam", href: "/foam/footwear#foam-offers", icon: `${MENU}/footwear.png` },
+          { name: "Visco Elastic Foam", href: "/foam/footwear#foam-offers", icon: `${MENU}/memory.png` },
+          { name: "Lamination Foam", href: "/foam/footwear#foam-offers", icon: `${MENU}/lamination.png` },
         ],
       },
     ],
   },
   {
     name: "Mattress",
-    line: "Orthopedic, pocket spring",
+    line: "Euro top, orthopaedic, pocket spring",
     href: "/mattress",
-    icon: TbBed,
-    panelWidth: "w-[78rem]",
-    /* Old Shop By Comfort / Size / Type + catalogue product lines. */
+    icon: `${MENU}/nav-mattress.png?v=2`,
+    texture: "mattress",
+    textureSrc: "/karmo/images/header/mattress-side-texture.jpg",
+    /* One division page — sub-rows are products, not category pages. */
+    panelWidth: "w-[25rem]",
     columns: [
       {
-        label: "Comfort",
+        label: "Mattress",
+        heading: "All mattresses",
+        icon: `${MENU}/nav-mattress.png?v=2`,
         items: [
-          { name: "Firm Mattress", href: "/mattress/firm", icon: MattressFirmIcon },
-          { name: "Medium Firm Mattress", href: "/mattress/medium-firm", icon: MattressMediumIcon },
-          { name: "Soft Mattress", href: "/mattress/soft", icon: MattressSoftIcon },
-        ],
-      },
-      {
-        label: "Size",
-        items: [
-          { name: "Single", href: "/mattress/size/single", icon: BedSingleIcon },
-          { name: "Queen", href: "/mattress/size/queen", icon: BedDoubleIcon },
-          { name: "King", href: "/mattress/size/king", icon: BedTripleIcon },
-        ],
-      },
-      {
-        label: "Type",
-        items: [
-          { name: "Foam Mattress", href: "/mattress/foam" },
-          { name: "Rubberised Coir Mattress", href: "/mattress/rubberised-coir" },
-          { name: "Spring Mattress", href: "/mattress/spring" },
-          { name: "Latex Mattress", href: "/mattress/latex" },
-        ],
-      },
-      {
-        label: "Series",
-        items: [
-          { name: "Orthopedic", href: "/mattress/orthopedic", icon: TbBone },
-          { name: "Imperial", href: "/mattress/imperial", icon: TbShield },
-          { name: "Prestige", href: "/mattress/prestige", icon: TbAward },
-          { name: "King Series", href: "/mattress/king", icon: TbCrown },
-        ],
-      },
-      {
-        label: "Specialty",
-        items: [
-          { name: "Bonnell Spring", href: "/mattress/bonnell-spring", icon: TbCircles },
-          { name: "Pocket Spring", href: "/mattress/pocket-spring", icon: TbCircleDot },
-          { name: "Natural Mattress", href: "/mattress/natural", icon: TbLeaf },
-          { name: "Folding Mattress", href: "/mattress/folding", icon: TbFold },
+          { name: "Karmo Euro Top Mattress", href: "/mattress/imperial-eurotop", icon: `${MENU}/imperial.png` },
+          { name: "Karmo King Mattress", href: "/mattress/king", icon: `${MENU}/king.png` },
+          { name: "Karmo Prestige Mattress", href: "/mattress/prestige", icon: `${MENU}/prestige.png` },
+          { name: "Karmo Orthopaedic Mattress", href: "/mattress/orthopedic", icon: `${MENU}/orthopedic.png` },
+          { name: "Karmo Bonnell Spring Mattress", href: "/mattress/bonnell-spring", icon: `${MENU}/bonnell.png` },
+          { name: "Karmo Pocket Spring Mattress", href: "/mattress/pillow-top-pocket-spring", icon: `${MENU}/pocket.png` },
+          { name: "Karmo Euro Top Pocket Spring Mattress", href: "/mattress/euro-top-pocket-spring", icon: `${MENU}/pocket.png` },
+          { name: "Karmo Folding Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/folding.png` },
+          { name: "Karmo Mattress Topper", href: "/mattress/topper", icon: `${MENU}/soft.png` },
         ],
       },
     ],
   },
   {
-    name: "HomeTex",
-    line: "Bed sheets, comforters",
+    name: "HomeTex / Bedding",
+    line: "Pillows, bed sheets, comforters",
     href: "/hometex",
-    icon: TbFeather,
-    /* Bedding range from Mattress Catalogue pages 19–27 (HomeTex section). */
+    icon: `${MENU}/nav-hometex.png?v=2`,
+    panelWidth: "w-[34rem]",
     columns: [
       {
         label: "Pillow",
+        href: "/hometex",
+        icon: `${MENU}/pillow.png`,
         items: [
-          { name: "Head Pillow", href: "/hometex/pillow", icon: TbSquareRounded },
-          { name: "Side Pillow", href: "/hometex/side-pillow", icon: TbStack },
-          { name: "Floor Pillow", href: "/hometex/floor-pillow", icon: TbBoxAlignBottom },
+          { name: "Relax Time", href: "/hometex", icon: `${MENU}/pillow.png` },
+          { name: "Plush", href: "/hometex", icon: `${MENU}/plush.png` },
+          { name: "Cushion", href: "/hometex", icon: `${MENU}/cushion.png` },
         ],
       },
       {
-        label: "Bedding",
+        label: "HomeTex",
+        href: "/hometex",
+        icon: `${MENU}/nav-hometex.png?v=2`,
         items: [
-          { name: "Bed Sheet", href: "/hometex/bed-sheet", icon: TbBedFlat },
-          { name: "Comforter", href: "/hometex/comforter", icon: TbLayoutGrid },
-          { name: "Mattress Topper", href: "/hometex/topper", icon: TbLayersSubtract },
-        ],
-      },
-      {
-        label: "Living",
-        items: [
-          { name: "Cushion", href: "/hometex/cushion", icon: TbDiamond },
+          { name: "Bed Sheet", href: "/hometex", icon: `${MENU}/bedsheet.png` },
+          { name: "Comforter", href: "/hometex", icon: `${MENU}/comforter.png` },
+          { name: "AC Quilt", href: "/hometex", icon: `${MENU}/ac-quilt.png` },
+          { name: "Airflow Mosquito Net", href: "/hometex", icon: `${MENU}/natural.png` },
         ],
       },
     ],
   },
   {
-    name: "Chemicals",
-    line: "Adhesives, polymers",
+    name: "Chemicals & Polymers",
+    line: "Solvents, adhesives, sodium silicate",
     href: "/chemicals",
-    icon: TbFlask,
+    icon: `${MENU}/nav-chemicals.png?v=2`,
+    panelWidth: "w-[58rem]",
     columns: [
       {
-        label: "Adhesive",
+        label: "Polyurethane Solvent",
+        href: "/chemicals",
+        icon: `${MENU}/solvent.png`,
         items: [
-          { name: "Karmo Adhesive", href: "/chemicals/adhesive", icon: TbDroplet },
+          { name: "TDI", href: "/chemicals", icon: `${MENU}/solvent.png` },
+          { name: "PPG", href: "/chemicals", icon: `${MENU}/grade-poly.png` },
+          { name: "CoPolymer", href: "/chemicals", icon: `${MENU}/rebonded.png` },
+          { name: "Silicone", href: "/chemicals", icon: `${MENU}/sealant.png` },
+          { name: "SO", href: "/chemicals", icon: `${MENU}/spray-adhesive.png` },
+          { name: "PS", href: "/chemicals", icon: `${MENU}/grade-hd.png` },
+          { name: "Pigment", href: "/chemicals", icon: `${MENU}/pigment.png` },
         ],
       },
       {
-        label: "Chemical",
+        label: "Karmo Adhesive",
+        href: "/chemicals",
+        icon: `${MENU}/adhesive.png`,
         items: [
-          { name: "Evergain Chemical", href: "/chemicals/evergain", icon: TbTestPipe },
+          { name: "Karmo Super", href: "/chemicals", icon: `${MENU}/adhesive.png` },
+          { name: "Karmo Light", href: "/chemicals", icon: `${MENU}/emulsion.png` },
+          { name: "Karmo Rubber Solution", href: "/chemicals", icon: `${MENU}/grade-480.png` },
+          { name: "Karmo PU", href: "/chemicals", icon: `${MENU}/grade-4g.png` },
+          { name: "Karmo Bond", href: "/chemicals", icon: `${MENU}/grade-signature.png` },
+        ],
+      },
+      {
+        label: "Evergain Chemical",
+        href: "/chemicals",
+        icon: `${MENU}/spray-adhesive.png`,
+        items: [
+          { name: "Neoprene Contact Adhesive 407", href: "/chemicals", icon: `${MENU}/adhesive.png` },
+          { name: "Polyurethane (PU) Shoe Adhesive A10", href: "/chemicals", icon: `${MENU}/footwear.png` },
+          { name: "Primer", href: "/chemicals", icon: `${MENU}/primer.png` },
+          { name: "Hardener", href: "/chemicals", icon: `${MENU}/hardener.png` },
+          { name: "Cleaner", href: "/chemicals", icon: `${MENU}/cleaner.png` },
+          { name: "Cr-grafting Shoe Adhesive F318", href: "/chemicals", icon: `${MENU}/grade-280.png` },
+          { name: "SBS Spray Adhesive 007M", href: "/chemicals", icon: `${MENU}/spray-adhesive.png` },
+          { name: "White Emulsion Glue", href: "/chemicals", icon: `${MENU}/emulsion.png` },
+          { name: "Super Class Acidity Silicon Sealant", href: "/chemicals", icon: `${MENU}/sealant.png` },
+          { name: "Evergain Free Nail Adhesive", href: "/chemicals", icon: `${MENU}/grade-1965.png` },
         ],
       },
       {
         label: "Silicate",
-        items: [
-          { name: "Sodium Silicate", href: "/chemicals/sodium-silicate", icon: TbAtom },
-        ],
+        href: "/chemicals",
+        icon: `${MENU}/silicate.png`,
+        items: [{ name: "Sodium Silicate", href: "/chemicals", icon: `${MENU}/silicate.png` }],
       },
     ],
   },
-  { name: "About", line: "The group since 1965", href: "/about" },
-  { name: "Contact", line: "Talk to us", href: "/contact" },
+  {
+    name: "Company",
+    line: "About, media, contact, dealership",
+    panelAlign: "right",
+    href: "/about",
+    panelWidth: "w-[56rem]",
+    columns: [
+      {
+        label: "About Us",
+        heading: "About Us",
+        href: "/about",
+        items: [
+          { name: "Company History, Mission & Vision", href: "/about#history" },
+          { name: "Board of Directors", href: "/about" },
+          { name: "Awards & Achievements", href: "/about" },
+          { name: "Our Partners", href: "/about#partners" },
+        ],
+      },
+      {
+        label: "Media Center",
+        heading: "Media Center",
+        href: "/media/news",
+        items: [
+          { name: "News & Blogs", href: "/media/news" },
+          { name: "Karmo Memory", href: "/media/memory" },
+          { name: "Karmo Ads", href: "/media/ads" },
+        ],
+      },
+      {
+        label: "Contact Us",
+        heading: "Contact Us",
+        href: "/contact",
+        items: [
+          { name: "Catalogues", href: "/contact" },
+          { name: "Bulk Order", href: "/contact" },
+          { name: "Address / Map", href: "/contact" },
+          { name: "FAQs", href: "/contact" },
+        ],
+      },
+      {
+        label: "Dealership",
+        heading: "Dealership",
+        href: "/contact",
+        items: [{ name: "Dealership Apply", href: "/contact" }],
+      },
+    ],
+  },
 ];
+
+/** Menu row icon — cartoon PNG path or react-icon component. */
+function MenuGlyph({ icon, alt = "", size = "md" }) {
+  if (!icon) return null;
+  if (typeof icon === "string") {
+    const box =
+      size === "nav"
+        ? "h-[26px] w-[26px]"
+        : size === "parent"
+          ? "h-11 w-11"
+          : size === "sm"
+            ? "h-7 w-7"
+            : "h-9 w-9";
+    const px =
+      size === "nav" ? 26 : size === "parent" ? 44 : size === "sm" ? 28 : 36;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={icon}
+        alt={alt}
+        width={px}
+        height={px}
+        className={`${box} shrink-0 object-contain object-top`}
+      />
+    );
+  }
+  const Icon = icon;
+  return (
+    <Icon
+      className={
+        size === "nav"
+          ? "text-[17px]"
+          : size === "parent"
+            ? "text-[24px]"
+            : "text-[20px]"
+      }
+    />
+  );
+}
 
 function Tool({ icon: Icon, label, href, count, onClick }) {
   const body = (
@@ -240,99 +330,217 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
 }
 
 function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
-  return (
-    <nav aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
-      <ul className="flex items-center">
-        {nav.map((entry) => (
-          <li key={entry.name} className="relative">
-            <Link
-              href={entry.href}
-              onMouseEnter={() => openPanel(entry.name)}
-              onFocus={() => openPanel(entry.name)}
-              className="flex items-center gap-1.5 px-2.5 py-2.5 text-ink transition-colors duration-300 hover:text-brand"
-            >
-              {entry.icon ? (
-                <entry.icon className="shrink-0 text-[17px] text-ink/55" />
-              ) : null}
-              <span className="display block text-[13px] font-bold uppercase leading-none tracking-[0.1em]">
-                {entry.name}
-              </span>
-              {entry.columns && (
-                <FiChevronDown
-                  className={`text-[13px] text-ink/40 transition-transform duration-300 ${
-                    panel === entry.name ? "rotate-180" : ""
-                  }`}
-                />
-              )}
-            </Link>
+  const pathname = usePathname() || "";
 
-            {entry.columns && (
+  return (
+    <nav className="flex h-full" aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
+      <ul className="flex h-full items-stretch gap-x-0.5">
+        {nav.map((entry) => {
+          const isDisabled = Boolean(entry.disabled);
+          const isActive =
+            !isDisabled &&
+            (pathname === entry.href || pathname.startsWith(`${entry.href}/`));
+          const isOpen = !isDisabled && panel === entry.name;
+
+          const label = (
+            <>
+              {entry.icon ? (
+                <MenuGlyph icon={entry.icon} alt="" size="nav" />
+              ) : null}
+              <span className="inline-flex items-center gap-1.5">
+                {/* "HomeTex / Bedding" and "Chemicals & Polymers" wrap to two
+                    lines below 2xl on purpose. Held to one line they need
+                    ~75px more than the row has: at 1440 that pushed Find a
+                    Store 11px past the header edge. From 1536 up there is room,
+                    so they stay on one line there. */}
+                <span
+                  className={`display block text-[13px] uppercase leading-[1.15] tracking-[0.1em] 2xl:whitespace-nowrap transition-[color,font-weight] duration-300 ${
+                    isActive ? "font-extrabold text-brand" : "font-bold"
+                  }`}
+                >
+                  {entry.name}
+                </span>
+                {entry.columns ? (
+                  <FiChevronDown
+                    className={`text-[13px] transition-[color,transform] duration-300 ${
+                      isActive ? "text-brand" : "text-ink/40"
+                    } ${isOpen ? "rotate-180" : ""}`}
+                  />
+                ) : null}
+              </span>
+            </>
+          );
+
+          return (
+            <li key={entry.name} className="relative flex">
+              {isDisabled ? (
+                <span
+                  aria-disabled="true"
+                  className="flex h-full cursor-default items-center gap-2 px-3 text-ink"
+                >
+                  {label}
+                </span>
+              ) : (
+                <Link
+                  href={entry.href}
+                  aria-current={isActive ? "page" : undefined}
+                  onMouseEnter={() => openPanel(entry.name)}
+                  onFocus={() => openPanel(entry.name)}
+                  className={`relative flex h-full items-center gap-2 px-3 transition-colors duration-300 ${
+                    isActive ? "text-brand" : "text-ink hover:text-brand"
+                  }`}
+                >
+                  {label}
+                </Link>
+              )}
+
+              {!isDisabled && entry.columns ? (
               <div
                 data-mega-menu
                 onMouseEnter={() => openPanel(entry.name)}
                 onMouseLeave={leaveMenuZone}
-                className={`absolute top-full left-1/2 z-[1100] hidden bg-white shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
+                /* Panels centre under their menu item by default. The first and
+                   last items are too close to the screen edge for that: at 1280
+                   Foam's panel ran 171px off the left and Company's 21px off the
+                   right. `panelAlign` pins those to the item's own left or right
+                   edge instead, so the panel opens inward. */
+                className={`absolute top-[calc(100%-4px)] z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
+                  entry.panelAlign === "left"
+                    ? "left-0"
+                    : entry.panelAlign === "right"
+                      ? "right-0"
+                      : "left-1/2 -translate-x-1/2"
+                } ${
+                  entry.textureSrc
+                    ? "header-mega-textured bg-[#fffefb]"
+                    : "bg-white"
+                } ${
                   entry.panelWidth || "w-[52rem]"
                 } ${
                   panel === entry.name
-                    ? "visible -translate-x-1/2 translate-y-0 opacity-100"
-                    : "invisible -translate-x-1/2 translate-y-1 opacity-0"
+                    ? "visible translate-y-0 opacity-100"
+                    : "invisible translate-y-1 opacity-0"
                 }`}
               >
+                {entry.textureSrc ? (
+                  <>
+                    {/* Solid cream under the damask — without this the panel is
+                        see-through and the hero navy reads as a dark overlay. */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0 bg-[#fffefb]"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={entry.textureSrc}
+                      alt=""
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center opacity-[0.16]"
+                    />
+                  </>
+                ) : null}
                 <div
-                  className={`grid divide-x divide-ink/6 px-5 py-5 ${
+                  className={`relative z-[1] grid divide-x divide-ink/6 px-5 py-5 ${
                     entry.columns.length >= 5
                       ? "grid-cols-5"
                       : entry.columns.length === 4
                         ? "grid-cols-4"
-                        : "grid-cols-3"
+                        : entry.columns.length === 3
+                          ? "grid-cols-3"
+                          : entry.columns.length === 2
+                            ? "grid-cols-2"
+                            : "grid-cols-1"
                   }`}
                 >
-                  {entry.columns.map((col) => (
-                    <div key={col.label} className="px-4 first:pl-1 last:pr-1">
-                      <div className="flex h-10 items-end border-b border-ink/6 pb-3">
-                        <span className="display text-[12px] font-bold uppercase leading-none tracking-[0.1em] text-ink">
-                          Shop By {col.label}
-                        </span>
-                      </div>
-
-                      <ul className="pt-0.5">
-                        {col.items.map((item, itemIndex) => (
-                          <li
-                            key={item.href}
-                            className={
-                              itemIndex < col.items.length - 1
-                                ? "border-b border-ink/6"
-                                : ""
-                            }
-                          >
+                    {entry.columns.map((col) => (
+                      <div key={col.label} className="px-4 first:pl-1 last:pr-1">
+                        {/* Parent category — larger icon + type so it reads above sub-rows */}
+                        <div className="flex min-h-[3.25rem] items-end border-b border-ink/10 pb-3.5">
+                          {col.href ? (
                             <Link
-                              href={item.href}
+                              href={col.href}
                               onClick={dismissPanel}
-                              className="group flex h-11 items-center justify-between gap-2.5 transition-colors duration-200 hover:text-brand"
+                              className="group flex min-w-0 items-center gap-2.5 transition-colors hover:text-brand"
                             >
+                              {col.icon ? (
+                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
+                                  <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                </span>
+                              ) : null}
+                              <span className="display text-[14px] font-extrabold uppercase leading-[1.15] tracking-[0.08em] text-ink group-hover:text-brand lg:text-[15px]">
+                                {col.heading ?? col.label}
+                              </span>
+                              <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform group-hover:translate-x-0.5 group-hover:text-brand" />
+                            </Link>
+                          ) : (
+                            <span className="flex min-w-0 items-center gap-2.5">
+                              {col.icon ? (
+                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
+                                  <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                </span>
+                              ) : null}
+                              <span className="display text-[14px] font-extrabold uppercase leading-[1.15] tracking-[0.08em] text-ink lg:text-[15px]">
+                                {col.heading ?? `Shop By ${col.label}`}
+                              </span>
+                            </span>
+                          )}
+                        </div>
+
+                        <ul className="pt-1">
+                          {col.items.map((item, itemIndex) => {
+                            const rowClass =
+                              "group flex min-h-11 items-center justify-between gap-2.5 py-1.5 transition-colors duration-200";
+                            const body = (
                               <span className="flex min-w-0 items-center gap-2.5">
                                 {item.icon ? (
-                                  <span className="flex h-7 w-7 shrink-0 items-center justify-center text-ink/60">
-                                    <item.icon className="text-[20px]" />
+                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-white/55 text-ink/60">
+                                    <MenuGlyph icon={item.icon} alt="" size="sm" />
                                   </span>
                                 ) : null}
-                                <span className="truncate text-[11.5px] font-semibold uppercase tracking-[0.06em] text-ink">
+                                <span className="line-clamp-2 text-[11px] font-semibold uppercase leading-snug tracking-[0.06em] text-ink/85">
                                   {item.name}
                                 </span>
                               </span>
-                              <FiChevronRight className="shrink-0 text-[13px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+                            );
+
+                            return (
+                              <li
+                                key={item.name}
+                                className={
+                                  itemIndex < col.items.length - 1
+                                    ? "border-b border-ink/6"
+                                    : ""
+                                }
+                              >
+                                {item.soon ? (
+                                  <span aria-disabled="true" className={`${rowClass} cursor-default opacity-60`}>
+                                    {body}
+                                    <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
+                                      Soon
+                                    </span>
+                                  </span>
+                                ) : (
+                                  <Link
+                                    href={item.href}
+                                    onClick={dismissPanel}
+                                    className={`${rowClass} hover:text-brand`}
+                                  >
+                                    {body}
+                                    <FiChevronRight className="shrink-0 text-[12px] text-ink/30 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                                  </Link>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </li>
-        ))}
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -351,8 +559,8 @@ function HeaderCtaButton({ compact = false }) {
         <FiMapPin className="text-[16px]" />
       </span>
       <span className="block text-left">
-        <span className="display block text-[12.5px] font-bold leading-tight">
-          Find a Store
+        <span className="display block text-[12.5px] font-bold uppercase leading-tight tracking-[0.04em]">
+          FIND A STORE
         </span>
         {!compact && (
           <span className="block text-[10.5px] leading-tight text-white/60">
@@ -367,7 +575,7 @@ function HeaderCtaButton({ compact = false }) {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ scrolled = false }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [panel, setPanel] = useState(null);
@@ -449,16 +657,43 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="shell-home-two flex h-[80px] items-center gap-4">
-        <Link href="/" aria-label="Karmo Group, home" className="shrink-0">
+      <div
+        className={`shell-home-two relative z-[2] flex items-center gap-4 translate-y-[3px] transition-[height] ${LOGO_EASE} ${
+          scrolled ? "h-[80px]" : "h-[104px] sm:h-[112px]"
+        }`}
+      >
+        <Link
+          href="/"
+          aria-label="Karmo Group, home"
+          className={`relative shrink-0 overflow-hidden transition-[width,height] ${LOGO_EASE} ${
+            scrolled
+              ? "h-8 w-[min(50vw,13rem)] sm:w-[14.5rem]"
+              : "h-[80px] w-[104px] sm:h-[88px] sm:w-[114px]"
+          }`}
+        >
+          <Logo
+            src="/karmo/logo-factory.png"
+            width={554}
+            height={427}
+            className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-[80px] w-auto sm:h-[88px] transition-[opacity,transform] ${LOGO_EASE} ${
+              scrolled
+                ? "pointer-events-none scale-75 opacity-0"
+                : "scale-100 opacity-100"
+            }`}
+            priority
+          />
           <Logo
             src="/karmo/logo-ink.png"
-            className="h-7 w-auto max-w-[min(50vw,13rem)] sm:h-8 sm:max-w-none"
+            className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-7 w-auto max-w-[min(50vw,13rem)] sm:h-8 sm:max-w-none transition-[opacity,transform] ${LOGO_EASE} ${
+              scrolled
+                ? "scale-100 opacity-100"
+                : "pointer-events-none scale-95 opacity-0"
+            }`}
             priority
           />
         </Link>
 
-        <div className="hidden flex-1 justify-center xl:flex">
+        <div className="hidden h-full flex-1 justify-center xl:flex">
           <DivisionNav
             panel={panel}
             openPanel={openPanel}
@@ -532,53 +767,132 @@ export default function Navbar() {
           <div className="absolute inset-x-0 top-full z-[9999] max-h-[calc(100svh-112px)] overflow-y-auto overscroll-contain border-t border-ink/8 bg-white xl:hidden">
             <div className="shell-home-two py-5">
               <ul className="divide-y divide-ink/8">
-                {nav.map((entry) => (
-                  <li key={entry.name} className="py-3.5">
-                    <Link
-                      href={entry.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3.5"
-                    >
-                      {entry.icon ? (
-                        <entry.icon className="shrink-0 text-[18px] text-ink/55" />
-                      ) : null}
-                      <span className="min-w-0 flex-1">
-                        <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
-                          {entry.name}
+                {nav.map((entry) => {
+                  const isDisabled = Boolean(entry.disabled);
+                  return (
+                    <li key={entry.name} className="py-3.5">
+                      {isDisabled ? (
+                        <span
+                          aria-disabled="true"
+                          className="flex cursor-default items-center gap-3.5"
+                        >
+                          {entry.icon ? (
+                            <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                          ) : null}
+                          <span className="min-w-0 flex-1">
+                            <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                              {entry.name}
+                            </span>
+                            <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                              {entry.line}
+                            </span>
+                          </span>
                         </span>
-                        <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
-                          {entry.line}
-                        </span>
-                      </span>
-                      <FiArrowUpRight className="shrink-0 text-brand" />
-                    </Link>
+                      ) : (
+                        <>
+                          <Link
+                            href={entry.href}
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-3.5"
+                          >
+                            {entry.icon ? (
+                              <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                            ) : null}
+                            <span className="min-w-0 flex-1">
+                              <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                                {entry.name}
+                              </span>
+                              <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                                {entry.line}
+                              </span>
+                            </span>
+                            <FiArrowUpRight className="shrink-0 text-brand" />
+                          </Link>
 
-                    {entry.columns ? (
-                      <div className="mt-3 space-y-3">
-                        {entry.columns.map((col) => (
-                          <div key={col.label}>
-                            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-ink/40">
-                              Shop by {col.label}
-                            </p>
-                            <ul className="flex flex-wrap gap-2">
-                              {col.items.map((sub) => (
-                                <li key={sub.href}>
-                                  <Link
-                                    href={sub.href}
-                                    onClick={() => setOpen(false)}
-                                    className="block bg-cream px-3 py-1.5 text-[12px] uppercase tracking-[0.06em] text-ink/70"
-                                  >
-                                    {sub.name}
-                                  </Link>
-                                </li>
+                          {entry.columns ? (
+                            <div className="mt-3 space-y-4">
+                              {entry.columns.map((col) => (
+                                <div key={col.label}>
+                                  {col.href ? (
+                                    <Link
+                                      href={col.href}
+                                      onClick={() => setOpen(false)}
+                                      className="mb-2 flex items-center gap-2.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-ink hover:text-brand"
+                                    >
+                                      {col.icon ? (
+                                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[5px] border border-ink/15 bg-white">
+                                          <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                        </span>
+                                      ) : null}
+                                      {col.heading ?? col.label}
+                                    </Link>
+                                  ) : (
+                                    <p className="mb-2 flex items-center gap-2.5 text-[12px] font-extrabold uppercase tracking-[0.12em] text-ink">
+                                      {col.icon ? (
+                                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[5px] border border-ink/15 bg-white">
+                                          <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                        </span>
+                                      ) : null}
+                                      {col.heading ?? `Shop by ${col.label}`}
+                                    </p>
+                                  )}
+                                  <ul className="overflow-hidden rounded-[4px] border border-ink/10 bg-white">
+                                    {col.items.map((sub, itemIndex) => {
+                                      const body = (
+                                        <span className="flex min-w-0 items-center gap-2.5">
+                                          {sub.icon ? (
+                                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-cream/80 text-ink/60">
+                                              <MenuGlyph icon={sub.icon} alt="" />
+                                            </span>
+                                          ) : null}
+                                          <span className="line-clamp-2 text-[12px] font-semibold uppercase leading-snug tracking-[0.06em] text-ink">
+                                            {sub.name}
+                                          </span>
+                                        </span>
+                                      );
+
+                                      return (
+                                        <li
+                                          key={sub.name}
+                                          className={
+                                            itemIndex < col.items.length - 1
+                                              ? "border-b border-ink/8"
+                                              : ""
+                                          }
+                                        >
+                                          {sub.soon ? (
+                                            <span
+                                              aria-disabled="true"
+                                              className="flex min-h-12 cursor-default items-center justify-between gap-2.5 px-2.5 py-1.5 opacity-60"
+                                            >
+                                              {body}
+                                              <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
+                                                Soon
+                                              </span>
+                                            </span>
+                                          ) : (
+                                            <Link
+                                              href={sub.href}
+                                              onClick={() => setOpen(false)}
+                                              className="group flex min-h-12 items-center justify-between gap-2.5 px-2.5 py-1.5 transition-colors duration-200 hover:bg-cream/70"
+                                            >
+                                              {body}
+                                              <FiChevronRight className="shrink-0 text-[14px] text-ink/35 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand" />
+                                            </Link>
+                                          )}
+                                        </li>
+                                      );
+                                    })}
+                                  </ul>
+                                </div>
                               ))}
-                            </ul>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </li>
-                ))}
+                            </div>
+                          ) : null}
+                        </>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="mt-5 grid grid-cols-2 gap-2">
@@ -627,8 +941,8 @@ export default function Navbar() {
                   <FiMapPin className="text-[16px]" />
                 </span>
                 <span className="block text-left">
-                  <span className="display block text-[12.5px] font-bold leading-tight">
-                    Find a Store
+                  <span className="display block text-[12.5px] font-bold uppercase leading-tight tracking-[0.04em]">
+                    FIND A STORE
                   </span>
                   <span className="block text-[10.5px] leading-tight text-white/60">
                     Showrooms nationwide

@@ -25,7 +25,7 @@ export default function ContactChannels({ channels }) {
   };
 
   return (
-    <section className="border-b border-ink/8 bg-white">
+    <section className="relative mb-1.5 bg-white">
       <motion.ul
         variants={group}
         {...reveal}
