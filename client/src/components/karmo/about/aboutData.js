@@ -60,7 +60,7 @@ export const aboutStory = {
   titleLead: "First in Bangladesh to",
   titleAccent: "pour polyurethane",
   image: {
-    src: "/karmo/images/mattress/suite-interior.jpg",
+    src: "/karmo/images/mattress/mosaic/suite-interior.jpg",
     alt: "A Karmo mattress dressed in a styled bedroom suite",
   },
   plaque: { figure: "1965", label: "Since" },
@@ -110,7 +110,7 @@ export const aboutDivisions = [
     name: "Karmo Mattress",
     line: "Your perfect partner for complete bedding",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.jpg",
+    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.png",
     alt: "A Karmo floral mattress on an upholstered bed",
     points: [
       "Pocket springs that move independently, head to toe",

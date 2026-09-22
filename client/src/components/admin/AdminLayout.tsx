@@ -8,7 +8,7 @@ import {
     LuLayoutGrid, LuLogOut, LuMenu, LuX, LuChevronDown,
     LuShoppingCart, LuUser, LuChevronLeft,
     LuLayoutDashboard, LuChartColumn, LuTruck, LuTag, LuStar, LuMapPin,
-    LuSettings, LuBell, LuSearch, LuCreditCard, LuZap, LuShield, LuRefreshCw, LuMail,
+    LuSettings, LuBell, LuSearch, LuCreditCard, LuZap, LuShield, LuRefreshCw, LuMail, LuBriefcase,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import Logo from '@/components/shared/Logo';
@@ -66,6 +66,19 @@ const menuSections = [
         label: 'Finance',
         items: [
             { name: 'Payments', href: '/dashboard/admin/payments', icon: LuCreditCard, submenu: null },
+        ],
+    },
+    // Recruitment — postings on /career and the CVs they pull in
+    {
+        label: 'Careers',
+        items: [
+            {
+                name: 'Jobs', href: '/dashboard/admin/jobs', icon: LuBriefcase, submenu: [
+                    { name: 'All Jobs', href: '/dashboard/admin/jobs' },
+                    { name: 'Post a Job', href: '/dashboard/admin/jobs/new' },
+                    { name: 'Applications', href: '/dashboard/admin/jobs/applications' },
+                ]
+            },
         ],
     },
     // People & access control

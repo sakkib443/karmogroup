@@ -43,13 +43,15 @@ export default function DivisionPromise({
   }));
 
   return (
-    <FoamPromise
-      heading={heading}
-      subline={subline}
-      claims={resolved}
-      still={still}
-      film={film}
-      showFilm={showFilm}
-    />
+    <div className="mb-[6px]">
+      <FoamPromise
+        heading={heading}
+        subline={subline}
+        claims={resolved}
+        still={still}
+        film={film}
+        showFilm={showFilm}
+      />
+    </div>
   );
 }

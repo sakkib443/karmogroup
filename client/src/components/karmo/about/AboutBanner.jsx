@@ -36,6 +36,8 @@ export default function AboutBanner() {
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
+        {...reveal}
+        viewport={VIEWPORT}
         className="shell relative z-[1] flex h-full flex-col items-center justify-center text-center"
       >
         <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/80">

@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import SectionLabel from "./SectionLabel";
 
 /**
  * Shop by material — the four core materials a Karmo mattress is built from,
@@ -20,21 +19,19 @@ import SectionLabel from "./SectionLabel";
  * are unequal — Rebonded Foam is the widest because foam is the craft the
  * company is known for, Pocket Spring the narrowest.
  *
- * ⚠ **The pictures are stand-ins.** These still point at the old product shots.
- * Each card wants a macro close-up of the *material itself* (foam chips, PE
- * foam, coil springs, coir fibre). Drop the new files under
- * `/karmo/images/home-02/materials/` and swap the four `src` lines — the
- * generation prompts live in `Mattress Brochure/MATERIAL-IMAGE-PROMPTS.md`.
+ * Macro close-ups of the four brochure materials live under
+ * `/karmo/images/home-02/materials/` (prompts in
+ * `karmo-library/02-catalogues/mattress-brochure/MATERIAL-IMAGE-PROMPTS.md`).
  */
 
 const materials = [
   {
     id: "rebonded-foam",
     name: "Rebonded Foam",
-    line: "Finest hi-density foam chips, steam-bonded for support that lasts.",
+    line: "Steam-bonded chips. Support that lasts.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
-    alt: "Close-up of Karmo rebonded foam — bonded hi-density foam chips",
+    src: "/karmo/images/home-02/materials/rebonded-foam-v4.jpg",
+    alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
@@ -43,10 +40,10 @@ const materials = [
   {
     id: "pe-foam",
     name: "Polyethylene Foam",
-    line: "Load-bearing hi-density core — made only by Karmo.",
+    line: "Hi-density core. Made only by Karmo.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/mattress-karmo-grey-bedroom.webp",
-    alt: "Close-up of Karmo hi-density polyethylene (PE) foam",
+    src: "/karmo/images/home-02/materials/pe-foam-v2.jpg",
+    alt: "Close-up of charcoal egg-crate contour foam",
     span: "lg:col-start-2 lg:row-start-1",
     ratio: "aspect-[16/9]",
     sizes: "(min-width: 1024px) 36vw, 100vw",
@@ -54,9 +51,9 @@ const materials = [
   {
     id: "natural-coir",
     name: "Natural Coir",
-    line: "100% coconut-husk fibre — breathable, cool, biodegradable.",
+    line: "Coconut fibre. Cool and breathable.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
+    src: "/karmo/images/home-02/materials/natural-coir.jpg",
     alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
     span: "lg:col-start-2 lg:row-start-2",
     ratio: "aspect-[16/9]",
@@ -65,9 +62,9 @@ const materials = [
   {
     id: "pocket-spring",
     name: "Pocket Spring",
-    line: "Vanadium-coated coils that move independently, contouring to you.",
+    line: "Independent coils. Contours to you.",
     href: "/mattress",
-    src: "/karmo/images/home-02/divisions/mattress-karmo-magnific-SyOgGVtUb8.jpg",
+    src: "/karmo/images/home-02/materials/pocket-spring.jpg",
     alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
     span: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
@@ -81,35 +78,30 @@ function MaterialCard({ item }) {
       variants={fade}
       className={`group relative overflow-hidden bg-[#EFE9E3] ${item.ratio} ${item.span} lg:aspect-auto lg:h-full`}
     >
-      <Link href={item.href} className="block h-full">
+      <Link href={item.href} className="group relative block h-full overflow-hidden">
         <Image
           src={item.src}
           alt={item.alt}
           fill
           sizes={item.sizes}
-          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
         />
 
-        {/* Bottom-weighted, because the copy sits low and the pictures are
-            light at the top. Deeper than the gallery's because this one has a
-            sentence to carry, not just a name. */}
         <span
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-black/78 via-black/28 to-transparent"
+          className="absolute inset-0 bg-black/30"
         />
 
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 sm:p-6">
-          <div className="min-w-0">
-            <h3 className="display text-[1.05rem] font-bold! uppercase leading-[1.15]! tracking-[0.01em] text-white sm:text-[1.2rem]">
-              {item.name}
-            </h3>
-            <p className="body-copy mt-1.5 max-w-[20rem] text-[12px] leading-[1.55] text-white/75 sm:text-[12.5px]">
-              {item.line}
-            </p>
-          </div>
-
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-ink transition-colors duration-300 group-hover:bg-brand group-hover:text-white sm:h-10 sm:w-10">
-            <FiArrowRight className="text-[15px]" />
+        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-6 pb-6 pt-16 sm:px-7 sm:pb-7 sm:pt-[4.5rem] lg:px-8 lg:pb-8 lg:pt-24">
+          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] sm:text-[13px] lg:text-[14px]">
+            {item.name}
+          </span>
+          <h3 className="mt-3 max-w-[16ch] text-[1.55rem] font-bold uppercase leading-[1.2] tracking-[-0.01em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)] sm:text-[1.75rem] lg:text-[1.95rem]">
+            {item.line}
+          </h3>
+          <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.02em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-colors duration-300 group-hover:text-brand sm:mt-6 sm:text-[14px] lg:text-[15px]">
+            Explore
+            <FiArrowRight className="text-[16px] transition-transform duration-300 group-hover:translate-x-0.5" />
           </span>
         </div>
       </Link>
@@ -123,19 +115,6 @@ export default function ShopByMaterial() {
 
   return (
     <section className="bg-white pt-4 pb-0 md:pt-5 lg:pt-6">
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="pl-4 text-left"
-      >
-        <motion.div variants={fade}>
-          <SectionLabel eyebrow="Built from the inside out">
-            Shop by <span className="font-bold text-brand">material</span>
-          </SectionLabel>
-        </motion.div>
-      </motion.div>
-
       {/* Uneven columns and rows — the asymmetry the client asked for. The
           grid takes a height at lg so the two tall cards and the stacked pair
           end on the same line; below lg each card falls back to its own ratio
@@ -144,7 +123,7 @@ export default function ShopByMaterial() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="mt-3 grid gap-1 px-0 md:mt-3.5 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
+        className="grid gap-1 px-0 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
       >
         {materials.map((item) => (
           <MaterialCard key={item.id} item={item} />

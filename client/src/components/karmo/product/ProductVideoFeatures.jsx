@@ -5,11 +5,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Product feature 2×2 media grid — no section heading; 6px gap from the
- * band above (homepage inter-section language).
+ * Two feature bands — editorial split (media + copy), moderate height.
+ * Not full-viewport fills; clean stacking under the build section.
  */
-
-const GAP = "gap-1 md:gap-1.5";
 
 export default function ProductVideoFeatures({ features = [] }) {
   const reduceMotion = useReducedMotion();
@@ -18,50 +16,58 @@ export default function ProductVideoFeatures({ features = [] }) {
   if (!features.length) return null;
 
   return (
-    <section className="mt-[6px] mb-8 bg-white md:mb-10 lg:mb-12">
-      <motion.ul
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className={`grid grid-cols-1 sm:grid-cols-2 ${GAP}`}
-      >
-        {features.map((feat, i) => (
-          <motion.li
+    <div className="bg-white">
+      {features.map((feat, i) => {
+        const mediaRight = i % 2 === 1;
+        return (
+          <section
             key={feat.title}
-            variants={fade}
-            className="group relative h-[min(72svh,640px)] min-h-[440px] overflow-hidden bg-ink sm:h-[min(68svh,700px)] lg:h-[min(74svh,780px)]"
+            className="mt-[6px] overflow-hidden bg-[#F7F6F4]"
+            aria-label={feat.title}
           >
-            <video
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-hidden
+            <motion.div
+              variants={group}
+              {...reveal}
+              viewport={VIEWPORT}
+              className={`grid min-h-[min(42svh,380px)] lg:min-h-[min(48svh,440px)] lg:grid-cols-2 ${
+                mediaRight ? "lg:[&>*:first-child]:order-2" : ""
+              }`}
             >
-              <source src={feat.video} type="video/mp4" />
-            </video>
+              <motion.div
+                variants={fade}
+                className="group relative min-h-[min(36svh,280px)] overflow-hidden bg-ink lg:min-h-0"
+              >
+                <video
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  aria-hidden
+                >
+                  <source src={feat.video} type="video/mp4" />
+                </video>
+              </motion.div>
 
-            <span
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-t from-shade-deep/90 via-shade-deep/35 to-transparent"
-            />
-
-            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 lg:p-7">
-              <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/55">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <h3 className="display mt-1.5 text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.02em] text-white sm:text-[1.25rem]">
-                {feat.title}
-              </h3>
-              <p className="body-copy mt-2 max-w-[22rem] text-[12.5px] leading-[1.55] text-white/75 sm:text-[13px] line-clamp-3">
-                {feat.body}
-              </p>
-            </div>
-          </motion.li>
-        ))}
-      </motion.ul>
-    </section>
+              <motion.div
+                variants={fade}
+                className="flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-12 lg:px-14 lg:py-14 xl:px-16"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="display mt-3 max-w-[16ch] text-[1.45rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink sm:text-[1.7rem] lg:text-[1.9rem]">
+                  {feat.title}
+                </h3>
+                <p className="body-copy mt-4 max-w-md text-[14px] leading-relaxed text-ink/55 sm:text-[15px]">
+                  {feat.body}
+                </p>
+              </motion.div>
+            </motion.div>
+          </section>
+        );
+      })}
+    </div>
   );
 }

@@ -31,6 +31,7 @@ client/src/
       Hero.jsx
       StandardStrip.jsx
       DivisionEditorials.jsx
+      ChemicalsBand.jsx
       ExploreSplit.jsx
       DivisionsStrip.jsx
       ShopByMaterial.jsx
@@ -39,9 +40,13 @@ client/src/
       Reels.jsx
       LivingLookbook.jsx
       Partners.jsx
-      CertifiedBy.jsx
+      PartnerPromoBand.jsx
       OrderAndContact.jsx
+      CertifiedBy.jsx      ← পেজে নয়, লেআউট থেকে মাউন্ট (ফুটারের ঠিক ওপরে)
 ```
+
+> **সিঙ্ক নোট:** `CertifiedBy` `page.jsx` এ নেই — `layout.tsx` এ `<main>` আর
+> `<Footer>` এর মাঝে বসানো, তাই সব `(karmo-2)` পেজে ফুটারের ঠিক ওপরে দেখায়।
 
 পরে **About** একই প্যাটার্নে: `components/karmo/about/` + `app/(karmo-2)/about/`।
 
@@ -86,22 +91,24 @@ client/src/
 ক্রম = [`page.jsx`](../../client/src/app/(karmo-2)/page.jsx)। ক্রম বদলালে এই
 টেবিল আর `page.jsx` একসাথে আপডেট করুন।
 
-| # | সেকশন | কম্পোনেন্ট | নোট |
+| # | সেকশন | কম্পোনেন্ট | লাইভ কপি / নোট |
 |---|---|---|---|
-| — | টপ হেডার + ন্যাভ | `header/TopHeader` + `header/Navbar` | লেআউট, মোট ১১২px fixed |
-| ১ | হিরো | `home/Hero` | ফুল-উইডথ, হেডারের নিচে এক ভিউপোর্ট |
-| ২ | ট্রাস্ট স্ট্রিপ | `home/StandardStrip` | ছয়টা পিলার |
-| ৩ | আইকনিক ব্র্যান্ডস | `home/DivisionEditorials` | বাঁ কপি + ডান ম্যাসনরি, ইমেজ গ্যাপ ৬px |
-| ৪ | এক্সপ্লোর | `home/ExploreSplit` | দুই প্যানেল + ফুল-উইডথ ব্যান্ড, গ্যাপ ৬px |
-| ৫ | ডিভিশন কার্ড | `home/DivisionsStrip` | চার ডিভিশন |
-| ৬ | শপ বাই ম্যাটেরিয়াল | `home/ShopByMaterial` | ফিল্টার এন্ট্রি |
-| ৭ | প্রোমো ট্রিও | `home/PromoTrio` | বড় + দুই স্ট্যাক |
-| ৮ | ফোম প্রমিস | `home/FoamPromise` | ভিডিও ব্যাকগ্রাউন্ড + দাবি |
-| ৯ | রিলস | `home/Reels` | কপি + ভিডিও ম্যাসনরি |
-| ১০ | লিভিং লুকবুক | `home/LivingLookbook` | তিন টাইল + ফিল্ম ব্যান্ড |
-| ১১ | পার্টনার্স | `home/Partners` | লোগো স্ট্রিপ |
-| ১২ | সার্টিফাইড | `home/CertifiedBy` | সার্টিফিকেট |
-| ১৩ | অর্ডার ও যোগাযোগ | `home/OrderAndContact` | ক্লোজ |
+| — | টপ হেডার + ন্যাভ | `header/TopHeader` + `header/Navbar` | লেআউট থেকে, মোট ১১২px fixed (৩২ + ৮০) |
+| ১ | হিরো | `home/Hero` | ফুল-উইডথ, ঘুরন্ত ভ্যারিয়েন্ট (Foam/Mattress/Chemicals); "We create the chemistry of comfort" |
+| ২ | ট্রাস্ট স্ট্রিপ | `home/StandardStrip` | ছয়টা পিলার: A legacy of 60 years · Trusted By Million · Recognised By · Natural & Sustainable · Free Delivery · 5k+ Stores |
+| ৩ | আইকনিক ব্র্যান্ডস | `home/DivisionEditorials` | বাঁ কপি + ডান ম্যাসনরি; "Iconic brands. Lasting craft." · Since 1965 |
+| ৪ | কেমিক্যালস ব্যান্ড | `home/ChemicalsBand` | তিন দাবি: Largest raw material stock · International quality certified · Specialized polyurethanes & polymers |
+| ৫ | এক্সপ্লোর | `home/ExploreSplit` | দুই প্যানেল (Mattress made for deep rest · HomeTex for every room) + ফ্ল্যাগশিপ ব্যান্ড (Foam crafted for comfort), গ্যাপ ৬px |
+| ৬ | ডিভিশন কার্ড | `home/DivisionsStrip` | "One group, four crafts" — Foam · Mattress · HomeTex · Chemicals |
+| ৭ | শপ বাই ম্যাটেরিয়াল | `home/ShopByMaterial` | চার ম্যাটেরিয়াল কার্ড: Rebonded Foam · Polyethylene Foam · Natural Coir · Pocket Spring |
+| ৮ | প্রোমো ট্রিও | `home/PromoTrio` | "Our popular products" — Foam seating collection + HomeTex bedding + Mattress range |
+| ৯ | ফোম প্রমিস | `home/FoamPromise` | ভিডিও ব্যাকগ্রাউন্ড; "Blending tradition with innovation" — Pure Quality · Long Lasting · Certified Comfort |
+| ১০ | রিলস | `home/Reels` | "On screen. See comfort." কপি + ভিডিও ম্যাসনরি |
+| ১১ | লিভিং লুকবুক | `home/LivingLookbook` | তিন টাইল + ফিল্ম ব্যান্ড ("Blending tradition") |
+| ১২ | পার্টনার্স | `home/Partners` | "Trusted by 100+ makers" লোগো স্ট্রিপ |
+| ১৩ | প্রোমো ব্যান্ড | `home/PartnerPromoBand` | All products 5% Discount + ১২ মাস EMI (ব্যাংক আর্টওয়ার্ক) |
+| ১৪ | অর্ডার ও যোগাযোগ | `home/OrderAndContact` | "How to make an order" ৪ ধাপ + "Have any questions" কন্টাক্ট ফর্ম |
+| — | সার্টিফাইড | `home/CertifiedBy` | **লেআউট থেকে** — ফুটারের ঠিক ওপরে; তিন সার্টিফিকেট |
 
 ডানে ভাসমান: চ্যাট / WhatsApp / স্ক্রল-টু-টপ — `FloatingContact` (রুট লেআউট)।
 
@@ -135,10 +142,11 @@ client/src/
 **উদ্দেশ্য** — ব্র্যান্ড + এক হেডলাইন + CTA, এক কম্পোজিশন।  
 **গঠন** — ফুল-উইডথ ইমেজ প্লেন, হেডার অফসেট `100svh - 112px`।
 
-### ৩–৪. এডিটোরিয়াল + এক্সপ্লোর
+### ৩–৫. এডিটোরিয়াল + কেমিক্যালস + এক্সপ্লোর
 
-**গঠন** — ইমেজ গ্রিডে সাদা গটার **৬px** (`gap-1.5`)। সেকশন ৩ ও ৪-এর ভেতরের গ্যাপ
-একই মাপ; দুই সেকশনের মাঝেও একই গটার যাতে এক ব্যান্ড মনে হয়।
+**গঠন** — উপরের ইমেজ-ব্যান্ডের টানা অংশ (DivisionEditorials → ChemicalsBand →
+ExploreSplit)। ইমেজ গ্রিডে সাদা গটার **৬px** (`gap-1.5`); সেকশনগুলোর ভেতরে ও
+মাঝে একই মাপ, যাতে তিনটা মিলে এক টানা ব্যান্ড মনে হয়।
 
 ### ১০. লিভিং লুকবুক
 
@@ -149,9 +157,10 @@ client/src/
 
 ## পেছনের সিস্টেম
 
-**রঙ** — ব্র্যান্ড `#D44348` (`brand.ts` / CSS ভেরিয়েবল)।  
-**টাইপ** — লেআউটের ThemeControl দিয়ে হেডিং ফেস চেষ্টা (ডিফল্ট Josefin Sans
-হেডিং); বডি Manrope। ফাইনাল হলে `brand.ts` এ লক।  
+**রঙ** — ব্র্যান্ড `#D44348` (`config/brand.ts` → `BRAND_PRIMARY`, CSS ভেরিয়েবল)।  
+**টাইপ** — লক করা (`config/brand.ts`): বডি **Poppins** (`BRAND_FONT`), হেডিং
+**Plus Jakarta Sans** (`BRAND_FONT_HEADING`)। লেআউটের ThemeControl প্যানেলে ২৬টা
+ফেস চেষ্টা করার জন্য লোড থাকে, কিন্তু ডিফল্ট এই দুটো।  
 **নড়াচড়া** — `motion.js` rise / group / VIEWPORT; `prefers-reduced-motion` মানে।  
 **স্ন্যাপ** — `HomeTwoSectionSnap` পূর্ণ-উচ্চতা ব্যান্ডে নরম স্ন্যাপ।
 
