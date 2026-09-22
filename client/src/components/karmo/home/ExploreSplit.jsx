@@ -213,11 +213,14 @@ function Panel({ panel, compact = false }) {
         }`}
       >
         <h2
-          className={`display font-bold uppercase leading-[1.15] tracking-[0.02em] text-white ${
-            compact
-              ? "text-[1.35rem] sm:text-[1.5rem] lg:text-[1.7rem] xl:text-[1.85rem]"
-              : "text-[1.65rem] sm:text-[1.85rem] lg:text-[2.1rem] xl:text-[2.3rem]"
-          }`}
+          className="display title-card-line uppercase text-white"
+          style={{
+            fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+            fontWeight: 350,
+            fontVariationSettings: '"wght" 350',
+            lineHeight: 1.08,
+            letterSpacing: "-0.015em",
+          }}
         >
           <span className="block sm:whitespace-nowrap">{panel.line1}</span>
           <span className="block sm:whitespace-nowrap">{panel.line2}</span>
@@ -282,7 +285,16 @@ export default function ExploreSplit({
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
               <div className="text-right">
-                <h2 className="display section-heading text-[1.75rem] uppercase leading-[1.12] text-white sm:text-[2.1rem] lg:text-[2.45rem] xl:text-[2.7rem]">
+                <h2
+                  className="display title-card-line uppercase text-white"
+                  style={{
+                    fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+                    fontWeight: 350,
+                    fontVariationSettings: '"wght" 350',
+                    lineHeight: 1.08,
+                    letterSpacing: "-0.015em",
+                  }}
+                >
                   <span className="block sm:whitespace-nowrap">Foam crafted</span>
                   <span className="block sm:whitespace-nowrap">for comfort</span>
                 </h2>

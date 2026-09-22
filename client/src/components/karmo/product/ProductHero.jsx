@@ -110,9 +110,11 @@ export default function ProductHero({ product }) {
     : getPricingRule(product.slug);
   const heightLocked = pricingRule?.heightFixed != null;
   const heightChoices = pricingRule?.heightOptions || null;
-  const buyboxIcons = product.buyboxIcons?.length
-    ? product.buyboxIcons
-    : DEFAULT_BUYBOX_ICONS;
+  const buyboxIcons = isFoam
+    ? product.buyboxIcons?.length
+      ? product.buyboxIcons
+      : DEFAULT_BUYBOX_ICONS
+    : product.buyboxIcons || [];
   const fabricTitle = product.fabricTitle || "Fabric";
   const textureSrc =
     product.textureSrc ||
@@ -397,30 +399,32 @@ export default function ProductHero({ product }) {
               </p>
             ) : null}
 
-            <ul
-              className="mt-4 grid grid-cols-4 gap-1 border border-ink/10 bg-white px-1.5 py-2 sm:gap-1.5 sm:px-2 sm:py-2"
-              aria-label="Product highlights"
-            >
-              {buyboxIcons.map((item) => (
-                <li
-                  key={item.label}
-                  className="flex min-w-0 flex-col items-center text-center"
-                >
-                  <span className="relative flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">
-                    <Image
-                      src={item.src}
-                      alt=""
-                      width={36}
-                      height={36}
-                      className="h-full w-full object-contain"
-                    />
-                  </span>
-                  <span className="mt-1 text-[10px] font-semibold leading-[1.2] text-brand sm:text-[11px]">
-                    {item.label}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {buyboxIcons.length ? (
+              <ul
+                className="mt-4 grid grid-cols-4 gap-1 border border-ink/10 bg-white px-1.5 py-2 sm:gap-1.5 sm:px-2 sm:py-2"
+                aria-label="Product highlights"
+              >
+                {buyboxIcons.map((item) => (
+                  <li
+                    key={item.label}
+                    className="flex min-w-0 flex-col items-center text-center"
+                  >
+                    <span className="relative flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">
+                      <Image
+                        src={item.src}
+                        alt=""
+                        width={36}
+                        height={36}
+                        className="h-full w-full object-contain"
+                      />
+                    </span>
+                    <span className="mt-1 text-[10px] font-semibold leading-[1.2] text-brand sm:text-[11px]">
+                      {item.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
 
             <div className="mt-1">
               {product.fabrics?.length ? (
@@ -436,7 +440,7 @@ export default function ProductHero({ product }) {
                             aria-label={f.label}
                             aria-pressed={on}
                             onClick={() => setFabric(f.id)}
-                            className={`relative block h-9 w-9 overflow-hidden border transition-colors ${
+                            className={`relative block h-12 w-12 overflow-hidden border transition-colors sm:h-14 sm:w-14 ${
                               on
                                 ? "border-brand"
                                 : "border-ink/15 hover:border-ink/35"
@@ -446,7 +450,7 @@ export default function ProductHero({ product }) {
                               src={f.image}
                               alt=""
                               fill
-                              sizes="36px"
+                              sizes="56px"
                               className="object-cover"
                             />
                           </button>

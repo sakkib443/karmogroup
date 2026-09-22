@@ -524,9 +524,9 @@ export default function DivisionProducts({
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
             {eyebrow}
           </span>
-          <h2 className="display mt-4 text-[1.9rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.4rem]">
+          <h2 className="display section-heading title-card-line mt-4 uppercase text-ink">
             {headingLead}{" "}
-            <span className="font-bold text-brand">{headingAccent}</span>
+            <span className="text-brand">{headingAccent}</span>
           </h2>
           {body ? (
             <p className="body-copy mx-auto mt-4 max-w-2xl text-[14px] leading-[1.65] text-ink/60 sm:text-[15px]">

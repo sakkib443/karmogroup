@@ -7,42 +7,38 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Awards & trust — above the footer on every karmo-2 page.
- * Three-column proof band; section tone bleeds into the footer.
+ * Four gold marks on the dark band: number one plus three original
+ * certification badges (transparent, no plate).
  */
-
-const BADGE = {
-  src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.webp",
-  width: 512,
-  height: 512,
-};
 
 const pillars = [
   {
-    id: "recommended",
-    src: BADGE.src,
-    width: BADGE.width,
-    height: BADGE.height,
+    id: "number-one",
+    src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.webp",
     alt: "Bangladesh’s number one comfort brand badge",
-    title: "Most highly recommended",
+    title: "Number one",
     body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
   },
   {
-    id: "awards",
-    src: "/karmo/images/home-02/trust/awards-trophies-v2.webp",
-    width: 512,
-    height: 512,
-    alt: "Recognition and awards for Karmo Group",
-    title: "Recognised for six decades",
-    body: "Founded in 1965 as the country’s first polyurethane producer. Super Brand recognition built on consistency, not campaigns.",
+    id: "iso",
+    src: "/karmo/images/home-02/certified/logos/logo-iso-9001-gold.webp",
+    alt: "ISO 9001 quality management gold seal",
+    title: "ISO 9001",
+    body: "International Organization for Standardization — the international standard for quality management.",
   },
   {
-    id: "certified",
-    src: "/karmo/images/home-02/trust/certified-seal-gold-v2.webp",
-    width: 512,
-    height: 512,
-    alt: "Certified quality seal — ISO accredited standards",
-    title: "Internationally certified quality",
-    body: "ISO 9001 quality management with UKAS and Moody International approval — every batch held to certified standards.",
+    id: "ukas",
+    src: "/karmo/images/home-02/certified/logos/logo-ukas-gold-v5.webp",
+    alt: "UKAS Quality Management gold badge, registration number 014",
+    title: "UKAS Quality Management",
+    body: "Registration Number 014 — registered name Karmo Foam & Adhesive Industries Ltd.",
+  },
+  {
+    id: "moody",
+    src: "/karmo/images/home-02/certified/logos/logo-moody-gold-v5.webp",
+    alt: "Moody International gold mark — ISO 9001 Approved",
+    title: "Moody International",
+    body: "ISO 9001 Approved — independent certification of the quality-management system.",
   },
 ];
 
@@ -53,7 +49,7 @@ export default function CertifiedBy() {
   return (
     <section
       className="relative overflow-hidden bg-[#0a0a0a] pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24"
-      aria-label="Awards and trust"
+      aria-label="Awards and certifications"
     >
       <span
         aria-hidden
@@ -76,39 +72,42 @@ export default function CertifiedBy() {
           viewport={VIEWPORT}
           className="mx-auto max-w-3xl text-center"
         >
-          <h2 className="display section-heading uppercase text-white">
+          <h2 className="display section-heading title-card-line uppercase text-white">
             Built on trust since 1965
           </h2>
           <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]">
-            Recommendation, recognition and certified quality — proof that lasts.
+            Number one in Bangladesh — with ISO 9001, UKAS and Moody
+            International certification behind every batch.
           </p>
         </motion.header>
 
         <motion.ul
           variants={group}
-          className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 md:mt-16 md:grid-cols-3 md:gap-0"
+          className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 md:mt-16 md:grid-cols-2 md:gap-x-0 md:gap-y-12 lg:grid-cols-4 lg:gap-y-0"
         >
-          {pillars.map(({ id, src, width, height, alt, title, body }, i) => (
+          {pillars.map(({ id, src, alt, title, body }, i) => (
             <motion.li
               key={id}
               variants={fade}
-              className={`flex flex-col items-center px-4 text-center md:px-8 lg:px-10 ${
-                i > 0 ? "md:border-l md:border-white/12" : ""
-              }`}
+              className={`flex flex-col items-center px-4 text-center md:px-6 lg:px-7 ${
+                i % 2 === 1 ? "md:border-l md:border-white/12" : ""
+              } ${i > 0 ? "lg:border-l lg:border-white/12" : ""}`}
             >
-              <div className="relative flex h-[11rem] w-[11rem] items-center justify-center sm:h-[13rem] sm:w-[13rem] lg:h-[14.5rem] lg:w-[14.5rem]">
+              <div className="relative flex h-[13.5rem] w-[13.5rem] items-center justify-center sm:h-[15.5rem] sm:w-[15.5rem] lg:h-[17rem] lg:w-[17rem]">
                 <Image
                   src={src}
                   alt={alt}
-                  width={width}
-                  height={height}
-                  sizes="(min-width: 1024px) 232px, (min-width: 640px) 208px, 176px"
-                  quality={70}
+                  width={1024}
+                  height={1024}
+                  sizes="(min-width: 1024px) 272px, 248px"
+                  quality={80}
                   className="h-full w-full object-contain"
                 />
               </div>
-              <p className="body-copy mt-6 max-w-[20rem] text-[13px] leading-[1.65] text-white/70 sm:mt-7 sm:text-[14px]">
-                <span className="sr-only">{title}. </span>
+              <h3 className="display mt-5 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white sm:mt-6">
+                {title}
+              </h3>
+              <p className="body-copy mt-2.5 max-w-[18rem] text-[13px] leading-[1.65] text-white/70 sm:text-[14px]">
                 {body}
               </p>
             </motion.li>
@@ -121,9 +120,10 @@ export default function CertifiedBy() {
           viewport={VIEWPORT}
           className="mx-auto mt-12 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-14 sm:text-[11px]"
         >
-          Reflects Karmo Group’s position since 1965, Super Brand recognition,
-          and ISO 9001 / UKAS / Moody International accreditation held by Karmo
-          Foam &amp; Adhesive Industries Ltd.
+          Reflects Karmo Group’s position since 1965, and ISO 9001 quality
+          management accredited by UKAS (Registration Number 014) and approved
+          by Moody International — held by Karmo Foam &amp; Adhesive Industries
+          Ltd.
         </motion.p>
       </motion.div>
     </section>

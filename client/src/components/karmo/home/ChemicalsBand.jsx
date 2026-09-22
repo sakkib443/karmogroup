@@ -75,8 +75,17 @@ export default function ChemicalsBand() {
           <span className="relative text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70">
             Karmo Chemicals
           </span>
-          <h2 className="relative display section-heading mt-3 uppercase text-white">
-            <span className="block font-semibold! text-white/90">The world of</span>
+          <h2
+            className="relative display title-card-line mt-3 uppercase text-white"
+            style={{
+              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+              fontWeight: 350,
+              fontVariationSettings: '"wght" 350',
+              lineHeight: 1.08,
+              letterSpacing: "-0.015em",
+            }}
+          >
+            <span className="block text-white/90">The world of</span>
             <span className="block text-white">polyurethane</span>
           </h2>
 

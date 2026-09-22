@@ -91,6 +91,7 @@ export default function OverlayHeroSlider({
       <div className={frameClass}>
         {slides.map((s, i) => {
           const on = i === active;
+          const titleCard = Boolean(s.titleCard);
           const right = s.align === "right";
           const center = s.align === "center";
           /* `copyAlign: "start"` keeps type left-aligned even when the block
@@ -98,9 +99,11 @@ export default function OverlayHeroSlider({
           const copyEnd = right && s.copyAlign !== "start";
           const copyStart = right && s.copyAlign === "start";
           const light = s.tone === "light";
-          const primary = s.cta?.find((c) => c.primary) ?? s.cta?.[0];
+          const primary = titleCard
+            ? null
+            : s.cta?.find((c) => c.primary) ?? s.cta?.[0];
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
-          const hasAccent = Boolean(s.headingAccent);
+          const hasAccent = !titleCard && Boolean(s.headingAccent);
 
           return (
             <div key={s.id} className="absolute inset-0">
@@ -121,10 +124,23 @@ export default function OverlayHeroSlider({
                   quality={90}
                   priority={i === 0}
                   loading="eager"
+                  unoptimized={Boolean(s.image.unoptimized)}
                   className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"
                   } ${s.image.className || ""}`}
                 />
+                {s.image.overlay ? (
+                  <Image
+                    src={s.image.overlay}
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    quality={90}
+                    className={`pointer-events-none ${
+                      s.image.fit === "contain" ? "object-contain" : "object-cover"
+                    } ${s.image.position || "object-center"} ${s.image.className || ""}`}
+                  />
+                ) : null}
               </motion.div>
               {s.breeze && !reduce ? (
                 <motion.span
@@ -151,7 +167,20 @@ export default function OverlayHeroSlider({
                   className="pointer-events-none absolute inset-0 bg-black/32"
                 />
               ) : null}
-              {!light ? (
+              {titleCard ? (
+                <motion.span
+                  aria-hidden
+                  initial={false}
+                  animate={{ opacity: on ? 1 : 0 }}
+                  transition={fadeMs}
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background: right
+                      ? "linear-gradient(to left, rgba(11,21,40,0.48) 0%, rgba(11,21,40,0.22) 40%, rgba(11,21,40,0.10) 100%)"
+                      : "linear-gradient(to top, rgba(11,21,40,0.72) 0%, rgba(11,21,40,0.32) 45%, rgba(11,21,40,0.22) 100%)",
+                  }}
+                />
+              ) : !light ? (
                 <>
                   <motion.span
                     aria-hidden
@@ -188,6 +217,8 @@ export default function OverlayHeroSlider({
                   className={`shell flex h-full ${
                     center
                       ? "items-start justify-center pt-[min(30vh,13rem)] md:pt-[min(32vh,15rem)]"
+                      : titleCard && right
+                        ? "items-center justify-end"
                       : `items-end pb-16 md:items-center md:pb-0 ${
                           right ? "md:justify-end" : ""
                         }`
@@ -195,20 +226,60 @@ export default function OverlayHeroSlider({
                 >
                   <motion.div
                     key={`${s.id}-${on ? "on" : "off"}`}
-                    initial={reduce ? false : "hidden"}
-                    animate={on && !reduce ? "show" : reduce && on ? "show" : "hidden"}
-                    variants={copyContainer}
-                    className={`w-full ${
-                      center
-                        ? "max-w-[min(94vw,52rem)] text-center"
-                        : `max-w-[min(92vw,24rem)] sm:max-w-[min(90vw,36rem)] ${
-                            copyStart
-                              ? "lg:max-w-[min(40vw,32rem)]"
-                              : "lg:max-w-[min(55vw,46rem)]"
-                          } ${copyEnd ? "md:text-right" : "text-left"}`
+                    initial={titleCard || reduce ? false : "hidden"}
+                    animate={
+                      titleCard || (reduce && on)
+                        ? "show"
+                        : on && !reduce
+                          ? "show"
+                          : "hidden"
+                    }
+                    variants={titleCard ? undefined : copyContainer}
+                    className={`${
+                      titleCard && right
+                        ? "ml-auto w-auto max-w-[min(92vw,40rem)] text-right"
+                        : titleCard && center
+                          ? "w-full max-w-none text-center"
+                          : center
+                            ? "w-full max-w-[min(94vw,52rem)] text-center"
+                            : `w-full max-w-[min(92vw,24rem)] sm:max-w-[min(90vw,36rem)] ${
+                                copyStart
+                                  ? "lg:max-w-[min(40vw,32rem)]"
+                                  : "lg:max-w-[min(55vw,46rem)]"
+                              } ${copyEnd ? "md:text-right" : "text-left"}`
                     } ${on ? "pointer-events-auto" : "pointer-events-none"}`}
                   >
-                    {(s.eyebrowStart || s.eyebrowEnd) && (
+                    {titleCard ? (
+                      <motion.div
+                        initial={reduce ? false : { opacity: 0, y: 26 }}
+                        animate={
+                          on ? { opacity: 1, y: 0 } : { opacity: 0, y: 26 }
+                        }
+                        transition={{
+                          duration: reduce ? 0 : 0.72,
+                          ease: EASE,
+                          delay: reduce || !on ? 0 : 0.14,
+                        }}
+                      >
+                        <Heading
+                          className={`display hero-heading title-card-line whitespace-nowrap uppercase text-white ${
+                            right ? "text-right" : ""
+                          }`}
+                          style={{
+                            fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
+                            fontWeight: 350,
+                            fontVariationSettings: '"wght" 350',
+                            letterSpacing: "0.12em",
+                            lineHeight: 1.1,
+                            textShadow: "0 2px 28px rgba(0,0,0,0.55)",
+                          }}
+                        >
+                          {s.headingLead}
+                        </Heading>
+                      </motion.div>
+                    ) : (
+                      <>
+                    {!titleCard && (s.eyebrowStart || s.eyebrowEnd) && (
                       <motion.div
                         variants={copyItem}
                         className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
@@ -248,11 +319,15 @@ export default function OverlayHeroSlider({
                     )}
                     <motion.div variants={copyItem}>
                       <Heading
-                        className={`display hero-heading uppercase leading-[1.08] tracking-[0.04em] text-white ${
+                        className={`display hero-heading title-card-line uppercase text-white ${
                           center
-                            ? "text-[1.45rem] font-semibold text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.55)] sm:text-[2rem] lg:text-[2.35rem] lg:tracking-[0.06em]"
-                            : "text-[1.85rem] font-light sm:text-[2.65rem] lg:text-[3.15rem]"
+                            ? "text-[1.45rem] leading-[1.08] tracking-[0.04em] text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.55)] sm:text-[2rem] lg:text-[2.35rem] lg:tracking-[0.06em]"
+                            : "text-[1.85rem] leading-[1.08] tracking-[0.04em] sm:text-[2.65rem] lg:text-[3.15rem]"
                         }`}
+                        style={{
+                          fontWeight: 350,
+                          fontVariationSettings: '"wght" 350',
+                        }}
                       >
                         <span
                           className={`block whitespace-normal ${
@@ -263,7 +338,7 @@ export default function OverlayHeroSlider({
                         </span>
                         {hasAccent ? (
                           <span
-                            className={`block whitespace-normal font-bold text-brand ${
+                            className={`block whitespace-normal text-brand ${
                               center || copyStart ? "" : "sm:whitespace-nowrap"
                             }`}
                           >
@@ -296,6 +371,8 @@ export default function OverlayHeroSlider({
                         </Link>
                       </motion.div>
                     ) : null}
+                      </>
+                    )}
                   </motion.div>
                 </div>
               </div>

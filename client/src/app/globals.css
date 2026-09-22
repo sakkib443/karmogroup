@@ -75,7 +75,8 @@ h1, h2, h3, h1 *, h2 *, h3 *,
  * continuously instead of stepping. */
 .home-two-type .section-heading {
   font-size: clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem) !important;
-  font-weight: 800 !important;
+  font-weight: 350 !important;
+  font-variation-settings: "wght" 350;
   line-height: 1.08 !important;
   letter-spacing: -0.015em !important;
   text-transform: uppercase;
@@ -1197,6 +1198,15 @@ svg.app-icon[fill="none"] {
 
 .foam-drift {
   animation: foam-drift 30s ease-in-out infinite alternate;
+}
+
+/* Mattress hero, first slide: on wide desktops the beach still sits a little
+   low in the frame. Nudge it up without changing the phone crop. */
+@media (min-width: 1024px) {
+  .mattress-hero-first {
+    transform: translateY(-8%) scale(1.12);
+    transform-origin: center center;
+  }
 }
 
 /* Site navbar: quilted mattress texture + welt piping.

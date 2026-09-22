@@ -78,9 +78,9 @@ function ColumnHeading({ eyebrow, title, accent }) {
       <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
         {eyebrow}
       </span>
-      <h2 className="display section-heading mt-3 uppercase text-ink">
+      <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
         {title}{" "}
-        <span className="font-bold text-brand">{accent}</span>
+        <span className="text-brand">{accent}</span>
       </h2>
       <LeafRule />
     </div>

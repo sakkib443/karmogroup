@@ -42,7 +42,16 @@ export default function ShoeSole() {
         viewport={VIEWPORT}
         className="absolute top-[22%] left-[7%] z-[2] sm:top-[24%] sm:left-[9%] lg:top-[26%] lg:left-[10%]"
       >
-        <h2 className="display max-w-[14ch] text-[1.35rem] font-bold uppercase leading-[1.12] tracking-[0.01em] text-white sm:text-[1.75rem] lg:text-[2.1rem]">
+        <h2
+          className="display title-card-line max-w-[14ch] uppercase text-white"
+          style={{
+            fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+            fontWeight: 350,
+            fontVariationSettings: '"wght" 350',
+            lineHeight: 1.08,
+            letterSpacing: "-0.015em",
+          }}
+        >
           Soles built to
           <span className="block">carry the day</span>
         </h2>
