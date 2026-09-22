@@ -146,8 +146,8 @@ export default function Partners() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Partners &amp; clients
           </span>
-          <h2 className="display section-heading mt-1 uppercase text-ink">
-            Trusted by <span className="font-bold text-brand">{CLAIMED}+</span>{" "}
+          <h2 className="display section-heading title-card-line mt-1 uppercase text-ink">
+            Trusted by <span className="text-brand">{CLAIMED}+</span>{" "}
             makers
           </h2>
         </motion.div>

@@ -259,7 +259,9 @@ export default function ThemeControl({ children, families, classNames }) {
 
     // The hero line carries `.hero-heading`; everything else is a section
     // title. Split so the two weights can differ.
-    const all = [...root.querySelectorAll("h1, h2, h3, h1 *, h2 *, h3 *")];
+    const all = [...root.querySelectorAll("h1, h2, h3, h1 *, h2 *, h3 *")].filter(
+      (n) => !n.closest(".title-card-line")
+    );
     const isHero = (n) => n.closest(".hero-heading");
     const groups = [
       [all.filter(isHero), cfg.weightHero],

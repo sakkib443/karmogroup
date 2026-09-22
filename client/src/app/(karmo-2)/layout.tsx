@@ -50,7 +50,6 @@ const manrope = Manrope({
 });
 const josefin = Josefin_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 const inter = Inter({

@@ -91,7 +91,7 @@ export default function DivisionAbout({
       >
         {/* ── Left: copy ─────────────────────────────────────────────────── */}
         <motion.div variants={fade}>
-          <h2 className="display text-[2rem] font-bold uppercase leading-[1.1] tracking-[0.01em] text-ink lg:text-[2.6rem]">
+          <h2 className="display section-heading title-card-line uppercase text-ink">
             {headingLead}{" "}
             <span className="text-brand">{headingAccent}</span>
           </h2>

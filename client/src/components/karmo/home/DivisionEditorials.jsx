@@ -29,25 +29,24 @@ const columns = [
     },
     {
       id: "foam-lavender",
-      href: "/hometex",
-      label: "HomeTex",
-      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-pillows-sideboard-hq.jpg",
-      alt: "White pillows and down feathers styled on a cane sideboard",
+      href: "/foam",
+      label: "Foam",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-olive-sofa-hq.jpg",
+      alt: "Olive three-seat sofa with Karmo foam in a sunlit living room",
       ratio: "aspect-[4/5]",
       grow: "md:flex-[15]",
-      position: "object-[72%_center]",
     },
   ],
   [
     {
       id: "mattress-bedroom",
-      href: "/foam",
-      label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/foam-luxury-arch-sofa-hq.jpg",
-      alt: "Charcoal foam sofa in a quiet luxury room with an arched forest mural",
+      href: "/hometex",
+      label: "HomeTex",
+      src: "/karmo/images/home-02/divisions/editorial-v2/hometex-pillows-sideboard-hq.jpg",
+      alt: "White pillows and down feathers styled on a cane sideboard",
       ratio: "aspect-[12/11]",
-      grow: "md:flex-[11]",
-      position: "object-[center_58%]",
+      grow: "md:flex-[14]",
+      position: "object-[72%_center]",
     },
     {
       id: "mattress-grey",
@@ -56,7 +55,7 @@ const columns = [
       src: "/karmo/images/home-02/divisions/editorial-v2/hometex-quilt-stack-hq.jpg",
       alt: "Stacked floral Karmo HomeTex quilts with floating feathers on a white bed",
       ratio: "aspect-[3/5]",
-      grow: "md:flex-[20]",
+      grow: "md:flex-[17]",
     },
   ],
   [
@@ -64,10 +63,11 @@ const columns = [
       id: "foam-campaign",
       href: "/foam",
       label: "Foam",
-      src: "/karmo/images/home-02/divisions/editorial-v2/foam-karmo-letter-sofa-hq.jpg",
-      alt: "Blue Karmo letter-cushion sofa in a quiet living room",
+      src: "/karmo/images/home-02/divisions/editorial-v2/foam-luxury-arch-sofa-hq.jpg",
+      alt: "Mustard wood-frame sofa set with Karmo foam in a sunlit living room",
       ratio: "aspect-[3/4]",
       grow: "md:flex-[16]",
+      position: "object-[center_42%]",
     },
     {
       id: "mattress-floral",
@@ -92,6 +92,7 @@ function Shot({ shot }) {
         alt={shot.alt}
         fill
         quality={85}
+        unoptimized
         sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
         className={`object-cover ${shot.position || "object-center"} origin-center transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
           shot.zoom
@@ -156,7 +157,16 @@ export default function DivisionEditorials() {
         >
           {/* Tagline only. "We create the" sits a step left of the
               chemistry line so the pair still reads left-aligned. */}
-          <h2 className="display section-heading uppercase text-ink">
+          <h2
+            className="display title-card-line uppercase text-ink"
+            style={{
+              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+              fontWeight: 350,
+              fontVariationSettings: '"wght" 350',
+              lineHeight: 1.08,
+              letterSpacing: "-0.015em",
+            }}
+          >
             <span className="block whitespace-nowrap -ml-[1.55em]">
               We create the
             </span>

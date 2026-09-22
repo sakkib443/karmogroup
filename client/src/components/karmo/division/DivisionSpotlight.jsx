@@ -70,9 +70,9 @@ export default function DivisionSpotlight({
           variants={fade}
           className="flex flex-col justify-center px-6 py-16 md:px-14 lg:px-20 lg:py-24 xl:pl-[max(5rem,calc((100vw-1600px)/2+5rem))] xl:pr-12"
         >
-          <h2 className="display text-[1.75rem] font-light uppercase leading-[1.12] tracking-[0.01em] text-ink lg:text-[2.15rem]">
+          <h2 className="display section-heading title-card-line uppercase text-ink">
             {headingLead}{" "}
-            <span className="font-bold text-brand">{headingAccent}</span>
+            <span className="text-brand">{headingAccent}</span>
           </h2>
 
           <ul className="mt-7 space-y-4">

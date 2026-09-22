@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
@@ -21,7 +20,7 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell pt-10 pb-5 text-center sm:pt-12 sm:pb-6 lg:pt-14"
+        className="shell pt-6 pb-2 text-center sm:pt-7 sm:pb-2.5 lg:pt-8"
       >
         <motion.p
           variants={fade}
@@ -47,15 +46,21 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
 
       <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
         <div className="relative h-[min(50svh,520px)] w-full min-h-[280px] sm:min-h-[340px] lg:h-[min(52svh,580px)]">
-          <Image
-            src="/karmo/images/product/Medium_Soft.webp"
-            alt={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
-            fill
-            sizes="100vw"
-            quality={90}
-            className="object-cover object-center"
-            priority={false}
-          />
+          <video
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/karmo/images/product/Medium_Soft.webp"
+            aria-label={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
+          >
+            <source
+              src="/karmo/videos/product/firmness-scale.mp4"
+              type="video/mp4"
+            />
+          </video>
         </div>
       </div>
     </section>

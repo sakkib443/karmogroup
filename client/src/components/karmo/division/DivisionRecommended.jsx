@@ -20,7 +20,7 @@ export default function DivisionRecommended({
   if (!columns.length) return null;
 
   return (
-    <section className="mb-1.5 w-full overflow-hidden bg-[#f7f7f8]">
+    <section id="which-foam" className="mb-1.5 w-full overflow-hidden bg-[#f7f7f8]">
       <motion.div
         variants={group}
         {...reveal}
@@ -29,7 +29,7 @@ export default function DivisionRecommended({
       >
         <motion.h2
           variants={fade}
-          className="display shrink-0 px-4 text-center text-[1.35rem] font-bold uppercase tracking-[0.04em] text-[#0b1a33] sm:px-8 sm:text-[1.65rem] lg:px-12 lg:text-[1.85rem]"
+          className="display section-heading title-card-line shrink-0 px-4 text-center uppercase text-[#0b1a33] sm:px-8 lg:px-12"
         >
           {heading}
         </motion.h2>
@@ -46,6 +46,7 @@ export default function DivisionRecommended({
                   src={col.image}
                   alt={col.alt || ""}
                   fill
+                  unoptimized
                   sizes="(min-width: 640px) 33vw, 100vw"
                   className="object-cover object-center"
                 />
