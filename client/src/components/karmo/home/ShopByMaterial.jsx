@@ -28,7 +28,7 @@ const materials = [
   {
     id: "rebonded-foam",
     name: "Rebonded Foam",
-    line: "Steam-bonded chips. Support that lasts.",
+    line: "Support that lasts",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/rebonded-foam-v4.jpg",
     alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
@@ -40,7 +40,7 @@ const materials = [
   {
     id: "pe-foam",
     name: "Polyethylene Foam",
-    line: "Hi-density core. Made only by Karmo.",
+    line: "Hi-density core",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/pe-foam-v2.jpg",
     alt: "Close-up of charcoal egg-crate contour foam",
@@ -51,7 +51,7 @@ const materials = [
   {
     id: "natural-coir",
     name: "Natural Coir",
-    line: "Coconut fibre. Cool and breathable.",
+    line: "Cool and breathable",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/natural-coir.jpg",
     alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
@@ -62,7 +62,7 @@ const materials = [
   {
     id: "pocket-spring",
     name: "Pocket Spring",
-    line: "Independent coils. Contours to you.",
+    line: "Independent coils",
     href: "/mattress",
     src: "/karmo/images/home-02/materials/pocket-spring.jpg",
     alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
@@ -89,14 +89,23 @@ function MaterialCard({ item }) {
 
         <span
           aria-hidden
-          className="absolute inset-0 bg-black/30"
+          className="absolute inset-0 bg-black/40"
         />
 
         <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-6 pb-6 pt-16 sm:px-7 sm:pb-7 sm:pt-[4.5rem] lg:px-8 lg:pb-8 lg:pt-24">
           <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] sm:text-[13px] lg:text-[14px]">
             {item.name}
           </span>
-          <h3 className="mt-3 max-w-[16ch] text-[1.55rem] font-bold uppercase leading-[1.2] tracking-[-0.01em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)] sm:text-[1.75rem] lg:text-[1.95rem]">
+          <h3
+            className="display title-card-line mt-3 whitespace-nowrap uppercase text-white"
+            style={{
+              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+              fontWeight: 350,
+              fontVariationSettings: '"wght" 350',
+              lineHeight: 1.08,
+              letterSpacing: "-0.015em",
+            }}
+          >
             {item.line}
           </h3>
           <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.02em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-colors duration-300 group-hover:text-brand sm:mt-6 sm:text-[14px] lg:text-[15px]">

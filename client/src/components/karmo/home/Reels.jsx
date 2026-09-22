@@ -149,7 +149,7 @@ export default function Reels() {
             </span>
           </p>
 
-          <h2 className="display section-heading mt-3 uppercase text-ink">
+          <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
             <span className="block sm:whitespace-nowrap">See comfort.</span>
             <span className="block text-brand sm:whitespace-nowrap">
               On screen.

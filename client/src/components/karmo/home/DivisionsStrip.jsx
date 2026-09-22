@@ -105,8 +105,17 @@ export default function DivisionsStrip() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
             Our Divisions
           </span>
-          <h2 className="display section-heading mt-1 uppercase text-ink">
-            One group, <span className="font-bold text-brand">four crafts</span>
+          <h2
+            className="display title-card-line mt-1 uppercase text-ink"
+            style={{
+              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+              fontWeight: 350,
+              fontVariationSettings: '"wght" 350',
+              lineHeight: 1.08,
+              letterSpacing: "-0.015em",
+            }}
+          >
+            One group, <span className="text-brand">four crafts</span>
           </h2>
         </motion.div>
       </motion.div>

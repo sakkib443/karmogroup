@@ -15,6 +15,10 @@ import DivisionProducts from "@/components/karmo/division/DivisionProducts";
 import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionRecommended from "@/components/karmo/division/DivisionRecommended";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
+import MattressBrands from "@/components/karmo/division/MattressBrands";
+import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
+import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
+import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 /** Scroll to `#hash` after navigation (Next client router often skips this). */
@@ -108,6 +112,12 @@ export default function DivisionPage({ data }) {
       {!data.banner?.hidden && <DivisionBanner {...data.banner} />}
       {data.about?.asHero && <DivisionAbout {...data.about} />}
       <DivisionFeatures items={data.features} />
+      {data.furnitureBrands && <FurnitureBrands {...data.furnitureBrands} />}
+      {data.furnitureGrades && (
+        <FurnitureGradesLineup {...data.furnitureGrades} />
+      )}
+      {data.brochureBrands && <MattressBrands {...data.brochureBrands} />}
+      {data.mattressFilm && <MattressFilmStage {...data.mattressFilm} />}
       {data.recommended?.columns && (
         <DivisionRecommended {...data.recommended} />
       )}
@@ -135,10 +145,10 @@ export default function DivisionPage({ data }) {
         />
       )}
       {data.zones && (
-        <section className="relative mb-1.5 grid w-full overflow-hidden bg-[#0b1a33] lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)] lg:aspect-[3.2/1]">
+        <section className="relative mb-0 grid w-full overflow-hidden bg-[#0b1a33] lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)] lg:aspect-[3.2/1]">
           {/* Left rail — copy + icons + CTA */}
           <div className="relative z-[1] flex flex-col items-center justify-center px-5 py-8 text-center sm:px-7 lg:px-9 lg:py-6">
-            <h2 className="display text-[1.35rem] font-bold uppercase leading-[1.12] tracking-[0.02em] text-white sm:text-[1.65rem] lg:text-[1.95rem]">
+            <h2 className="display section-heading title-card-line uppercase text-white">
               {data.zones.heading}
             </h2>
             {/* Optional — only the mattress division sets it. The other three
@@ -152,7 +162,20 @@ export default function DivisionPage({ data }) {
               <ul className="mt-5 grid w-full grid-cols-3 gap-3 sm:mt-6 sm:gap-4">
                 {data.zones.icons.map((icon) => (
                   <li key={icon.id} className="flex flex-col items-center text-center">
-                    <ZonesIcon id={icon.id} className="h-9 w-9 text-white sm:h-10 sm:w-10" />
+                    {icon.src ? (
+                      <span className="relative mx-auto flex h-14 w-14 items-center justify-center overflow-hidden bg-[#fff8f0] sm:h-16 sm:w-16">
+                        <img
+                          src={icon.src}
+                          alt=""
+                          aria-hidden="true"
+                          width={64}
+                          height={64}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      </span>
+                    ) : (
+                      <ZonesIcon id={icon.id} className="h-9 w-9 text-white sm:h-10 sm:w-10" />
+                    )}
                     <span className="mt-2 text-[10px] font-semibold uppercase leading-tight tracking-[0.06em] text-white/85 sm:text-[11px]">
                       {icon.label}
                     </span>
@@ -183,6 +206,22 @@ export default function DivisionPage({ data }) {
             />
           </div>
         </section>
+      )}
+      {data.zones && (
+        <div
+          aria-hidden
+          className="mattress-side-ribbon flex w-full overflow-hidden"
+          style={{ height: 168, margin: 0 }}
+        >
+          {Array.from({ length: 10 }).map((_, i) => (
+            <img
+              key={`side-tex-${i}`}
+              src="/karmo/images/header/mattress-side-texture.jpg"
+              alt=""
+              style={{ height: "100%", width: "auto", flex: "0 0 auto" }}
+            />
+          ))}
+        </div>
       )}
       <DivisionProducts {...data.products} categoryId={categoryId} />
       <OrderAndContact />

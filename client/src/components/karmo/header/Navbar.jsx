@@ -31,12 +31,12 @@ const LOGO_EASE = "duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 const MENU = "/karmo/images/header/menu-cartoon";
 
 /*
- * Header menu — client sheet (Sep 2026), organised for how the pages work:
+ * Header menu — client sheet (Website Menu revised, Sep 2026):
  *
  *   · Mattress → one division page (`/mattress`). Sub-rows go to product PDPs.
- *   · Foam → three main categories = three pages (`/foam/furniture`,
- *     `/foam/bed-automotive`, `/foam/footwear`). Column headers open those
- *     pages; sub-rows go to a product when one exists, otherwise the category.
+ *   · Foam → hover-only parent (click does not navigate). Three category
+ *     pages are the menu: `/foam/furniture`, `/foam/bed-automotive`,
+ *     `/foam/footwear`. `/foam` catalogue stays for other site links.
  *   · HomeTex / Chemicals → division page for now; sub-rows stay on-division
  *     until product PDPs exist.
  *   · Company → About / Media / Contact / Dealership block.
@@ -47,7 +47,8 @@ const nav = [
   {
     name: "Foam",
     line: "Furniture, bed, automotive, footwear",
-    href: "/foam",
+    href: null,
+    match: "/foam",
     icon: `${MENU}/nav-foam.png?v=2`,
     texture: "foam",
     textureSrc: "/karmo/images/header/foam-side-texture.jpg",
@@ -73,11 +74,11 @@ const nav = [
         href: "/foam/bed-automotive",
         icon: `${MENU}/bed-auto.png`,
         items: [
-          { name: "Contour Design Foam Chattogram", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
-          { name: "Contour Design Foam Sylhet", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
-          { name: "Contour Design Foam Dhaka", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
-          { name: "Contour Design Foam Karmo", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
-          { name: "Contour Design Foam Catalog", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/set-block.png` },
+          { name: "Contour Design Foam – Chattogram Design", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
+          { name: "Contour Design Foam – Sylhet Design", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
+          { name: "Contour Design Foam – Dhaka Design", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour.png` },
+          { name: "Contour Design Foam – Karmo Design", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/contour-egg.png` },
+          { name: "Contour Design Foam – Catalogue Design", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/set-block.png` },
           { name: "Acoustic Foam", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/acoustic.png` },
           { name: "Bed Foam", href: "/foam/bed-automotive#foam-offers", icon: `${MENU}/bed-auto.png` },
         ],
@@ -103,7 +104,7 @@ const nav = [
     texture: "mattress",
     textureSrc: "/karmo/images/header/mattress-side-texture.jpg",
     /* One division page — sub-rows are products, not category pages. */
-    panelWidth: "w-[25rem]",
+    panelWidth: "25rem",
     columns: [
       {
         label: "Mattress",
@@ -125,10 +126,10 @@ const nav = [
   },
   {
     name: "HomeTex / Bedding",
-    line: "Pillows, bed sheets, comforters",
+    line: "Pillows, sheets, quilts, towels",
     href: "/hometex",
     icon: `${MENU}/nav-hometex.png?v=2`,
-    panelWidth: "w-[34rem]",
+    panelWidth: "36rem",
     columns: [
       {
         label: "Pillow",
@@ -138,6 +139,8 @@ const nav = [
           { name: "Relax Time", href: "/hometex", icon: `${MENU}/pillow.png` },
           { name: "Plush", href: "/hometex", icon: `${MENU}/plush.png` },
           { name: "Cushion", href: "/hometex", icon: `${MENU}/cushion.png` },
+          { name: "Organic Silk Cotton", href: "/hometex", icon: `${MENU}/natural.png` },
+          { name: "Orthopedic U-Pillow", href: "/hometex", icon: `${MENU}/orthopedic.png` },
         ],
       },
       {
@@ -147,27 +150,35 @@ const nav = [
         items: [
           { name: "Bed Sheet", href: "/hometex", icon: `${MENU}/bedsheet.png` },
           { name: "Comforter", href: "/hometex", icon: `${MENU}/comforter.png` },
-          { name: "AC Quilt", href: "/hometex", icon: `${MENU}/ac-quilt.png` },
+          { name: "Quilts & Bed Spreads", href: "/hometex", icon: `${MENU}/ac-quilt.png` },
           { name: "Airflow Mosquito Net", href: "/hometex", icon: `${MENU}/natural.png` },
+          { name: "Wipes / Towels", href: "/hometex", icon: `${MENU}/soft.png` },
         ],
       },
     ],
   },
   {
     name: "Chemicals & Polymers",
-    line: "Solvents, adhesives, sodium silicate",
+    line: "Solvents, additives, adhesives",
     href: "/chemicals",
     icon: `${MENU}/nav-chemicals.png?v=2`,
-    panelWidth: "w-[58rem]",
+    panelWidth: "min(72rem, 94vw)",
     columns: [
       {
-        label: "Polyurethane Solvent",
+        label: "Polyurethane / Solvent",
         href: "/chemicals",
         icon: `${MENU}/solvent.png`,
         items: [
           { name: "TDI", href: "/chemicals", icon: `${MENU}/solvent.png` },
           { name: "PPG", href: "/chemicals", icon: `${MENU}/grade-poly.png` },
           { name: "CoPolymer", href: "/chemicals", icon: `${MENU}/rebonded.png` },
+        ],
+      },
+      {
+        label: "Specialized Chemicals & Additives",
+        href: "/chemicals",
+        icon: `${MENU}/pigment.png`,
+        items: [
           { name: "Silicone", href: "/chemicals", icon: `${MENU}/sealant.png` },
           { name: "SO", href: "/chemicals", icon: `${MENU}/spray-adhesive.png` },
           { name: "PS", href: "/chemicals", icon: `${MENU}/grade-hd.png` },
@@ -204,7 +215,7 @@ const nav = [
         ],
       },
       {
-        label: "Silicate",
+        label: "Sodium Silicate",
         href: "/chemicals",
         icon: `${MENU}/silicate.png`,
         items: [{ name: "Sodium Silicate", href: "/chemicals", icon: `${MENU}/silicate.png` }],
@@ -216,7 +227,7 @@ const nav = [
     line: "About, media, contact, dealership",
     panelAlign: "right",
     href: "/about",
-    panelWidth: "w-[56rem]",
+    panelWidth: "56rem",
     columns: [
       {
         label: "About Us",
@@ -337,10 +348,15 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
       <ul className="flex h-full items-stretch gap-x-0.5">
         {nav.map((entry) => {
           const isDisabled = Boolean(entry.disabled);
+          const matchPath = entry.match || entry.href;
           const isActive =
             !isDisabled &&
-            (pathname === entry.href || pathname.startsWith(`${entry.href}/`));
+            Boolean(matchPath) &&
+            (pathname === matchPath || pathname.startsWith(`${matchPath}/`));
           const isOpen = !isDisabled && panel === entry.name;
+          const triggerClass = `relative flex h-full items-center gap-2 px-3 transition-colors duration-300 ${
+            isActive ? "text-brand" : "text-ink hover:text-brand"
+          }`;
 
           const label = (
             <>
@@ -380,18 +396,32 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                 >
                   {label}
                 </span>
-              ) : (
+              ) : entry.href ? (
                 <Link
                   href={entry.href}
                   aria-current={isActive ? "page" : undefined}
                   onMouseEnter={() => openPanel(entry.name)}
                   onFocus={() => openPanel(entry.name)}
-                  className={`relative flex h-full items-center gap-2 px-3 transition-colors duration-300 ${
-                    isActive ? "text-brand" : "text-ink hover:text-brand"
-                  }`}
+                  className={triggerClass}
                 >
                   {label}
                 </Link>
+              ) : (
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-haspopup="true"
+                  aria-current={isActive ? "page" : undefined}
+                  onMouseEnter={() => openPanel(entry.name)}
+                  onFocus={() => openPanel(entry.name)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openPanel(entry.name);
+                  }}
+                  className={triggerClass}
+                >
+                  {label}
+                </button>
               )}
 
               {!isDisabled && entry.columns ? (
@@ -404,6 +434,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                    Foam's panel ran 171px off the left and Company's 21px off the
                    right. `panelAlign` pins those to the item's own left or right
                    edge instead, so the panel opens inward. */
+                style={{ width: entry.panelWidth || "52rem", maxWidth: "94vw" }}
                 className={`absolute top-[calc(100%-4px)] z-[1100] hidden overflow-hidden shadow-[0_24px_50px_-18px_rgba(0,0,0,0.18)] transition-all duration-300 xl:block ${
                   entry.panelAlign === "left"
                     ? "left-0"
@@ -414,8 +445,6 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                   entry.textureSrc
                     ? "header-mega-textured bg-[#fffefb]"
                     : "bg-white"
-                } ${
-                  entry.panelWidth || "w-[52rem]"
                 } ${
                   panel === entry.name
                     ? "visible translate-y-0 opacity-100"
@@ -440,7 +469,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                   </>
                 ) : null}
                 <div
-                  className={`relative z-[1] grid divide-x divide-ink/6 px-5 py-5 ${
+                  className={`relative z-[1] grid w-full min-w-0 divide-x divide-ink/6 px-5 py-5 ${
                     entry.columns.length >= 5
                       ? "grid-cols-5"
                       : entry.columns.length === 4
@@ -453,7 +482,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                   }`}
                 >
                     {entry.columns.map((col) => (
-                      <div key={col.label} className="px-4 first:pl-1 last:pr-1">
+                      <div key={col.label} className="min-w-0 px-4 first:pl-1 last:pr-1">
                         {/* Parent category — larger icon + type so it reads above sub-rows */}
                         <div className="flex min-h-[3.25rem] items-end border-b border-ink/10 pb-3.5">
                           {col.href ? (
@@ -790,24 +819,40 @@ export default function Navbar({ scrolled = false }) {
                         </span>
                       ) : (
                         <>
-                          <Link
-                            href={entry.href}
-                            onClick={() => setOpen(false)}
-                            className="flex items-center gap-3.5"
-                          >
-                            {entry.icon ? (
-                              <MenuGlyph icon={entry.icon} alt="" size="nav" />
-                            ) : null}
-                            <span className="min-w-0 flex-1">
-                              <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
-                                {entry.name}
+                          {entry.href ? (
+                            <Link
+                              href={entry.href}
+                              onClick={() => setOpen(false)}
+                              className="flex items-center gap-3.5"
+                            >
+                              {entry.icon ? (
+                                <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                              ) : null}
+                              <span className="min-w-0 flex-1">
+                                <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                                  {entry.name}
+                                </span>
+                                <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                                  {entry.line}
+                                </span>
                               </span>
-                              <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
-                                {entry.line}
+                              <FiArrowUpRight className="shrink-0 text-brand" />
+                            </Link>
+                          ) : (
+                            <span className="flex items-center gap-3.5">
+                              {entry.icon ? (
+                                <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                              ) : null}
+                              <span className="min-w-0 flex-1">
+                                <span className="display block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">
+                                  {entry.name}
+                                </span>
+                                <span className="mt-0.5 block text-[11px] uppercase tracking-[0.08em] text-ink/50">
+                                  {entry.line}
+                                </span>
                               </span>
                             </span>
-                            <FiArrowUpRight className="shrink-0 text-brand" />
-                          </Link>
+                          )}
 
                           {entry.columns ? (
                             <div className="mt-3 space-y-4">
