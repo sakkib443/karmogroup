@@ -9,7 +9,7 @@ import Image from "next/image";
 export default function FurnitureGradesLineup({
   lineup,
   alt = "",
-  heading = "All your upholstery needs",
+  heading = "The set foam line",
 }) {
   if (!lineup) return null;
 
@@ -18,7 +18,7 @@ export default function FurnitureGradesLineup({
       id="furniture-grades"
       aria-label={alt || "Karmo furniture foam grades"}
       className="relative mb-1.5 w-full overflow-hidden bg-[#2a241c]"
-      style={{ minHeight: "100svh" }}
+      style={{ height: "calc(100svh - 112px)" }}
     >
       <Image
         src={lineup}
@@ -27,7 +27,8 @@ export default function FurnitureGradesLineup({
         priority
         unoptimized
         sizes="100vw"
-        className="object-cover object-[center_72%]"
+        className="object-cover"
+        style={{ objectPosition: "center 50%" }}
       />
       <span
         aria-hidden
@@ -42,7 +43,10 @@ export default function FurnitureGradesLineup({
         }}
       />
       {heading ? (
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] flex justify-center px-5 pt-8 text-center sm:px-8 sm:pt-10 lg:pt-14">
+        <div
+          className="pointer-events-none absolute inset-x-0 z-[2] flex justify-center px-5 text-center sm:px-8"
+          style={{ top: "22%" }}
+        >
           <p
             className="display title-card-line uppercase text-white"
             style={{

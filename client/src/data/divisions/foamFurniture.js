@@ -95,9 +95,9 @@ const foamFurniture = {
   },
 
   furnitureGrades: {
-    lineup: `${IMG}/rooms/furniture-grades-four-hq.jpg`,
+    lineup: `${IMG}/rooms/furniture-grades-user-hq.png`,
     alt: "Four Karmo furniture foam grades in a living room — 280, 2001, HD and 1965",
-    heading: "All your upholstery needs",
+    heading: "The set foam line",
   },
 
   recommended: {
@@ -112,7 +112,7 @@ const foamFurniture = {
       {
         id: "density",
         image: `${IMG}/why/why-density-hq.jpg`,
-        alt: "Cutaway of dense furniture foam that holds its loft for years",
+        alt: "Cream armchair with a KARMO foam label under a magnifying glass",
         caption: "If you want density that lasts for years",
       },
       {
@@ -135,7 +135,7 @@ const foamFurniture = {
         title: "No Filler",
         overview:
           "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: `${IMG}/mosaic/exploded-layers-hq.jpg`,
+        background: `${IMG}/products/hd-hover-hq.jpg`,
       },
       {
         id: "long-durability",
@@ -157,13 +157,11 @@ const foamFurniture = {
       },
     ],
     spotlight: {
-      image: `${IMG}/mosaic/spotlight-hq.jpg`,
-      alt: "Teal foam sofa in a bright contemporary living room",
+      image: `${IMG}/mosaic/spotlight-emerald-left-hq.png`,
+      alt: "Emerald armchair and oak dresser on the left of a sunlit living room",
       headingLead: "Designed",
       headingAccent: "to",
       headingEnd: "endure",
-      subline: "Set foam grades for sofas, cushions and everyday living rooms.",
-      brand: "Karmo Foam",
     },
     inside: {
       heading: "Inside every",
@@ -204,7 +202,9 @@ const foamFurniture = {
       ],
       photo: {
         src: `${IMG}/inside/cushion-cutaway-hq.jpg`,
-        alt: "Sofa cushion peeled back to show Karmo set foam inside",
+        video: "/karmo/videos/shorts/v1-tisa.mp4",
+        videoStart: 1,
+        alt: "Tanzin Tisha for Karmo Foam",
         caption: "Upholstery foam · no filler · rubber grade",
       },
     },
@@ -236,47 +236,32 @@ const foamFurniture = {
     ],
   },
 
-  zones: {
-    src: `${IMG}/mosaic/exploded-layers-hq.jpg`,
-    alt: "Exploded Karmo set foam layers for sofa seating",
-    width: 1536,
-    height: 1024,
-    heading: "Built density by density",
-    subheading:
-      "Soft top, dense core and firm base — pressed and tested for furniture that lasts.",
-    icons: [
-      { id: "foam", label: "Soft top" },
-      { id: "pillow", label: "Dense core" },
-      { id: "springs", label: "Firm base" },
-    ],
-    cta: { label: "Find your foam", href: "#foam-offers" },
-  },
+  zones: false,
 
   lounge: {
     layout: "overlay",
-    headingLead: "The comfort you feel",
-    headingAccent: "every day",
-    kicker: "Sink into Karmo Foam seating",
-    cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+    headingLead: "The comfort you feel every day",
     image: {
-      src: `${IMG}/bands/lounge-hq.jpg`,
-      alt: "A woman resting on a plush foam sofa in a calm living room",
+      src: `${IMG}/bands/lounge-mustard-user-hq.png`,
+      alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
       width: 1920,
       height: 1080,
+      unoptimized: true,
+      position: "object-left",
     },
     slides: [
       {
         id: "lounge",
-        align: "left",
-        headingLead: "The comfort you feel",
-        headingAccent: "every day",
-        kicker: "Sink into Karmo Foam seating",
-        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+        align: "right",
+        titleCard: true,
+        headingLead: "The comfort you feel every day",
         image: {
-          src: `${IMG}/bands/lounge-hq.jpg`,
-          alt: "A woman resting on a plush foam sofa in a calm living room",
+          src: `${IMG}/bands/lounge-mustard-user-hq.png`,
+          alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
           width: 1920,
           height: 1080,
+          unoptimized: true,
+          position: "object-left",
         },
       },
     ],
@@ -327,6 +312,7 @@ const foamFurniture = {
     headingAccent: "for you",
     body: "Furniture grades from the Karmo Foam Catalogue — Poly, 280, 480, 2001, HD, 4G, 1965 and Signature. Cut as sets. No filler used.",
     textured: true,
+    textureSrc: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
     variant: "catalogue",
     offersId: "foam-offers",
     items: [
