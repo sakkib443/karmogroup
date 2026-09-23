@@ -271,9 +271,10 @@ export default function ExploreSplit({
             className={`explore-band relative overflow-hidden bg-[#d8d8d8] ${bandH}`}
           >
             <Image
-              src="/karmo/images/home-02/banners/foam-crafted-karmo-v2-hq.png"
+              src="/karmo/images/foam/furniture/hero/hero-crafted-hq.png"
               alt="Cream armchair with a KARMO foam label under a magnifying glass"
               fill
+              unoptimized
               sizes="100vw"
               className="object-cover object-left"
             />
