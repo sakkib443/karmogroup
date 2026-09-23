@@ -285,22 +285,79 @@ function InsideLayersCard({ layers = [] }) {
 }
 
 function InsidePhotoCard({ photo }) {
-  if (!photo?.src) return null;
+  const reduceMotion = useReducedMotion();
+  const videoRef = useRef(null);
+  const wrapRef = useRef(null);
+  const inView = useInView(wrapRef, { amount: 0.2 });
+  const film = photo?.video;
+  const startAt = photo?.videoStart ?? 0;
+
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node || reduceMotion || !film) return undefined;
+
+    const skipHead = () => {
+      if (startAt > 0 && node.currentTime < startAt) {
+        node.currentTime = startAt;
+      }
+    };
+
+    const onEnded = () => {
+      if (startAt > 0) node.currentTime = startAt;
+      node.play().catch(() => {});
+    };
+
+    node.addEventListener("loadedmetadata", skipHead);
+    node.addEventListener("playing", skipHead);
+    node.addEventListener("timeupdate", skipHead);
+    node.addEventListener("ended", onEnded);
+
+    if (inView) {
+      skipHead();
+      node.play().catch(() => {});
+    } else {
+      node.pause();
+    }
+
+    return () => {
+      node.removeEventListener("loadedmetadata", skipHead);
+      node.removeEventListener("playing", skipHead);
+      node.removeEventListener("timeupdate", skipHead);
+      node.removeEventListener("ended", onEnded);
+    };
+  }, [inView, reduceMotion, film, startAt]);
+
+  if (!photo?.src && !film) return null;
 
   return (
     <motion.figure
+      ref={wrapRef}
       variants={fade}
       className="relative h-full min-h-[220px] overflow-hidden bg-[#efe9e3] md:min-h-0"
     >
-      <Image
-        src={photo.src}
-        alt={photo.alt || ""}
-        fill
-        sizes="(min-width: 768px) 30vw, 100vw"
-        className="object-cover object-center"
-      />
+      {photo.src ? (
+        <Image
+          src={photo.src}
+          alt={photo.alt || ""}
+          fill
+          sizes="(min-width: 768px) 30vw, 100vw"
+          className="object-cover object-center"
+        />
+      ) : null}
+      {!reduceMotion && film ? (
+        <video
+          ref={videoRef}
+          src={film}
+          muted
+          playsInline
+          loop={startAt <= 0}
+          preload="auto"
+          aria-label={photo.alt || ""}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+      ) : null}
       {photo.caption ? (
-        <figcaption className="absolute bottom-4 left-4 bg-white/92 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#0b1a33] sm:bottom-5 sm:left-5 sm:text-[11px]">
+        <figcaption className="absolute bottom-4 left-4 z-[1] bg-white/92 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#0b1a33] sm:bottom-5 sm:left-5 sm:text-[11px]">
           {photo.caption}
         </figcaption>
       ) : null}
@@ -399,6 +456,7 @@ function OrganizedClaim({ item, reveal }) {
           src={item.background}
           alt=""
           fill
+          unoptimized
           sizes="(min-width: 768px) 40vw, 100vw"
           className="object-cover object-center"
           aria-hidden
@@ -474,33 +532,53 @@ function OrganizedSpotlight({ data, reveal }) {
       variants={fade}
       {...reveal}
       viewport={VIEWPORT}
-      className="relative min-h-[260px] overflow-hidden bg-[#dfe7ef] md:min-h-0"
+      className="relative min-h-[260px] overflow-hidden bg-[#f4f0e8] md:min-h-0"
     >
       <Image
         src={data.image}
         alt={data.alt || ""}
         fill
+        unoptimized
         sizes="(min-width: 768px) 65vw, 100vw"
-        className="object-cover object-[center_40%]"
+        className="object-cover object-left"
         priority={false}
       />
-      <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] flex h-full items-end justify-end px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-        <div className="max-w-[22rem] text-right">
+      <span
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to right, rgba(11,26,51,0.22) 0%, rgba(11,26,51,0.34) 48%, rgba(11,26,51,0.50) 100%)",
+        }}
+      />
+      <div
+        className="relative z-[1] flex h-full px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10"
+        style={{ alignItems: "center", justifyContent: "flex-end" }}
+      >
+        <div style={{ textAlign: "right", transform: "translateY(-14%)" }}>
           <h3
             className="display title-card-line uppercase text-white"
-            style={SECTION_TYPE}
+            style={{
+              ...SECTION_TYPE,
+              whiteSpace: "nowrap",
+              fontSize: "clamp(1.28rem, 0.96rem + 1.1vw, 1.85rem)",
+            }}
           >
-            <span className="block">Designed to</span>
-            <span className="block">{data.headingEnd}</span>
+            Designed to {data.headingEnd}
           </h3>
           {data.subline ? (
-            <p className="body-copy mt-3 text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
+            <p
+              className="body-copy mt-3 max-w-[22rem] text-[13px] leading-[1.6] sm:text-[14px]"
+              style={{ color: "rgba(255,255,255,0.8)", marginLeft: "auto" }}
+            >
               {data.subline}
             </p>
           ) : null}
           {data.brand ? (
-            <p className="display mt-4 text-[11px] uppercase tracking-[0.18em] text-white/90 sm:text-[12px]">
+            <p
+              className="display mt-4 text-[11px] uppercase tracking-[0.18em] sm:text-[12px]"
+              style={{ color: "rgba(255,255,255,0.9)" }}
+            >
               {data.brand}
             </p>
           ) : null}

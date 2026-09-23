@@ -478,6 +478,7 @@ export default function DivisionProducts({
   categoryId = "all",
   detailHref,
   textured = false,
+  textureSrc = "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg",
   /** `catalogue` = mattress-style offer cards. */
   variant = "default",
 }) {
@@ -503,7 +504,7 @@ export default function DivisionProducts({
       {textured && !hasFloatCard ? (
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <Image
-            src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+            src={textureSrc}
             alt=""
             fill
             sizes="100vw"
