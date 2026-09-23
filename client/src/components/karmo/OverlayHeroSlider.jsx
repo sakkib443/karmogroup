@@ -94,6 +94,7 @@ export default function OverlayHeroSlider({
           const titleCard = Boolean(s.titleCard);
           const right = s.align === "right";
           const center = s.align === "center";
+          const middle = s.align === "middle";
           /* `copyAlign: "start"` keeps type left-aligned even when the block
              sits on the right (Foam craft slide). Default stays end-aligned. */
           const copyEnd = right && s.copyAlign !== "start";
@@ -215,7 +216,9 @@ export default function OverlayHeroSlider({
               >
                 <div
                   className={`shell flex h-full ${
-                    center
+                    middle
+                      ? "items-center justify-center"
+                      : center
                       ? "items-start justify-center pt-[min(30vh,13rem)] md:pt-[min(32vh,15rem)]"
                       : titleCard && right
                         ? "items-center justify-end"
@@ -238,7 +241,7 @@ export default function OverlayHeroSlider({
                     className={`${
                       titleCard && right
                         ? "ml-auto w-auto max-w-[min(92vw,40rem)] text-right"
-                        : titleCard && center
+                        : titleCard && (center || middle)
                           ? "w-full max-w-none text-center"
                           : center
                             ? "w-full max-w-[min(94vw,52rem)] text-center"
@@ -263,7 +266,7 @@ export default function OverlayHeroSlider({
                       >
                         <Heading
                           className={`display hero-heading title-card-line whitespace-nowrap uppercase text-white ${
-                            right ? "text-right" : ""
+                            right ? "text-right" : middle || center ? "text-center" : ""
                           }`}
                           style={{
                             fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
