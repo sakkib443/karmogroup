@@ -74,3 +74,6 @@ Mattress Brochure/
 branch_structure.json
 temp_auto_push.bat
 temp_interactive_push.bat
+
+# pnpm content-addressable store (never commit)
+.pnpm-store/
