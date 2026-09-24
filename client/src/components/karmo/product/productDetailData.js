@@ -76,27 +76,24 @@ function parseTaka(label) {
 
 const catalog = mattress.products?.items || [];
 
-/** Shared K-A-R-M-O campaign thumbs — fallback when a SKU has no own set. */
-export const KARMO_LETTER_GALLERY = [
-  "/products/product-01/gallery-3.jpg", // K
-  "/products/product-01/gallery-5.jpg", // A
-  "/products/product-01/gallery-4.jpg", // R
-  "/products/product-01/gallery-1.jpg", // M
-  "/products/product-01/gallery-2.jpg", // O
-];
+function letterSet(folder) {
+  return ["K", "A", "R", "M", "O"].map(
+    (letter) => `/karmo/images/mattress/products/${folder}/letter-${letter}.png`
+  );
+}
 
-/** King Mattress — locked plate: same backdrop + letter position; only bed/props change. */
-export const KING_LETTER_GALLERY = [
-  "/karmo/images/mattress/products/king-gallery/letter-K-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/letter-A-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/letter-R-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/letter-M-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/letter-O-v4.webp",
-];
+/** King Mattress — first catalogue product letter strip. */
+export const KING_LETTER_GALLERY = letterSet("product-01");
+
+/** Prestige Mattress — own K-A-R-M-O strip, not King's. */
+export const PRESTIGE_LETTER_GALLERY = letterSet("product-02");
+
+/** @deprecated King-only set. Kept so older imports do not break. */
+export const KARMO_LETTER_GALLERY = KING_LETTER_GALLERY;
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/karmo/images/mattress/products/king-room-hq.jpg",
+  "/karmo/images/mattress/products/king-cover-hq.png",
   "/karmo/images/mattress/products/king-gallery/angle-front-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-side-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-detail-v4.webp",
@@ -104,6 +101,13 @@ export const KING_REAL_GALLERY = [
 
 const LETTER_BY_ID = {
   king: KING_LETTER_GALLERY,
+  prestige: PRESTIGE_LETTER_GALLERY,
+  orthopedic: letterSet("product-03"),
+  "imperial-eurotop": letterSet("product-04"),
+  "bonnell-spring": letterSet("product-05"),
+  "pillow-top-pocket-spring": letterSet("product-06"),
+  "euro-top-pocket-spring": letterSet("product-07"),
+  topper: letterSet("product-08"),
 };
 
 const REAL_BY_ID = {
@@ -129,7 +133,7 @@ function toDetail(item) {
   const price = parseTaka(item.now);
   const mrp = parseTaka(item.was) || price;
   const realGallery = buildRealGallery(item);
-  const letterGallery = LETTER_BY_ID[item.id] || KARMO_LETTER_GALLERY;
+  const letterGallery = LETTER_BY_ID[item.id] || [];
   /* PDP opens on the catalogue thumbnail (first real gallery shot). */
   const cover = item.image || realGallery[0] || letterGallery[0];
 
