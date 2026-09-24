@@ -17,6 +17,7 @@ import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionRecommended from "@/components/karmo/division/DivisionRecommended";
 import DivisionWhyChoose from "@/components/karmo/division/DivisionWhyChoose";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
+import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
@@ -129,11 +130,20 @@ export default function DivisionPage({ data }) {
       {data.whyChoose?.items?.length > 0 && (
         <DivisionWhyChoose {...data.whyChoose} />
       )}
-      {data.about && !data.about.asHero && data.about.beforeShapeGrid && <DivisionAbout {...data.about} />}
-      {data.shapeGrid && <DivisionShapeGrid {...data.shapeGrid} />}
+      {data.about && !data.about.asHero && data.about.beforeShapeGrid && (
+        <DivisionAbout {...data.about} />
+      )}
+      {data.shapeGrid &&
+        (data.shapeGridVariant === "hometex" ? (
+          <HometexShapeGrid {...data.shapeGrid} />
+        ) : (
+          <DivisionShapeGrid {...data.shapeGrid} />
+        ))}
       {data.explore && <ExploreSplit {...data.explore} />}
       {data.lounge && <DivisionAbout {...data.lounge} />}
-      {data.about && !data.about.asHero && !data.about.beforeShapeGrid && <DivisionAbout {...data.about} />}
+      {data.about && !data.about.asHero && !data.about.beforeShapeGrid && (
+        <DivisionAbout {...data.about} />
+      )}
 
       {/* Hidden at the client's ask — the product grid below shows every model.
           Re-enable on all four pages by uncommenting this one line. */}
@@ -153,47 +163,15 @@ export default function DivisionPage({ data }) {
           still={data.promise.still}
         />
       )}
-      {data.zones?.overlay ? (
-        <section
-          className="relative mb-0 w-full overflow-hidden bg-[#0b1a33]"
-          style={{ minHeight: 420, height: "calc(100svh - 112px)" }}
-        >
-          <Image
-            src={data.zones.src}
-            alt={data.zones.alt || ""}
-            fill
-            unoptimized
-            sizes="100vw"
-            className="object-cover object-center"
-            priority={false}
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(11,26,51,0.62) 0%, rgba(11,26,51,0.28) 38%, rgba(11,26,51,0.08) 70%, transparent 100%)",
-            }}
-          />
-          <div
-            className="relative z-[1] flex h-full items-center px-7 sm:px-10 lg:px-14"
-            style={{ justifyContent: "flex-start" }}
-          >
-            <h2
-              className="display section-heading title-card-line uppercase text-white"
-              style={{ whiteSpace: "nowrap", textAlign: "left" }}
-            >
-              {data.zones.heading}
-            </h2>
-          </div>
-        </section>
-      ) : data.zones ? (
+      {data.zones && (
         <section className="relative mb-0 grid w-full overflow-hidden bg-[#0b1a33] lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)] lg:aspect-[3.2/1]">
           {/* Left rail — copy + icons + CTA */}
           <div className="relative z-[1] flex flex-col items-center justify-center px-5 py-8 text-center sm:px-7 lg:px-9 lg:py-6">
             <h2 className="display section-heading title-card-line uppercase text-white">
               {data.zones.heading}
             </h2>
+            {/* Optional — only the mattress division sets it. The other three
+                omit the field, so nothing renders and their rail is unchanged. */}
             {data.zones.subheading && (
               <p className="body-copy mt-3 max-w-[26rem] text-[12.5px] leading-[1.6] text-white/65 sm:text-[13px]">
                 {data.zones.subheading}
@@ -247,7 +225,23 @@ export default function DivisionPage({ data }) {
             />
           </div>
         </section>
-      ) : null}
+      )}
+      {data.zones && (
+        <div
+          aria-hidden
+          className="mattress-side-ribbon flex w-full overflow-hidden"
+          style={{ height: 168, margin: 0 }}
+        >
+          {Array.from({ length: 10 }).map((_, i) => (
+            <img
+              key={`side-tex-${i}`}
+              src="/karmo/images/header/mattress-side-texture.jpg"
+              alt=""
+              style={{ height: "100%", width: "auto", flex: "0 0 auto" }}
+            />
+          ))}
+        </div>
+      )}
       <DivisionProducts {...data.products} categoryId={categoryId} />
       <OrderAndContact />
     </>

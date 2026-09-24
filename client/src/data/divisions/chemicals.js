@@ -107,6 +107,9 @@ const chemicals = {
     src: "/karmo/videos/product-film.mp4",
     still: "/karmo/images/divisions/chemicals-bench.jpg",
     alt: "Karmo Chemicals Film",
+    /* Shorter than the mattress full-screen band so the whole section sits
+       inside a normal large-device viewport. */
+    minH: "min(60svh, 560px)",
     heading: "Strong Bonds, Trusted Chemistry",
     headingClassName: "mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]",
     headingStyle: {},
