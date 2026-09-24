@@ -13,6 +13,8 @@ const CERT_UKAS = "/karmo/images/home-02/certified/02-ukas.jpg";
 const foam = {
   slug: "foam",
 
+  bedAutomotiveHero: true,
+
   banner: {
     hidden: true,
     bg: `${IMG}/bands/lounge-sofa-hq.jpg`,

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
 import DivisionBanner from "@/components/karmo/division/DivisionBanner";
+import BedAutomotiveHero from "@/components/karmo/division/BedAutomotiveHero";
 import DivisionFeatures from "@/components/karmo/division/DivisionFeatures";
 import DivisionAbout from "@/components/karmo/division/DivisionAbout";
 import DivisionCategories from "@/components/karmo/division/DivisionCategories";
@@ -109,8 +110,11 @@ export default function DivisionPage({ data }) {
 
   return (
     <>
+      {data.bedAutomotiveHero && <BedAutomotiveHero />}
       {!data.banner?.hidden && <DivisionBanner {...data.banner} />}
-      {data.about?.asHero && <DivisionAbout {...data.about} />}
+      {data.about?.asHero && !data.bedAutomotiveHero && (
+        <DivisionAbout {...data.about} />
+      )}
       <DivisionFeatures items={data.features} />
       {data.furnitureBrands && <FurnitureBrands {...data.furnitureBrands} />}
       {data.furnitureGrades && (
@@ -244,22 +248,6 @@ export default function DivisionPage({ data }) {
           </div>
         </section>
       ) : null}
-      {data.zones && (
-        <div
-          aria-hidden
-          className="mattress-side-ribbon flex w-full overflow-hidden"
-          style={{ height: 168, margin: 0 }}
-        >
-          {Array.from({ length: 10 }).map((_, i) => (
-            <img
-              key={`side-tex-${i}`}
-              src="/karmo/images/header/mattress-side-texture.jpg"
-              alt=""
-              style={{ height: "100%", width: "auto", flex: "0 0 auto" }}
-            />
-          ))}
-        </div>
-      )}
       <DivisionProducts {...data.products} categoryId={categoryId} />
       <OrderAndContact />
     </>
