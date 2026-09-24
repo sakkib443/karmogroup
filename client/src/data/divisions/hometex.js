@@ -14,40 +14,21 @@ const hometex = {
   slug: "hometex",
 
   banner: {
-    bg: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
-    badge: {
-      src: "/karmo/images/home-02/hero/badge-number-one.webp",
-      width: 420,
-      height: 330,
-    },
-    eyebrowEnd: "HomeTex Brand",
-    headline: "Dressed for Rest",
-    cta: [
-      { label: "Buy online", href: "#hometex-offers", primary: true },
-      { label: "Find in stores", href: "/contact" },
-    ],
+    style: "simple-slider",
     slides: [
       {
-        id: "bedding-set",
-        name: "Bedding Sets",
-        sub: "Premium cotton bed sheets that dress the whole room.",
-        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-set.png",
-        alt: "Karmo HomeTex bedding set",
+        id: "comforter-1",
+        bg: "/karmo/images/chemicals/comforter.png",
+        headline: "Moments that make a house",
+        align: "left",
       },
       {
-        id: "comforter",
-        name: "Comforters",
-        sub: "Soft, breathable warmth for every season.",
-        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
-        alt: "Karmo HomeTex comforter styled in a studio",
-      },
-      {
-        id: "bedding-room",
-        name: "Complete Bedding",
-        sub: "Coordinated linen, from sheets to pillow covers.",
-        image: "/karmo/images/home-02/divisions/hometex-bedding-set.webp",
-        alt: "Karmo HomeTex complete bedding",
-      },
+        id: "comforter-2",
+        bg: "/karmo/images/chemicals/comforter 2.png",
+        headline: "BREATHABLE WARMTH",
+        align: "right",
+        contentClassName: "pb-24",
+      }
     ],
   },
 
@@ -78,22 +59,170 @@ const hometex = {
     },
   ],
 
-  about: {
-    headingLead: "Moments that make a house",
-    headingAccent: "feel like home",
-    kicker: "We finish every set, every single stitch",
-    eyebrow: "About Karmo HomeTex",
-    bodyLead: "Karmo HomeTex",
-    body:
-      " dresses your bedroom in premium cotton comfort — bed sheets, comforters, pillow covers and coordinated linen woven for softness that lasts. Breathable, anti-dust and colour-fast, every set is finished to bring the calm of a made bed to your home, wash after wash.",
-    cta: [
-      { label: "Shop the bedding", href: "#hometex-offers", primary: true },
-      { label: "Contact us", href: "/contact" },
+  recommended: {
+    heading: "Which Karmo foam is right for you",
+    columns: [
+      {
+        id: "firm",
+        image: "/karmo/images/foam-2/why/why-firm-hq.jpg",
+        alt: "Upright seating on a firm sofa — cushions hold their shape",
+        caption: "If you need firm support that holds its shape",
+      },
+      {
+        id: "density",
+        image: "/karmo/images/foam-2/why/why-density-hq.jpg",
+        alt: "Cutaway of dense furniture foam that holds its loft for years",
+        caption: "If you want density that lasts for years",
+      },
+      {
+        id: "airflow",
+        image: "/karmo/images/foam-2/why/why-airflow-hq.jpg",
+        alt: "Relaxed seating by an open window — cool airflow comfort",
+        caption: "If you prefer cool, open airflow comfort",
+      },
     ],
-    image: {
-      src: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
-      alt: "A Karmo HomeTex bedding set styled in a bright bedroom",
+  },
+
+  shapeGrid: {
+    skin: "organized",
+    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    highlights: [
+      {
+        id: "no-filler",
+        icon: "shield",
+        badge: "red",
+        title: "No Filler",
+        overview:
+          "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
+        background: "/karmo/images/foam-2/mosaic/exploded-layers-hq.jpg",
+      },
+      {
+        id: "long-durability",
+        icon: "feather",
+        badge: "blue",
+        title: "Long Durability",
+        overview:
+          "Engineered to resist sagging and hold structure — support that stays true for years of seating.",
+        background: "/karmo/images/foam-2/why/why-density-hq.jpg",
+      },
+      {
+        id: "more-resilient",
+        icon: "certificate",
+        badge: "green",
+        title: "More Resilient",
+        overview:
+          "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
+        background: "/karmo/images/foam-2/why/why-firm-hq.jpg",
+      },
+    ],
+    spotlight: {
+      align: "left",
+      image: "/karmo/images/chemicals/comfort 6.png",
+      alt: "Teal foam sofa in a bright contemporary living room",
+      headingLead: "Designed",
+      headingAccent: "to",
+      headingEnd: "endure",
+      subline: "Set foam grades for sofas, cushions and everyday living rooms.",
+      brand: "Karmo Foam",
     },
+    inside: {
+      heading: "Inside every",
+      accent: "set",
+      body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
+      background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+      layers: [
+        {
+          id: "open-cell",
+          name: "Open-cell PU",
+          line: "Flexible foam so air can pass — cool seating that does not trap heat.",
+        },
+        {
+          id: "no-filler",
+          name: "No filler used",
+          line: "Catalogue grade is 100% foam. Density holds because nothing cheap is mixed in.",
+        },
+        {
+          id: "rubber",
+          name: "Rubber-grade density",
+          line: "From Poly at 25 kg/m³ to 1965 at 50 kg/m³ — pick the load the sofa needs.",
+        },
+        {
+          id: "cell",
+          name: "Fine cell structure",
+          line: "Even cells for clean cuts, fine finish and rebound that comes back.",
+        },
+        {
+          id: "set",
+          name: "Maker set sizes",
+          line: "22×22×4 and 22×18×3 packs, or any cut the upholstery line asks for.",
+        },
+        {
+          id: "airflow",
+          name: "Measured airflow",
+          line: "TDS-rated scfm so cushions stay supportive without going dead.",
+        },
+      ],
+      photo: {
+        src: "/karmo/images/chemicals/comfort 5.png",
+        alt: "Sofa cushion peeled back to show Karmo set foam inside",
+      },
+    },
+    faqs: [
+      {
+        id: "grade",
+        question: "What does rubber-grade foam mean at Karmo?",
+        answer:
+          "It means high-density polyurethane built without cheap fillers — firmer airflow, cleaner recovery and density that holds for sofas, cushions and specialty padding.",
+      },
+      {
+        id: "density",
+        question: "How do I choose density for sofas and cushions?",
+        answer:
+          "Seat bases favour higher density (HD, 4G, 1965). Backs and throws can run softer (Poly, 280). Visit a store to compare grades side by side.",
+      },
+      {
+        id: "set-size",
+        question: "What set sizes do you cut for furniture makers?",
+        answer:
+          "Standard sets are 22×22×4 (5 pcs) and 22×18×3 (5 pcs). Any required size can be cut to the maker’s spec.",
+      },
+      {
+        id: "care",
+        question: "How should I care for foam after delivery?",
+        answer:
+          "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. Store cut sheets flat and away from prolonged sun.",
+      },
+    ],
+  },
+
+  lounge: {
+    layout: "overlay",
+    headingLead: "The comfort you feel",
+    headingAccent: "every day",
+    kicker: "Sink into Karmo Foam seating",
+    cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+    image: {
+      src: "/karmo/images/chemicals/comforter 3.png",
+      alt: "A woman resting on a plush foam sofa in a calm living room",
+      width: 1920,
+      height: 1080,
+    },
+    slides: [
+      {
+        id: "lounge",
+        align: "left",
+        headingLead: "The comfort you feel",
+        headingAccent: "every day",
+        kicker: "Sink into Karmo Foam seating",
+        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+        image: {
+          src: "/karmo/images/chemicals/comforter 3.png",
+          alt: "A woman resting on a plush foam sofa in a calm living room",
+          width: 1920,
+          height: 1080,
+        },
+      },
+    ],
   },
 
   categories: {
@@ -129,7 +258,7 @@ const hometex = {
     ],
   },
 
-  promise: {},
+
 
   products: {
     eyebrow: "Best price",
