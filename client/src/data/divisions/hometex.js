@@ -59,26 +59,27 @@ const hometex = {
     },
   ],
 
+  /* "Why Choose Karmo HomeTex" — using the recommended component format to match mattress page design */
   recommended: {
-    heading: "Which Karmo foam is right for you",
+    heading: "Why Choose Karmo HomeTex ?",
     columns: [
       {
-        id: "firm",
-        image: "/karmo/images/foam-2/why/why-firm-hq.jpg",
-        alt: "Upright seating on a firm sofa — cushions hold their shape",
-        caption: "If you need firm support that holds its shape",
+        id: "comfort",
+        image: "/karmo/images/hometex/hometex-first-sub/made.png",
+        caption: "Unmatched Everyday Comfort",
+        alt: "Karmo HomeTex bedding set",
       },
       {
-        id: "density",
-        image: "/karmo/images/foam-2/why/why-density-hq.jpg",
-        alt: "Cutaway of dense furniture foam that holds its loft for years",
-        caption: "If you want density that lasts for years",
+        id: "cotton",
+        image: "/karmo/images/hometex/hometex-first-sub/sleep.png",
+        caption: "Premium Cotton Weave",
+        alt: "Karmo HomeTex studio bedding",
       },
       {
-        id: "airflow",
-        image: "/karmo/images/foam-2/why/why-airflow-hq.jpg",
-        alt: "Relaxed seating by an open window — cool airflow comfort",
-        caption: "If you prefer cool, open airflow comfort",
+        id: "everyone",
+        image: "/karmo/images/hometex/hometex-first-sub/rounded.png",
+        caption: "Pure Comfort For Everyone",
+        alt: "Karmo HomeTex bedroom linen",
       },
     ],
   },
@@ -88,48 +89,40 @@ const hometex = {
     background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
     highlights: [
       {
-        id: "no-filler",
-        icon: "shield",
-        badge: "red",
-        title: "No Filler",
-        overview:
-          "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: "/karmo/images/foam-2/mosaic/exploded-layers-hq.jpg",
+        id: "luxury-woven",
+        title: "Luxury Woven Into",
+        titleLine2: "Every Thread",
+        indentLine2: true,
+        marginLeft: "12%",
+        hideIcon: true,
+        hideLine: true,
+        lightText: true,
+        background: "/karmo/images/hometex/hometex-first-sub/comforter 6.png",
       },
       {
-        id: "long-durability",
-        icon: "feather",
-        badge: "blue",
-        title: "Long Durability",
-        overview:
-          "Engineered to resist sagging and hold structure — support that stays true for years of seating.",
-        background: "/karmo/images/foam-2/why/why-density-hq.jpg",
-      },
-      {
-        id: "more-resilient",
-        icon: "certificate",
-        badge: "green",
-        title: "More Resilient",
-        overview:
-          "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
-        background: "/karmo/images/foam-2/why/why-firm-hq.jpg",
+        id: "why-choose-us",
+        background: "/karmo/images/hometex/hometex-first-sub/hometex why chose us.png",
+        imageOnly: true,
+        hideOverlay: true,
       },
     ],
     spotlight: {
       align: "left",
+      valign: "center",
+      offsetY: "8rem",
       image: "/karmo/images/chemicals/comfort 6.png",
       alt: "Teal foam sofa in a bright contemporary living room",
       headingLead: "Designed",
       headingAccent: "to",
       headingEnd: "endure",
-      subline: "Set foam grades for sofas, cushions and everyday living rooms.",
-      brand: "Karmo Foam",
     },
     inside: {
+      hideText: true,
+      lightOverlay: true,
       heading: "Inside every",
       accent: "set",
       body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
-      background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+      background: "/karmo/images/hometex/hometex-first-sub/dog.png",
       layers: [
         {
           id: "open-cell",
@@ -165,6 +158,7 @@ const hometex = {
       photo: {
         src: "/karmo/images/chemicals/comfort 5.png",
         alt: "Sofa cushion peeled back to show Karmo set foam inside",
+        lightOverlay: true,
       },
     },
     faqs: [
@@ -197,10 +191,7 @@ const hometex = {
 
   lounge: {
     layout: "overlay",
-    headingLead: "The comfort you feel",
-    headingAccent: "every day",
-    kicker: "Sink into Karmo Foam seating",
-    cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+    headingLead: "The comfort you feel every day",
     image: {
       src: "/karmo/images/chemicals/comforter 3.png",
       alt: "A woman resting on a plush foam sofa in a calm living room",
@@ -211,10 +202,18 @@ const hometex = {
       {
         id: "lounge",
         align: "left",
-        headingLead: "The comfort you feel",
-        headingAccent: "every day",
-        kicker: "Sink into Karmo Foam seating",
-        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+        titleCard: true,
+        /* Sit the copy in the upper third, smaller and lighter than the
+           default title card (client ask, Sep 2026). */
+        valign: "top",
+        headingClassName: "text-white/85",
+        headingStyle: {
+          fontSize: "clamp(0.92rem, 0.78rem + 1.05vw, 1.7rem)",
+          fontWeight: 300,
+          fontVariationSettings: '"wght" 300',
+          letterSpacing: "0.14em",
+        },
+        headingLead: "The comfort you feel every day",
         image: {
           src: "/karmo/images/chemicals/comforter 3.png",
           alt: "A woman resting on a plush foam sofa in a calm living room",
