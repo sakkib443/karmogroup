@@ -15,10 +15,7 @@ import { toast } from "react-hot-toast";
 
 import { useAppDispatch } from "@/redux";
 import { addToCart } from "@/redux/slices/cartSlice";
-import {
-  KARMO_LETTER_GALLERY,
-  formatTaka,
-} from "@/components/karmo/product/productDetailData";
+import { formatTaka } from "@/components/karmo/product/productDetailData";
 import {
   getPricingRule,
   quoteMattressListPrice,
@@ -85,7 +82,7 @@ function ThumbButton({ src, active, onClick, label, className = "" }) {
         active ? "border-brand" : "border-ink/10 hover:border-ink/30"
       } ${className}`}
     >
-      <Image src={src} alt="" fill sizes="120px" className="object-cover" />
+      <Image src={src} alt="" fill unoptimized sizes="120px" className="object-contain bg-[#f3f1ec]" />
     </button>
   );
 }
@@ -97,7 +94,7 @@ export default function ProductHero({ product }) {
 
   const letterGallery = product.letterGallery?.length
     ? product.letterGallery
-    : KARMO_LETTER_GALLERY;
+    : [];
   const realGallery = product.realGallery?.length
     ? product.realGallery
     : product.gallery || [];
@@ -295,9 +292,10 @@ export default function ProductHero({ product }) {
 
         <div className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-10 xl:gap-12">
           {/* Sticky shell must be a plain div — Framer transform kills sticky. */}
-          <div className="h-fit lg:sticky lg:top-[128px] lg:col-span-7 lg:z-[1]">
+          <div className="h-fit lg:sticky lg:top-[128px] lg:col-span-6 lg:z-[1]">
             <motion.div {...fadeIn}>
               <div className="flex items-start gap-3">
+                {letterGallery.length ? (
                 <ul className="hidden w-[68px] shrink-0 flex-col gap-2 xl:flex xl:w-[76px]">
                   {letterGallery.map((src, i) => (
                     <li key={`letter-${i}`}>
@@ -311,9 +309,17 @@ export default function ProductHero({ product }) {
                     </li>
                   ))}
                 </ul>
+                ) : null}
 
                 <div className="min-w-0 flex-1">
-                  <div className="relative h-[min(72svh,680px)] w-full overflow-hidden bg-[#f3f1ec]">
+                  <div
+                    className="relative mx-auto overflow-hidden bg-[#f3f1ec]"
+                    style={{
+                      width: "min(100%, calc(100svh - 14rem))",
+                      maxWidth: "100%",
+                    }}
+                  >
+                  <div className="relative w-full" style={{ paddingTop: "100%" }}>
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={mainSrc}
@@ -328,18 +334,20 @@ export default function ProductHero({ product }) {
                             src={mainSrc}
                             alt={product.name}
                             fill
+                            unoptimized
                             priority
                             quality={90}
                             sizes="(min-width: 1024px) 48vw, 100vw"
-                            className="object-cover object-center"
+                            className="object-contain object-center"
                           />
                         ) : null}
                       </motion.div>
                     </AnimatePresence>
                   </div>
+                  </div>
 
                   {realGallery.length ? (
-                    <ul className="mt-3 flex gap-2 overflow-x-auto">
+                    <ul className="mt-3 flex justify-center gap-2 overflow-x-auto">
                       {realGallery.map((src, i) => (
                         <li key={`real-${src}`} className="w-[68px] shrink-0 xl:w-[76px]">
                           <ThumbButton
@@ -354,7 +362,8 @@ export default function ProductHero({ product }) {
                     </ul>
                   ) : null}
 
-                  <ul className="mt-3 flex gap-2 overflow-x-auto xl:hidden">
+                  {letterGallery.length ? (
+                  <ul className="mt-3 flex justify-center gap-2 overflow-x-auto xl:hidden">
                     {letterGallery.map((src, i) => (
                       <li key={`m-letter-${i}`} className="w-[64px] shrink-0">
                         <ThumbButton
@@ -367,6 +376,7 @@ export default function ProductHero({ product }) {
                       </li>
                     ))}
                   </ul>
+                  ) : null}
                 </div>
               </div>
             </motion.div>
@@ -376,7 +386,7 @@ export default function ProductHero({ product }) {
           <motion.div
             {...fade}
             transition={{ duration: 0.5, ease: EASE, delay: reduce ? 0 : 0.06 }}
-            className="lg:col-span-5"
+            className="lg:col-span-6"
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="text-[13px] font-semibold uppercase tracking-[0.3em] text-brand">

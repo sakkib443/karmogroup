@@ -84,6 +84,10 @@ const hometex = {
     ],
   },
 
+  /* Use the forked HometexShapeGrid (abu-taleb design). Foam/mattress keep the
+     shared DivisionShapeGrid (main's design) — see DivisionPage. */
+  shapeGridVariant: "hometex",
+
   shapeGrid: {
     skin: "organized",
     background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",

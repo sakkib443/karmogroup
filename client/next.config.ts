@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
     // WebP encodes in milliseconds, is supported everywhere the site targets,
     // and costs a few KB against AVIF. Worth it to have the images appear.
     formats: ["image/webp"],
-    qualities: [70, 72, 75, 82, 85, 90],
+    qualities: [70, 72, 75, 80, 82, 85, 90],
     deviceSizes: [640, 750, 828, 1080, 1200, 1536, 1920, 2048, 2560, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [

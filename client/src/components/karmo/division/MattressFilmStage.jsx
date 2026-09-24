@@ -12,6 +12,9 @@ export default function MattressFilmStage({
   still,
   alt = "",
   heading = "The Art of Restful Living",
+  /* Band height. Defaults to a full viewport (the mattress "Sleep Well" film);
+     callers can pass a shorter value so the whole band fits on screen. */
+  minH = "100svh",
 }) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef(null);
@@ -37,7 +40,7 @@ export default function MattressFilmStage({
       ref={wrapRef}
       aria-label={alt || "Karmo mattress Sleep Well film"}
       className="relative mb-1.5 w-full overflow-hidden bg-[#0b1a33]"
-      style={{ minHeight: "100svh" }}
+      style={{ minHeight: minH }}
     >
       {still ? (
         <Image

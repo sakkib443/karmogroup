@@ -75,27 +75,27 @@ const foam = {
     columns: [
       {
         id: "firm",
-        image: `${IMG}/why/why-firm-hq.jpg`,
+        image: "/karmo/images/foam/furniture/why/why-1.png",
         alt: "Upright seating on a firm high-density foam sofa",
-        caption: "If you need firm support that holds its shape",
+        caption: "IF YOU NEED HIGH-IMPACT SUPPORT & ENERGY RETURN",
       },
       {
         id: "density",
-        image: `${IMG}/why/why-density-hq.jpg`,
+        image: "/karmo/images/foam/furniture/why/why-4.png",
         alt: "Hand pressing into dense Karmo foam showing rebound",
-        caption: "If you want density that lasts for years",
+        caption: "IF YOU WANT DENSITY THAT LASTS FOR YEARS",
       },
       {
         id: "airflow",
-        image: `${IMG}/why/why-airflow-hq.jpg`,
+        image: "/karmo/images/foam/furniture/why/why-6.png",
         alt: "Bright living room with breathable foam seating",
-        caption: "If you prefer cool, open airflow comfort",
+        caption: "IF YOU PREFER COOL, OPEN AIRFLOW COMFORT",
       },
     ],
   },
 
   shapeGrid: {
-    background: `${IMG}/mosaic/foam-texture-hq.jpg`,
+    background: "/karmo/images/foam/furniture/mosaic/foam-texture-hq.webp",
     highlights: [
       {
         id: "no-filler",
@@ -104,7 +104,7 @@ const foam = {
         title: "No Filler",
         overview:
           "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: `${IMG}/bands/lounge-sofa-hq.jpg`,
+        background: "/karmo/images/foam/furniture/bands/no-filler-footwear.png",
       },
       {
         id: "long-durability",
@@ -124,30 +124,28 @@ const foam = {
       },
     ],
     spotlight: {
-      image: `${IMG}/mosaic/designed-to-rest-hq.jpg`,
+      image: "/karmo/images/foam/furniture/mosaic/footwear-spotlight2.png",
       alt: "A calm living room with deep foam sofa seating",
-      headingLead: "Designed",
-      headingAccent: "to",
-      headingEnd: "endure",
-      subline: "High-density cores and open airflow for everyday living rooms.",
-      brand: "Karmo Foam",
+      headingLead: "DESIGNED TO ENDURE",
+      headingAccent: "",
+      headingEnd: "",
+      subline: "",
+      brand: "",
     },
-    certifications: [
-      {
-        id: "iso",
-        image: CERT_ISO,
-        alt: "ISO 9001 quality management certificate",
-        title: "ISO 9001 Accreditation",
-        body: "International quality management — every foam grade held to certified standards.",
-      },
-      {
-        id: "ukas",
-        image: CERT_UKAS,
-        alt: "UKAS accredited quality management certificate",
-        title: "UKAS Accreditation",
-        body: "Quality systems accredited by UKAS — trusted craft since 1965.",
-      },
-    ],
+certifications: [
+  {
+    id: "flex-test",
+    image: "/karmo/images/foam/furniture/badges/flex-test-badge.png", // ফ্রেম ছাড়া ক্লিন ট্রান্সপারেন্ট ব্যাজ
+    title: "100,000+ FLEX CYCLES",
+    body: "Zero sole breakdown after 100k automated lab flex tests — built for extreme athletic endurance.",
+  },
+  {
+    id: "shock-absorb",
+    image: "/karmo/images/foam/furniture/badges/shock-absorb-badge.png",
+    title: "DYNAMIC SHOCK ABSORPTION",
+    body: "Dissipates up to 45% of heel-strike ground impact, reducing knee fatigue and joint pressure.",
+  },
+],
     faqs: [
       {
         id: "grade",
@@ -174,13 +172,13 @@ const foam = {
           "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. For cut sheets, store flat and away from prolonged sun.",
       },
     ],
-    film: "/karmo/videos/shorts/v1-tisa-trim.mp4",
-    still: `${IMG}/mosaic/tisha-film-still-hq.jpg`,
-    filmAlt: "Tanzin Tisha for Karmo Foam",
+    film: null,
+    still:  "/karmo/images/foam/furniture/mosaic/footwear-sole-v4.png",
+    filmAlt: "Karmo Footwear Foam Quality",
   },
 
   zones: {
-    src: `${IMG}/bands/layers-cutaway-hq.jpg`,
+    src: "/karmo/images/foam/furniture/bands/footwear-layers-cutaway.png",
     alt: "Layered foam cutaway showing soft top, dense core and base foam",
     width: 1536,
     height: 864,
@@ -188,22 +186,24 @@ const foam = {
     subheading:
       "Soft wadding, hi-density rebonded cores and polyethylene bases — pressed and tested for furniture that lasts.",
     icons: [
-      { id: "foam", label: "Soft wadding" },
-      { id: "pillow", label: "Dense core" },
-      { id: "springs", label: "Firm base" },
+    { id: "foam", label: "Soft Insole" }, 
+    { id: "pillow", label: "Rebound Core" },  
+    { id: "springs", label: "Tough Base" },
     ],
     cta: { label: "Find your foam", href: "#foam-offers" },
   },
 
   lounge: {
     layout: "overlay",
-    headingLead: "The comfort you feel",
-    headingAccent: "every day",
+    headingLead: "THE COMFORT YOU FEEL EVERY DAY",
+    headingAccent: "",
     kicker: "Sink into Karmo Foam seating",
-    cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+    titleCard: true,
+    cta: null,
     image: {
-      src: `${IMG}/bands/lounge-sofa-hq.jpg`,
-      alt: "A woman resting on a plush foam sofa in a calm living room",
+      src: "/karmo/images/foam/furniture/bands/footwear-comfort-lounge2.png",
+      alt: "Comfortable footwear foam for everyday walking",
+      position: "object-[center_40%]",
       width: 1920,
       height: 1080,
     },
@@ -211,13 +211,14 @@ const foam = {
       {
         id: "lounge",
         align: "left",
-        headingLead: "The comfort you feel",
-        headingAccent: "every day",
-        kicker: "Sink into Karmo Foam seating",
-        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+        headingLead: "THE COMFORT YOU FEEL EVERY DAY",
+        headingAccent: "",
+        kicker: "",
+        // cta: ,
         image: {
-          src: `${IMG}/bands/lounge-sofa-hq.jpg`,
-          alt: "A woman resting on a plush foam sofa in a calm living room",
+      src: "/karmo/images/foam/furniture/bands/footwear-comfort-lounge2.png",
+      alt: "Comfortable footwear foam for everyday walking",
+      position: "object-[center_40%]",
           width: 1920,
           height: 1080,
         },
@@ -246,60 +247,60 @@ const foam = {
       height: 1024,
     },
     slides: [
-      {
-        id: "journey",
-        align: "center",
-        /* Site tagline — same line as Iconic brands / About: The Journey Since 1965 */
-        headingLead: "The Journey Since 1965",
-        headingAccent: "",
-        veil: true,
-        image: {
-          src: `${IMG}/hero/hero-slide-01-no-foam-v10-hq.jpg`,
-          alt: "Mustard sofa in a modern living room",
-          width: 1536,
-          height: 1024,
-          position: "object-center",
-        },
-      },
-      {
-        id: "craft",
-        align: "right",
-        eyebrowStart: "Bangladesh’s",
-        eyebrowEnd: "Foam Brand",
-        badge: { src: BADGE, width: 420, height: 330 },
-        headingLead: "Density crafted",
-        headingAccent: "to endure",
-        kicker: "Every grade cut, tested and ready for makers",
-        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
-        image: {
-          src: `${IMG}/hero/craft-karmo-grades-v9-hq.jpg`,
-          alt: "Karmo 280, Signature and 1965 foam on the left of a living room; clear navy wall on the right for headline copy",
-          width: 2560,
-          height: 1096,
-          /* Tall/full viewport + panoramic art makes the stacks read small on
-             deploy; zoom into the left floor so they match the intended hero. */
-          position: "object-[30%_78%]",
-          className: "origin-[30%_78%] scale-[1.36]",
-        },
-      },
-      {
-        id: "grades",
-        align: "left",
-        eyebrowStart: "Bangladesh’s",
-        eyebrowEnd: "Foam Brand",
-        badge: { src: BADGE, width: 420, height: 330 },
-        headingLead: "Four grades.",
-        headingAccent: "one craft",
-        kicker: "Rubber grade. Higher durability. Fine cell structure",
-        cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
-        image: {
-          src: "/karmo/images/home-02/hero/home-hero-slide-foam-grades-v2-hq.jpg",
-          alt: "Four Karmo foam grades in front of a white sofa living room",
-          width: 2560,
-          height: 1096,
-          position: "object-center",
-        },
-      },
+{
+  id: "journey",
+  titleCard: true, // <--- এই একটি লাইন আপনার সব সমস্যা সমাধান করে দেবে!
+  align: "right",
+  headingLead: "ALL YOUR FOOTWEAR NEEDS",
+  veil: true,
+  image: {
+    src: "/karmo/images/foam/hero/footwear-hero1.jpeg",
+    alt: "Footwear foam",
+    width: 1536,
+    height: 1024,
+    position: "object-left",
+    className: "scale-[1.12] -translate-x-[10%] origin-left", // জুতোটি সুন্দরভাবে বামে সরে যাবে
+  },
+},
+      // {
+      //   id: "craft",
+      //   align: "right",
+      //   eyebrowStart: "Bangladesh’s",
+      //   eyebrowEnd: "Foam Brand",
+      //   badge: { src: BADGE, width: 420, height: 330 },
+      //   headingLead: "Density crafted",
+      //   headingAccent: "to endure",
+      //   kicker: "Every grade cut, tested and ready for makers",
+      //   cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+      //   image: {
+      //     src: `${IMG}/hero/craft-karmo-grades-v9-hq.jpg`,
+      //     alt: "Karmo 280, Signature and 1965 foam on the left of a living room; clear navy wall on the right for headline copy",
+      //     width: 2560,
+      //     height: 1096,
+      //     /* Tall/full viewport + panoramic art makes the stacks read small on
+      //        deploy; zoom into the left floor so they match the intended hero. */
+      //     position: "object-[30%_78%]",
+      //     className: "origin-[30%_78%] scale-[1.36]",
+      //   },
+      // },
+      // {
+      //   id: "grades",
+      //   align: "left",
+      //   eyebrowStart: "Bangladesh’s",
+      //   eyebrowEnd: "Foam Brand",
+      //   badge: { src: BADGE, width: 420, height: 330 },
+      //   headingLead: "Four grades.",
+      //   headingAccent: "one craft",
+      //   kicker: "Rubber grade. Higher durability. Fine cell structure",
+      //   cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
+      //   image: {
+      //     src: "/karmo/images/home-02/hero/home-hero-slide-foam-grades-v2-hq.jpg",
+      //     alt: "Four Karmo foam grades in front of a white sofa living room",
+      //     width: 2560,
+      //     height: 1096,
+      //     position: "object-center",
+      //   },
+      // },
     ],
   },
 

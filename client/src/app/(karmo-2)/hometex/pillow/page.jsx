@@ -5,7 +5,7 @@ import PillowHero from "@/components/karmo/division/PillowHero";
 import DivisionFeatures from "@/components/karmo/division/DivisionFeatures";
 import DivisionProducts from "@/components/karmo/division/DivisionProducts";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
-import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
+import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
 import DivisionAbout from "@/components/karmo/division/DivisionAbout";
 
 import hometex from "@/data/divisions/hometex";
@@ -293,7 +293,7 @@ export default function PillowRoute() {
       <PillowHero />
       <DivisionFeatures items={pillowPage.features} />
       <WhyChoosePillows />
-      <DivisionShapeGrid {...customShapeGrid} />
+      <HometexShapeGrid {...customShapeGrid} />
       <DivisionAbout {...customLounge} />
       <FoamZones data={customFoam} />
       <DivisionProducts {...pillowPage.products} categoryId="all" />
