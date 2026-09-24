@@ -15,41 +15,10 @@ const chemicals = {
   slug: "chemicals",
 
   banner: {
-    bg: "/karmo/images/divisions/chemicals-bench.jpg",
-    badge: {
-      src: "/karmo/images/home-02/hero/badge-number-one.webp",
-      width: 420,
-      height: 330,
-    },
-    eyebrowEnd: "Adhesive Brand",
-    headline: "Bonded to Last",
-    cta: [
-      { label: "Buy online", href: "#chemicals-offers", primary: true },
-      { label: "Find in stores", href: "/contact" },
-    ],
-    slides: [
-      {
-        id: "adhesive-tins",
-        name: "Adhesives",
-        sub: "Industrial-strength bonding for wood, foam and fabric.",
-        image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
-        alt: "Karmo adhesive tins",
-      },
-      {
-        id: "resin-bottles",
-        name: "Resins",
-        sub: "Clear, fast-curing resins for a lasting finish.",
-        image: "/karmo/images/home-02/divisions/chemicals-karmo-resin-bottles.png",
-        alt: "Karmo resin bottles",
-      },
-      {
-        id: "product",
-        name: "Specialty Chemicals",
-        sub: "Formulated for strength, safety and consistency.",
-        image: "/karmo/images/home-02/divisions/chemicals-karmo-product.png",
-        alt: "Karmo specialty chemical product",
-      },
-    ],
+    bg: "/karmo/images/chemicals/camicels.png",
+    style: "simple",
+    headline: "The world of polyurethane",
+    slides: [],
   },
 
   features: [
@@ -80,6 +49,8 @@ const chemicals = {
   ],
 
   about: {
+    beforeShapeGrid: true,
+    layout: "collage-full",
     headingLead: "Strength you can",
     headingAccent: "build on",
     kicker: "We test every batch, every single drum",
@@ -91,10 +62,12 @@ const chemicals = {
       { label: "Explore the range", href: "#chemicals-offers", primary: true },
       { label: "Contact us", href: "/contact" },
     ],
-    image: {
-      src: "/karmo/images/home-02/divisions/chemicals-resin-tins.webp",
-      alt: "Karmo resin and adhesive tins on a workbench",
-    },
+    images: [
+      "/karmo/images/chemicals/chemicals-karmo-adhesive-tins.webp",
+      "/karmo/images/chemicals/camicels 3.png",
+      "/karmo/images/chemicals/atha 3.png",
+      "/karmo/images/chemicals/atha 2.png",
+    ],
   },
 
   categories: {
@@ -130,35 +103,78 @@ const chemicals = {
     ],
   },
 
-  promise: {
+  mattressFilm: {
+    src: "/karmo/videos/product-film.mp4",
+    still: "/karmo/images/divisions/chemicals-bench.jpg",
+    alt: "Karmo Chemicals Film",
     heading: "Strong Bonds, Trusted Chemistry",
-    subline: "Everyone Claims Strength, But Not Everyone Can Prove Consistency",
-    claims: [
+    headingClassName: "mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]",
+    headingStyle: {},
+    containerClassName: "shell pointer-events-none absolute inset-0 z-[2] flex h-full flex-col justify-center text-center",
+  },
+
+  _shapeGrid: {
+    className: "px-4 md:px-2 lg:px-4 2xl:px-6",
+    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    highlights: [
       {
-        id: "strong-bond",
-        icon: "shield",
-        badge: "bg-[#E03131]",
-        title: "Strong Bond",
-        body: "Industrial-strength adhesives engineered to hold under load and stress — bonds that stay put across wood, foam, fabric and more, job after job.",
+        id: "no-filler",
+        background: "/karmo/images/chemicals/atha.png",
+        overlay: "bg-[#0b1a33]/20",
       },
       {
-        id: "fast-cure",
-        icon: "droplet",
-        badge: "bg-[#1C7ED6]",
-        title: "Fast Curing",
-        body: "Formulated to set quickly and finish clean, cutting downtime on the line without sacrificing the final strength of the bond.",
-        solid: true,
+        id: "long-durability",
+        icon: "feather",
+        badge: "blue",
+        title: "Long Durability",
+        overview:
+          "Engineered to resist sagging and hold structure — support that stays true for years of seating.",
       },
       {
-        id: "certified",
+        id: "more-resilient",
         icon: "certificate",
-        badge: "bg-[#2F9E44]",
-        title: "Quality Certified",
-        body: "Every batch is mixed to a consistent grade and quality-tested, so the chemistry you trust today performs exactly the same tomorrow.",
+        badge: "green",
+        title: "More Resilient",
+        overview:
+          "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
       },
     ],
-    still: "/karmo/images/divisions/chemicals-bench.jpg",
-    showFilm: false,
+    spotlight: {
+      image: "/karmo/images/chemicals/dds.png",
+      alt: "Karmo Chemicals adhesive products",
+      overlay: "bg-[#0b1a33]/20",
+    },
+    topImage: "/karmo/images/chemicals/hdfdk.png",
+    topImageOverlay: "bg-[#0b1a33]/20",
+    faqs: [
+      {
+        id: "grade",
+        question: "What does rubber-grade foam mean at Karmo?",
+        answer:
+          "It means high-density polyurethane built without cheap fillers — firmer air flow, cleaner recovery and density that holds for furniture, footwear and specialty padding.",
+      },
+      {
+        id: "density",
+        question: "How do I choose density for sofas and cushions?",
+        answer:
+          "Seat bases favour higher density for support; backs and throws can run softer. Visit a store to compare 280, Signature and 1965 side by side.",
+      },
+      {
+        id: "rebonded",
+        question: "When should I use rebonded foam?",
+        answer:
+          "Rebonded is steam-bonded foam chips — excellent for firm bases, mattress cores and heavy-use seating where lasting support matters most.",
+      },
+      {
+        id: "care",
+        question: "How should I care for foam after delivery?",
+        answer:
+          "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. For cut sheets, store flat and away from prolonged sun.",
+      },
+    ],
+    still: "/karmo/images/chemicals/atha 5.png",
+    filmAlt: "Karmo Chemicals",
+    filmOverlay: "bg-[#0b1a33]/20",
   },
 
   products: {
