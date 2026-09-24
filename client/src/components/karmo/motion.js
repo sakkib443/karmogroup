@@ -6,10 +6,13 @@
  * not a micro-fade. Hero stays excluded (load theatre, not scroll reveal).
  */
 
-// Soft ease-out with a long settle (IKEA-like, no bounce).
-export const SETTLE = [0.05, 0.7, 0.1, 1];
+// Arrive and stop. Fast out of the gate, long settle, no bounce.
+/** @type {const} */
+export const SETTLE = [0.22, 1, 0.36, 1];
 
-// Curtains, wipes and pans — eases at both ends.
+// Curtains, wipes and pans — eases at both ends, for things that travel a
+// long way across the frame.
+/** @type {const} */
 export const SWEEP = [0.76, 0, 0.24, 1];
 
 // Longer so the travel reads clearly while scrolling.
@@ -109,3 +112,10 @@ export const curtainRight = {
   hidden: { x: "0%" },
   show: { x: "101%", transition: { duration: SLOW_S, ease: SWEEP } },
 };
+
+/** Simple fade in animation variant */
+export const fade = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: RISE_S, ease: SETTLE } },
+};
+
