@@ -157,8 +157,6 @@ export default function Partners() {
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
-        {...reveal}
-        viewport={VIEWPORT}
         className="relative z-[1] mt-3 space-y-1.5 sm:mt-3.5 lg:mt-4"
       >
         {rows.map((items, i) => (
