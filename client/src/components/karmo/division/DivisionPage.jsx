@@ -129,6 +129,11 @@ export default function DivisionPage({ data }) {
       {data.explore && <ExploreSplit {...data.explore} />}
       {data.lounge && <DivisionAbout {...data.lounge} />}
       {!data.about?.asHero && <DivisionAbout {...data.about} />}
+      {data.about && !data.about.asHero && data.about.beforeShapeGrid && <DivisionAbout {...data.about} />}
+      {data.shapeGrid && <DivisionShapeGrid {...data.shapeGrid} />}
+      {data.explore && <ExploreSplit {...data.explore} />}
+      {data.lounge && <DivisionAbout {...data.lounge} />}
+      {data.about && !data.about.asHero && !data.about.beforeShapeGrid && <DivisionAbout {...data.about} />}
 
       {/* Hidden at the client's ask — the product grid below shows every model.
           Re-enable on all four pages by uncommenting this one line. */}
