@@ -1,0 +1,34 @@
+#!/bin/sh
+# Before every commit: refuse to let the obfuscated payload be committed — from
+# ANY staged file, not just postcss.config.mjs. This stops an infected machine
+# from pushing the malware back into the repo.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+. "$ROOT/.githooks/malware-guard.sh"
+
+INFECTED=""
+for f in $(git diff --cached --name-only --diff-filter=ACM); do
+  case "$f" in
+    # The guard's own files/docs name these tokens on purpose (detection rules),
+    # and build scripts legitimately use node built-ins — never scan those.
+    .githooks/*|client/scripts/*|SECURITY.md|.gitattributes) continue ;;
+  esac
+  # Read the STAGED blob (what would actually be committed), not the worktree.
+  if git show ":$f" 2>/dev/null | grep -Eq "$SIGNATURE"; then
+    INFECTED="$INFECTED $f"
+  fi
+done
+
+if [ -n "$INFECTED" ]; then
+  echo ""
+  echo "✋ COMMIT BLOCKED — injected malware signature in:"
+  for f in $INFECTED; do echo "     $f"; done
+  echo ""
+  echo "   Your machine is likely infected (crypto-stealer that rewrites config files)."
+  echo "   1) Restore clean files:  git checkout -- <file>   (postcss auto-heals on next pull)"
+  echo "   2) Reinstall deps clean:  cd client && rm -rf node_modules && npm ci"
+  echo "   3) Rotate your GitHub token; move any crypto wallet keys."
+  echo ""
+  echo "   (Emergency override, NOT recommended: git commit --no-verify)"
+  exit 1
+fi
+exit 0

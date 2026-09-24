@@ -1,0 +1,14 @@
+#!/bin/sh
+# After switching branches/checking out: heal postcss.config.mjs if a poisoned
+# branch brought the payload in. Same logic as post-merge.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+. "$ROOT/.githooks/malware-guard.sh"
+
+if file_is_infected "$POSTCSS"; then
+  echo ""
+  echo "🛑 SUPPLY-CHAIN GUARD: this checkout carries injected malware in client/postcss.config.mjs — auto-restoring clean."
+  heal_postcss
+  echo "   ✅ Cleaned."
+  echo ""
+fi
+exit 0

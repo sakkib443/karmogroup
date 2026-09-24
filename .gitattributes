@@ -1,0 +1,9 @@
+# --- Supply-chain guard (see SECURITY.md) ------------------------------------
+# Always keep OUR local copy of postcss.config.mjs when merging, so a poisoned
+# incoming version can never overwrite the clean one during a pull. Requires the
+# one-time config the setup step installs:  git config merge.ours.driver true
+client/postcss.config.mjs merge=ours
+
+# Hook + shell scripts must stay LF or /bin/sh chokes on \r under Git Bash.
+.githooks/** text eol=lf
+*.sh text eol=lf

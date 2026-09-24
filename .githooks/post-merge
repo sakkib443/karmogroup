@@ -1,0 +1,23 @@
+#!/bin/sh
+# After every pull/merge: if the injector's payload rode in on postcss.config.mjs,
+# strip it back to clean immediately so it can never be executed by a build.
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+. "$ROOT/.githooks/malware-guard.sh"
+
+if file_is_infected "$POSTCSS"; then
+  echo ""
+  echo "🛑 SUPPLY-CHAIN GUARD: injected malware found in client/postcss.config.mjs after this pull."
+  echo "   Auto-restoring the clean config so nothing runs on your next build."
+  heal_postcss
+  echo "   ✅ Cleaned. A teammate almost certainly has an infected machine — tell them to run 'npm ci' fresh and check 'git status' after 'npm run dev'."
+  echo ""
+fi
+
+# Also warn (cannot auto-fix generically) if the payload turns up anywhere else.
+OTHER="$(git grep -lI -E "$SIGNATURE" -- '*.js' '*.jsx' '*.mjs' '*.ts' '*.tsx' 2>/dev/null | grep -v '^client/postcss.config.mjs$' | grep -v '^client/scripts/')"
+if [ -n "$OTHER" ]; then
+  echo "⚠️  SUPPLY-CHAIN GUARD: payload signature also seen in:"
+  echo "$OTHER" | sed 's/^/     /'
+  echo "     Do NOT run a build. Inspect these files by hand."
+fi
+exit 0
