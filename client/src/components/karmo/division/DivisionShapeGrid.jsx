@@ -182,7 +182,9 @@ function SpotlightPanel({ data }) {
         className="object-cover object-[center_40%]"
         priority={false}
       />
-      {data.overlay && <div className="absolute inset-0 bg-black/20 pointer-events-none" />}
+      {data.overlay ? (
+        <span aria-hidden className={`absolute inset-0 z-0 pointer-events-none ${data.overlay}`} />
+      ) : null}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
         <div className="max-w-[16rem] text-right sm:max-w-[18rem] lg:max-w-[20rem]">
           <h3 className="display section-heading title-card-line uppercase text-[#0b1a33]">
@@ -545,19 +547,9 @@ function OrganizedSpotlight({ data, reveal }) {
         className="object-cover object-left"
         priority={false}
       />
-      <span
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to right, rgba(11,26,51,0.22) 0%, rgba(11,26,51,0.34) 48%, rgba(11,26,51,0.50) 100%)",
-        }}
-      />
-      <div
-        className="relative z-[1] flex h-full px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10"
-        style={{ alignItems: "center", justifyContent: "flex-end" }}
-      >
-        <div style={{ textAlign: "right", transform: "translateY(-14%)" }}>
+      <span aria-hidden className="absolute inset-0 bg-black/40" />
+      <div className="relative z-[1] flex h-full items-end justify-end px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+        <div className="max-w-[22rem] text-right">
           <h3
             className="display title-card-line uppercase text-white"
             style={{
