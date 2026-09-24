@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { TbCertificate, TbFeather, TbShieldCheck } from "react-icons/tb";
+import {
+  TbCertificate,
+  TbFeather,
+  TbShieldCheck,
+  TbRefresh,
+  TbRipple,
+} from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -32,9 +38,33 @@ const BADGE = {
 function CoilsIcon({ className = "" }) {
   return (
     <svg viewBox="0 0 32 32" className={className} fill="none" aria-hidden>
-      <rect x="5" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
-      <rect x="12.9" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
-      <rect x="20.8" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
+      <rect
+        x="5"
+        y="6"
+        width="6.2"
+        height="20"
+        rx="3.1"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <rect
+        x="12.9"
+        y="6"
+        width="6.2"
+        height="20"
+        rx="3.1"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <rect
+        x="20.8"
+        y="6"
+        width="6.2"
+        height="20"
+        rx="3.1"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
       <path
         d="M8.1 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2M16 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2M23.9 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2"
         stroke="currentColor"
@@ -55,8 +85,19 @@ function PulseIcon({ className = "" }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="23.5" cy="10" r="3.2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M23.5 8.4v3.2M21.9 10h3.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle
+        cx="23.5"
+        cy="10"
+        r="3.2"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M23.5 8.4v3.2M21.9 10h3.2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -116,10 +157,7 @@ function ClaimPanel({ item, solid = false }) {
         >
           {item.overview}
         </p>
-        <span
-          aria-hidden
-          className="mt-5 h-[3px] w-10 bg-brand sm:mt-6"
-        />
+        <span aria-hidden className="mt-5 h-[3px] w-10 bg-brand sm:mt-6" />
       </div>
     </motion.article>
   );
@@ -141,15 +179,16 @@ function ClaimsPairPanel({ items = [] }) {
           <div
             key={item.id}
             className={`flex min-h-[200px] flex-col justify-center px-5 py-5 sm:px-5 sm:py-6 md:min-h-0 ${
-              i > 0
-                ? "border-t border-white/15 md:border-l md:border-t-0"
-                : ""
+              i > 0 ? "border-t border-white/15 md:border-l md:border-t-0" : ""
             }`}
           >
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 ${badge}`}
             >
-              <Icon className="text-[24px] text-white sm:text-[28px]" aria-hidden />
+              <Icon
+                className="text-[24px] text-white sm:text-[28px]"
+                aria-hidden
+              />
             </span>
             <h3 className="display mt-3.5 text-[13px] font-bold uppercase tracking-[0.04em] text-white sm:text-[14px] lg:text-[15px]">
               {item.title}
@@ -182,22 +221,13 @@ function SpotlightPanel({ data }) {
         className="object-cover object-[center_40%]"
         priority={false}
       />
-      {data.overlay && data.overlay !== "none" ? (
-        <span aria-hidden className={`absolute inset-0 z-0 pointer-events-none ${data.overlay}`} />
-      ) : null}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
-        <div className="max-w-[16rem] text-right sm:max-w-[18rem] lg:max-w-[20rem]">
-          <h3 className="display section-heading title-card-line uppercase text-[#0b1a33]">
-            {data.headingLead}{" "}
-            {data.headingAccent ? (
-              <span className="italic text-[#0b1a33]/80">
-                {data.headingAccent}
-              </span>
-            ) : null}{" "}
-            {data.headingEnd}
+        <div className="max-w-none text-right">
+          <h3 className="display section-heading title-card-line whitespace-nowrap uppercase text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] text-lg sm:text-xl lg:text-2xl">
+            {data.headingLead}
           </h3>
           {data.subline ? (
-            <p className="body-copy mt-3 text-[12.5px] leading-[1.5] text-[#0b1a33]/70 sm:text-[13.5px]">
+            <p className="body-copy mt-3 text-[12.5px] leading-[1.5] text-white/80 drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)] sm:text-[13.5px]">
               {data.subline}
             </p>
           ) : null}
@@ -212,21 +242,24 @@ function SpotlightPanel({ data }) {
   );
 }
 
-function CertCard({ item }) {
+function CertCard({ item, index = 0 }) {
+  // ১ম কার্ড হবে অরেঞ্জ (TbRefresh), ২য় কার্ড হবে পার্পল (TbRipple)
+  const isFirst = index === 0;
+  const badgeBg = isFirst ? "bg-[#F76707]" : "bg-[#7048E8]";
+  const IconComponent = isFirst ? TbRefresh : TbRipple;
+
   return (
     <motion.article
       variants={fade}
       className={`flex items-center gap-4 px-5 py-4 transition-colors duration-300 hover:bg-white sm:gap-5 sm:px-6 sm:py-5 ${LIGHT}`}
     >
-      <div className="relative h-[78px] w-[78px] shrink-0 overflow-hidden bg-white shadow-[0_0_0_1px_rgba(11,26,51,0.08)] sm:h-[88px] sm:w-[88px]">
-        <Image
-          src={item.image}
-          alt={item.alt || ""}
-          fill
-          sizes="88px"
-          className="object-contain object-center p-1.5"
-        />
-      </div>
+      {/* ── আলাদা কালার ও আলাদা আইকন ── */}
+      <span
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${badgeBg} text-white sm:h-14 sm:w-14`}
+      >
+        <IconComponent className="text-[24px] sm:text-[28px]" aria-hidden />
+      </span>
+
       <div className="min-w-0">
         <h3 className="display text-[14px] font-bold uppercase leading-snug tracking-[0.04em] text-[#0b1a33] sm:text-[15px] lg:text-[16px]">
           {item.title}
@@ -246,8 +279,7 @@ function InsideIntroCard({ heading, accent, body }) {
       className={`flex flex-col justify-center px-5 py-5 sm:px-6 sm:py-6 ${LIGHT}`}
     >
       <h2 className="display section-heading title-card-line uppercase text-[#0b1a33]">
-        {heading}{" "}
-        {accent ? <span className="text-brand">{accent}</span> : null}
+        {heading} {accent ? <span className="text-brand">{accent}</span> : null}
       </h2>
       {body ? (
         <p className="body-copy mt-2.5 text-[12.5px] leading-[1.5] text-[#0b1a33]/62 sm:text-[13px]">
@@ -474,15 +506,15 @@ function OrganizedClaim({ item, reveal }) {
           <Icon className="text-[24px] text-white" aria-hidden />
         </span>
         <h3
-          className="display title-card-line mt-4 uppercase text-white"
+          className="text-xl sm:text-2xl lg:text-3xl font-bold uppercase text-white whitespace-nowrap"
           style={CARD_TYPE}
         >
           {item.title}
         </h3>
-        <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
+        {/* <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
           {item.overview}
         </p>
-        <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" />
+        <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" /> */}
       </div>
     </motion.article>
   );
@@ -695,12 +727,7 @@ function OrganizedInside({ inside, reveal }) {
   );
 }
 
-function OrganizedGrid({
-  highlights,
-  spotlight,
-  inside,
-  reveal,
-}) {
+function OrganizedGrid({ highlights, spotlight, inside, reveal }) {
   const primary = highlights[0];
   const pair = highlights.slice(1, 3);
 
@@ -742,7 +769,7 @@ function MosaicGrid({
   const pair = highlights.slice(1, 3);
 
   return (
-    <div className="relative z-[1] w-full p-[6px]">
+    <div className="relative z-[1] mx-auto w-[92%] sm:w-[85%] lg:w-[80%] py-1.5">
       <motion.div
         variants={group}
         {...reveal}
@@ -774,8 +801,8 @@ function MosaicGrid({
             </>
           ) : (
             <>
-              {certifications.slice(0, 2).map((item) => (
-                <CertCard key={item.id} item={item} />
+              {certifications.slice(0, 2).map((item, index) => (
+                <CertCard key={item.id} item={item} index={index} />
               ))}
               {hasFilm ? (
                 <div className="h-[min(56svh,440px)] w-full md:h-full md:min-h-0">
