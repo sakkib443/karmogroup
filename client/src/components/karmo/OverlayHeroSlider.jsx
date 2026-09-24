@@ -222,6 +222,10 @@ export default function OverlayHeroSlider({
                       ? "items-start justify-center pt-[min(30vh,13rem)] md:pt-[min(32vh,15rem)]"
                       : titleCard && right
                         ? "items-center justify-end"
+                      : s.valign === "top"
+                        ? `items-start pt-[18vh] md:pt-[16vh] ${
+                            right ? "md:justify-end" : ""
+                          }`
                       : `items-end pb-16 md:items-center md:pb-0 ${
                           right ? "md:justify-end" : ""
                         }`
@@ -267,7 +271,7 @@ export default function OverlayHeroSlider({
                         <Heading
                           className={`display hero-heading title-card-line whitespace-nowrap uppercase text-white ${
                             right ? "text-right" : middle || center ? "text-center" : ""
-                          }`}
+                          } ${s.headingClassName || ""}`}
                           style={{
                             fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
                             fontWeight: 350,
@@ -275,6 +279,7 @@ export default function OverlayHeroSlider({
                             letterSpacing: "0.12em",
                             lineHeight: 1.1,
                             textShadow: "0 2px 28px rgba(0,0,0,0.55)",
+                            ...(s.headingStyle || {}),
                           }}
                         >
                           {s.headingLead}

@@ -359,6 +359,9 @@ function InsidePhotoCard({ photo }) {
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
       ) : null}
+      {photo.lightOverlay && (
+        <span aria-hidden className="absolute inset-0 bg-black/20 pointer-events-none" />
+      )}
       {photo.caption ? (
         <figcaption className="absolute bottom-4 left-4 z-[1] bg-white/92 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#0b1a33] sm:bottom-5 sm:left-5 sm:text-[11px]">
           {photo.caption}
@@ -466,24 +469,46 @@ function OrganizedClaim({ item, reveal }) {
           aria-hidden
         />
       ) : null}
-      <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] px-7 py-7 lg:px-8 lg:py-8">
-        <span
-          className={`flex h-12 w-12 items-center justify-center rounded-full ${badge}`}
-        >
-          <Icon className="text-[24px] text-white" aria-hidden />
-        </span>
+      {!item.hideOverlay && <span aria-hidden className="absolute inset-0 bg-black/40" />}
+      {!item.imageOnly && (
+        <div className="relative z-[1] flex h-full flex-col justify-end px-7 py-7 lg:px-8 lg:py-8">
+        {!item.hideIcon && (
+          <span
+            className={`flex h-12 w-12 items-center justify-center rounded-full ${badge}`}
+          >
+            <Icon className="text-[24px] text-white" aria-hidden />
+          </span>
+        )}
         <h3
-          className="display title-card-line mt-4 uppercase text-white"
-          style={CARD_TYPE}
+          className={`display ${!item.hideLine ? 'title-card-line' : ''} mt-4 uppercase text-white`}
+          style={
+            item.lightText
+              ? {
+                  fontSize: "clamp(1.1rem, 1.8vw + 0.5rem, 1.8rem)",
+                  fontWeight: 200,
+                  fontVariationSettings: '"wght" 200',
+                  letterSpacing: "0.06em",
+                  lineHeight: "1.25",
+                  marginLeft: item.marginLeft || 0,
+                }
+              : { ...CARD_TYPE, marginLeft: item.marginLeft || 0 }
+          }
         >
-          {item.title}
+          <span className="block whitespace-nowrap">{item.title}</span>
+          {item.titleLine2 && (
+            <span className={`block mt-1 whitespace-nowrap ${item.indentLine2 ? 'ml-[15%]' : ''}`}>
+              {item.titleLine2}
+            </span>
+          )}
         </h3>
-        <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
-          {item.overview}
-        </p>
-        <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" />
+        {item.overview && (
+          <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
+            {item.overview}
+          </p>
+        )}
+        {!item.hideLine && <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" />}
       </div>
+      )}
     </motion.article>
   );
 }
@@ -548,8 +573,11 @@ function OrganizedSpotlight({ data, reveal }) {
         priority={false}
       />
       <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] flex h-full items-end justify-end px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-        <div className="max-w-[22rem] text-right">
+      <div className={`relative z-[1] flex h-full ${data.valign === 'center' ? 'items-center' : data.valign === 'start' ? 'items-start' : 'items-end'} ${data.align === 'left' ? 'justify-start' : 'justify-end'} px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10`}>
+        <div 
+          className={`max-w-[22rem] ${data.align === 'left' ? 'text-left' : 'text-right'}`}
+          style={data.offsetY ? { marginTop: data.offsetY } : undefined}
+        >
           <h3
             className="display title-card-line uppercase text-white"
             style={{
@@ -563,7 +591,7 @@ function OrganizedSpotlight({ data, reveal }) {
           {data.subline ? (
             <p
               className="body-copy mt-3 max-w-[22rem] text-[13px] leading-[1.6] sm:text-[14px]"
-              style={{ color: "rgba(255,255,255,0.8)", marginLeft: "auto" }}
+              style={{ color: "rgba(255,255,255,0.8)", marginLeft: data.align === 'left' ? '0' : 'auto' }}
             >
               {data.subline}
             </p>
@@ -651,43 +679,46 @@ function OrganizedInside({ inside, reveal }) {
               aria-hidden
             />
           ) : null}
-          <span aria-hidden className="absolute inset-0 bg-[#0b1a33]/58" />
-          <div className="relative z-[1]">
-            <h2
-              className="display title-card-line uppercase text-white"
-              style={INSIDE_TYPE}
-            >
-              {inside.heading}{" "}
-              {inside.accent ? (
-                <span className="text-brand">{inside.accent}</span>
+          {!inside.hideText && <span aria-hidden className="absolute inset-0 bg-[#0b1a33]/58" />}
+          {inside.hideText && inside.lightOverlay && <span aria-hidden className="absolute inset-0 bg-black/20 pointer-events-none" />}
+          {!inside.hideText && (
+            <div className="relative z-[1]">
+              <h2
+                className="display title-card-line uppercase text-white"
+                style={INSIDE_TYPE}
+              >
+                {inside.heading}{" "}
+                {inside.accent ? (
+                  <span className="text-brand">{inside.accent}</span>
+                ) : null}
+              </h2>
+              {inside.body ? (
+                <p className="body-copy mt-2 max-w-[28rem] text-[12px] leading-[1.45] text-white/72 sm:text-[12.5px]">
+                  {inside.body}
+                </p>
               ) : null}
-            </h2>
-            {inside.body ? (
-              <p className="body-copy mt-2 max-w-[28rem] text-[12px] leading-[1.45] text-white/72 sm:text-[12.5px]">
-                {inside.body}
-              </p>
-            ) : null}
-            {layers.length > 0 ? (
-              <ol className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:mt-5 sm:gap-x-5">
-                {layers.map((layer, i) => (
-                  <li key={layer.id} className="flex gap-2">
-                    <span
-                      className="display w-5 shrink-0 text-[10px] text-brand sm:text-[11px]"
-                      style={{
-                        fontWeight: 350,
-                        fontVariationSettings: '"wght" 350',
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="display min-w-0 text-[10.5px] uppercase leading-snug tracking-[0.05em] text-white sm:text-[11.5px]">
-                      {layer.name}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            ) : null}
-          </div>
+              {layers.length > 0 ? (
+                <ol className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:mt-5 sm:gap-x-5">
+                  {layers.map((layer, i) => (
+                    <li key={layer.id} className="flex gap-2">
+                      <span
+                        className="display w-5 shrink-0 text-[10px] text-brand sm:text-[11px]"
+                        style={{
+                          fontWeight: 350,
+                          fontVariationSettings: '"wght" 350',
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="display min-w-0 text-[10.5px] uppercase leading-snug tracking-[0.05em] text-white sm:text-[11.5px]">
+                        {layer.name}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+            </div>
+          )}
         </motion.article>
       )}
       <InsidePhotoCard photo={inside.photo} />
@@ -715,7 +746,11 @@ function OrganizedGrid({
         <div className="grid min-h-0 grid-cols-1 gap-[6px] md:h-full md:grid-rows-[minmax(0,1fr)_minmax(0,1.2fr)]">
           <div className="grid min-h-0 h-full grid-cols-1 gap-[6px] md:grid-cols-2">
             <OrganizedClaim item={primary} reveal={reveal} />
-            <OrganizedPair items={pair} reveal={reveal} />
+            {pair.length > 1 ? (
+              <OrganizedPair items={pair} reveal={reveal} />
+            ) : pair.length === 1 ? (
+              <OrganizedClaim item={pair[0]} reveal={reveal} />
+            ) : null}
           </div>
           <OrganizedSpotlight data={spotlight} reveal={reveal} />
         </div>

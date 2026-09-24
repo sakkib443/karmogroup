@@ -48,6 +48,7 @@ export default function DivisionAbout({
   body,
   cta = [],
   image,
+  images,
   slides,
   layout = "split",
   asHero = false,
@@ -78,6 +79,47 @@ export default function DivisionAbout({
         firstSlideMs={asHero ? 2600 : undefined}
         autoplayMs={asHero ? 4800 : undefined}
       />
+    );
+  }
+
+  if (layout === "collage-full") {
+    return (
+      <section className="bg-white">
+        <motion.div
+          variants={group}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="w-full"
+        >
+          {/* ── Full Width & Height: Image Collage ────────────────────────────── */}
+          <motion.div variants={fade} className="grid grid-cols-4 grid-rows-2 gap-[6px] w-full h-screen">
+            {images?.[0] && (
+              <div className="relative col-span-2 row-span-2 overflow-hidden bg-[#EFE9E3]">
+                <Image src={images[0]} alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+              </div>
+            )}
+            {images?.[1] && (
+              <div className="relative col-span-1 row-span-1 overflow-hidden bg-[#EFE9E3]">
+                <Image src={images[1]} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+              </div>
+            )}
+            {images?.[2] && (
+              <div className="relative col-span-1 row-span-2 overflow-hidden bg-[#EFE9E3]">
+                <Image src={images[2]} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+              </div>
+            )}
+            {images?.[3] && (
+              <div className="relative col-span-1 row-span-1 overflow-hidden bg-[#EFE9E3]">
+                <Image src={images[3]} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+              </div>
+            )}
+          </motion.div>
+        </motion.div>
+      </section>
     );
   }
 
@@ -143,13 +185,15 @@ export default function DivisionAbout({
           variants={fade}
           className="relative aspect-[16/10] overflow-hidden bg-[#EFE9E3] lg:aspect-[3/2]"
         >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-cover"
-          />
+          {image?.src && (
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+          )}
         </motion.div>
       </motion.div>
     </section>

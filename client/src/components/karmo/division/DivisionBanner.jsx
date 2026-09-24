@@ -441,14 +441,43 @@ export default function DivisionBanner({
           </motion.div>
         </AnimatePresence>
 
+        {/* Clean mattress-style control — arrows + thin progress bars, no
+            counter (matches OverlayHeroSlider on the mattress hero). */}
         {multi && showControls && (
-          <HeroControls
-            slides={slides}
-            active={active}
-            go={go}
-            autoplay={autoplay}
-            reduce={reduce}
-          />
+          <div className="absolute inset-x-0 bottom-4 z-[3] flex items-center justify-center gap-3 sm:gap-4 lg:bottom-6">
+            <button
+              type="button"
+              onClick={() => go(active - 1)}
+              aria-label="Previous slide"
+              className="flex h-8 w-8 items-center justify-center text-white/70 transition-colors hover:text-white"
+            >
+              <FiChevronLeft className="text-[18px]" />
+            </button>
+            <div className="flex items-center gap-2">
+              {slides.map((s, i) => (
+                <button
+                  key={s.id || i}
+                  type="button"
+                  onClick={() => go(i)}
+                  aria-label={`Go to slide ${i + 1}`}
+                  aria-current={i === active}
+                  className={`h-[3px] rounded-full transition-all duration-500 ${
+                    i === active
+                      ? "w-8 bg-brand"
+                      : "w-5 bg-white/45 hover:bg-white/80"
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => go(active + 1)}
+              aria-label="Next slide"
+              className="flex h-8 w-8 items-center justify-center text-white/70 transition-colors hover:text-white"
+            >
+              <FiChevronRight className="text-[18px]" />
+            </button>
+          </div>
         )}
       </section>
     );

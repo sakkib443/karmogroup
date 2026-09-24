@@ -15,6 +15,7 @@ import DivisionSpotlight from "@/components/karmo/division/DivisionSpotlight";
 import DivisionProducts from "@/components/karmo/division/DivisionProducts";
 import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionRecommended from "@/components/karmo/division/DivisionRecommended";
+import DivisionWhyChoose from "@/components/karmo/division/DivisionWhyChoose";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
@@ -125,10 +126,9 @@ export default function DivisionPage({ data }) {
       {data.recommended?.columns && (
         <DivisionRecommended {...data.recommended} />
       )}
-      {data.shapeGrid && <DivisionShapeGrid {...data.shapeGrid} />}
-      {data.explore && <ExploreSplit {...data.explore} />}
-      {data.lounge && <DivisionAbout {...data.lounge} />}
-      {!data.about?.asHero && <DivisionAbout {...data.about} />}
+      {data.whyChoose?.items?.length > 0 && (
+        <DivisionWhyChoose {...data.whyChoose} />
+      )}
       {data.about && !data.about.asHero && data.about.beforeShapeGrid && <DivisionAbout {...data.about} />}
       {data.shapeGrid && <DivisionShapeGrid {...data.shapeGrid} />}
       {data.explore && <ExploreSplit {...data.explore} />}
