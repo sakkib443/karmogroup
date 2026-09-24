@@ -393,6 +393,96 @@ export default function DivisionBanner({
     );
   }
 
+  if (style === "simple-slider") {
+    return (
+      <section className={`relative w-full overflow-hidden bg-ink ${VIEW_H}`}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={slide.id || active}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: EASE }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={slide.bg || bg}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[rgba(0,0,0,0.42)]"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={slide.id || active}
+            initial={reduce ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? false : { opacity: 0, y: -15 }}
+            transition={{ duration: 0.6, ease: EASE }}
+            className={`shell relative z-[1] flex h-full flex-col justify-center ${
+              slide.align === "right"
+                ? "items-end text-right"
+                : slide.align === "center"
+                ? "items-center text-center"
+                : "items-start text-left"
+            } ${slide.contentClassName || ""}`}
+          >
+            <h1 className="mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]">
+              {slide.headline || headline}
+            </h1>
+          </motion.div>
+        </AnimatePresence>
+
+        {multi && showControls && (
+          <HeroControls
+            slides={slides}
+            active={active}
+            go={go}
+            autoplay={autoplay}
+            reduce={reduce}
+          />
+        )}
+      </section>
+    );
+  }
+
+  if (style === "simple") {
+    return (
+      <section className={`relative w-full overflow-hidden bg-ink ${VIEW_H}`}>
+        <Image
+          src={bg}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[rgba(0,0,0,0.42)]"
+        />
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: EASE }}
+          className="shell relative z-[1] flex h-full flex-col justify-center text-left"
+        >
+          <h1 className="mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]">
+            {headline}
+          </h1>
+        </motion.div>
+      </section>
+    );
+  }
+
   const layout = layoutFor(slide, active);
 
   const copyProps = {
