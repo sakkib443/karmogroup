@@ -138,19 +138,21 @@ export default function DivisionAbout({
           </div>
         </motion.div>
 
-        {/* ── Right: lifestyle picture ───────────────────────────────────── */}
-        <motion.div
-          variants={fade}
-          className="relative aspect-[16/10] overflow-hidden bg-[#EFE9E3] lg:aspect-[3/2]"
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-cover"
-          />
-        </motion.div>
+        {/* ── Right: lifestyle picture (skipped if no image is provided) ──── */}
+        {image?.src && (
+          <motion.div
+            variants={fade}
+            className="relative aspect-[16/10] overflow-hidden bg-[#EFE9E3] lg:aspect-[3/2]"
+          >
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+          </motion.div>
+        )}
       </motion.div>
     </section>
   );
