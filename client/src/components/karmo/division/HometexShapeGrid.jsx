@@ -3,13 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import {
-  TbCertificate,
-  TbFeather,
-  TbShieldCheck,
-  TbRefresh,
-  TbRipple,
-} from "react-icons/tb";
+import { TbCertificate, TbFeather, TbShieldCheck } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -38,33 +32,9 @@ const BADGE = {
 function CoilsIcon({ className = "" }) {
   return (
     <svg viewBox="0 0 32 32" className={className} fill="none" aria-hidden>
-      <rect
-        x="5"
-        y="6"
-        width="6.2"
-        height="20"
-        rx="3.1"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <rect
-        x="12.9"
-        y="6"
-        width="6.2"
-        height="20"
-        rx="3.1"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <rect
-        x="20.8"
-        y="6"
-        width="6.2"
-        height="20"
-        rx="3.1"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
+      <rect x="5" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="12.9" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
+      <rect x="20.8" y="6" width="6.2" height="20" rx="3.1" stroke="currentColor" strokeWidth="1.6" />
       <path
         d="M8.1 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2M16 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2M23.9 10.2c1.6 0 1.6 2.2 0 2.2s-1.6 2.2 0 2.2 1.6 2.2 0 2.2"
         stroke="currentColor"
@@ -85,19 +55,8 @@ function PulseIcon({ className = "" }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle
-        cx="23.5"
-        cy="10"
-        r="3.2"
-        stroke="currentColor"
-        strokeWidth="1.6"
-      />
-      <path
-        d="M23.5 8.4v3.2M21.9 10h3.2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      <circle cx="23.5" cy="10" r="3.2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M23.5 8.4v3.2M21.9 10h3.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -157,7 +116,10 @@ function ClaimPanel({ item, solid = false }) {
         >
           {item.overview}
         </p>
-        <span aria-hidden className="mt-5 h-[3px] w-10 bg-brand sm:mt-6" />
+        <span
+          aria-hidden
+          className="mt-5 h-[3px] w-10 bg-brand sm:mt-6"
+        />
       </div>
     </motion.article>
   );
@@ -179,16 +141,15 @@ function ClaimsPairPanel({ items = [] }) {
           <div
             key={item.id}
             className={`flex min-h-[200px] flex-col justify-center px-5 py-5 sm:px-5 sm:py-6 md:min-h-0 ${
-              i > 0 ? "border-t border-white/15 md:border-l md:border-t-0" : ""
+              i > 0
+                ? "border-t border-white/15 md:border-l md:border-t-0"
+                : ""
             }`}
           >
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14 ${badge}`}
             >
-              <Icon
-                className="text-[24px] text-white sm:text-[28px]"
-                aria-hidden
-              />
+              <Icon className="text-[24px] text-white sm:text-[28px]" aria-hidden />
             </span>
             <h3 className="display mt-3.5 text-[13px] font-bold uppercase tracking-[0.04em] text-white sm:text-[14px] lg:text-[15px]">
               {item.title}
@@ -221,13 +182,22 @@ function SpotlightPanel({ data }) {
         className="object-cover object-[center_40%]"
         priority={false}
       />
+      {data.overlay ? (
+        <span aria-hidden className={`absolute inset-0 z-0 pointer-events-none ${data.overlay}`} />
+      ) : null}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
-        <div className="max-w-none text-right">
-          <h3 className="display section-heading title-card-line whitespace-nowrap uppercase text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] text-lg sm:text-xl lg:text-2xl">
-            {data.headingLead}
+        <div className="max-w-[16rem] text-right sm:max-w-[18rem] lg:max-w-[20rem]">
+          <h3 className="display section-heading title-card-line uppercase text-[#0b1a33]">
+            {data.headingLead}{" "}
+            {data.headingAccent ? (
+              <span className="italic text-[#0b1a33]/80">
+                {data.headingAccent}
+              </span>
+            ) : null}{" "}
+            {data.headingEnd}
           </h3>
           {data.subline ? (
-            <p className="body-copy mt-3 text-[12.5px] leading-[1.5] text-white/80 drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)] sm:text-[13.5px]">
+            <p className="body-copy mt-3 text-[12.5px] leading-[1.5] text-[#0b1a33]/70 sm:text-[13.5px]">
               {data.subline}
             </p>
           ) : null}
@@ -242,24 +212,21 @@ function SpotlightPanel({ data }) {
   );
 }
 
-function CertCard({ item, index = 0 }) {
-  // ১ম কার্ড হবে অরেঞ্জ (TbRefresh), ২য় কার্ড হবে পার্পল (TbRipple)
-  const isFirst = index === 0;
-  const badgeBg = isFirst ? "bg-[#F76707]" : "bg-[#7048E8]";
-  const IconComponent = isFirst ? TbRefresh : TbRipple;
-
+function CertCard({ item }) {
   return (
     <motion.article
       variants={fade}
       className={`flex items-center gap-4 px-5 py-4 transition-colors duration-300 hover:bg-white sm:gap-5 sm:px-6 sm:py-5 ${LIGHT}`}
     >
-      {/* ── আলাদা কালার ও আলাদা আইকন ── */}
-      <span
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${badgeBg} text-white sm:h-14 sm:w-14`}
-      >
-        <IconComponent className="text-[24px] sm:text-[28px]" aria-hidden />
-      </span>
-
+      <div className="relative h-[78px] w-[78px] shrink-0 overflow-hidden bg-white shadow-[0_0_0_1px_rgba(11,26,51,0.08)] sm:h-[88px] sm:w-[88px]">
+        <Image
+          src={item.image}
+          alt={item.alt || ""}
+          fill
+          sizes="88px"
+          className="object-contain object-center p-1.5"
+        />
+      </div>
       <div className="min-w-0">
         <h3 className="display text-[14px] font-bold uppercase leading-snug tracking-[0.04em] text-[#0b1a33] sm:text-[15px] lg:text-[16px]">
           {item.title}
@@ -279,7 +246,8 @@ function InsideIntroCard({ heading, accent, body }) {
       className={`flex flex-col justify-center px-5 py-5 sm:px-6 sm:py-6 ${LIGHT}`}
     >
       <h2 className="display section-heading title-card-line uppercase text-[#0b1a33]">
-        {heading} {accent ? <span className="text-brand">{accent}</span> : null}
+        {heading}{" "}
+        {accent ? <span className="text-brand">{accent}</span> : null}
       </h2>
       {body ? (
         <p className="body-copy mt-2.5 text-[12.5px] leading-[1.5] text-[#0b1a33]/62 sm:text-[13px]">
@@ -391,6 +359,9 @@ function InsidePhotoCard({ photo }) {
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
       ) : null}
+      {photo.lightOverlay && (
+        <span aria-hidden className="absolute inset-0 bg-black/20 pointer-events-none" />
+      )}
       {photo.caption ? (
         <figcaption className="absolute bottom-4 left-4 z-[1] bg-white/92 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#0b1a33] sm:bottom-5 sm:left-5 sm:text-[11px]">
           {photo.caption}
@@ -498,24 +469,46 @@ function OrganizedClaim({ item, reveal }) {
           aria-hidden
         />
       ) : null}
-      <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] px-7 py-7 lg:px-8 lg:py-8">
-        <span
-          className={`flex h-12 w-12 items-center justify-center rounded-full ${badge}`}
-        >
-          <Icon className="text-[24px] text-white" aria-hidden />
-        </span>
+      {!item.hideOverlay && <span aria-hidden className="absolute inset-0 bg-black/40" />}
+      {!item.imageOnly && (
+        <div className="relative z-[1] flex h-full flex-col justify-end px-7 py-7 lg:px-8 lg:py-8">
+        {!item.hideIcon && (
+          <span
+            className={`flex h-12 w-12 items-center justify-center rounded-full ${badge}`}
+          >
+            <Icon className="text-[24px] text-white" aria-hidden />
+          </span>
+        )}
         <h3
-          className="text-xl sm:text-2xl lg:text-3xl font-bold uppercase text-white whitespace-nowrap"
-          style={CARD_TYPE}
+          className={`display ${!item.hideLine ? 'title-card-line' : ''} mt-4 uppercase text-white`}
+          style={
+            item.lightText
+              ? {
+                  fontSize: "clamp(1.1rem, 1.8vw + 0.5rem, 1.8rem)",
+                  fontWeight: 200,
+                  fontVariationSettings: '"wght" 200',
+                  letterSpacing: "0.06em",
+                  lineHeight: "1.25",
+                  marginLeft: item.marginLeft || 0,
+                }
+              : { ...CARD_TYPE, marginLeft: item.marginLeft || 0 }
+          }
         >
-          {item.title}
+          <span className="block whitespace-nowrap">{item.title}</span>
+          {item.titleLine2 && (
+            <span className={`block mt-1 whitespace-nowrap ${item.indentLine2 ? 'ml-[15%]' : ''}`}>
+              {item.titleLine2}
+            </span>
+          )}
         </h3>
-        {/* <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
-          {item.overview}
-        </p>
-        <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" /> */}
+        {item.overview && (
+          <p className="body-copy mt-2.5 max-w-[24rem] text-[13px] leading-[1.6] text-white/80 sm:text-[14px]">
+            {item.overview}
+          </p>
+        )}
+        {!item.hideLine && <span aria-hidden className="mt-5 h-[3px] w-8 bg-brand" />}
       </div>
+      )}
     </motion.article>
   );
 }
@@ -580,8 +573,11 @@ function OrganizedSpotlight({ data, reveal }) {
         priority={false}
       />
       <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] flex h-full items-end justify-end px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
-        <div className="max-w-[22rem] text-right">
+      <div className={`relative z-[1] flex h-full ${data.valign === 'center' ? 'items-center' : data.valign === 'start' ? 'items-start' : 'items-end'} ${data.align === 'left' ? 'justify-start' : 'justify-end'} px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10`}>
+        <div 
+          className={`max-w-[22rem] ${data.align === 'left' ? 'text-left' : 'text-right'}`}
+          style={data.offsetY ? { marginTop: data.offsetY } : undefined}
+        >
           <h3
             className="display title-card-line uppercase text-white"
             style={{
@@ -595,7 +591,7 @@ function OrganizedSpotlight({ data, reveal }) {
           {data.subline ? (
             <p
               className="body-copy mt-3 max-w-[22rem] text-[13px] leading-[1.6] sm:text-[14px]"
-              style={{ color: "rgba(255,255,255,0.8)", marginLeft: "auto" }}
+              style={{ color: "rgba(255,255,255,0.8)", marginLeft: data.align === 'left' ? '0' : 'auto' }}
             >
               {data.subline}
             </p>
@@ -683,43 +679,46 @@ function OrganizedInside({ inside, reveal }) {
               aria-hidden
             />
           ) : null}
-          <span aria-hidden className="absolute inset-0 bg-[#0b1a33]/58" />
-          <div className="relative z-[1]">
-            <h2
-              className="display title-card-line uppercase text-white"
-              style={INSIDE_TYPE}
-            >
-              {inside.heading}{" "}
-              {inside.accent ? (
-                <span className="text-brand">{inside.accent}</span>
+          {!inside.hideText && <span aria-hidden className="absolute inset-0 bg-[#0b1a33]/58" />}
+          {inside.hideText && inside.lightOverlay && <span aria-hidden className="absolute inset-0 bg-black/20 pointer-events-none" />}
+          {!inside.hideText && (
+            <div className="relative z-[1]">
+              <h2
+                className="display title-card-line uppercase text-white"
+                style={INSIDE_TYPE}
+              >
+                {inside.heading}{" "}
+                {inside.accent ? (
+                  <span className="text-brand">{inside.accent}</span>
+                ) : null}
+              </h2>
+              {inside.body ? (
+                <p className="body-copy mt-2 max-w-[28rem] text-[12px] leading-[1.45] text-white/72 sm:text-[12.5px]">
+                  {inside.body}
+                </p>
               ) : null}
-            </h2>
-            {inside.body ? (
-              <p className="body-copy mt-2 max-w-[28rem] text-[12px] leading-[1.45] text-white/72 sm:text-[12.5px]">
-                {inside.body}
-              </p>
-            ) : null}
-            {layers.length > 0 ? (
-              <ol className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:mt-5 sm:gap-x-5">
-                {layers.map((layer, i) => (
-                  <li key={layer.id} className="flex gap-2">
-                    <span
-                      className="display w-5 shrink-0 text-[10px] text-brand sm:text-[11px]"
-                      style={{
-                        fontWeight: 350,
-                        fontVariationSettings: '"wght" 350',
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className="display min-w-0 text-[10.5px] uppercase leading-snug tracking-[0.05em] text-white sm:text-[11.5px]">
-                      {layer.name}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            ) : null}
-          </div>
+              {layers.length > 0 ? (
+                <ol className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:mt-5 sm:gap-x-5">
+                  {layers.map((layer, i) => (
+                    <li key={layer.id} className="flex gap-2">
+                      <span
+                        className="display w-5 shrink-0 text-[10px] text-brand sm:text-[11px]"
+                        style={{
+                          fontWeight: 350,
+                          fontVariationSettings: '"wght" 350',
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="display min-w-0 text-[10.5px] uppercase leading-snug tracking-[0.05em] text-white sm:text-[11.5px]">
+                        {layer.name}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+            </div>
+          )}
         </motion.article>
       )}
       <InsidePhotoCard photo={inside.photo} />
@@ -727,7 +726,12 @@ function OrganizedInside({ inside, reveal }) {
   );
 }
 
-function OrganizedGrid({ highlights, spotlight, inside, reveal }) {
+function OrganizedGrid({
+  highlights,
+  spotlight,
+  inside,
+  reveal,
+}) {
   const primary = highlights[0];
   const pair = highlights.slice(1, 3);
 
@@ -742,7 +746,11 @@ function OrganizedGrid({ highlights, spotlight, inside, reveal }) {
         <div className="grid min-h-0 grid-cols-1 gap-[6px] md:h-full md:grid-rows-[minmax(0,1fr)_minmax(0,1.2fr)]">
           <div className="grid min-h-0 h-full grid-cols-1 gap-[6px] md:grid-cols-2">
             <OrganizedClaim item={primary} reveal={reveal} />
-            <OrganizedPair items={pair} reveal={reveal} />
+            {pair.length > 1 ? (
+              <OrganizedPair items={pair} reveal={reveal} />
+            ) : pair.length === 1 ? (
+              <OrganizedClaim item={pair[0]} reveal={reveal} />
+            ) : null}
           </div>
           <OrganizedSpotlight data={spotlight} reveal={reveal} />
         </div>
@@ -769,7 +777,7 @@ function MosaicGrid({
   const pair = highlights.slice(1, 3);
 
   return (
-    <div className="relative z-[1] mx-auto w-[92%] sm:w-[85%] lg:w-[80%] py-1.5">
+    <div className="relative z-[1] w-full p-[6px]">
       <motion.div
         variants={group}
         {...reveal}
@@ -801,8 +809,8 @@ function MosaicGrid({
             </>
           ) : (
             <>
-              {certifications.slice(0, 2).map((item, index) => (
-                <CertCard key={item.id} item={item} index={index} />
+              {certifications.slice(0, 2).map((item) => (
+                <CertCard key={item.id} item={item} />
               ))}
               {hasFilm ? (
                 <div className="h-[min(56svh,440px)] w-full md:h-full md:min-h-0">
@@ -817,7 +825,7 @@ function MosaicGrid({
   );
 }
 
-export default function DivisionShapeGrid({
+export default function HometexShapeGrid({
   className = "mb-1.5",
   background,
   highlights = [],
