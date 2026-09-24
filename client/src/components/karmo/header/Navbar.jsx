@@ -133,14 +133,14 @@ const nav = [
     columns: [
       {
         label: "Pillow",
-        href: "/hometex",
+        href: "/hometex/pillow",
         icon: `${MENU}/pillow.png`,
         items: [
-          { name: "Relax Time", href: "/hometex", icon: `${MENU}/pillow.png` },
-          { name: "Plush", href: "/hometex", icon: `${MENU}/plush.png` },
-          { name: "Cushion", href: "/hometex", icon: `${MENU}/cushion.png` },
-          { name: "Organic Silk Cotton", href: "/hometex", icon: `${MENU}/natural.png` },
-          { name: "Orthopedic U-Pillow", href: "/hometex", icon: `${MENU}/orthopedic.png` },
+          { name: "Relax Time", href: "/hometex/pillow", icon: `${MENU}/pillow.png` },
+          { name: "Plush", href: "/hometex/pillow", icon: `${MENU}/plush.png` },
+          { name: "Cushion", href: "/hometex/pillow", icon: `${MENU}/cushion.png` },
+          { name: "Organic Silk Cotton", href: "/hometex/pillow", icon: `${MENU}/natural.png` },
+          { name: "Orthopedic U-Pillow", href: "/hometex/pillow", icon: `${MENU}/orthopedic.png` },
         ],
       },
       {

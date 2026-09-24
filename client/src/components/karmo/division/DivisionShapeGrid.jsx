@@ -182,7 +182,7 @@ function SpotlightPanel({ data }) {
         className="object-cover object-[center_40%]"
         priority={false}
       />
-      {data.overlay ? (
+      {data.overlay && data.overlay !== "none" ? (
         <span aria-hidden className={`absolute inset-0 z-0 pointer-events-none ${data.overlay}`} />
       ) : null}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
@@ -368,7 +368,7 @@ function InsidePhotoCard({ photo }) {
   );
 }
 
-function FilmPanel({ film, still, filmAlt = "" }) {
+function FilmPanel({ film, still, filmAlt = "", overlay }) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef(null);
   const wrapRef = useRef(null);
@@ -414,6 +414,7 @@ function FilmPanel({ film, still, filmAlt = "" }) {
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
       ) : null}
+      {overlay && <div className="absolute inset-0 bg-black/20 pointer-events-none" />}
     </motion.div>
   );
 }
@@ -732,6 +733,7 @@ function MosaicGrid({
   film,
   still,
   filmAlt,
+  filmOverlay,
   hasInside,
   hasFilm,
   reveal,
@@ -777,7 +779,7 @@ function MosaicGrid({
               ))}
               {hasFilm ? (
                 <div className="h-[min(56svh,440px)] w-full md:h-full md:min-h-0">
-                  <FilmPanel film={film} still={still} filmAlt={filmAlt} />
+                  <FilmPanel film={film} still={still} filmAlt={filmAlt} overlay={filmOverlay} />
                 </div>
               ) : null}
             </>
@@ -798,6 +800,7 @@ export default function DivisionShapeGrid({
   film,
   still,
   filmAlt = "",
+  filmOverlay = false,
   skin = "mosaic",
 }) {
   const reduceMotion = useReducedMotion();
@@ -841,6 +844,7 @@ export default function DivisionShapeGrid({
           film={film}
           still={still}
           filmAlt={filmAlt}
+          filmOverlay={filmOverlay}
           hasInside={hasInside}
           hasFilm={hasFilm}
           reveal={reveal}

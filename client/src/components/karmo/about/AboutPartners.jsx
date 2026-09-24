@@ -100,8 +100,6 @@ export default function AboutPartners() {
         variants={fade}
         {...reveal}
         viewport={VIEWPORT}
-        {...reveal}
-        viewport={VIEWPORT}
         className="marquee-rows relative mt-10 space-y-3 sm:mt-12 sm:space-y-4 lg:mt-14"
       >
         <PartnerTrack partners={rowOne} direction="left" still={!!reduceMotion} />
