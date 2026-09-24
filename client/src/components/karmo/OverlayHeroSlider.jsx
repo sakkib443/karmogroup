@@ -50,15 +50,13 @@ export default function OverlayHeroSlider({
 
   const go = useCallback(
     (i) => setActive(((i % slides.length) + slides.length) % slides.length),
-    [slides.length]
+    [slides.length],
   );
 
   useEffect(() => {
     if (reduce || slides.length < 2) return undefined;
     const delay =
-      !firstAdvanceDone.current && active === 0
-        ? firstSlideMs
-        : autoplayMs;
+      !firstAdvanceDone.current && active === 0 ? firstSlideMs : autoplayMs;
     const t = setTimeout(() => {
       firstAdvanceDone.current = true;
       setActive((a) => (a + 1) % slides.length);
@@ -68,7 +66,7 @@ export default function OverlayHeroSlider({
 
   const fadeMs = useMemo(
     () => (reduce ? { duration: 0 } : { duration: fadeDuration, ease: EASE }),
-    [reduce, fadeDuration]
+    [reduce, fadeDuration],
   );
 
   if (!slides.length) return null;
@@ -102,7 +100,7 @@ export default function OverlayHeroSlider({
           const light = s.tone === "light";
           const primary = titleCard
             ? null
-            : s.cta?.find((c) => c.primary) ?? s.cta?.[0];
+            : (s.cta?.find((c) => c.primary) ?? s.cta?.[0]);
           const Heading = on ? (asHero ? "h1" : "h2") : "p";
           const hasAccent = !titleCard && Boolean(s.headingAccent);
 
@@ -138,7 +136,9 @@ export default function OverlayHeroSlider({
                     sizes="100vw"
                     quality={90}
                     className={`pointer-events-none ${
-                      s.image.fit === "contain" ? "object-contain" : "object-cover"
+                      s.image.fit === "contain"
+                        ? "object-contain"
+                        : "object-cover"
                     } ${s.image.position || "object-center"} ${s.image.className || ""}`}
                   />
                 ) : null}
@@ -287,98 +287,90 @@ export default function OverlayHeroSlider({
                       </motion.div>
                     ) : (
                       <>
-                    {!titleCard && (s.eyebrowStart || s.eyebrowEnd) && (
-                      <motion.div
-                        variants={copyItem}
-                        className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
-                          copyEnd ? "md:justify-end" : "justify-start"
-                        }`}
-                      >
-                        {s.eyebrowStart ? (
-                          <span
-                            className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
-                              light ? "text-ink" : "text-white"
+                        {!titleCard && (s.eyebrowStart || s.eyebrowEnd) && (
+                          <motion.div
+                            variants={copyItem}
+                            className={`mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 sm:mb-4 sm:gap-x-3 ${
+                              copyEnd ? "md:justify-end" : "justify-start"
                             }`}
                           >
-                            {s.eyebrowStart}
-                          </span>
-                        ) : null}
-                        {s.badge ? (
-                          <Image
-                            src={s.badge.src}
-                            alt=""
-                            width={s.badge.width ?? 420}
-                            height={s.badge.height ?? 330}
-                            sizes="88px"
-                            quality={70}
-                            className="h-8 w-auto shrink-0 -translate-y-[8%] sm:h-11"
-                          />
-                        ) : null}
-                        {s.eyebrowEnd ? (
-                          <span
-                            className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
-                              light ? "text-ink" : "text-white"
+                            {s.eyebrowStart ? (
+                              <span
+                                className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                                  light ? "text-ink" : "text-white"
+                                }`}
+                              >
+                                {s.eyebrowStart}
+                              </span>
+                            ) : null}
+                            {s.badge ? (
+                              <Image
+                                src={s.badge.src}
+                                alt=""
+                                width={s.badge.width ?? 420}
+                                height={s.badge.height ?? 330}
+                                sizes="88px"
+                                quality={70}
+                                className="h-8 w-auto shrink-0 -translate-y-[8%] sm:h-11"
+                              />
+                            ) : null}
+                            {s.eyebrowEnd ? (
+                              <span
+                                className={`text-[12px] font-bold uppercase tracking-[0.1em] sm:text-[15px] ${
+                                  light ? "text-ink" : "text-white"
+                                }`}
+                              >
+                                {s.eyebrowEnd}
+                              </span>
+                            ) : null}
+                          </motion.div>
+                        )}
+                        <motion.div variants={copyItem}>
+                          <Heading
+                            className={`display hero-heading title-card-line uppercase text-white ${
+                              center
+                                ? "text-[1.25rem] leading-[1.1] sm:text-[1.65rem] lg:text-[1.95rem]"
+                                : "text-[1.25rem] leading-[1.1] sm:text-[1.65rem] lg:text-[2rem]"
+                            }`}
+                            style={{
+                              fontWeight: 350,
+                              fontVariationSettings: '"wght" 350',
+                            }}
+                          >
+                            <span className="inline whitespace-nowrap">
+                              {s.headingLead}{" "}
+                            </span>
+                            {hasAccent ? (
+                              <span className="inline whitespace-nowrap text-brand">
+                                {s.headingAccent}
+                              </span>
+                            ) : null}
+                          </Heading>
+                        </motion.div>
+                        {s.kicker ? (
+                          <motion.p
+                            variants={copyItem}
+                            className={`mt-2.5 text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:text-[12px] sm:tracking-[0.3em] ${
+                              copyStart
+                                ? "max-w-[34ch]"
+                                : "max-w-[28ch] sm:max-w-none"
                             }`}
                           >
-                            {s.eyebrowEnd}
-                          </span>
+                            {s.kicker}
+                          </motion.p>
                         ) : null}
-                      </motion.div>
-                    )}
-                    <motion.div variants={copyItem}>
-                      <Heading
-                        className={`display hero-heading title-card-line uppercase text-white ${
-                          center
-                            ? "text-[1.45rem] leading-[1.08] tracking-[0.04em] text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.55)] sm:text-[2rem] lg:text-[2.35rem] lg:tracking-[0.06em]"
-                            : "text-[1.85rem] leading-[1.08] tracking-[0.04em] sm:text-[2.65rem] lg:text-[3.15rem]"
-                        }`}
-                        style={{
-                          fontWeight: 350,
-                          fontVariationSettings: '"wght" 350',
-                        }}
-                      >
-                        <span
-                          className={`block whitespace-normal ${
-                            center || copyStart ? "" : "sm:whitespace-nowrap"
-                          }`}
-                        >
-                          {s.headingLead}
-                        </span>
-                        {hasAccent ? (
-                          <span
-                            className={`block whitespace-normal text-brand ${
-                              center || copyStart ? "" : "sm:whitespace-nowrap"
-                            }`}
-                          >
-                            {s.headingAccent}
-                          </span>
+                        {primary ? (
+                          <motion.div variants={copyItem}>
+                            <Link
+                              href={primary.href}
+                              tabIndex={on ? 0 : -1}
+                              className="mt-5 inline-flex h-[44px] items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[48px] sm:px-8"
+                            >
+                              {primary.label}
+                              <FiArrowRight className="text-[15px]" />
+                            </Link>
+                          </motion.div>
                         ) : null}
-                      </Heading>
-                    </motion.div>
-                    {s.kicker ? (
-                      <motion.p
-                        variants={copyItem}
-                        className={`mt-2.5 text-[11px] font-semibold uppercase leading-snug tracking-[0.22em] text-white/80 sm:text-[12px] sm:tracking-[0.3em] ${
-                          copyStart
-                            ? "max-w-[34ch]"
-                            : "max-w-[28ch] sm:max-w-none"
-                        }`}
-                      >
-                        {s.kicker}
-                      </motion.p>
-                    ) : null}
-                    {primary ? (
-                      <motion.div variants={copyItem}>
-                        <Link
-                          href={primary.href}
-                          tabIndex={on ? 0 : -1}
-                          className="mt-5 inline-flex h-[44px] items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-[48px] sm:px-8"
-                        >
-                          {primary.label}
-                          <FiArrowRight className="text-[15px]" />
-                        </Link>
-                      </motion.div>
-                    ) : null}
                       </>
                     )}
                   </motion.div>
