@@ -52,6 +52,7 @@ export default function DivisionAbout({
   slides,
   layout = "split",
   asHero = false,
+  frameClassName,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -76,6 +77,7 @@ export default function DivisionAbout({
         slides={frames}
         asHero={asHero}
         size={asHero ? "viewport" : "band"}
+        frameClassName={frameClassName}
         firstSlideMs={asHero ? 2600 : undefined}
         autoplayMs={asHero ? 4800 : undefined}
       />
