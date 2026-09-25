@@ -39,6 +39,8 @@ export default function OverlayHeroSlider({
   /** `band` = 1916/821 aspect (division pages). `viewport` = under fixed header. */
   size = "band",
   className = "",
+  /** Optional full override of the frame sizing classes (aspect/height). */
+  frameClassName = "",
   autoplayMs = AUTOPLAY_MS,
   /** Delay before leaving slide 0 the first time (home / mattress landings). */
   firstSlideMs = FIRST_SLIDE_MS,
@@ -75,9 +77,10 @@ export default function OverlayHeroSlider({
   /* Desktop keeps the original full-bleed math. Mobile gets a taller usable
      frame so copy and photo both read (band aspect alone collapses to ~170px). */
   const frameClass =
-    size === "viewport"
+    frameClassName ||
+    (size === "viewport"
       ? "relative h-[min(78svh,620px)] min-h-[520px] w-full md:h-[calc(100svh-112px)] md:min-h-[calc(100svh-112px)]"
-      : "relative h-[min(68svh,520px)] min-h-[420px] w-full md:h-auto md:min-h-0 md:aspect-[1916/821]";
+      : "relative h-[min(68svh,520px)] min-h-[420px] w-full md:h-auto md:min-h-0 md:aspect-[1916/821]");
 
   return (
     <section
