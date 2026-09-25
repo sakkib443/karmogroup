@@ -15,6 +15,10 @@ export default function DivisionRecommended({
   columns = [],
   uncropped = false,
   imageOverlay = false,
+  /* Flat 20%-black tint over each image — opt-in, used only by HomeTex's
+     "Why Choose Karmo HomeTex" band. Off by default so main's pages
+     (e.g. bed-automotive uncropped) stay exactly as they are. */
+  flatOverlay = false,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -44,16 +48,27 @@ export default function DivisionRecommended({
               variants={fade}
               className="flex min-h-0 min-w-0 flex-col"
             >
-              <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-auto sm:min-h-0 sm:flex-1">
+              <div className={`relative w-full overflow-hidden ${uncropped ? "aspect-[3/2]" : "aspect-[4/3] sm:aspect-auto sm:min-h-0 sm:flex-1"}`}>
                 <Image
                   src={col.image}
                   alt={col.alt || ""}
                   fill
                   unoptimized
                   sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover object-center"
+                  className={uncropped ? "object-contain object-center" : "object-cover object-center"}
+                  style={{ objectPosition: col.objectPosition || "center" }}
                 />
-                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+                {imageOverlay ? (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/30 to-black/20"
+                  />
+                ) : flatOverlay ? (
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 bg-black/20"
+                  />
+                ) : null}
               </div>
               <p className="display shrink-0 px-2 pb-1 pt-3 text-center text-[11px] font-bold uppercase leading-snug tracking-[0.06em] text-[#0b1a33] sm:px-3 sm:text-[12px] lg:text-[13px]">
                 {col.caption}

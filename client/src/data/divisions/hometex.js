@@ -74,6 +74,8 @@ const hometex = {
   /* "Why Choose Karmo HomeTex" — using the recommended component format to match mattress page design */
   recommended: {
     heading: "Why Choose Karmo HomeTex ?",
+    /* Flat dark tint on the images — HomeTex-only (see DivisionRecommended). */
+    flatOverlay: true,
     columns: [
       {
         id: "comfort",
