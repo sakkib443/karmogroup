@@ -43,7 +43,13 @@ export default function HomePage() {
 
       <PromoTrio />
       <ShopBySize />
-      <FoamPromise filmMode="fixed" />
+      {/* No `film`: the borrowed clip this band used to loop was pulled from
+          the repo. `stillFixed` gives the background the same "stays put"
+          feel — a plain photo pinned to the viewport instead of a video. */}
+      <FoamPromise
+        stillFixed
+        still="/karmo/images/home-02/promise/foam-promise-bg.jpg"
+      />
 
       <Reels />
       <ShoeSole />

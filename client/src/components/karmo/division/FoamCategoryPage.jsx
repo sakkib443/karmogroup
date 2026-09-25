@@ -72,26 +72,28 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
   spotlight: {
     image: "/karmo/images/foam/banner-01.png",
     alt: "A calm living room with deep foam sofa seating",
+    /* Light scrim so the dark heading stays readable against the bright sky —
+       the client's ask; the image had none before. */
+    overlay: true,
     headingLead: "Designed",
     headingAccent: "to",
     headingEnd: "endure",
     subline: "High-density cores and open airflow for everyday living rooms.",
     brand: "Karmo Foam",
   },
+  /* Two foam-benefit claims, not certification photos — the client's ask.
+     Icon and colour are picked in `CertCard` itself (bed icon, orange first;
+     car icon, purple second), matched to this page's own two audiences. */
   certifications: [
     {
-      id: "iso",
-      image: "/karmo/images/home-02/certified/01-iso-9001.jpg",
-      alt: "ISO 9001 quality management certificate",
-      title: "ISO 9001 Accreditation",
-      body: "International quality management — every foam grade held to certified standards.",
+      id: "sleep-support",
+      title: "Restful Sleep Support",
+      body: "Consistent density under mattresses and cushions holds its shape night after night — no sagging, no lost support.",
     },
     {
-      id: "ukas",
-      image: "/karmo/images/home-02/certified/02-ukas.jpg",
-      alt: "UKAS accredited quality management certificate",
-      title: "UKAS Accreditation",
-      body: "Quality systems accredited by UKAS — trusted craft since 1965.",
+      id: "smooth-journey",
+      title: "Smooth Every Journey",
+      body: "Firm, resilient foam in seats and interiors absorbs road vibration — comfortable for the whole ride.",
     },
   ],
   film: "/karmo/videos/shorts/v1-tisa-trim.mp4",
@@ -107,8 +109,10 @@ export function buildFoamCategoryData(key) {
     ...foam,
     bedAutomotiveHero:
       key === "bed-automotive" ? foam.bedAutomotiveHero : null,
-    // Bed & Automotive drops the generic "Built density by density" zones band.
-    zones: key === "bed-automotive" ? null : foam.zones,
+    // Footwear and Bed & Automotive both drop the generic
+    // "Built density by density" zones band.
+    zones:
+      key === "footwear" || key === "bed-automotive" ? null : foam.zones,
     recommended: key === "bed-automotive" ? {
       heading: "Why choose Karmo Bed & Automotive Foam",
       uncropped: true,

@@ -72,6 +72,7 @@ const foam = {
 
   recommended: {
     heading: "Which Karmo foam is right for you",
+    imageOverlay: true,
     columns: [
       {
         id: "firm",
@@ -126,6 +127,7 @@ const foam = {
     spotlight: {
       image: "/karmo/images/foam/furniture/mosaic/footwear-spotlight2.png",
       alt: "A calm living room with deep foam sofa seating",
+      overlay: "bg-[#0b1a33]/20",
       headingLead: "DESIGNED TO ENDURE",
       headingAccent: "",
       headingEnd: "",
@@ -175,6 +177,7 @@ certifications: [
     film: null,
     still:  "/karmo/images/foam/furniture/mosaic/footwear-sole-v4.png",
     filmAlt: "Karmo Footwear Foam Quality",
+    filmOverlay: true,
   },
 
   zones: {
@@ -215,6 +218,7 @@ certifications: [
         headingAccent: "",
         kicker: "",
         // cta: ,
+        veil: true,
         image: {
       src: "/karmo/images/foam/furniture/bands/footwear-comfort-lounge2.png",
       alt: "Comfortable footwear foam for everyday walking",

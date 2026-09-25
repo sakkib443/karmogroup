@@ -48,7 +48,7 @@ export default function CertifiedBy() {
 
   return (
     <section
-      className="relative overflow-hidden bg-[#0a0a0a] pt-16 pb-16 md:pt-20 md:pb-20 lg:pt-24 lg:pb-24"
+      className="relative overflow-hidden bg-[#0a0a0a] pt-12 pb-12 md:pt-14 md:pb-14 lg:pt-16 lg:pb-16"
       aria-label="Awards and certifications"
     >
       <span
@@ -81,33 +81,34 @@ export default function CertifiedBy() {
           </p>
         </motion.header>
 
+        {/* Four cards on their own borders rather than a row of dividers —
+            reads as one organized grid at any width instead of a line that
+            only gains structure once it reaches the desktop column count. */}
         <motion.ul
           variants={group}
-          className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 md:mt-16 md:grid-cols-2 md:gap-x-0 md:gap-y-12 lg:grid-cols-4 lg:gap-y-0"
+          className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:mt-12 sm:gap-5 lg:max-w-none lg:grid-cols-4 lg:gap-6"
         >
-          {pillars.map(({ id, src, alt, title, body }, i) => (
+          {pillars.map(({ id, src, alt, title, body }) => (
             <motion.li
               key={id}
               variants={fade}
-              className={`flex flex-col items-center px-4 text-center md:px-6 lg:px-7 ${
-                i % 2 === 1 ? "md:border-l md:border-white/12" : ""
-              } ${i > 0 ? "lg:border-l lg:border-white/12" : ""}`}
+              className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-6 text-center sm:px-5 sm:py-7"
             >
-              <div className="relative flex h-[13.5rem] w-[13.5rem] items-center justify-center sm:h-[15.5rem] sm:w-[15.5rem] lg:h-[17rem] lg:w-[17rem]">
+              <div className="relative flex h-24 w-24 items-center justify-center sm:h-28 sm:w-28 lg:h-32 lg:w-32">
                 <Image
                   src={src}
                   alt={alt}
-                  width={1024}
-                  height={1024}
-                  sizes="(min-width: 1024px) 272px, 248px"
+                  width={512}
+                  height={512}
+                  sizes="(min-width: 1024px) 128px, 112px"
                   quality={80}
                   className="h-full w-full object-contain"
                 />
               </div>
-              <h3 className="display mt-5 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white sm:mt-6">
+              <h3 className="display mt-4 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-white">
                 {title}
               </h3>
-              <p className="body-copy mt-2.5 max-w-[18rem] text-[13px] leading-[1.65] text-white/70 sm:text-[14px]">
+              <p className="body-copy mt-2 max-w-[15rem] text-[12px] leading-[1.55] text-white/70 sm:text-[13px]">
                 {body}
               </p>
             </motion.li>
@@ -118,7 +119,7 @@ export default function CertifiedBy() {
           variants={fade}
           {...reveal}
           viewport={VIEWPORT}
-          className="mx-auto mt-12 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-14 sm:text-[11px]"
+          className="mx-auto mt-10 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-12 sm:text-[11px]"
         >
           Reflects Karmo Group’s position since 1965, and ISO 9001 quality
           management accredited by UKAS (Registration Number 014) and approved

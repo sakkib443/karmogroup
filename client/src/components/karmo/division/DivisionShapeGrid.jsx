@@ -221,6 +221,12 @@ function SpotlightPanel({ data }) {
         className="object-cover object-[center_40%]"
         priority={false}
       />
+      {data.overlay ? (
+        <span
+          aria-hidden
+          className={`absolute inset-0 z-0 pointer-events-none ${data.overlay}`}
+        />
+      ) : null}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
         <div className="max-w-none text-right">
           <h3 className="display section-heading title-card-line whitespace-nowrap uppercase text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)] text-lg sm:text-xl lg:text-2xl">
@@ -580,7 +586,10 @@ function OrganizedSpotlight({ data, reveal }) {
         priority={false}
       />
       <span aria-hidden className="absolute inset-0 bg-black/40" />
-      <div className="relative z-[1] flex h-full items-end justify-end px-7 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">
+      {/* Nudged up from true middle, right-aligned as before — was bottom-
+          right, sitting low. Right alignment stays; only the vertical
+          position moved. */}
+      <div className="relative z-[1] flex h-full items-center justify-end px-7 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10 lg:pb-24 lg:pt-10">
         <div className="max-w-[22rem] text-right">
           <h3
             className="display title-card-line uppercase text-white"

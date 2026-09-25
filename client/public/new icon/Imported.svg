@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Matches Microfibre.png / Soft.png: dark-grey outline, one pink accent
+       stroke, one blue accent stroke, transparent background. Drawn instead
+       of sourced — no "international origin" mark existed in that set, and a
+       plain globe is the one shape that reads as "imported" without text. -->
+  <circle cx="100" cy="100" r="68" stroke="#58595b" stroke-width="7"/>
+  <path d="M100 32v136M32 100h136" stroke="#58595b" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="100" cy="100" rx="30" ry="68" stroke="#58595b" stroke-width="4"/>
+  <path d="M36 78c20 10 108 10 128 0" stroke="#e2617e" stroke-width="5" stroke-linecap="round"/>
+  <path d="M36 122c20-10 108-10 128 0" stroke="#5fa8dc" stroke-width="5" stroke-linecap="round"/>
+</svg>

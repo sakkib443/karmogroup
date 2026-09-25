@@ -33,10 +33,12 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *     "Long Lasting", so the eye is pulled to the middle of three rather
  *     than raked left to right.
  *
- * ── The background film ────────────────────────────────────────────────────
- * `product-film.mp4`, the clip `/home-2`'s `FilmBand` plays, at the client's
- * ask for "the video from Home 2". The seamless-loop rig is lifted from that
- * component wholesale rather than reimplemented — see the note on it below.
+ * ── The background ─────────────────────────────────────────────────────────
+ * A still photograph, pinned to the viewport (`stillFixed`). It replaces the
+ * looping clip the band used to carry: that file came from another company's
+ * site and was deleted from the repo, not just unhooked. The film rig below is
+ * still here because the division pages pass their own, owned clips through
+ * this component — the homepage simply no longer passes one.
  */
 
 /* Brightened from the reference's muted #E8892B at the client's ask for a more
@@ -117,7 +119,6 @@ function LeafRule() {
 const CROSSFADE = 0.7;
 /* Slightly below 1 — the clip reads too brisk at native speed behind the copy. */
 const PLAYBACK = 0.9;
-const FILM = "/karmo/videos/product-film.mp4";
 const STILL = "/karmo/livora/page-header-bg-image.jpg";
 
 /**
@@ -174,13 +175,33 @@ export default function FoamPromise({
   /* Background still. Defaults to the homepage foam texture; callers can pass a
      photo instead (e.g. the mattress page's sea-beach shot). */
   still = STILL,
+  /* Pins the still to the viewport instead of letting it scroll with the
+     section, so the band slides over a background that stays put and the
+     picture is revealed a strip at a time. What the homepage uses now that the
+     film is gone.
+
+     `background-attachment: fixed` rather than the hand-rolled clip-path rig
+     the film needs: that rig only exists because there is no such property for
+     a `<video>` element. For an image the browser does it natively, and does it
+     on the compositor instead of on every scroll frame in JS.
+
+     Left to `bg-scroll` below the `md` breakpoint on purpose. iOS Safari has
+     never supported a fixed attachment — it silently paints the image at
+     viewport size and then scrolls it anyway, which crops the picture hard on
+     a phone for an effect nobody gets. Small screens get the ordinary cover
+     background, which is what they would have seen regardless. */
+  stillFixed = false,
   /* When false the looping film is skipped and only `still` shows — a plain
-     photographic background instead of the homepage's video band. */
+     photographic background instead of a video band. */
   showFilm = true,
-  /* Which clip loops behind the band. Defaults to the homepage foam film; the
-     mattress page passes its own "Sleep Well" clip. */
-  film = FILM,
+  /* Which clip loops behind the band. No default: the homepage passes none,
+     and the division pages pass their own. With nothing here the still is the
+     whole background. */
+  film = null,
 }) {
+  /* One switch for every branch below, so a caller that asks for a film
+     without giving one gets the still rather than an empty `<video>`. */
+  const hasFilm = showFilm && Boolean(film);
   const reduce = useReducedMotion();
   const reveal = reduce ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -234,7 +255,7 @@ export default function FoamPromise({
    * it is the whole background and it behaves normally.
    */
   useEffect(() => {
-    if (reduce || !showFilm || filmMode === "drift") return;
+    if (reduce || !hasFilm || filmMode === "drift") return;
     const section = sectionRef.current;
     const inner = driftRef.current;
     if (!section || !inner) return;
@@ -316,7 +337,7 @@ export default function FoamPromise({
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [reduce, filmMode, showFilm]);
+  }, [reduce, filmMode, hasFilm]);
 
   /**
    * Two stacked copies of one clip, cross-faded at the seam.
@@ -401,11 +422,25 @@ export default function FoamPromise({
       {/* A still under the film, never removed, so the band is never a black
           rectangle — not while the film buffers, not if it fails, and not for a
           reader who asked for less motion, who gets no video element at all.
-          This one is a plain absolute layer and scrolls with the section, which
-          is also what makes it the right fallback before hydration. */}
-      <div aria-hidden className="absolute inset-0 z-0 overflow-hidden">
-        <Image src={still} alt="" fill sizes="100vw" className="object-cover" priority={false} />
-      </div>
+          When there is no film at all (the homepage today) this still *is* the
+          background, and `stillFixed` is what gives it the "stays put while the
+          section slides over it" look the client asked for. */}
+      {stillFixed ? (
+        /* A CSS background rather than `next/image`'s `<img>`: pinning to the
+           viewport is `background-attachment: fixed`, and that property has no
+           effect on a replaced element like an `<img>` — it only does anything
+           on something painted as a background. `bg-scroll` under `md` opts
+           small screens back out; see the `stillFixed` prop note for why. */
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 bg-scroll bg-cover bg-center md:bg-fixed"
+          style={{ backgroundImage: `url(${still})` }}
+        />
+      ) : (
+        <div aria-hidden className="absolute inset-0 z-0 overflow-hidden">
+          <Image src={still} alt="" fill sizes="100vw" className="object-cover" priority={false} />
+        </div>
+      )}
 
       {/* The film. One set of `<video>` elements in every mode — the mode only
           decides the two boxes they sit in, so the loop rig, the refs and the
@@ -426,7 +461,7 @@ export default function FoamPromise({
             · drift is a CSS keyframe and its own overscan is in that rule.
           Each overscan has to stay clear of its figure above — raising one
           without the other is exactly what pulls an edge into view. */}
-      {!reduce && showFilm && (
+      {!reduce && hasFilm && (
         <div
           ref={filmRef}
           aria-hidden
