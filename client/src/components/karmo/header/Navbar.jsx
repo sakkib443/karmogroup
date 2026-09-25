@@ -127,7 +127,8 @@ const nav = [
   {
     name: "HomeTex / Bedding",
     line: "Pillows, sheets, quilts, towels",
-    href: "/hometex",
+    href: null,
+    match: "/hometex",
     icon: `${MENU}/nav-hometex.png?v=2`,
     panelWidth: "36rem",
     columns: [

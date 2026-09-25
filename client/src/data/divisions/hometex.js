@@ -24,38 +24,50 @@ const hometex = {
       },
       {
         id: "comforter-2",
-        bg: "/karmo/images/chemicals/comforter 2.png",
+        bg: "/karmo/images/hometex/hometex-first-sub/bed.png",
         headline: "BREATHABLE WARMTH",
         align: "right",
-        contentClassName: "pb-24",
+        contentClassName: "pt-[18vh]",
       }
     ],
   },
 
   features: [
     {
-      id: "years",
-      icon: "/karmo/images/trust/legacy-60-years.png",
-      title: "Since 1965",
-      note: "Six decades of home comfort",
+      id: "legacy",
+      title: "A legacy of 60 years",
+      note: "of healthy sleep",
+      icon: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
     },
     {
-      id: "cotton",
-      icon: "/karmo/images/trust/sustainable-products.png",
-      title: "Premium Cotton",
-      note: "Soft, breathable, long-lasting",
+      id: "trusted",
+      title: "Trusted By Million",
+      note: "families worldwide.",
+      icon: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
     },
     {
-      id: "antidust",
-      icon: "/karmo/images/trust/trusted-families.png",
-      title: "Anti-Dust Weave",
-      note: "Cleaner, healthier bedding",
+      id: "recognised",
+      title: "Recognised By",
+      note: "Super Brand",
+      icon: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
     },
     {
-      id: "care",
-      icon: "/karmo/images/trust/recognised-super-brand.png",
-      title: "Easy Care",
-      note: "Machine washable, colour-fast",
+      id: "natural",
+      title: "Natural and",
+      note: "Sustainable Products",
+      icon: "/karmo/images/trust/cartoon-v3/natural-v2.webp",
+    },
+    {
+      id: "delivery",
+      title: "Free Delivery",
+      note: "Available",
+      icon: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
+    },
+    {
+      id: "stores",
+      title: "5k+ Stores",
+      note: "Pan Bangladesh",
+      icon: "/karmo/images/trust/cartoon-v3/stores-v2.webp",
     },
   ],
 
@@ -209,7 +221,7 @@ const hometex = {
         titleCard: true,
         /* Sit the copy in the upper third, smaller and lighter than the
            default title card (client ask, Sep 2026). */
-        valign: "top",
+        valign: "center",
         headingClassName: "text-white/85",
         headingStyle: {
           fontSize: "clamp(0.92rem, 0.78rem + 1.05vw, 1.7rem)",

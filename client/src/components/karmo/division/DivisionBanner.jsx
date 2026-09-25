@@ -435,7 +435,7 @@ export default function DivisionBanner({
                 : "items-start text-left"
             } ${slide.contentClassName || ""}`}
           >
-            <h1 className="mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]">
+            <h1 className={`mt-5 text-[clamp(1.2rem,2.5vw,2.2rem)] font-light! uppercase whitespace-nowrap leading-[1.05]! tracking-[0.1em] text-white [text-shadow:0_2px_28px_rgba(0,0,0,0.45)] ${slide.headlineClassName || ""}`}>
               {slide.headline || headline}
             </h1>
           </motion.div>

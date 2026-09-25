@@ -53,6 +53,7 @@ export default function DivisionRecommended({
                   sizes="(min-width: 640px) 33vw, 100vw"
                   className="object-cover object-center"
                 />
+                <div className="absolute inset-0 bg-black/20 pointer-events-none" />
               </div>
               <p className="display shrink-0 px-2 pb-1 pt-3 text-center text-[11px] font-bold uppercase leading-snug tracking-[0.06em] text-[#0b1a33] sm:px-3 sm:text-[12px] lg:text-[13px]">
                 {col.caption}
