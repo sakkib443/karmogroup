@@ -89,7 +89,6 @@ export default function BedAutomotiveHero() {
               ease: [0.16, 1, 0.3, 1],
             }}
             className="display whitespace-nowrap text-left text-[clamp(0.8rem,3.2vw,3rem)] font-semibold uppercase leading-tight tracking-[0.025em] text-white"
-            style={{ textShadow: "0 2px 6px rgba(0, 0, 0, 0.65), 0 1px 2px rgba(0, 0, 0, 0.45)" }}
           >
             {active.title}
           </motion.h1>

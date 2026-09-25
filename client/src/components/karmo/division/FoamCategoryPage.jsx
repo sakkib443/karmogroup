@@ -44,6 +44,8 @@ export function buildFoamCategoryData(key) {
     ...foam,
     bedAutomotiveHero:
       key === "bed-automotive" ? foam.bedAutomotiveHero : null,
+    // Bed & Automotive drops the generic "Built density by density" zones band.
+    zones: key === "bed-automotive" ? null : foam.zones,
     recommended: key === "bed-automotive" ? {
       heading: "Why choose Karmo Bed & Automotive Foam",
       uncropped: true,
@@ -73,7 +75,11 @@ export function buildFoamCategoryData(key) {
       ...foam.shapeGrid,
       highlights: foam.shapeGrid.highlights.map((h, i) =>
         i === 0 ? { ...h, background: "/karmo/images/bed_&_automotive/train.png" } : h
-      )
+      ),
+      spotlight: {
+        ...foam.shapeGrid.spotlight,
+        image: "/karmo/images/foam/banner-01.png",
+      },
     } : foam.shapeGrid,
     lounge: key === "bed-automotive" ? {
       ...foam.lounge,

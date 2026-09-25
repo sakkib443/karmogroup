@@ -52,7 +52,6 @@ export default function PillowHero() {
             transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
             id="pillow-title"
             className="display text-left text-[clamp(1.5rem,3.5vw,3.5rem)] font-semibold uppercase leading-tight tracking-[0.025em] text-white"
-            style={{ textShadow: "0 2px 6px rgba(0, 0, 0, 0.65), 0 1px 2px rgba(0, 0, 0, 0.45)" }}
           >
             {slides[active].title}
           </motion.h1>
