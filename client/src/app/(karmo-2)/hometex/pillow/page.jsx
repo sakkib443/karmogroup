@@ -107,11 +107,12 @@ const customShapeGrid = {
 
 const customLounge = {
   ...foam.lounge,
-  // 90vh-tall showcase band. This used to hold the suitcase flat-lay, letterboxed
-  // with `contain` on a matching cream frame. That artwork moved up into the
-  // hero, and the hero's old first image (the bedroom shot) took its place
-  // here. A photograph would show grey bars beside it under `contain`, so it
-  // is `cover` now, cropped toward the bottom to keep the pillows and feathers.
+  // 90vh-tall showcase band. It holds the client's own suitcase flat-lay (the
+  // artwork that was in the hero before the sideboard image), not the original
+  // `bottom-banner.png`. That one was 16:9 and letterboxed with `contain`; this
+  // one is a 2.5:1 banner with the suitcase on the right and empty backdrop on
+  // the left, so it is `cover` anchored right (the suitcase stays whole) — the
+  // same framing the hero used for it.
   frameClassName: "relative w-full h-[90vh]",
   slides: [
     {
@@ -122,9 +123,9 @@ const customLounge = {
       kicker: "",
       cta: [],
       image: {
-        src: "/karmo/images/hometex/pillow/karmo-pillow-wide-logo-v2.png",
-        alt: "Two white Karmo pillows with printed logos on a sage-green bed in a sunlit bedroom",
-        position: "object-[center_70%]",
+        src: "/karmo/images/hometex/pillow/karmo-plush-travel-suitcase-hero-v2.png",
+        alt: "A Karmo Plush pillow packed in an open suitcase beside headphones, a wallet, an orange knit and a travel list, on a warm cream backdrop",
+        position: "object-[63%_center] lg:object-right",
       },
       veil: true,
     }
