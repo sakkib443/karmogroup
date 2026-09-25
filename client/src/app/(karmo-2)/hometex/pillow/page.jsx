@@ -18,32 +18,10 @@ const pillowPage = {
   ...hometex,
   slug: "pillow",
   banner: { hidden: true },
-  features: [
-    {
-      id: "feather-touch",
-      icon: "/new%20icon/Microfibre.png",
-      title: "Feather-Touch Microfibre",
-      note: "Premium down-like softness",
-    },
-    {
-      id: "imported",
-      icon: "/karmo/images/trust/delivery-icon.png",
-      title: "Imported from Indonesia",
-      note: "Finest international materials",
-    },
-    {
-      id: "soft",
-      icon: "/new%20icon/Soft.png",
-      title: "Soft & Luxurious",
-      note: "Ultimate plush comfort",
-    },
-    {
-      id: "long-lasting",
-      icon: "/karmo/images/trust/recognised-super-brand.png",
-      title: "Long-Lasting Shape",
-      note: "Retains loft night after night",
-    },
-  ],
+  /* No pillow-specific `features` override — the client asked for the same
+     trust strip every other division page uses (legacy/trusted/recognised/
+     natural/delivery/stores), not a bespoke set. `...hometex` above already
+     carries it, so this page now just doesn't shadow it. */
 };
 
 function WhyChoosePillows() {
@@ -129,10 +107,12 @@ const customShapeGrid = {
 
 const customLounge = {
   ...foam.lounge,
-  // 90vh-tall showcase band. `object-contain` keeps the full luggage flat-lay
-  // visible (no top/bottom crop); the light frame background blends with the
-  // image's own paper backdrop so any letterbox area reads as one surface.
-  frameClassName: "relative w-full h-[90vh] bg-[#e8e6e2]",
+  // 90vh-tall showcase band. This used to hold the suitcase flat-lay, letterboxed
+  // with `contain` on a matching cream frame. That artwork moved up into the
+  // hero, and the hero's old first image (the bedroom shot) took its place
+  // here. A photograph would show grey bars beside it under `contain`, so it
+  // is `cover` now, cropped toward the bottom to keep the pillows and feathers.
+  frameClassName: "relative w-full h-[90vh]",
   slides: [
     {
       id: "pillow-lounge",
@@ -142,9 +122,9 @@ const customLounge = {
       kicker: "",
       cta: [],
       image: {
-        src: "/karmo/images/pillow/bottom-banner.png",
-        alt: "Karmo Plush Pillow",
-        fit: "contain",
+        src: "/karmo/images/hometex/pillow/karmo-pillow-wide-logo-v2.png",
+        alt: "Two white Karmo pillows with printed logos on a sage-green bed in a sunlit bedroom",
+        position: "object-[center_70%]",
       },
       veil: true,
     }

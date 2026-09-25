@@ -1200,6 +1200,25 @@ svg.app-icon[fill="none"] {
   animation: foam-drift 30s ease-in-out infinite alternate;
 }
 
+/* Slow brightness breathe for `DivisionVideoHero` — light rising and falling
+   over the footage rather than a flat, static exposure. Animates `filter` on
+   the video layers themselves (not the scrim above them) so it changes the
+   footage's actual brightness instead of just crossing it with a fade. */
+@keyframes hero-breathe {
+  0%, 100% { filter: brightness(0.82) saturate(0.96); }
+  50% { filter: brightness(1.16) saturate(1.04); }
+}
+
+.hero-breathe {
+  animation: hero-breathe 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-breathe {
+    animation: none;
+  }
+}
+
 /* Mattress hero, first slide: on wide desktops the beach still sits a little
    low in the frame. Nudge it up without changing the phone crop. */
 @media (min-width: 1024px) {

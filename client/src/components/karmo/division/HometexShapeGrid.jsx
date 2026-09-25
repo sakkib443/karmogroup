@@ -777,7 +777,9 @@ function MosaicGrid({
   const pair = highlights.slice(1, 3);
 
   return (
-    <div className="relative z-[1] w-full p-[6px]">
+    /* 80% of the section, centred — was edge-to-edge, at the client's ask
+       (same fix as the Bed & Automotive shape grid). */
+    <div className="relative z-[1] mx-auto w-full max-w-[80%] p-[6px]">
       <motion.div
         variants={group}
         {...reveal}

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { TbCertificate, TbFeather, TbShieldCheck } from "react-icons/tb";
+import { TbCertificate, TbFeather, TbShieldCheck, TbBed, TbCar } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -14,8 +14,12 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 const NAVY =
   "h-full min-h-0 rounded-none border border-[#e07a3a]/70 bg-[#0b1a33] text-white";
+/* Was `#f7f7f8` — near enough to white that the two feature cards below read
+   as blank against the page. Only `CertCard` actually renders this on the
+   page (`inside` is unset here, so `InsideIntroCard`/`InsideLayersCard`
+   never mount), so darkening it is scoped to those two cards in practice. */
 const LIGHT =
-  "h-full min-h-0 rounded-none border border-[#e2e2e4] bg-[#f7f7f8]";
+  "h-full min-h-0 rounded-none border border-[#d8d8da] bg-[#ececed]";
 
 const CLAIM_ICONS = {
   shield: TbShieldCheck,
@@ -174,57 +178,60 @@ function SpotlightPanel({ data }) {
       variants={fade}
       className="relative col-span-1 min-h-[240px] overflow-hidden rounded-none bg-[#dfe7ef] md:col-span-2 md:min-h-0"
     >
+      {/* Shifted left — was `center`, which cropped in tight on the sleeping
+          figure and lost the Karmo Poly foam stack at the image's left edge.
+          Framing the subject toward the left also leaves clear sky on the
+          right for the heading to sit on. */}
       <Image
         src={data.image}
         alt={data.alt || ""}
         fill
         sizes="(min-width: 768px) 55vw, 100vw"
-        className="object-cover object-[center_40%]"
+        className="object-cover object-[22%_38%]"
         priority={false}
       />
-      {data.overlay && <div className="absolute inset-0 bg-black/20 pointer-events-none" />}
+      {data.overlay && <div className="absolute inset-0 bg-black/15 pointer-events-none" />}
       <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
-        <div className="max-w-[16rem] text-right sm:max-w-[18rem] lg:max-w-[20rem]">
-          <h3 className="display section-heading title-card-line uppercase text-[#0b1a33]">
-            {data.headingLead}{" "}
-            {data.headingAccent ? (
-              <span className="italic text-[#0b1a33]/80">
-                {data.headingAccent}
-              </span>
-            ) : null}{" "}
-            {data.headingEnd}
+        {/* Same treatment as the footwear page's spotlight: white, explicitly
+            sized instead of the unscoped `.section-heading` fallback, which —
+            outside the homepage's `.home-two-type` scope — rendered at the
+            browser's own default h3 size, too wide for the panel at any width
+            and dark navy on a bright sky. Explicit sizing is what actually
+            keeps this on one line; `whitespace-nowrap` alone just let it run
+            past the edge and get clipped.
+
+            No italic accent, no drop-shadow, no subline/brand lines under it —
+            all at the client's ask: plain upright white type, nothing else. */}
+        <div className="max-w-none text-right">
+          <h3 className="display section-heading title-card-line whitespace-nowrap uppercase text-white text-lg sm:text-xl lg:text-2xl">
+            {data.headingLead} {data.headingAccent} {data.headingEnd}
           </h3>
-          {data.subline ? (
-            <p className="body-copy mt-3 text-[12.5px] leading-[1.5] text-[#0b1a33]/70 sm:text-[13.5px]">
-              {data.subline}
-            </p>
-          ) : null}
-          {data.brand ? (
-            <p className="display mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand sm:mt-6 sm:text-[12px]">
-              {data.brand}
-            </p>
-          ) : null}
         </div>
       </div>
     </motion.article>
   );
 }
 
-function CertCard({ item }) {
+/* Was two certification photos (ISO 9001, UKAS) — the client asked for those
+   off this page entirely, icon and copy both, and for two foam-benefit claims
+   in the same round colour-badge style the highlight row above already uses.
+   `index` picks the pair the same way `DivisionShapeGrid`'s footwear version
+   does: first card orange with one icon, second purple with the other. */
+function CertCard({ item, index = 0 }) {
+  const isFirst = index === 0;
+  const badgeBg = isFirst ? "bg-[#F76707]" : "bg-[#7048E8]";
+  const IconComponent = isFirst ? TbBed : TbCar;
+
   return (
     <motion.article
       variants={fade}
       className={`flex items-center gap-4 px-5 py-4 transition-colors duration-300 hover:bg-white sm:gap-5 sm:px-6 sm:py-5 ${LIGHT}`}
     >
-      <div className="relative h-[78px] w-[78px] shrink-0 overflow-hidden bg-white shadow-[0_0_0_1px_rgba(11,26,51,0.08)] sm:h-[88px] sm:w-[88px]">
-        <Image
-          src={item.image}
-          alt={item.alt || ""}
-          fill
-          sizes="88px"
-          className="object-contain object-center p-1.5"
-        />
-      </div>
+      <span
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${badgeBg} text-white sm:h-14 sm:w-14`}
+      >
+        <IconComponent className="text-[24px] sm:text-[28px]" aria-hidden />
+      </span>
       <div className="min-w-0">
         <h3 className="display text-[14px] font-bold uppercase leading-snug tracking-[0.04em] text-[#0b1a33] sm:text-[15px] lg:text-[16px]">
           {item.title}
@@ -750,7 +757,10 @@ function MosaicGrid({
   const pair = highlights.slice(1, 3);
 
   return (
-    <div className="relative z-[1] w-full p-[6px]">
+    /* 80% of the section, centred — was edge-to-edge, which left only the 6px
+       gap between cards to show the foam texture behind. The wider margin now
+       does that job. */
+    <div className="relative z-[1] mx-auto w-full max-w-[80%] p-[6px]">
       <motion.div
         variants={group}
         {...reveal}
@@ -782,8 +792,8 @@ function MosaicGrid({
             </>
           ) : (
             <>
-              {certifications.slice(0, 2).map((item) => (
-                <CertCard key={item.id} item={item} />
+              {certifications.slice(0, 2).map((item, index) => (
+                <CertCard key={item.id} item={item} index={index} />
               ))}
               {hasFilm ? (
                 <div className="h-[min(56svh,440px)] w-full md:h-full md:min-h-0">
@@ -824,16 +834,20 @@ export default function BedAutomotiveShapeGrid({
       id={hasInside ? "inside-every-karmo" : undefined}
       className={`relative w-full overflow-hidden ${className}`}
     >
+      {/* A hint of texture in the 80%-width grid's side margins. opacity-90
+          read as too strong a pattern; the next pass, opacity-25 under a heavy
+          white gradient, went the other way and disappeared entirely. Settled
+          in between. */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <Image
           src={bg}
           alt=""
           fill
           sizes="100vw"
-          className="object-cover object-center opacity-55"
+          className="object-cover object-center opacity-50"
           priority={false}
         />
-        <span className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/55 to-white/70" />
+        <span className="absolute inset-0 bg-gradient-to-b from-white/45 via-white/35 to-white/45" />
       </div>
 
       {organized && hasInside ? (

@@ -161,6 +161,10 @@ const nav = [
   {
     name: "Chemicals & Polymers",
     line: "Solvents, additives, adhesives",
+    /* Pages for this menu aren't designed yet: the menu and its hover panel
+       stay, but nothing in it navigates. `href`s are kept so the active-route
+       highlight and the eventual re-enable are just deleting this one flag. */
+    linksDisabled: true,
     href: "/chemicals",
     icon: `${MENU}/nav-chemicals.png?v=2`,
     panelWidth: "min(72rem, 94vw)",
@@ -227,6 +231,9 @@ const nav = [
     name: "Company",
     line: "About, media, contact, dealership",
     panelAlign: "right",
+    /* Same as Chemicals & Polymers: hover panel stays, nothing navigates
+       until these pages are designed. */
+    linksDisabled: true,
     href: "/about",
     panelWidth: "56rem",
     columns: [
@@ -397,7 +404,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                 >
                   {label}
                 </span>
-              ) : entry.href ? (
+              ) : entry.href && !entry.linksDisabled ? (
                 <Link
                   href={entry.href}
                   aria-current={isActive ? "page" : undefined}
@@ -486,7 +493,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                       <div key={col.label} className="min-w-0 px-4 first:pl-1 last:pr-1">
                         {/* Parent category — larger icon + type so it reads above sub-rows */}
                         <div className="flex min-h-[3.25rem] items-end border-b border-ink/10 pb-3.5">
-                          {col.href ? (
+                          {col.href && !entry.linksDisabled ? (
                             <Link
                               href={col.href}
                               onClick={dismissPanel}
@@ -510,7 +517,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                                 </span>
                               ) : null}
                               <span className="display text-[14px] font-extrabold uppercase leading-[1.15] tracking-[0.08em] text-ink lg:text-[15px]">
-                                {col.heading ?? `Shop By ${col.label}`}
+                                {col.heading ?? (col.href ? col.label : `Shop By ${col.label}`)}
                               </span>
                             </span>
                           )}
@@ -542,12 +549,17 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                                     : ""
                                 }
                               >
-                                {item.soon ? (
-                                  <span aria-disabled="true" className={`${rowClass} cursor-default opacity-60`}>
+                                {item.soon || entry.linksDisabled ? (
+                                  <span
+                                    aria-disabled="true"
+                                    className={`${rowClass} cursor-default ${item.soon ? "opacity-60" : ""}`}
+                                  >
                                     {body}
-                                    <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
-                                      Soon
-                                    </span>
+                                    {item.soon ? (
+                                      <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
+                                        Soon
+                                      </span>
+                                    ) : null}
                                   </span>
                                 ) : (
                                   <Link
@@ -820,7 +832,7 @@ export default function Navbar({ scrolled = false }) {
                         </span>
                       ) : (
                         <>
-                          {entry.href ? (
+                          {entry.href && !entry.linksDisabled ? (
                             <Link
                               href={entry.href}
                               onClick={() => setOpen(false)}
@@ -859,7 +871,7 @@ export default function Navbar({ scrolled = false }) {
                             <div className="mt-3 space-y-4">
                               {entry.columns.map((col) => (
                                 <div key={col.label}>
-                                  {col.href ? (
+                                  {col.href && !entry.linksDisabled ? (
                                     <Link
                                       href={col.href}
                                       onClick={() => setOpen(false)}
@@ -879,7 +891,7 @@ export default function Navbar({ scrolled = false }) {
                                           <MenuGlyph icon={col.icon} alt="" size="parent" />
                                         </span>
                                       ) : null}
-                                      {col.heading ?? `Shop by ${col.label}`}
+                                      {col.heading ?? (col.href ? col.label : `Shop by ${col.label}`)}
                                     </p>
                                   )}
                                   <ul className="overflow-hidden rounded-[4px] border border-ink/10 bg-white">
@@ -906,15 +918,19 @@ export default function Navbar({ scrolled = false }) {
                                               : ""
                                           }
                                         >
-                                          {sub.soon ? (
+                                          {sub.soon || entry.linksDisabled ? (
                                             <span
                                               aria-disabled="true"
-                                              className="flex min-h-12 cursor-default items-center justify-between gap-2.5 px-2.5 py-1.5 opacity-60"
+                                              className={`flex min-h-12 cursor-default items-center justify-between gap-2.5 px-2.5 py-1.5 ${
+                                                sub.soon ? "opacity-60" : ""
+                                              }`}
                                             >
                                               {body}
-                                              <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
-                                                Soon
-                                              </span>
+                                              {sub.soon ? (
+                                                <span className="shrink-0 rounded-full bg-ink/8 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.1em] text-ink/55">
+                                                  Soon
+                                                </span>
+                                              ) : null}
                                             </span>
                                           ) : (
                                             <Link

@@ -7,6 +7,7 @@ import { FiArrowRight } from "react-icons/fi";
 
 import DivisionBanner from "@/components/karmo/division/DivisionBanner";
 import BedAutomotiveHero from "@/components/karmo/division/BedAutomotiveHero";
+import DivisionVideoHero from "@/components/karmo/division/DivisionVideoHero";
 import DivisionFeatures from "@/components/karmo/division/DivisionFeatures";
 import DivisionAbout from "@/components/karmo/division/DivisionAbout";
 import DivisionCategories from "@/components/karmo/division/DivisionCategories";
@@ -114,8 +115,9 @@ export default function DivisionPage({ data }) {
   return (
     <>
       {data.bedAutomotiveHero && <BedAutomotiveHero />}
+      {data.videoHero && <DivisionVideoHero {...data.videoHero} />}
       {!data.banner?.hidden && <DivisionBanner {...data.banner} />}
-      {data.about?.asHero && !data.bedAutomotiveHero && (
+      {data.about?.asHero && !data.bedAutomotiveHero && !data.videoHero && (
         <DivisionAbout {...data.about} />
       )}
       <DivisionFeatures items={data.features} />

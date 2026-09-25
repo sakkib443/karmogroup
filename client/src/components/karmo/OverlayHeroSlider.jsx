@@ -179,9 +179,11 @@ export default function OverlayHeroSlider({
                   transition={fadeMs}
                   className="pointer-events-none absolute inset-0"
                   style={{
-                    background: right
-                      ? "linear-gradient(to left, rgba(11,21,40,0.48) 0%, rgba(11,21,40,0.22) 40%, rgba(11,21,40,0.10) 100%)"
-                      : "linear-gradient(to top, rgba(11,21,40,0.72) 0%, rgba(11,21,40,0.32) 45%, rgba(11,21,40,0.22) 100%)",
+                    background:
+                      s.titleOverlay ||
+                      (right
+                        ? "linear-gradient(to left, rgba(11,21,40,0.48) 0%, rgba(11,21,40,0.22) 40%, rgba(11,21,40,0.10) 100%)"
+                        : "linear-gradient(to top, rgba(11,21,40,0.72) 0%, rgba(11,21,40,0.32) 45%, rgba(11,21,40,0.22) 100%)"),
                   }}
                 />
               ) : !light ? (

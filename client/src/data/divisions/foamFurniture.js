@@ -10,9 +10,21 @@ const BADGE = "/karmo/images/home-02/hero/badge-number-one.webp";
 const foamFurniture = {
   slug: "foam-furniture",
 
+  /* Client's new clip, swapped in for the `about` hero below — that block is
+     untouched on purpose. `DivisionPage` skips it while `videoHero` is set, so
+     going back to the static banner later is deleting this one field, not
+     redoing the page. */
+  videoHero: {
+    video: "/karmo/videos/foam/acoustic-foam-wall-pan.mp4",
+    heading: "All your upholstery needs",
+    /* 0.25 was slow-motion; 0.85 came back reading as barely slowed at all.
+       Settled a bit under normal speed. */
+    playbackRate: 0.65,
+  },
+
   banner: {
     hidden: true,
-    bg: `${IMG}/hero/hero-crafted-hq.jpg`,
+    bg: `${IMG}/hero/hero-foam-user-hq.png`,
     badge: { src: BADGE, width: 420, height: 330 },
     eyebrowEnd: "Foam Brand",
     headline: "All your upholstery needs",
@@ -95,9 +107,9 @@ const foamFurniture = {
   },
 
   furnitureGrades: {
-    lineup: `${IMG}/rooms/furniture-grades-user-hq.png`,
-    alt: "Four Karmo furniture foam grades in a living room — 280, 2001, HD and 1965",
-    heading: "The set foam line",
+    lineup: `${IMG}/hero/hero-crafted-hq.png`,
+    alt: "Cream armchair with a KARMO foam label under a magnifying glass",
+    heading: "All your upholstery needs",
   },
 
   recommended: {
@@ -282,22 +294,26 @@ const foamFurniture = {
       { label: "Contact us", href: "/contact" },
     ],
     image: {
-      src: `${IMG}/hero/hero-crafted-hq.png`,
-      alt: "Cream armchair with a KARMO foam label under a magnifying glass",
-      width: 1672,
-      height: 941,
+      src: `${IMG}/hero/hero-foam-user-hq.png`,
+      alt: "Close-up of black egg-crate Karmo furniture foam",
+      width: 2120,
+      height: 742,
+      unoptimized: true,
     },
     slides: [
       {
         id: "upholstery",
-        align: "right",
+        align: "middle",
         titleCard: true,
+        titleOverlay:
+          "linear-gradient(to top, rgba(11,21,40,0.70) 0%, rgba(11,21,40,0.52) 45%, rgba(11,21,40,0.46) 100%)",
         headingLead: "All your upholstery needs",
         image: {
-          src: `${IMG}/hero/hero-crafted-hq.png`,
-          alt: "Cream armchair with a KARMO foam label under a magnifying glass",
-          width: 1672,
-          height: 941,
+          src: `${IMG}/hero/hero-foam-user-hq.png`,
+          alt: "Close-up of black egg-crate Karmo furniture foam",
+          width: 2120,
+          height: 742,
+          unoptimized: true,
         },
       },
     ],
