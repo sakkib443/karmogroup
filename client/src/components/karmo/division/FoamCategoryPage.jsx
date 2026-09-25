@@ -36,6 +36,69 @@ const CATEGORIES = {
   },
 };
 
+// Bed & Automotive keeps the pre-merge foam shape-grid (rendered by the legacy
+// BedAutomotiveShapeGrid): the shared foam.shapeGrid was later reworked toward
+// footwear content, which does not belong on this page. Only the highlight-0
+// background (train) and the spotlight image (banner-01) are this page's own.
+const BED_AUTOMOTIVE_SHAPEGRID = {
+  background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+  highlights: [
+    {
+      id: "no-filler",
+      icon: "shield",
+      badge: "red",
+      title: "No Filler",
+      overview:
+        "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
+      background: "/karmo/images/bed_&_automotive/train.png",
+    },
+    {
+      id: "long-durability",
+      icon: "feather",
+      badge: "blue",
+      title: "Long Durability",
+      overview:
+        "Engineered to resist sagging and hold structure — support that stays true for years of seating.",
+    },
+    {
+      id: "more-resilient",
+      icon: "certificate",
+      badge: "green",
+      title: "More Resilient",
+      overview:
+        "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
+    },
+  ],
+  spotlight: {
+    image: "/karmo/images/foam/banner-01.png",
+    alt: "A calm living room with deep foam sofa seating",
+    headingLead: "Designed",
+    headingAccent: "to",
+    headingEnd: "endure",
+    subline: "High-density cores and open airflow for everyday living rooms.",
+    brand: "Karmo Foam",
+  },
+  certifications: [
+    {
+      id: "iso",
+      image: "/karmo/images/home-02/certified/01-iso-9001.jpg",
+      alt: "ISO 9001 quality management certificate",
+      title: "ISO 9001 Accreditation",
+      body: "International quality management — every foam grade held to certified standards.",
+    },
+    {
+      id: "ukas",
+      image: "/karmo/images/home-02/certified/02-ukas.jpg",
+      alt: "UKAS accredited quality management certificate",
+      title: "UKAS Accreditation",
+      body: "Quality systems accredited by UKAS — trusted craft since 1965.",
+    },
+  ],
+  film: "/karmo/videos/shorts/v1-tisa-trim.mp4",
+  still: "/karmo/images/foam-2/mosaic/tisha-film-still-hq.jpg",
+  filmAlt: "Tanzin Tisha for Karmo Foam",
+};
+
 export function buildFoamCategoryData(key) {
   const cat = CATEGORIES[key];
   if (!cat) return foam;
@@ -71,16 +134,9 @@ export function buildFoamCategoryData(key) {
         },
       ],
     } : foam.recommended,
-    shapeGrid: key === "bed-automotive" ? {
-      ...foam.shapeGrid,
-      highlights: foam.shapeGrid.highlights.map((h, i) =>
-        i === 0 ? { ...h, background: "/karmo/images/bed_&_automotive/train.png" } : h
-      ),
-      spotlight: {
-        ...foam.shapeGrid.spotlight,
-        image: "/karmo/images/foam/banner-01.png",
-      },
-    } : foam.shapeGrid,
+    shapeGrid: key === "bed-automotive" ? BED_AUTOMOTIVE_SHAPEGRID : foam.shapeGrid,
+    shapeGridVariant:
+      key === "bed-automotive" ? "bed-automotive-legacy" : foam.shapeGridVariant,
     lounge: key === "bed-automotive" ? {
       ...foam.lounge,
       image: {
