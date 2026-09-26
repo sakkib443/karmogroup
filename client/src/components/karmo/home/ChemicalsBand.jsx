@@ -93,14 +93,12 @@ export default function ChemicalsBand() {
             {claims.map((claim) => (
               <li key={claim.id} className="group flex flex-col items-center text-center">
                 <span className="relative mx-auto flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[4.75rem] sm:w-[4.75rem]">
-                  <img
+                  <Image
                     src={claim.icon}
                     alt=""
                     aria-hidden="true"
                     width={76}
                     height={76}
-                    loading="lazy"
-                    decoding="async"
                     className="h-full w-full object-contain"
                   />
                 </span>

@@ -155,14 +155,12 @@ export default function OrderAndContact() {
                   }`}
                 >
                   <span className="relative z-[1] flex h-[5rem] w-[5rem] shrink-0 items-center justify-center overflow-visible bg-white lg:h-[5.5rem] lg:w-[5.5rem]">
-                    <img
+                    <Image
                       src={step.icon}
                       alt=""
                       aria-hidden="true"
                       width={88}
                       height={88}
-                      loading="lazy"
-                      decoding="async"
                       className={`object-contain ${
                         step.n === "04"
                           ? "h-[5.25rem] w-[5.25rem] lg:h-24 lg:w-24"

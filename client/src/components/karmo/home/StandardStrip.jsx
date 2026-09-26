@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
@@ -65,14 +66,12 @@ export default function StandardStrip() {
             }`}
           >
             <span className="relative mx-auto flex h-[5.5rem] w-[5.5rem] items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-24 sm:w-24">
-              <img
+              <Image
                 src={icon}
                 alt=""
                 aria-hidden="true"
                 width={96}
                 height={96}
-                loading="lazy"
-                decoding="async"
                 className="h-[5.5rem] w-[5.5rem] object-contain sm:h-24 sm:w-24"
               />
             </span>
