@@ -5,7 +5,6 @@ out/
 build/
 
 # env
-.env
 .env*.local
 
 # Reference material only — the extracted static site, blueprint PDF and
@@ -77,3 +76,4 @@ temp_interactive_push.bat
 
 # pnpm content-addressable store (never commit)
 .pnpm-store/
+config.bat
