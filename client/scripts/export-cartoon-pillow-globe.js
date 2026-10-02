@@ -10,7 +10,7 @@ const OUT = path.join(
 const SIZE = 320;
 
 const JOBS = [
-  { src: "cartoon-pillow-tear-v2.jpg", out: "cartoon-pillow-v5.webp", inner: 300 },
+  { src: "sketch-pillow-clean.jpg", out: "sketch-pillow-clean.webp", inner: 308 },
 ];
 
 const LEAF = [165, 206, 103];

@@ -22,7 +22,7 @@ const SETS = [
     {
       title: "Largest Raw Material",
       note: "Stock",
-      icon: "/karmo/images/trust/cartoon-v3/cartoon-pillow-v3.webp",
+      icon: "/karmo/images/trust/cartoon-v3/sketch-pillow-tint.webp",
     },
     {
       title: "International Quality",
@@ -86,7 +86,8 @@ function IconGrid({ items, large = false }) {
   const imgPx = large ? 133 : 96;
 
   const imgScale = (i) => {
-    if (!large && (i === 1 || i === 2)) return "scale-[0.92]";
+    if (!large && i === 1) return "scale-[1.12]";
+    if (!large && i === 2) return "scale-[0.92]";
     if (large && i === 1) return "scale-[1.1]";
     if (large && i === 2) return "scale-[0.86]";
     if (large && i === 3) return "scale-[0.88]";
