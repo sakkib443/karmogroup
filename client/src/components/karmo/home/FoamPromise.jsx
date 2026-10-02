@@ -198,6 +198,7 @@ export default function FoamPromise({
      and the division pages pass their own. With nothing here the still is the
      whole background. */
   film = null,
+  scrim = "bg-shade-deep/72",
 }) {
   /* One switch for every branch below, so a caller that asks for a film
      without giving one gets the still rather than an empty `<video>`. */
@@ -380,17 +381,18 @@ export default function FoamPromise({
   // missed and the band would sit on the still forever. So the state is also
   // read straight off the element once, on mount.
   useEffect(() => {
+    if (reduce || !hasFilm) return;
     for (const video of [layerA.current, layerB.current]) {
       if (video) video.playbackRate = PLAYBACK;
     }
     if (layerA.current?.readyState >= 2) setReady(true);
-  }, []);
+  }, [hasFilm, film, reduce]);
 
   const layerProps = (which) => ({
     ref: which === 0 ? layerA : layerB,
     className:
       "absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-linear",
-    style: { opacity: ready && front === which ? 1 : 0 },
+    style: { opacity: front === which ? 1 : 0 },
     muted: true,
     playsInline: true,
     preload: "auto",
@@ -398,6 +400,11 @@ export default function FoamPromise({
     tabIndex: -1,
     onLoadedData: (event) => {
       event.currentTarget.playbackRate = PLAYBACK;
+      setReady(true);
+    },
+    onCanPlay: (event) => {
+      event.currentTarget.playbackRate = PLAYBACK;
+      event.currentTarget.play().catch(() => {});
       setReady(true);
     },
     onTimeUpdate: relay(which),
@@ -467,8 +474,8 @@ export default function FoamPromise({
           aria-hidden
           className={
             filmMode === "fixed"
-              ? "pointer-events-none fixed inset-0 z-0"
-              : "pointer-events-none absolute inset-0 z-0 overflow-hidden"
+              ? "pointer-events-none fixed inset-0 z-[1]"
+              : "pointer-events-none absolute inset-0 z-[1] overflow-hidden"
           }
           style={filmMode === "fixed" ? { clipPath: clipRef.current } : undefined}
         >
@@ -485,7 +492,7 @@ export default function FoamPromise({
             }
           >
             <video {...layerProps(0)} autoPlay src={film} />
-            <video {...layerProps(1)} src={film} />
+            <video {...layerProps(1)} autoPlay src={film} />
           </div>
         </div>
       )}
@@ -496,13 +503,13 @@ export default function FoamPromise({
           rather than a gradient: the cards sit across the full height, so there
           is no band of the picture that can be left bright. Absolute, above
           both the still and the film. */}
-      <span aria-hidden className="absolute inset-0 z-[1] bg-shade-deep/72" />
+      <span aria-hidden className={`absolute inset-0 z-[2] ${scrim}`} />
 
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell relative z-[2]"
+        className="shell relative z-[3]"
       >
         <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="text-center">
           <h2 className="display section-heading title-card-line uppercase text-white">

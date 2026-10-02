@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -30,7 +29,7 @@ const materials = [
     name: "Rebonded Foam",
     line: "Support that lasts",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/rebonded-foam-v4.jpg",
+    src: "/karmo/images/home-02/materials/rebonded-foam-v5.jpg",
     alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
@@ -92,26 +91,22 @@ function MaterialCard({ item }) {
           className="absolute inset-0 bg-black/40"
         />
 
-        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-6 pb-6 pt-16 sm:px-7 sm:pb-7 sm:pt-[4.5rem] lg:px-8 lg:pb-8 lg:pt-24">
-          <span className="text-[12px] font-semibold uppercase tracking-[0.16em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] sm:text-[13px] lg:text-[14px]">
+        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-5 pb-5 pt-24 sm:px-6 sm:pt-32 lg:justify-center lg:px-9 lg:pb-0 lg:pt-0">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/85 sm:text-[11px]">
             {item.name}
           </span>
           <h3
-            className="display title-card-line mt-3 whitespace-nowrap uppercase text-white"
+            className="display title-card-line mt-2 whitespace-nowrap uppercase text-white"
             style={{
-              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+              fontSize: "clamp(1.05rem, 0.85rem + 0.85vw, 1.55rem)",
               fontWeight: 350,
               fontVariationSettings: '"wght" 350',
-              lineHeight: 1.08,
-              letterSpacing: "-0.015em",
+              lineHeight: 1.12,
+              letterSpacing: "0.04em",
             }}
           >
             {item.line}
           </h3>
-          <span className="mt-5 inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.02em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)] transition-colors duration-300 group-hover:text-brand sm:mt-6 sm:text-[14px] lg:text-[15px]">
-            Explore
-            <FiArrowRight className="text-[16px] transition-transform duration-300 group-hover:translate-x-0.5" />
-          </span>
         </div>
       </Link>
     </motion.article>

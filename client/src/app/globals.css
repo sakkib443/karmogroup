@@ -1235,28 +1235,11 @@ svg.app-icon[fill="none"] {
   position: relative;
   isolation: isolate;
   background-color: #fff;
-  box-shadow:
-    0 1px 0 rgba(34, 34, 34, 0.08),
-    0 12px 28px -20px rgba(70, 50, 30, 0.28);
+  box-shadow: 0 1px 0 rgba(34, 34, 34, 0.08);
 }
 
 .header-mattress-band::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("/karmo/images/header/mattress-quilt-damask-blend-hq.jpg");
-  /* Match bar height; tile sideways so pattern stays fine, not zoomed. */
-  background-size: auto 100%;
-  background-position: center top;
-  background-repeat: repeat-x;
-  opacity: 0.32;
-  transition: opacity 500ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.header-mattress-band.is-scrolled::before {
-  opacity: 0.18;
+  content: none;
 }
 
 /* Division mega menus (Mattress, Foam) — soft textured panel.
@@ -1282,9 +1265,7 @@ svg.app-icon[fill="none"] {
   pointer-events: none;
   box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
-    inset 0 3px 0 0 rgba(212, 196, 168, 0.45),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.9),
-    inset 0 -3px 0 0 rgba(196, 165, 116, 0.4);
+    inset 0 3px 0 0 rgba(212, 196, 168, 0.45);
 }
 
 /* Held still, not stripped: the band keeps its film and its still, it simply

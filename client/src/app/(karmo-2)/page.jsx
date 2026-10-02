@@ -13,6 +13,7 @@ import DivisionEditorials from "@/components/karmo/home/DivisionEditorials";
 import ChemicalsBand from "@/components/karmo/home/ChemicalsBand";
 import StandardStrip from "@/components/karmo/home/StandardStrip";
 import Hero from "@/components/karmo/home/Hero";
+import ReviewSection from "@/components/karmo/review/ReviewSection";
 import { pageMetadata, SITE_TITLE, SITE_DESCRIPTION } from "@/config/site";
 
 export const metadata = pageMetadata({
@@ -29,34 +30,63 @@ export const metadata = pageMetadata({
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <StandardStrip />
-      <DivisionEditorials />
-      <ChemicalsBand />
-      <ExploreSplit />
+      <ReviewSection id="hero">
+        <Hero />
+      </ReviewSection>
+      <ReviewSection id="trust-strip">
+        <StandardStrip />
+      </ReviewSection>
+      <ReviewSection id="division-editorials">
+        <DivisionEditorials />
+      </ReviewSection>
+      <ReviewSection id="chemicals-band">
+        <ChemicalsBand />
+      </ReviewSection>
+      <ReviewSection id="explore-split">
+        <ExploreSplit />
+      </ReviewSection>
 
-      <DivisionsStrip />
+      <ReviewSection id="divisions-strip">
+        <DivisionsStrip />
+      </ReviewSection>
 
       {/* Sits after the divisions strip because that is where the page stops
           introducing the company and starts selling a product. */}
-      <ShopByMaterial />
+      <ReviewSection id="shop-by-material">
+        <ShopByMaterial />
+      </ReviewSection>
 
-      <PromoTrio />
-      <ShopBySize />
-      {/* No `film`: the borrowed clip this band used to loop was pulled from
-          the repo. `stillFixed` gives the background the same "stays put"
-          feel — a plain photo pinned to the viewport instead of a video. */}
-      <FoamPromise
-        stillFixed
-        still="/karmo/images/home-02/promise/foam-promise-bg.jpg"
-      />
+      <ReviewSection id="promo-trio">
+        <PromoTrio />
+      </ReviewSection>
+      <ReviewSection id="shop-by-size">
+        <ShopBySize />
+      </ReviewSection>
+      <ReviewSection id="foam-promise">
+        <FoamPromise
+          filmMode="parallax"
+          film="/karmo/videos/product-film.mp4"
+          still="/karmo/images/home-02/promise/foam-promise-bg.jpg"
+          scrim="bg-black/55"
+        />
+      </ReviewSection>
 
-      <Reels />
-      <ShoeSole />
-      <Partners />
+      <ReviewSection id="reels">
+        <Reels />
+      </ReviewSection>
+      <ReviewSection id="shoe-sole">
+        <ShoeSole />
+      </ReviewSection>
+      <ReviewSection id="partners">
+        <Partners />
+      </ReviewSection>
 
-      <PartnerPromoBand />
-      <OrderAndContact />
+      <ReviewSection id="partner-promo">
+        <PartnerPromoBand />
+      </ReviewSection>
+      <ReviewSection id="order-contact">
+        <OrderAndContact textureSlides />
+      </ReviewSection>
     </>
   );
 }

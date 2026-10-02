@@ -77,3 +77,6 @@ temp_interactive_push.bat
 
 # pnpm content-addressable store (never commit)
 .pnpm-store/
+
+# Client-review runtime data (approvals, notes, uploaded screenshots)
+client/.review-data/

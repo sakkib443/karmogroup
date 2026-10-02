@@ -46,6 +46,12 @@ ENV HOSTNAME=0.0.0.0
 
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
+# Client-review data (approvals, notes, uploaded screenshots).
+# In Coolify add a persistent storage mounted at /data/review, otherwise this
+# folder is wiped on every redeploy.
+ENV REVIEW_DATA_DIR=/data/review
+RUN mkdir -p /data/review && chown -R nextjs:nodejs /data
+
 # standalone output already contains a minimal node_modules + server.js
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

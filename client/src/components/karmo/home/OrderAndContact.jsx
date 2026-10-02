@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiMail, FiPhone, FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * Order guide + contact — content from the client's live site, rebuilt to
@@ -87,7 +88,7 @@ function ColumnHeading({ eyebrow, title, accent }) {
   );
 }
 
-export default function OrderAndContact() {
+export default function OrderAndContact({ textureSlides = false }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -108,18 +109,21 @@ export default function OrderAndContact() {
 
   return (
     <section className="relative overflow-hidden py-16 lg:py-24">
-      {/* Same mattress damask as Iconic brands / Divisions */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-[0.22]"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-white/50" />
-      </div>
+      {textureSlides ? (
+        <TextureSlides />
+      ) : (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+          <Image
+            src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center opacity-[0.22]"
+            priority={false}
+          />
+          <span className="absolute inset-0 bg-white/50" />
+        </div>
+      )}
 
       <div className="shell relative z-[1]">
         <motion.div

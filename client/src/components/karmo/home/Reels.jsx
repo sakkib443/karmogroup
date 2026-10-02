@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
@@ -9,6 +8,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 import VideoModal from "@/components/karmo/VideoModal";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { homeReels } from "@/data/films";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * Home films / shorts band — same shell split as DivisionEditorials
@@ -115,18 +115,7 @@ export default function Reels() {
       style={{ ["--reels-h"]: DESKTOP_H }}
       aria-label="Karmo films"
     >
-      {/* Generated foam cell texture — sharp pores, no blur */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <Image
-          src="/karmo/images/foam/foam-cell-texture.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-[0.22]"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-white/62" />
-      </div>
+      <TextureSlides />
 
       <motion.div
         variants={group}

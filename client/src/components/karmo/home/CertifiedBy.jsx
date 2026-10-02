@@ -14,7 +14,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const pillars = [
   {
     id: "number-one",
-    src: "/karmo/images/home-02/trust/badge-number-one-gold-v2.webp",
+    src: "/karmo/images/home-02/trust/badge-number-one-gold-fullheight.webp",
     alt: "Bangladesh’s number one comfort brand badge",
     title: "Number one",
     body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
@@ -64,7 +64,7 @@ export default function CertifiedBy() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell relative z-[1]"
+        className="relative z-[1] mx-auto w-full max-w-[1840px] px-5 md:px-8 lg:px-10 xl:px-12"
       >
         <motion.header
           variants={fade}
@@ -81,34 +81,41 @@ export default function CertifiedBy() {
           </p>
         </motion.header>
 
-        {/* Four cards on their own borders rather than a row of dividers —
-            reads as one organized grid at any width instead of a line that
-            only gains structure once it reaches the desktop column count. */}
         <motion.ul
           variants={group}
-          className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-4 sm:mt-12 sm:gap-5 lg:max-w-none lg:grid-cols-4 lg:gap-6"
+          className="mt-12 grid grid-cols-1 sm:mt-14 md:mt-16 md:grid-cols-2 lg:grid-cols-4"
         >
-          {pillars.map(({ id, src, alt, title, body }) => (
+          {pillars.map(({ id, src, alt, title, body }, i) => (
             <motion.li
               key={id}
               variants={fade}
-              className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-6 text-center sm:px-5 sm:py-7"
+              className={`relative flex flex-col items-center px-5 py-8 text-center md:px-8 md:py-10 lg:px-10 lg:py-2 xl:px-12 ${
+                i < pillars.length - 1 ? "border-b border-white/20" : ""
+              } ${i < 2 ? "md:border-b md:border-white/20" : "md:border-b-0"} lg:border-b-0`}
             >
-              <div className="relative flex h-24 w-24 items-center justify-center sm:h-28 sm:w-28 lg:h-32 lg:w-32">
+              {i % 2 === 0 || i < pillars.length - 1 ? (
+                <span
+                  aria-hidden
+                  className={`pointer-events-none absolute top-1/2 right-0 hidden h-[58%] w-px -translate-y-1/2 bg-white/20 ${
+                    i % 2 === 0 ? "md:block" : ""
+                  } ${i < pillars.length - 1 ? "lg:block" : "lg:hidden"}`}
+                />
+              ) : null}
+              <div className="relative flex h-[13.5rem] w-[13.5rem] items-center justify-center sm:h-[15.5rem] sm:w-[15.5rem] lg:h-[17rem] lg:w-[17rem]">
                 <Image
                   src={src}
                   alt={alt}
-                  width={512}
-                  height={512}
-                  sizes="(min-width: 1024px) 128px, 112px"
+                  width={1024}
+                  height={1024}
+                  sizes="(min-width: 1024px) 272px, 248px"
                   quality={80}
                   className="h-full w-full object-contain"
                 />
               </div>
-              <h3 className="display mt-4 text-[0.7rem] font-bold uppercase tracking-[0.1em] text-white">
+              <h3 className="display mt-5 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white sm:mt-6">
                 {title}
               </h3>
-              <p className="body-copy mt-2 max-w-[15rem] text-[12px] leading-[1.55] text-white/70 sm:text-[13px]">
+              <p className="body-copy mt-2.5 max-w-[18rem] text-[13px] leading-[1.65] text-white/70 sm:text-[14px]">
                 {body}
               </p>
             </motion.li>

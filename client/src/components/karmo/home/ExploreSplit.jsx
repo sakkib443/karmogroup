@@ -268,20 +268,21 @@ export default function ExploreSplit({
             variants={fade}
             {...reveal}
             viewport={VIEWPORT}
-            className={`explore-band relative overflow-hidden bg-[#d8d8d8] ${bandH}`}
+            className={`explore-band relative overflow-hidden bg-[#f3eee6] ${bandH}`}
           >
             <Image
-              src="/karmo/images/foam/furniture/hero/hero-crafted-hq.png"
-              alt="Cream armchair with a KARMO foam label under a magnifying glass"
+              src="/karmo/images/foam/furniture/hero/foam-sunlit-sofa-user.png"
+              alt="Sunlit sofa and foam showcase"
               fill
               unoptimized
               sizes="100vw"
-              className="object-cover object-left"
+              className="object-cover object-[right_bottom]"
+              priority={false}
             />
 
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shade-deep/35 via-shade-deep/30 to-shade-deep/55"
+              className="pointer-events-none absolute inset-0 bg-gradient-to-l from-shade-deep/58 via-shade-deep/22 to-shade-deep/8"
             />
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
