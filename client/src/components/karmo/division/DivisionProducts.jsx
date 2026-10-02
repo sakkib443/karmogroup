@@ -245,7 +245,7 @@ function MattressFloatCard({ item }) {
                       : "border-ink/10 hover:border-ink/25")
                   }
                 >
-                  <img
+                  <Image
                     src={opt.icon}
                     alt=""
                     aria-hidden
@@ -271,7 +271,7 @@ function MattressFloatCard({ item }) {
               href={href}
               className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
             >
-              <img
+              <Image
                 src="/karmo/images/trust/order-cartoon/cart-v2.webp"
                 alt=""
                 aria-hidden
@@ -411,7 +411,7 @@ function MattressCatalogueCard({ item }) {
                     : "border-ink/10 hover:border-ink/25"
                 }`}
               >
-                <img
+                <Image
                   src={opt.icon}
                   alt=""
                   aria-hidden
@@ -436,7 +436,7 @@ function MattressCatalogueCard({ item }) {
             href={href}
             className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
           >
-            <img
+            <Image
               src="/karmo/images/trust/order-cartoon/cart-v2.webp"
               alt=""
               aria-hidden

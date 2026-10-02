@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -331,6 +332,8 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
                 ? 28
                 : 36;
     return (
+      // Menu icons carry `?v=` cache-busting query strings, which next/Image
+      // rejects for local images (needs images.localPatterns). Keep a raw <img>.
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={icon}
@@ -508,12 +511,13 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                       aria-hidden
                       className="pointer-events-none absolute inset-0 z-0 bg-[#fffefb]"
                     />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={entry.textureSrc}
                       alt=""
                       aria-hidden
-                      className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-center opacity-[0.16]"
+                      fill
+                      sizes="(min-width: 1024px) 60vw, 100vw"
+                      className="pointer-events-none z-0 object-cover object-center opacity-[0.16]"
                     />
                   </>
                 ) : null}

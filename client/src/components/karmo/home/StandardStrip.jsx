@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiChevronRight } from "react-icons/fi";
 
@@ -106,14 +107,12 @@ function IconGrid({ items, large = false }) {
           <span
             className={`relative mx-auto flex items-center justify-center overflow-visible transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 ${box}`}
           >
-            <img
+            <Image
               src={icon}
               alt=""
               aria-hidden="true"
               width={imgPx}
               height={imgPx}
-              loading="lazy"
-              decoding="async"
               className={`object-contain ${box} ${imgScale(i)}`}
             />
           </span>
