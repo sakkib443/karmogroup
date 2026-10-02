@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * Our Divisions — four square catalogue tiles in one row.
@@ -24,8 +25,8 @@ const divisions = [
   {
     name: "Mattress",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-catalog-v8.jpg",
-    alt: "Hand reaching from the side onto a quilted Karmo mattress",
+    image: "/karmo/images/home-02/divisions/mattress-catalog-v9.png",
+    alt: "Hand pressing a red floral quilted Karmo mattress",
     position: "object-[center_58%]",
   },
   {
@@ -82,18 +83,7 @@ export default function DivisionsStrip() {
 
   return (
     <section className="relative overflow-hidden bg-white py-8 md:py-10">
-      {/* Same mattress damask as Iconic brands — readable pattern, no blur */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-[0.38]"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-white/50" />
-      </div>
+      <TextureSlides />
 
       <motion.div
         variants={group}

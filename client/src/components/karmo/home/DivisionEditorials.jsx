@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { FiArrowUpRight } from "react-icons/fi";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * Home Two — third section. Screen-tall band: left tagline (shell-aligned) +
@@ -125,23 +127,13 @@ export default function DivisionEditorials() {
   return (
     <section
       data-home-two-snap
-      className="division-editorials relative my-[6px] overflow-x-clip py-14 lg:overflow-visible lg:py-0"
+      className="division-editorials relative mb-[6px] overflow-x-clip py-14 lg:overflow-visible lg:py-0"
       style={{
         ["--division-h"]: DESKTOP_H,
+        backgroundColor: "#ffffff",
       }}
     >
-      {/* Soft mattress damask — readable pattern, no blur */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-[0.38]"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-white/50" />
-      </div>
+      <TextureSlides />
 
       <motion.div
         variants={group}
@@ -155,25 +147,49 @@ export default function DivisionEditorials() {
           viewport={VIEWPORT}
           className="min-w-0 self-center text-left"
         >
-          {/* Tagline only. "We create the" sits a step left of the
-              chemistry line so the pair still reads left-aligned. */}
-          <h2
-            className="display title-card-line uppercase text-ink"
-            style={{
-              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
-              fontWeight: 350,
-              fontVariationSettings: '"wght" 350',
-              lineHeight: 1.08,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            <span className="block whitespace-nowrap -ml-[1.55em]">
-              We create the
+          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
+              Our craft
             </span>
-            <span className="block whitespace-nowrap text-brand">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
+              Karmo since 1965
+            </span>
+          </p>
+
+          <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
+            <span className="block sm:whitespace-nowrap">We create the</span>
+            <span className="block text-brand sm:whitespace-nowrap">
               Chemistry of comfort
             </span>
           </h2>
+
+          <span className="mt-4 flex items-center gap-3">
+            <span className="h-px w-10 bg-brand" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
+              Made under one roof
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
+              <path
+                d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
+                fill="#FF9A1F"
+              />
+              <path d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8" stroke="#B4651A" strokeWidth="1.3" strokeLinecap="round" />
+            </svg>
+          </span>
+
+          <p className="body-copy mt-5 text-[16px] leading-[1.7] text-ink/55 lg:text-[17px]">
+            From foam and mattresses to HomeTex and chemicals, Karmo makes every
+            layer of comfort under one roof.
+          </p>
+
+          <Link href="/mattress" className="group mt-8 inline-flex items-center gap-3">
+            <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
+              Explore our range
+            </span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
+              <FiArrowUpRight />
+            </span>
+          </Link>
         </motion.div>
 
         <div

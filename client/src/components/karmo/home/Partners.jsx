@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * The client roll — who Karmo actually supplies.
@@ -123,18 +124,7 @@ export default function Partners() {
       className="relative overflow-hidden pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
       aria-label="Partners and clients"
     >
-      {/* Chemicals polymer texture — same treatment as mattress damask bands */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <Image
-          src="/karmo/images/chemicals/chemicals-section-texture-v1.jpg"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-[0.42]"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-white/55" />
-      </div>
+      <TextureSlides />
 
       <motion.div
         variants={group}

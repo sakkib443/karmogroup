@@ -173,6 +173,11 @@ const nav = [
         label: "Polyurethane / Solvent",
         href: "/chemicals/polyurethane",
         icon: `${MENU}/solvent.png`,
+        /* First page of this menu that's actually designed now — overrides
+           the parent's `linksDisabled` for this one column and its rows. The
+           other four columns, and the "Chemicals & Polymers" link itself,
+           stay disabled. */
+        enabled: true,
         items: [
           { name: "TDI", href: "/chemicals/polyurethane", icon: `${MENU}/solvent.png` },
           { name: "PPG", href: "/chemicals/polyurethane", icon: `${MENU}/grade-poly.png` },
@@ -183,6 +188,9 @@ const nav = [
         label: "Specialized Chemicals & Additives",
         href: "/chemicals/specialized",
         icon: `${MENU}/pigment.png`,
+        /* Second page of this menu now designed — see the note on
+           "Polyurethane / Solvent" above. */
+        enabled: true,
         items: [
           { name: "Silicone", href: "/chemicals/specialized", icon: `${MENU}/sealant.png` },
           { name: "SO", href: "/chemicals/specialized", icon: `${MENU}/spray-adhesive.png` },
@@ -194,6 +202,9 @@ const nav = [
         label: "Karmo Adhesive",
         href: "/chemicals/karmo-adhesive",
         icon: `${MENU}/adhesive.png`,
+        /* Third page of this menu now designed — see the note on
+           "Polyurethane / Solvent" above. */
+        enabled: true,
         items: [
           { name: "Karmo Super", href: "/chemicals/karmo-adhesive", icon: `${MENU}/adhesive.png` },
           { name: "Karmo Light", href: "/chemicals/karmo-adhesive", icon: `${MENU}/emulsion.png` },
@@ -206,6 +217,9 @@ const nav = [
         label: "Evergain Chemical",
         href: "/chemicals/evergain",
         icon: `${MENU}/spray-adhesive.png`,
+        /* Fourth page of this menu now designed — see the note on
+           "Polyurethane / Solvent" above. */
+        enabled: true,
         items: [
           { name: "Neoprene Contact Adhesive 407", href: "/chemicals/evergain", icon: `${MENU}/adhesive.png` },
           { name: "Polyurethane (PU) Shoe Adhesive A10", href: "/chemicals/evergain", icon: `${MENU}/footwear.png` },
@@ -223,6 +237,10 @@ const nav = [
         label: "Sodium Silicate",
         href: "/chemicals/sodium-silicate",
         icon: `${MENU}/silicate.png`,
+        /* Fifth and last page of this menu now designed — the whole
+           "Chemicals & Polymers" menu is done except its own landing page
+           (`/chemicals`, still `linksDisabled` on the parent above). */
+        enabled: true,
         items: [{ name: "Sodium Silicate", href: "/chemicals/sodium-silicate", icon: `${MENU}/silicate.png` }],
       },
     ],
@@ -283,16 +301,35 @@ const nav = [
 function MenuGlyph({ icon, alt = "", size = "md" }) {
   if (!icon) return null;
   if (typeof icon === "string") {
+    /* `panelParent` / `panelItem` are the hover mega-menu's own sizes — a step
+       up from `parent` (44) and `sm` (28) at the client's ask. The mobile
+       drawer keeps using `parent` and the default, so it is unchanged. The
+       item rows lost 2px of padding each to pay for it: Evergain's column has
+       ten rows, and on a 1366×768 laptop the panel has to stay on screen. */
     const box =
       size === "nav"
         ? "h-[26px] w-[26px]"
-        : size === "parent"
-          ? "h-11 w-11"
-          : size === "sm"
-            ? "h-7 w-7"
-            : "h-9 w-9";
+        : size === "panelParent"
+          ? "h-[50px] w-[50px]"
+          : size === "panelItem"
+            ? "h-[34px] w-[34px]"
+            : size === "parent"
+              ? "h-11 w-11"
+              : size === "sm"
+                ? "h-7 w-7"
+                : "h-9 w-9";
     const px =
-      size === "nav" ? 26 : size === "parent" ? 44 : size === "sm" ? 28 : 36;
+      size === "nav"
+        ? 26
+        : size === "panelParent"
+          ? 50
+          : size === "panelItem"
+            ? 34
+            : size === "parent"
+              ? 44
+              : size === "sm"
+                ? 28
+                : 36;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -310,9 +347,13 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
       className={
         size === "nav"
           ? "text-[17px]"
-          : size === "parent"
-            ? "text-[24px]"
-            : "text-[20px]"
+          : size === "panelParent"
+            ? "text-[28px]"
+            : size === "panelItem"
+              ? "text-[23px]"
+              : size === "parent"
+                ? "text-[24px]"
+                : "text-[20px]"
       }
     />
   );
@@ -321,7 +362,7 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
 function Tool({ icon: Icon, label, href, count, onClick }) {
   const body = (
     <>
-      <Icon className="text-[20px]" />
+      <Icon className="text-[26px]" />
       {count > 0 && (
         <span className="absolute -right-1.5 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
           {count}
@@ -331,7 +372,7 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
   );
 
   const className =
-    "relative flex h-10 w-10 items-center justify-center text-ink transition-colors duration-300 hover:text-brand";
+    "relative flex h-12 w-12 items-center justify-center text-ink transition-colors duration-300 hover:text-brand";
 
   if (onClick) {
     return (
@@ -493,15 +534,15 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                       <div key={col.label} className="min-w-0 px-4 first:pl-1 last:pr-1">
                         {/* Parent category — larger icon + type so it reads above sub-rows */}
                         <div className="flex min-h-[3.25rem] items-end border-b border-ink/10 pb-3.5">
-                          {col.href && !entry.linksDisabled ? (
+                          {col.href && !(entry.linksDisabled && !col.enabled) ? (
                             <Link
                               href={col.href}
                               onClick={dismissPanel}
                               className="group flex min-w-0 items-center gap-2.5 transition-colors hover:text-brand"
                             >
                               {col.icon ? (
-                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
-                                  <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                <span className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
+                                  <MenuGlyph icon={col.icon} alt="" size="panelParent" />
                                 </span>
                               ) : null}
                               <span className="display text-[14px] font-extrabold uppercase leading-[1.15] tracking-[0.08em] text-ink group-hover:text-brand lg:text-[15px]">
@@ -512,8 +553,8 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                           ) : (
                             <span className="flex min-w-0 items-center gap-2.5">
                               {col.icon ? (
-                                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
-                                  <MenuGlyph icon={col.icon} alt="" size="parent" />
+                                <span className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-[5px] border border-ink/20 bg-white shadow-[0_2px_8px_-4px_rgba(0,0,0,0.12)]">
+                                  <MenuGlyph icon={col.icon} alt="" size="panelParent" />
                                 </span>
                               ) : null}
                               <span className="display text-[14px] font-extrabold uppercase leading-[1.15] tracking-[0.08em] text-ink lg:text-[15px]">
@@ -526,12 +567,12 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                         <ul className="pt-1">
                           {col.items.map((item, itemIndex) => {
                             const rowClass =
-                              "group flex min-h-11 items-center justify-between gap-2.5 py-1.5 transition-colors duration-200";
+                              "group flex min-h-11 items-center justify-between gap-2.5 py-1 transition-colors duration-200";
                             const body = (
                               <span className="flex min-w-0 items-center gap-2.5">
                                 {item.icon ? (
-                                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-white/55 text-ink/60">
-                                    <MenuGlyph icon={item.icon} alt="" size="sm" />
+                                  <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-white/55 text-ink/60">
+                                    <MenuGlyph icon={item.icon} alt="" size="panelItem" />
                                   </span>
                                 ) : null}
                                 <span className="line-clamp-2 text-[11px] font-semibold uppercase leading-snug tracking-[0.06em] text-ink/85">
@@ -549,7 +590,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                                     : ""
                                 }
                               >
-                                {item.soon || entry.linksDisabled ? (
+                                {item.soon || (entry.linksDisabled && !col.enabled) ? (
                                   <span
                                     aria-disabled="true"
                                     className={`${rowClass} cursor-default ${item.soon ? "opacity-60" : ""}`}
@@ -709,15 +750,17 @@ export default function Navbar({ scrolled = false }) {
           aria-label="Karmo Group, home"
           className={`relative shrink-0 overflow-hidden transition-[width,height] ${LOGO_EASE} ${
             scrolled
-              ? "h-8 w-[min(50vw,13rem)] sm:w-[14.5rem]"
-              : "h-[80px] w-[104px] sm:h-[88px] sm:w-[114px]"
+              ? "h-11 w-[150px] sm:h-[56px] sm:w-[187px]"
+              : "h-[72px] w-[270px] sm:h-[88px] sm:w-[330px]"
           }`}
         >
+          {/* Resting: the wide "Karmo Group" wordmark. Scrolled: the compact
+              short "KARMO" mark. Cross-faded, same as the pair they replaced. */}
           <Logo
-            src="/karmo/logo-factory.png"
-            width={554}
-            height={427}
-            className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-[80px] w-auto sm:h-[88px] transition-[opacity,transform] ${LOGO_EASE} ${
+            src="/karmo/logo-group.png"
+            width={300}
+            height={80}
+            className={`absolute left-0 top-1/2 origin-left -translate-y-[60%] h-[72px] w-auto sm:h-[88px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
                 ? "pointer-events-none scale-75 opacity-0"
                 : "scale-100 opacity-100"
@@ -725,8 +768,10 @@ export default function Navbar({ scrolled = false }) {
             priority
           />
           <Logo
-            src="/karmo/logo-ink.png"
-            className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-7 w-auto max-w-[min(50vw,13rem)] sm:h-8 sm:max-w-none transition-[opacity,transform] ${LOGO_EASE} ${
+            src="/karmo/logo-compact.png"
+            width={400}
+            height={120}
+            className={`absolute left-0 top-1/2 origin-left -translate-y-[58%] h-11 w-auto sm:h-[56px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
                 ? "scale-100 opacity-100"
                 : "pointer-events-none scale-95 opacity-0"
@@ -749,7 +794,7 @@ export default function Navbar({ scrolled = false }) {
           <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
 
           <span className="ml-1.5 hidden md:block">
-            <HeaderCtaButton />
+            <HeaderCtaButton compact />
           </span>
 
           <button
@@ -871,7 +916,7 @@ export default function Navbar({ scrolled = false }) {
                             <div className="mt-3 space-y-4">
                               {entry.columns.map((col) => (
                                 <div key={col.label}>
-                                  {col.href && !entry.linksDisabled ? (
+                                  {col.href && !(entry.linksDisabled && !col.enabled) ? (
                                     <Link
                                       href={col.href}
                                       onClick={() => setOpen(false)}
@@ -918,7 +963,7 @@ export default function Navbar({ scrolled = false }) {
                                               : ""
                                           }
                                         >
-                                          {sub.soon || entry.linksDisabled ? (
+                                          {sub.soon || (entry.linksDisabled && !col.enabled) ? (
                                             <span
                                               aria-disabled="true"
                                               className={`flex min-h-12 cursor-default items-center justify-between gap-2.5 px-2.5 py-1.5 ${

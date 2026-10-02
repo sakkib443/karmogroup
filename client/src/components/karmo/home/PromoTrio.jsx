@@ -21,8 +21,8 @@ const feature = {
   eyebrow: "Our popular products",
   titleLines: ["Foam seating", "collection"],
   href: "/foam",
-  src: "/karmo/images/home-02/promo-trio/feature-left-v10-hq.png",
-  alt: "Grey armchair with Karmo foam blocks and a red foam chair",
+  src: "/karmo/images/home-02/promo-trio/feature-sunlit-living-user.png",
+  alt: "Sunlit living room with colorful Karmo foam blocks",
   cta: "Shop the collection",
 };
 
@@ -109,19 +109,24 @@ export default function PromoTrio() {
             src={feature.src}
             alt={feature.alt}
             fill
+            unoptimized
             sizes="(max-width: 1024px) 100vw, 66vw"
-            className="object-cover object-[26%_center]"
+            className="object-cover object-[right_bottom]"
             priority
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1] bg-shade-deep/35"
           />
           <Link
             href={feature.href}
             className="group absolute inset-0 z-20 flex flex-col items-end justify-center py-8 pl-6 pr-10 text-right sm:pl-8 sm:pr-14 lg:pl-10 lg:pr-20 xl:pr-24"
           >
             <div className="relative z-20 w-[min(22rem,46%)] -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 xl:-translate-y-12">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/55">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
                 {feature.eyebrow}
               </span>
-              <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
+              <h2 className="display section-heading title-card-line mt-3 uppercase text-white">
                 {feature.titleLines.map((line) => (
                   <span key={line} className="block">
                     {line}
