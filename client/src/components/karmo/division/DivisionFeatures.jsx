@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
@@ -60,14 +61,12 @@ export default function DivisionFeatures({ items = [] }) {
               }`}
             >
               <span className="mx-auto flex h-20 w-20 items-center justify-center transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[5.5rem] sm:w-[5.5rem]">
-                <img
+                <Image
                   src={item.icon}
                   alt=""
                   aria-hidden="true"
                   width={iconPx}
                   height={iconPx}
-                  loading="lazy"
-                  decoding="async"
                   className={iconClass}
                 />
               </span>

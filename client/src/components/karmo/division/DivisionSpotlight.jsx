@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { FiArrowRight } from "react-icons/fi";
@@ -117,10 +118,12 @@ export default function DivisionSpotlight({
         >
           {reduce ? (
             still && (
-              <img
+              <Image
                 src={still}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover"
+                fill
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
               />
             )
           ) : (

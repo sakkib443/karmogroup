@@ -188,7 +188,7 @@ export default function DivisionPage({ data }) {
                   <li key={icon.id} className="flex flex-col items-center text-center">
                     {icon.src ? (
                       <span className="relative mx-auto flex h-14 w-14 items-center justify-center overflow-hidden bg-[#fff8f0] sm:h-16 sm:w-16">
-                        <img
+                        <Image
                           src={icon.src}
                           alt=""
                           aria-hidden="true"
@@ -238,10 +238,13 @@ export default function DivisionPage({ data }) {
           style={{ height: 168, margin: 0 }}
         >
           {Array.from({ length: 10 }).map((_, i) => (
-            <img
+            <Image
               key={`side-tex-${i}`}
               src="/karmo/images/header/mattress-side-texture.jpg"
               alt=""
+              width={1536}
+              height={1024}
+              sizes="256px"
               style={{ height: "100%", width: "auto", flex: "0 0 auto" }}
             />
           ))}

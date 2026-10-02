@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 /**
@@ -102,8 +103,7 @@ export default function DivisionVideoHero({
     >
       {reduceMotion ? (
         poster && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={poster} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <Image src={poster} alt="" fill sizes="100vw" className="object-cover" />
         )
       ) : (
         <>
