@@ -66,7 +66,7 @@ export default function HomePage() {
         <FoamPromise
           filmMode="parallax"
           film="/karmo/videos/product-film.mp4"
-          still="/karmo/images/home-02/promise/foam-promise-bg.jpg"
+          still="/karmo/images/home-02/promise/foam-promise-bg.webp"
           scrim="bg-black/55"
         />
       </ReviewSection>

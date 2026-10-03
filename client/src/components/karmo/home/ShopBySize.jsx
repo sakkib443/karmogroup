@@ -18,7 +18,7 @@ const sizes = [
     dims: "36 × 75 in",
     fits: "Fits 1",
     href: "/mattress",
-    src: "/karmo/images/home-02/sizes/size-single-pose-clear.png",
+    src: "/karmo/images/home-02/sizes/size-single-pose-clear.webp",
     alt: "One person sleeping on their side on a Karmo single mattress",
   },
   {
@@ -27,7 +27,7 @@ const sizes = [
     dims: "48 × 75 in",
     fits: "Fits 2",
     href: "/mattress",
-    src: "/karmo/images/home-02/sizes/size-double-pose-clear.png",
+    src: "/karmo/images/home-02/sizes/size-double-pose-clear.webp",
     alt: "Two people sleeping in different poses on a Karmo double mattress",
   },
   {
@@ -36,7 +36,7 @@ const sizes = [
     dims: "69 × 81 in",
     fits: "Fits 1 + child",
     href: "/mattress",
-    src: "/karmo/images/home-02/sizes/size-queen-pose-clear.png",
+    src: "/karmo/images/home-02/sizes/size-queen-pose-clear.webp",
     alt: "An adult and a child sleeping on their sides on a Karmo queen mattress",
   },
   {
@@ -45,7 +45,7 @@ const sizes = [
     dims: "72 × 80 in",
     fits: "Fits 2 + child",
     href: "/mattress",
-    src: "/karmo/images/home-02/sizes/size-king-pose-clear.png",
+    src: "/karmo/images/home-02/sizes/size-king-pose-clear.webp",
     alt: "A family sleeping in mixed poses on a Karmo king mattress",
   },
 ];

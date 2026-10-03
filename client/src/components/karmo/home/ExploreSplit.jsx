@@ -39,7 +39,7 @@ const DEFAULT_PANELS = [
   {
     id: "hometex",
     href: "/hometex",
-    src: "/karmo/images/home-02/explore/hometex-panel-v2.jpg",
+    src: "/karmo/images/home-02/explore/hometex-panel-v2.webp",
     alt: "A cream sofa in a mustard yellow HomeTex living room",
     line1: "HomeTex for",
     line2: "every room",
@@ -271,7 +271,7 @@ export default function ExploreSplit({
             className={`explore-band relative overflow-hidden bg-[#f3eee6] ${bandH}`}
           >
             <Image
-              src="/karmo/images/foam/furniture/hero/foam-sunlit-sofa-user.png"
+              src="/karmo/images/foam/furniture/hero/foam-sunlit-sofa-user.webp"
               alt="Sunlit sofa and foam showcase"
               fill
               unoptimized

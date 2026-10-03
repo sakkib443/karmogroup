@@ -18,14 +18,14 @@ import { rise as fade, VIEWPORT } from "@/components/karmo/motion";
 const GAP = "gap-1.5";
 
 const leftPane = {
-  src: "/karmo/images/home-02/promo-band/promo-living-room-hq.png",
+  src: "/karmo/images/home-02/promo-band/promo-living-room-hq.webp",
   alt: "A calm Karmo living room with soft seating and natural light",
   href: "/foam",
   crop: "object-[center_40%]",
 };
 
 const rightPane = {
-  src: "/karmo/images/home-02/promo-band/promo-couple-bedroom-hq.png",
+  src: "/karmo/images/home-02/promo-band/promo-couple-bedroom-hq.webp",
   alt: "A couple reading on the floor beside a Karmo bed dressed in HomeTex bedding",
   href: "/mattress",
   crop: "object-[center_58%]",
@@ -113,7 +113,7 @@ export default function PartnerPromoBand() {
           className="relative col-span-full min-h-[min(52svh,360px)] border border-ink/8 bg-white md:min-h-[460px] lg:col-span-1 lg:min-h-[460px] xl:min-h-[500px]"
         >
           <Image
-            src="/karmo/images/home-02/promo-band/emi-banks-panel-v3.png"
+            src="/karmo/images/home-02/promo-band/emi-banks-panel-v3.webp"
             alt="Up to 12 months EMI available with BRAC Bank, City Bank, MTB, Prime Bank, UCB, One Bank, Jamuna Bank and other partner banks"
             fill
             sizes="(min-width: 1280px) 264px, (min-width: 1024px) 248px, 100vw"

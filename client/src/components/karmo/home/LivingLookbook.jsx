@@ -20,7 +20,7 @@ const BAND_H =
   "h-[min(58svh,520px)] min-h-[320px] md:h-[min(68svh,700px)] md:min-h-[420px]";
 
 const BAND_IMAGE =
-  "/karmo/images/home-02/lookbook/lookbook-tradition-innovation-v1.jpg";
+  "/karmo/images/home-02/lookbook/lookbook-tradition-innovation-v1.webp";
 /* Same spinning mark as `/home-2` FilmBand. */
 const BADGE = "/karmo/livora/intro-video-circle.svg";
 
