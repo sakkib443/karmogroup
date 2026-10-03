@@ -30,6 +30,7 @@ export default function Logo({
   src = "/karmo/logo.png",
   width = LOGO_W,
   height = LOGO_H,
+  quality = 75,
 }) {
   return (
     <Image
@@ -37,6 +38,7 @@ export default function Logo({
       alt="Karmo"
       width={width}
       height={height}
+      quality={quality}
       priority={priority}
       // object-contain is the safety net: if a parent ever squeezes the box,
       // the artwork letterboxes instead of stretching. A distorted logo is

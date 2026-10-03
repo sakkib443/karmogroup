@@ -367,7 +367,7 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
 function Tool({ icon: Icon, label, href, count, onClick }) {
   const body = (
     <>
-      <Icon className="text-[26px]" />
+      <Icon className="text-[22px] sm:text-[26px]" />
       {count > 0 && (
         <span className="absolute -right-1.5 -top-1 flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold leading-none text-white">
           {count}
@@ -377,7 +377,7 @@ function Tool({ icon: Icon, label, href, count, onClick }) {
   );
 
   const className =
-    "relative flex h-12 w-12 items-center justify-center text-ink transition-colors duration-300 hover:text-brand";
+    "relative flex h-10 w-10 items-center justify-center text-ink sm:h-12 sm:w-12 transition-colors duration-300 hover:text-brand";
 
   if (onClick) {
     return (
@@ -398,8 +398,8 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
   const pathname = usePathname() || "";
 
   return (
-    <nav className="flex h-full" aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
-      <ul className="flex h-full items-stretch gap-x-0.5">
+    <nav className="flex h-full min-w-0" aria-label="Divisions" data-mega-menu onMouseLeave={leaveMenuZone}>
+      <ul className="flex h-full min-w-0 items-stretch gap-x-0.5">
         {nav.map((entry) => {
           const isDisabled = Boolean(entry.disabled);
           const matchPath = entry.match || entry.href;
@@ -408,23 +408,25 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
             Boolean(matchPath) &&
             (pathname === matchPath || pathname.startsWith(`${matchPath}/`));
           const isOpen = !isDisabled && panel === entry.name;
-          const triggerClass = `relative flex h-full items-center gap-2 px-3 transition-colors duration-300 ${
+          const triggerClass = `relative flex h-full items-center gap-1.5 px-2 min-[1700px]:gap-2 min-[1700px]:px-3 transition-colors duration-300 ${
             isActive ? "text-brand" : "text-ink hover:text-brand"
           }`;
 
           const label = (
             <>
+              {/* Icons only where the row has room for them next to one-line
+                  labels; on 1280–1699px laptops the labels need that space. */}
               {entry.icon ? (
-                <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                <span className="hidden min-[1700px]:inline-flex">
+                  <MenuGlyph icon={entry.icon} alt="" size="nav" />
+                </span>
               ) : null}
               <span className="inline-flex items-center gap-1.5">
-                {/* "HomeTex / Bedding" and "Chemicals & Polymers" wrap to two
-                    lines below 2xl on purpose. Held to one line they need
-                    ~75px more than the row has: at 1440 that pushed Find a
-                    Store 11px past the header edge. From 1536 up there is room,
-                    so they stay on one line there. */}
+                {/* Labels stay on one line while the row has room and wrap to two
+                    lines only when it does not, so the right-hand tools never
+                    run past the header edge (they did by ~100px at 1920). */}
                 <span
-                  className={`display block text-[13px] uppercase leading-[1.15] tracking-[0.1em] 2xl:whitespace-nowrap transition-[color,font-weight] duration-300 ${
+                  className={`display block text-[11.5px] uppercase leading-[1.15] tracking-[0.05em] min-[1700px]:text-[13px] min-[1700px]:tracking-[0.1em] transition-[color,font-weight] duration-300 ${
                     isActive ? "font-extrabold text-brand" : "font-bold"
                   }`}
                 >
@@ -642,12 +644,14 @@ function HeaderCtaButton({ compact = false }) {
   return (
     <Link
       href="/find-store"
-      className="group flex h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white transition-colors duration-300 hover:bg-shade"
+      className="group flex h-[46px] shrink-0 items-center gap-3 rounded-[4px] bg-shade-soft pl-1.5 pr-4 text-white xl:max-[1365px]:pr-1.5 transition-colors duration-300 hover:bg-shade"
     >
       <span className="flex h-[34px] w-[34px] items-center justify-center rounded-[3px] bg-brand text-white shadow-[0_4px_12px_-4px_rgba(212,67,72,0.6)] transition-all duration-300 group-hover:-translate-y-px group-hover:shadow-[0_6px_16px_-4px_rgba(212,67,72,0.75)]">
         <FiMapPin className="text-[16px]" />
       </span>
-      <span className="block text-left">
+      {/* On 1280–1365px laptops the five menus need the room, so the button
+          shows just its pin there (the label stays for screen readers). */}
+      <span className="block text-left xl:max-[1365px]:sr-only">
         <span className="display block text-[12.5px] font-bold uppercase leading-tight tracking-[0.04em]">
           FIND A STORE
         </span>
@@ -747,7 +751,7 @@ export default function Navbar({ scrolled = false }) {
   return (
     <>
       <div
-        className={`shell-home-two relative z-[2] flex items-center gap-4 translate-y-[3px] transition-[height] ${LOGO_EASE} ${
+        className={`shell-header relative z-[2] flex items-center gap-4 translate-y-[3px] transition-[height] ${LOGO_EASE} ${
           scrolled ? "h-[80px]" : "h-[104px] sm:h-[112px]"
         }`}
       >
@@ -756,17 +760,18 @@ export default function Navbar({ scrolled = false }) {
           aria-label="Karmo Group, home"
           className={`relative shrink-0 overflow-hidden transition-[width,height] ${LOGO_EASE} ${
             scrolled
-              ? "h-11 w-[150px] sm:h-[56px] sm:w-[187px]"
-              : "h-[72px] w-[270px] sm:h-[88px] sm:w-[330px]"
+              ? "h-[50px] w-[172px] sm:h-[66px] sm:w-[227px]"
+              : "h-[52px] w-[207px] sm:h-[80px] sm:w-[318px] lg:h-[108px] lg:w-[429px] xl:h-[92px] xl:w-[366px] min-[1700px]:h-[108px] min-[1700px]:w-[429px]"
           }`}
         >
           {/* Resting: the wide "Karmo Group" wordmark. Scrolled: the compact
               short "KARMO" mark. Cross-faded, same as the pair they replaced. */}
           <Logo
-            src="/karmo/logo-group.png"
-            width={300}
-            height={80}
-            className={`absolute left-0 top-1/2 origin-left -translate-y-[60%] h-[72px] w-auto sm:h-[88px] transition-[opacity,transform] ${LOGO_EASE} ${
+            src="/karmo/logo-group-k3.png"
+            width={1272}
+            height={320}
+            quality={100}
+            className={`absolute left-0 top-1/2 origin-left -translate-y-[60%] h-[52px] w-auto sm:h-[80px] lg:h-[108px] xl:h-[92px] min-[1700px]:h-[108px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
                 ? "pointer-events-none scale-75 opacity-0"
                 : "scale-100 opacity-100"
@@ -774,10 +779,11 @@ export default function Navbar({ scrolled = false }) {
             priority
           />
           <Logo
-            src="/karmo/logo-compact.png"
-            width={400}
+            src="/karmo/logo-compact-k2.png"
+            width={412}
             height={120}
-            className={`absolute left-0 top-1/2 origin-left -translate-y-[58%] h-11 w-auto sm:h-[56px] transition-[opacity,transform] ${LOGO_EASE} ${
+            quality={100}
+            className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-[50px] w-auto sm:h-[66px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
                 ? "scale-100 opacity-100"
                 : "pointer-events-none scale-95 opacity-0"
@@ -786,7 +792,7 @@ export default function Navbar({ scrolled = false }) {
           />
         </Link>
 
-        <div className="hidden h-full flex-1 justify-center xl:flex">
+        <div className="hidden h-full min-w-0 flex-1 justify-center xl:flex">
           <DivisionNav
             panel={panel}
             openPanel={openPanel}
@@ -817,7 +823,7 @@ export default function Navbar({ scrolled = false }) {
 
       {search ? (
         <div className="absolute inset-x-0 top-full border-t border-ink/8 bg-white shadow-[0_24px_40px_-24px_rgba(15,23,42,0.4)]">
-          <div className="shell-home-two py-5">
+          <div className="shell-header py-5">
             <form
               role="search"
               onSubmit={(e) => e.preventDefault()}
@@ -858,7 +864,7 @@ export default function Navbar({ scrolled = false }) {
             className="fixed inset-0 z-[9998] bg-ink/35 xl:hidden"
           />
           <div className="absolute inset-x-0 top-full z-[9999] max-h-[calc(100svh-112px)] overflow-y-auto overscroll-contain border-t border-ink/8 bg-white xl:hidden">
-            <div className="shell-home-two py-5">
+            <div className="shell-header py-5">
               <ul className="divide-y divide-ink/8">
                 {nav.map((entry) => {
                   const isDisabled = Boolean(entry.disabled);

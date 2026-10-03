@@ -4,72 +4,71 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Brochure page 3 — Our Mattress Brands.
- * Official marks cropped from the catalogue, shown on a clean grid.
+ * Brochure page 3 — same band type as homepage Chemicals:
+ * screen-tall photo, catalogue page overlaid on the left.
  */
-export default function MattressBrands({ heading, kicker, items = [] }) {
-  if (!items.length) return null;
+
+const DESKTOP_H = "calc(100svh - 64px)";
+
+export default function MattressBrands({
+  heading,
+  image,
+  imageAlt,
+  background,
+  items = [],
+}) {
+  if (!image && !items.length) return null;
 
   return (
     <section
       id="our-mattress-brands"
       aria-label={heading || "Our mattress brands"}
-      className="relative mb-1.5 overflow-hidden py-10 md:py-12 lg:py-14"
-      style={{ background: "#faf7f2" }}
+      className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0B1A33] lg:h-[calc(100svh-64px)] lg:min-h-[calc(100svh-64px)]"
+      style={{ ["--mattress-brands-h"]: DESKTOP_H }}
     >
-      <div
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-        aria-hidden
-      >
+      {background ? (
         <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+          src={background}
           alt=""
           fill
           sizes="100vw"
-          className="object-cover object-center"
-          style={{ opacity: 0.26, filter: "blur(2.5px)" }}
+          className="object-cover object-[center_62%]"
         />
-        <span
-          className="absolute inset-0"
-          style={{ background: "rgba(255,250,245,0.58)" }}
+      ) : null}
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-l from-black/42 via-black/22 to-black/10"
+      />
+
+      <div className="relative grid min-h-[min(72svh,620px)] lg:h-full lg:min-h-0 lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.55fr)]">
+        <aside className="relative order-2 min-h-[min(56svh,520px)] lg:order-1 lg:min-h-0">
+          {image ? (
+            <Image
+              src={image}
+              alt={imageAlt || heading || "Our mattress brands"}
+              fill
+              sizes="(min-width: 1024px) 32vw, 100vw"
+              className="object-cover object-center"
+            />
+          ) : null}
+        </aside>
+        <div
+          className="relative order-1 min-h-[min(36svh,300px)] lg:order-2 lg:min-h-0"
+          aria-hidden
         />
       </div>
 
-      <div className="shell relative z-[1] text-center">
-        <h2 className="display section-heading title-card-line uppercase text-ink">
-          {heading}
-        </h2>
-        {kicker && (
-          <p className="mt-2 text-[13px] font-medium text-brand sm:text-[14px]">
-            {kicker}
-          </p>
-        )}
-      </div>
-
-      <ul className="shell relative z-[1] mt-8 grid grid-cols-2 gap-3 sm:mt-9 sm:gap-4 md:grid-cols-4 lg:mt-10 lg:gap-5">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className={item.wide ? "col-span-2 md:col-span-2" : ""}
-          >
-            <Link
-              href={item.href}
-              aria-label={item.alt}
-              className="group flex h-full min-h-[150px] items-center justify-center bg-white px-6 py-6 shadow-[0_1px_0_rgba(34,34,34,0.06)] transition-shadow duration-500 hover:shadow-[0_18px_40px_-24px_rgba(15,23,42,0.35)] sm:min-h-[176px] sm:px-8 sm:py-8 lg:min-h-[188px]"
-            >
-              <span className="relative block h-[80px] w-full sm:h-[96px] lg:h-[108px]">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  sizes="(min-width: 768px) 22vw, 50vw"
-                  className="object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                />
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {items.length ? (
+        <nav className="sr-only" aria-label={heading || "Mattress brands"}>
+          <ul>
+            {items.map((item) => (
+              <li key={item.id}>
+                <Link href={item.href}>{item.alt}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
     </section>
   );
 }
