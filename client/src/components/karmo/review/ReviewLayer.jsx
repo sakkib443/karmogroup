@@ -192,7 +192,10 @@ function ReviewLayerInner({ page, config }) {
         // Sticks near the top of the visible part, pushed up by the section end.
         const y = Math.min(top + 12, bottom - 12 - MARKER);
         marker.style.display = "grid";
-        marker.style.transform = `translate3d(${x}px,${y}px,0)`;
+        // `translate`, not `transform`: the hover `scale` is applied after
+        // `translate` but before `transform`, so a transform offset would be
+        // scaled too and the marker would jump away from the cursor.
+        marker.style.translate = `${x}px ${y}px`;
       }
 
       if (section.id === openRef.current && outline.current) {
