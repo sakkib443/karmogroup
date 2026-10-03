@@ -1,245 +1,302 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { FiChevronRight } from "react-icons/fi";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * Footwear foam — a dark product lineup: one heading, then three stations
- * (cutaway shoe · two foam sheets · three insoles fanned from one heel) on a
- * rolled-black-foam backdrop.
- *
- * Height: full-height like the other bands on this page — the viewport minus
- * the fixed header (112px), plus twenty pixels so the next section can never
- * show along the bottom edge (it was six; the client asked for a little more). It is a `min-height`, so on a short or narrow screen
- * the band grows to its content instead of clipping it, and the content sits
- * in the middle of whatever height it gets. `data-home-two-snap` hands it to
- * `HomeTwoSectionSnap`, which eases the band flush under the header, same as
- * the other full-height sections.
- *
- * The three pieces used to be sized against the viewport height (`svh`) and
- * pinned to widths that didn't add up — 52% + a 36svh square + 28% is more than
- * 100% on anything narrower than a wide monitor, so the row overflowed and the
- * section's own `overflow-hidden` clipped the edges; on a phone the stacked
- * pieces were taller than the fixed screen-height section and got cut off top
- * and bottom. Everything here is sized by *width* instead (grid fractions and
- * aspect ratios), so nothing can overflow at any size:
- *
- *   · xl and up (≥1280)  one row — shoe · sheets · insoles, aligned on one
- *                        centre line, with hairlines between the stations.
- *                        Fractions are chosen so all three come out at roughly
- *                        the same height (shoe ≈ 0.89u, sheets 1u, insoles 1u).
- *   · below xl           shoe full-width on top, sheets + insoles side by side
- *                        underneath, the whole block capped at 820px so a wide
- *                        tablet doesn't blow the shoe up.
+ * Footwear foam — five layouts, cycled by the right arrow:
+ * 0) left claim panel
+ * 1) right claim panel
+ * 2) centered overlay, large shoe at the bottom
+ * 3) one-line title only
+ * 4) slow-motion generated film
  */
 
+const DESKTOP_H = "calc(100svh - 64px)";
 const BG = "/karmo/images/home-02/footwear/rolled-black-foam-bg.webp";
 const SHOE = "/karmo/images/home-02/footwear/shoe-catalog-real.webp";
+const FILM = "/karmo/images/home-02/footwear/gemini-generated-video-e79029c4.mp4";
+const SLOW_MO = 0.72;
 
-/* The shoe PNG is 1223×528 but the shoe itself only fills (27,72)–(1198,505):
-   13% of the height above it is empty. Laid out as-is, the shoe sits visibly
-   lower than the pieces beside it. This trims the picture to the shoe's own
-   1171×433 box (aspect-[1171/433]) and offsets the full image inside it, so the
-   layout is aligning real edges, not transparent padding. */
 const SHOE_TRIM = {
-  left: "-2.306%", // 27 / 1171
-  top: "-16.628%", // 72 / 433
-  width: "104.44%", // 1223 / 1171
-  height: "121.94%", // 528 / 433
+  left: "-2.306%",
+  top: "-16.628%",
+  width: "104.44%",
+  height: "121.94%",
 };
 
-const SOLES = [
+const TITLE_STYLE = {
+  fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+  fontWeight: 350,
+  fontVariationSettings: '"wght" 350',
+  lineHeight: 1.08,
+  letterSpacing: "-0.015em",
+};
+
+const claims = [
   {
-    id: "cream",
-    src: "/karmo/images/home-02/footwear/sole-high-v3.webp",
-    alt: "Cream Karmo foam insole",
-    width: 320,
-    height: 965,
-    rotate: -34,
-    z: 1,
+    id: "insole",
+    title: "Cushioned insoles",
+    icon: "/karmo/images/trust/cartoon-v3/foot-insole-v2.webp",
   },
   {
-    id: "pink",
-    src: "/karmo/images/home-02/footwear/sole-mid-v3.webp",
-    alt: "Magenta Karmo foam insole",
-    width: 335,
-    height: 946,
-    rotate: 0,
-    z: 3,
+    id: "sheets",
+    title: "Load-bearing foam sheets",
+    icon: "/karmo/images/trust/cartoon-v3/foot-sheets-v2.webp",
   },
   {
-    id: "navy",
-    src: "/karmo/images/home-02/footwear/sole-low-v3.webp",
-    alt: "Navy Karmo foam insole",
-    width: 347,
-    height: 1004,
-    rotate: 34,
-    z: 2,
+    id: "shoe",
+    title: "Light for all-day wear",
+    icon: "/karmo/images/trust/cartoon-v3/foot-shoe-v2.webp",
   },
 ];
 
-/* A faint pool of light behind each piece, so the cut-outs lift off the dark
-   foam instead of floating on it. */
-function Pool() {
+function ClaimRow() {
   return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute left-1/2 top-1/2 h-[135%] w-[125%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.11),transparent)]"
-    />
+    <ul className="relative grid w-full grid-cols-3 gap-x-1 gap-y-3 sm:gap-x-1.5">
+      {claims.map((claim) => (
+        <li key={claim.id} className="group flex flex-col items-center text-center">
+          <span className="relative mx-auto flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[4.75rem] sm:w-[4.75rem]">
+            <Image
+              src={claim.icon}
+              alt=""
+              aria-hidden="true"
+              width={76}
+              height={76}
+              className="h-full w-full object-contain"
+            />
+          </span>
+          <span className="mt-2 text-[10px] font-semibold uppercase leading-[1.35] tracking-[0.04em] text-white/85 sm:text-[11px]">
+            {claim.title}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-/* Hairline between stations — xl only, fades out at both ends. Sits in the
-   middle of the grid gap (gap-x-12 → 1.5rem either side). */
-function Divider() {
+function Heading({ className = "" }) {
   return (
-    <span
-      aria-hidden
-      className="pointer-events-none absolute -left-6 bottom-6 top-6 hidden w-px bg-gradient-to-b from-transparent via-white/15 to-transparent xl:block"
-    />
+    <h2
+      className={`display title-card-line whitespace-nowrap uppercase text-white ${className}`}
+      style={TITLE_STYLE}
+    >
+      Soles built to carry the day
+    </h2>
+  );
+}
+
+function ShoeArt({ sizes, className = "" }) {
+  return (
+    <div className={`relative aspect-[1171/433] w-full ${className}`}>
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.12),transparent)]"
+      />
+      <Image
+        src={SHOE}
+        alt="Cross section of a sports shoe built on Karmo footwear foam"
+        width={1223}
+        height={528}
+        unoptimized
+        sizes={sizes}
+        className="absolute max-w-none drop-shadow-[0_22px_40px_rgba(0,0,0,0.55)]"
+        style={SHOE_TRIM}
+      />
+    </div>
+  );
+}
+
+function VideoLayout({ reveal, active }) {
+  const reduceMotion = useReducedMotion();
+  const videoRef = useRef(null);
+  const wrapRef = useRef(null);
+  const inView = useInView(wrapRef, { amount: 0.25 });
+
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node || reduceMotion) return;
+    node.playbackRate = SLOW_MO;
+    if (active && inView) {
+      node.play().catch(() => {});
+    } else {
+      node.pause();
+    }
+  }, [active, inView, reduceMotion]);
+
+  return (
+    <motion.div
+      ref={wrapRef}
+      variants={group}
+      {...reveal}
+      viewport={VIEWPORT}
+      className="relative z-[2] min-h-[min(72svh,620px)] overflow-hidden bg-black lg:h-full lg:min-h-0"
+    >
+      <video
+        ref={videoRef}
+        src={FILM}
+        muted
+        playsInline
+        loop
+        preload="auto"
+        aria-hidden
+        tabIndex={-1}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-black/45"
+      />
+      <div className="relative z-[1] flex h-full min-h-[min(72svh,620px)] items-center justify-center px-7 lg:min-h-0">
+        <Heading className="text-center" />
+      </div>
+    </motion.div>
+  );
+}
+
+function TitleOnlyLayout({ reveal }) {
+  return (
+    <motion.div
+      variants={group}
+      {...reveal}
+      viewport={VIEWPORT}
+      className="relative z-[2] flex min-h-[min(72svh,620px)] items-center justify-center px-7 lg:h-full lg:min-h-0"
+    >
+      <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
+        <Heading className="text-center" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function CenterLayout({ reveal }) {
+  return (
+    <motion.div
+      variants={group}
+      {...reveal}
+      viewport={VIEWPORT}
+      className="relative z-[2] flex min-h-[min(72svh,620px)] flex-col items-center lg:h-full lg:min-h-0"
+    >
+      <motion.aside
+        variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
+        className="relative flex w-full max-w-xl flex-1 translate-y-8 flex-col items-center justify-center px-7 pt-10 text-center text-white sm:translate-y-10 sm:px-9 lg:translate-y-12 lg:px-10 lg:pt-12"
+      >
+        <ClaimRow />
+        <Heading className="relative mt-5 sm:mt-6" />
+      </motion.aside>
+
+      <motion.div
+        variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
+        className="relative mx-auto w-full max-w-[78vw] shrink-0 -translate-y-5 px-4 pb-2 sm:max-w-[44rem] sm:-translate-y-6 sm:px-8 lg:max-w-[52rem] lg:-translate-y-8 lg:pb-3"
+      >
+        <ShoeArt sizes="92vw" />
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function PanelLayout({ reveal, side = "left" }) {
+  const isRight = side === "right";
+
+  return (
+    <motion.div
+      variants={group}
+      {...reveal}
+      viewport={VIEWPORT}
+      className={`relative z-[2] grid min-h-[min(72svh,620px)] lg:h-full lg:min-h-0 ${
+        isRight
+          ? "lg:grid-cols-[minmax(0,1.55fr)_minmax(18rem,0.72fr)]"
+          : "lg:grid-cols-[minmax(18rem,0.72fr)_minmax(0,1.55fr)]"
+      }`}
+    >
+      <motion.aside
+        variants={fade}
+        {...reveal}
+        viewport={VIEWPORT}
+        className={`relative flex flex-col items-center justify-center px-7 py-10 text-center text-white sm:px-9 lg:px-10 lg:py-12 ${
+          isRight ? "lg:col-start-2" : ""
+        }`}
+      >
+        <span
+          aria-hidden
+          className="absolute inset-0 bg-black/45 backdrop-blur-[2px]"
+        />
+        <div className="relative w-full max-w-[22rem]">
+          <ShoeArt sizes="(min-width: 1024px) 22rem, 80vw" />
+        </div>
+        <div className="relative mt-7 w-full sm:mt-8">
+          <ClaimRow />
+        </div>
+        <Heading className="relative mt-5 sm:mt-6" />
+      </motion.aside>
+      <div
+        className={`relative min-h-[min(36svh,300px)] lg:min-h-0 ${
+          isRight ? "lg:col-start-1 lg:row-start-1" : ""
+        }`}
+        aria-hidden
+      />
+    </motion.div>
   );
 }
 
 export default function ShoeSole() {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const [slide, setSlide] = useState(0);
 
   return (
     <section
-      className="relative isolate flex min-h-[calc(100svh-92px)] w-full items-center overflow-hidden bg-black"
       id="karmo-footwear"
       data-home-two-snap
+      className="footwear-band relative overflow-hidden bg-black"
+      style={{ ["--footwear-h"]: DESKTOP_H }}
       aria-label="Karmo footwear foam"
     >
-      <Image
-        src={BG}
-        alt=""
-        fill
-        sizes="100vw"
-        quality={90}
-        className="object-cover object-center"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] bg-black/78"
-      />
-      {/* Light from above, so the middle of the band reads brighter than its
-          corners. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_70%_60%_at_50%_45%,rgba(255,255,255,0.07),transparent)]"
-      />
+      {slide !== 4 ? (
+        <>
+          <Image
+            src={BG}
+            alt=""
+            fill
+            sizes="100vw"
+            quality={90}
+            className="object-cover object-center"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1] bg-black/45"
+          />
+        </>
+      ) : null}
 
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="relative z-[2] mx-auto flex w-full max-w-[1840px] flex-col items-center gap-9 px-5 py-14 sm:gap-12 sm:px-8 sm:py-16 xl:gap-14 xl:px-10 xl:py-20 2xl:px-14"
+      {slide === 0 ? (
+        <PanelLayout reveal={reveal} side="left" />
+      ) : slide === 1 ? (
+        <PanelLayout reveal={reveal} side="right" />
+      ) : slide === 2 ? (
+        <CenterLayout reveal={reveal} />
+      ) : slide === 3 ? (
+        <TitleOnlyLayout reveal={reveal} />
+      ) : (
+        <VideoLayout reveal={reveal} active={slide === 4} />
+      )}
+
+      <button
+        type="button"
+        onClick={() => setSlide((s) => (s + 1) % 5)}
+        aria-label="Show next footwear layout"
+        className="absolute top-1/2 right-2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-ink/15 bg-white text-ink shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition hover:border-ink/30 hover:text-brand sm:right-3 sm:h-11 sm:w-11 lg:right-4"
       >
-        <motion.div variants={fade} className="text-center">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
-            Footwear foam
-          </span>
-          <h2
-            className="display title-card-line mt-2 uppercase text-white"
-            style={{
-              fontSize: "clamp(1.35rem, 1.05rem + 1.3vw, 2.25rem)",
-              fontWeight: 350,
-              fontVariationSettings: '"wght" 350',
-              lineHeight: 1.1,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            <span className="block sm:inline">Soles built to </span>
-            <span className="block sm:inline">carry the day</span>
-          </h2>
-          <span aria-hidden className="mx-auto mt-4 block h-[2px] w-10 bg-brand" />
-        </motion.div>
-
-        {/* The lineup. Fractions are tuned so the three pieces come out the
-            same height at xl; the shoe cell spans the full width below it. */}
-        <div className="grid w-full max-w-[820px] grid-cols-[0.85fr_1.15fr] gap-x-4 gap-y-9 sm:gap-x-6 sm:gap-y-12 xl:max-w-none xl:grid-cols-[2.4fr_1fr_1.45fr] xl:gap-x-12 xl:gap-y-0">
-          {/* 1 — cutaway shoe */}
-          <motion.div
-            variants={fade}
-            className="col-span-2 flex items-center justify-center xl:col-span-1"
-          >
-            <div className="relative aspect-[1171/433] w-full">
-              <Pool />
-              <Image
-                src={SHOE}
-                alt="Cross section of synthetic footwear — Karmo load-bearing foam"
-                width={1223}
-                height={528}
-                unoptimized
-                sizes="(min-width: 1280px) 46vw, (min-width: 820px) 820px, 92vw"
-                className="absolute max-w-none drop-shadow-[0_18px_36px_rgba(0,0,0,0.55)]"
-                style={SHOE_TRIM}
-              />
-            </div>
-          </motion.div>
-
-          {/* 2 — the two catalogue sheets, overlapped from opposite corners */}
-          <motion.div
-            variants={fade}
-            className="relative flex items-center justify-center"
-          >
-            <Divider />
-            <div className="relative aspect-square w-full max-w-[360px] xl:max-w-none">
-              <Pool />
-              <div className="absolute left-0 top-0 z-[1] aspect-square w-[66%] overflow-hidden shadow-[0_16px_34px_-10px_rgba(0,0,0,0.7)] ring-1 ring-white/25">
-                <Image
-                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-purple.webp"
-                  alt="Load-bearing purple foam sheet"
-                  fill
-                  sizes="(min-width: 1280px) 14vw, 30vw"
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute bottom-0 right-0 z-[2] aspect-square w-[66%] overflow-hidden shadow-[0_16px_34px_-10px_rgba(0,0,0,0.7)] ring-1 ring-white/25">
-                <Image
-                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-grey.webp"
-                  alt="Load-bearing grey foam sheet"
-                  fill
-                  sizes="(min-width: 1280px) 14vw, 30vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 3 — three insoles fanned from one heel. The box is 1.45:1 because
-              that is the shape the fan itself makes: at ±34° and a sole height
-              of 96% of the box, the fan spans 1.35× its height. */}
-          <motion.div
-            variants={fade}
-            className="relative flex items-center justify-center"
-          >
-            <Divider />
-            <div className="relative aspect-[1.45/1] w-full max-w-[520px] xl:max-w-none">
-              <Pool />
-              {SOLES.map(({ id, src, alt, width, height, rotate, z }) => (
-                <Image
-                  key={id}
-                  src={src}
-                  alt={alt}
-                  width={width}
-                  height={height}
-                  unoptimized
-                  sizes="(min-width: 1280px) 10vw, 22vw"
-                  className="absolute bottom-[3%] left-1/2 h-[96%] w-auto max-w-none origin-bottom object-contain drop-shadow-[0_12px_22px_rgba(0,0,0,0.5)]"
-                  style={{
-                    zIndex: z,
-                    transform: `translateX(-50%) rotate(${rotate}deg)`,
-                  }}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
+        <FiChevronRight className="text-[20px]" aria-hidden />
+      </button>
     </section>
   );
 }

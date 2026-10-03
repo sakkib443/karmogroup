@@ -14,15 +14,15 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 
 const VIEW_H =
-  "h-auto min-h-0 lg:h-[calc(100svh-80px)] lg:min-h-[calc(100svh-80px)]";
+  "h-auto min-h-0 lg:h-[calc(100svh-48px)] lg:min-h-[calc(100svh-48px)]";
 const GAP = "gap-1 md:gap-1.5";
 
 const feature = {
   eyebrow: "Our popular products",
   titleLines: ["Foam seating", "collection"],
   href: "/foam",
-  src: "/karmo/images/home-02/promo-trio/feature-sunlit-living-user.webp",
-  alt: "Sunlit living room with colorful Karmo foam blocks",
+  src: "/karmo/images/home-02/promo-trio/feature-foam-seating-pro-v3.webp",
+  alt: "Cream armchair with gold legs in a sunlit Karmo living room",
   cta: "Shop the collection",
 };
 
@@ -42,7 +42,6 @@ const side = [
     src: "/karmo/images/home-02/promo-trio/side-bottom-bxxJ1Zj5Y2.webp",
     alt: "Karmo mattress range",
     tone: "bg-[#e2e2e2]",
-    overlay: true,
   },
 ];
 
@@ -63,19 +62,14 @@ function SideCard({ item }) {
             sizes="(max-width: 1024px) 100vw, 34vw"
             className="object-cover object-center"
           />
-          {item.overlay ? (
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 z-[1] bg-[#1a1a1a]/12"
-            />
-          ) : null}
+          <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] bg-shade-deep/22" />
         </>
       ) : null}
       <div className="relative z-10 -translate-y-3 sm:-translate-y-4 lg:-translate-y-5">
-        <h3 className="display text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-ink sm:text-[1.25rem] lg:text-[1.35rem]">
+        <h3 className="display text-[1.15rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-white sm:text-[1.25rem] lg:text-[1.35rem]">
           {item.title}
         </h3>
-        <span className="mt-3 block text-[11px] font-semibold uppercase tracking-[0.14em] text-ink underline decoration-ink/35 underline-offset-[5px] transition-colors group-hover:decoration-brand">
+        <span className="mt-3 block text-[11px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/50 underline-offset-[5px] transition-colors group-hover:decoration-brand">
           Shop now
         </span>
       </div>
@@ -111,7 +105,7 @@ export default function PromoTrio() {
             fill
             unoptimized
             sizes="(max-width: 1024px) 100vw, 66vw"
-            className="object-cover object-[right_bottom]"
+            className="object-cover object-[center_bottom]"
             priority
           />
           <span
@@ -133,7 +127,7 @@ export default function PromoTrio() {
                   </span>
                 ))}
               </h2>
-              <span className="mt-6 inline-flex h-11 w-fit items-center gap-2 bg-ink px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 group-hover:bg-brand sm:h-12 sm:px-7 sm:text-[12px]">
+              <span className="mt-6 inline-flex h-11 w-fit items-center gap-2 bg-brand px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand sm:h-12 sm:px-7 sm:text-[12px]">
                 {feature.cta}
                 <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
               </span>
