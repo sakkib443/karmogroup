@@ -133,7 +133,7 @@ export default function DivisionEditorials() {
         backgroundColor: "#ffffff",
       }}
     >
-      <TextureSlides />
+      <TextureSlides lighter />
 
       <motion.div
         variants={group}

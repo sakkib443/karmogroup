@@ -110,7 +110,7 @@ export default function OrderAndContact({ textureSlides = false }) {
   return (
     <section className="relative overflow-hidden py-16 lg:py-24">
       {textureSlides ? (
-        <TextureSlides />
+        <TextureSlides lighter />
       ) : (
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <Image
