@@ -115,7 +115,7 @@ export default function Reels() {
       style={{ ["--reels-h"]: DESKTOP_H }}
       aria-label="Karmo films"
     >
-      <TextureSlides />
+      <TextureSlides lighter />
 
       <motion.div
         variants={group}

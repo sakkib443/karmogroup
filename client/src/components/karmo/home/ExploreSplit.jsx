@@ -276,7 +276,7 @@ export default function ExploreSplit({
               fill
               unoptimized
               sizes="100vw"
-              className="object-cover object-[right_bottom]"
+              className="object-cover object-[20%_bottom]"
               priority={false}
             />
 
@@ -286,7 +286,7 @@ export default function ExploreSplit({
             />
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
-              <div className="text-right">
+              <div className="-translate-y-10 text-right sm:-translate-y-12 lg:-translate-y-14">
                 <h2
                   className="display title-card-line uppercase text-white"
                   style={{
