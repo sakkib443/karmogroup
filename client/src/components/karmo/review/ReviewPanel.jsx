@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import {
   FiAlertCircle,
   FiCheck,
+  FiClock,
   FiEdit3,
   FiImage,
   FiRotateCcw,
@@ -13,8 +14,9 @@ import {
 } from "react-icons/fi";
 
 import { STATUS_LABEL } from "@/components/karmo/review/reviewConfig";
-import { formatWhen, uploadImages } from "@/components/karmo/review/reviewApi";
+import { formatFull, uploadImages } from "@/components/karmo/review/reviewApi";
 import ReviewHistory from "@/components/karmo/review/ReviewHistory";
+import ReviewRequests from "@/components/karmo/review/ReviewRequests";
 
 const MAX_FILES = 4;
 const ACCEPT = "image/png,image/jpeg,image/webp,image/gif";
@@ -28,13 +30,11 @@ const CHIP = {
 const DONE_COPY = {
   approved: ["Approved. Thank you!", "This section now shows a green mark."],
   changes: ["Feedback sent", "The team will update this section."],
-  reset: ["Back to pending", "You can review this section again any time."],
 };
 
 const DONE_BG = {
   approved: "bg-emerald-500 shadow-emerald-500/40",
   changes: "bg-rose-500 shadow-rose-500/40",
-  reset: "bg-slate-400 shadow-slate-400/40",
 };
 
 function Spinner() {
@@ -51,31 +51,49 @@ function ErrorLine({ children }) {
   );
 }
 
+function Tab({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative inline-flex h-9 items-center gap-1.5 px-1 text-[12.5px] font-bold transition ${
+        active ? "text-ink" : "text-ink/45 hover:text-ink/75"
+      }`}
+    >
+      {children}
+      <span
+        aria-hidden
+        className={`absolute inset-x-0 -bottom-px h-[2px] rounded-full transition ${active ? "bg-brand" : "bg-transparent"}`}
+      />
+    </button>
+  );
+}
+
 /**
- * The review card for one section: approve it, or ask for changes with a note
- * and reference images. Non-modal on purpose so the section stays visible.
+ * The review card for one section. Non-modal on purpose so the section stays
+ * visible.
+ *   Review tab   approve / ask for changes, then the open change requests —
+ *                each can be marked Done, edited or deleted — and Reset.
+ *   History tab  everything that ever happened to the section, with exact
+ *                times; done requests can be reopened from there.
  */
-export default function ReviewPanel({
-  section,
-  index,
-  total,
-  record,
-  name,
-  onNameChange,
-  onClose,
-  onSubmit,
-}) {
+export default function ReviewPanel({ section, index, total, record, onClose, onSubmit }) {
   const reduce = useReducedMotion();
   const status = record?.status ?? "pending";
   const chip = CHIP[status];
+  const requests = record?.requests ?? [];
+  const openCount = requests.filter((r) => !r.done).length;
+  const historyCount = record?.entries?.length ?? 0;
 
+  const [tab, setTab] = useState("review"); // "review" | "history"
   const [mode, setMode] = useState(null); // null | "changes"
   const [note, setNote] = useState("");
   const [files, setFiles] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [done, setDone] = useState(null); // "approved" | "changes" | "reset"
+  const [done, setDone] = useState(null); // "approved" | "changes"
   const [drag, setDrag] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const fileInput = useRef(null);
   const textRef = useRef(null);
@@ -106,6 +124,7 @@ export default function ReviewPanel({
       }));
       return [...prev, ...next];
     });
+    setTab("review");
     setMode("changes");
   };
 
@@ -130,7 +149,8 @@ export default function ReviewPanel({
     });
   };
 
-  const run = async (task, kind) => {
+  /** Approve / send feedback: show the thank-you state, then close. */
+  const finish = async (task, kind) => {
     setBusy(true);
     setError("");
     try {
@@ -144,13 +164,29 @@ export default function ReviewPanel({
     }
   };
 
-  const approve = () => run(() => onSubmit({ status: "approved", name }), "approved");
+  /** Everything else updates in place and the panel stays open. */
+  const inPlace = async (payload) => {
+    setBusy(true);
+    setError("");
+    try {
+      await onSubmit(payload);
+      return true;
+    } catch (err) {
+      setError(err?.message || "Something went wrong. Please try again.");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  };
 
-  const undo = () =>
-    run(async () => {
-      await onSubmit({ status: "reset", name });
+  const approve = () => finish(() => onSubmit({ status: "approved" }), "approved");
+
+  const reset = async () => {
+    if (await inPlace({ status: "reset" })) {
+      setConfirmReset(false);
       setMode(null);
-    }, "reset");
+    }
+  };
 
   const sendChanges = () => {
     if (!note.trim() && !files.length) {
@@ -158,11 +194,15 @@ export default function ReviewPanel({
       textRef.current?.focus();
       return;
     }
-    run(async () => {
+    finish(async () => {
       const images = files.length ? await uploadImages(files.map((f) => f.file)) : [];
-      await onSubmit({ status: "changes", note, images, name });
+      await onSubmit({ status: "changes", note, images });
     }, "changes");
   };
+
+  // Request actions throw so each card can show its own error.
+  const requestAction = (action, requestId, text) =>
+    onSubmit({ status: action, requestId, note: text });
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[9500] flex items-end p-2 sm:items-center sm:py-4 sm:pl-[64px] sm:pr-4">
@@ -173,12 +213,12 @@ export default function ReviewPanel({
         animate={{ opacity: 1, x: 0, scale: 1 }}
         exit={{ opacity: 0, x: reduce ? 0 : -12, scale: 0.98 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-auto relative flex max-h-[min(88dvh,740px)] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_40px_90px_-24px_rgba(11,26,51,0.55)] ring-1 ring-black/5 sm:w-[396px]"
+        className="pointer-events-auto relative flex max-h-[min(88dvh,760px)] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_40px_90px_-24px_rgba(11,26,51,0.55)] ring-1 ring-black/5 sm:w-[420px]"
       >
         <span aria-hidden className="h-[3px] w-full shrink-0 bg-gradient-to-r from-brand via-[#FF9A1F] to-brand" />
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-3 px-5 pb-3 pt-4">
+        <div className="flex items-start justify-between gap-3 px-5 pb-2 pt-4">
           <div className="min-w-0">
             <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/45">
               Section {index} of {total}
@@ -189,7 +229,7 @@ export default function ReviewPanel({
             >
               <span className={`h-1.5 w-1.5 rounded-full ${chip.dot}`} />
               {STATUS_LABEL[status]}
-              {record?.updatedAt && status !== "pending" ? ` · ${formatWhen(record.updatedAt)}` : ""}
+              {record?.updatedAt ? ` · ${formatFull(record.updatedAt)}` : ""}
             </span>
           </div>
           <button
@@ -202,8 +242,30 @@ export default function ReviewPanel({
           </button>
         </div>
 
+        {/* Tabs — History sits on the right */}
+        {!done && (
+          <div className="flex shrink-0 items-center justify-between border-b border-ink/10 px-5">
+            <Tab active={tab === "review"} onClick={() => setTab("review")}>
+              Review
+              {openCount > 0 && (
+                <span className="rounded-full bg-rose-500 px-1.5 text-[10px] font-bold leading-[16px] text-white">
+                  {openCount}
+                </span>
+              )}
+            </Tab>
+            <Tab active={tab === "history"} onClick={() => setTab("history")}>
+              <FiClock className="text-[13px]" /> History
+              {historyCount > 0 && (
+                <span className="rounded-full bg-ink/10 px-1.5 text-[10px] font-bold leading-[16px] text-ink/60">
+                  {historyCount}
+                </span>
+              )}
+            </Tab>
+          </div>
+        )}
+
         {/* Body */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-4">
           {done ? (
             <div className="flex flex-col items-center px-2 py-8 text-center">
               <motion.span
@@ -212,17 +274,21 @@ export default function ReviewPanel({
                 transition={{ type: "spring", stiffness: 380, damping: 18 }}
                 className={`grid h-16 w-16 place-items-center rounded-full text-white shadow-lg ${DONE_BG[done]}`}
               >
-                {done === "approved" ? (
-                  <FiCheck className="text-[30px]" />
-                ) : done === "changes" ? (
-                  <FiSend className="text-[26px]" />
-                ) : (
-                  <FiRotateCcw className="text-[26px]" />
-                )}
+                {done === "approved" ? <FiCheck className="text-[30px]" /> : <FiSend className="text-[26px]" />}
               </motion.span>
               <p className="mt-4 text-[16px] font-bold text-ink">{DONE_COPY[done][0]}</p>
               <p className="mt-1 text-[12.5px] leading-relaxed text-ink/55">{DONE_COPY[done][1]}</p>
             </div>
+          ) : tab === "history" ? (
+            historyCount ? (
+              <ReviewHistory
+                entries={record.entries}
+                requests={requests}
+                onReopen={(id) => requestAction("reopened", id)}
+              />
+            ) : (
+              <p className="py-6 text-center text-[13px] text-ink/45">Nothing has happened here yet.</p>
+            )
           ) : mode === "changes" ? (
             <div>
               <p className="text-[13px] font-semibold text-ink">What should we change?</p>
@@ -326,10 +392,10 @@ export default function ReviewPanel({
               {status === "approved" ? (
                 <div className="rounded-xl bg-emerald-50 px-4 py-3.5 ring-1 ring-emerald-200">
                   <p className="flex items-center gap-2 text-[13.5px] font-bold text-emerald-800">
-                    <FiCheck className="text-[17px]" /> You approved this section
+                    <FiCheck className="text-[17px]" /> This section is approved
                   </p>
                   <p className="mt-1 text-[12px] leading-relaxed text-emerald-800/70">
-                    Changed your mind? You can ask for changes or undo the approval.
+                    Changed your mind? Ask for changes, or reset it below.
                   </p>
                 </div>
               ) : (
@@ -338,62 +404,81 @@ export default function ReviewPanel({
                 </p>
               )}
 
-              <ErrorLine>{error}</ErrorLine>
-
               <div className="mt-4 grid grid-cols-2 gap-2.5">
-                {status === "approved" ? (
-                  <button
-                    type="button"
-                    onClick={undo}
-                    disabled={busy}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-ink/15 text-[12.5px] font-bold text-ink/75 transition hover:border-ink/30 hover:text-ink disabled:opacity-60"
-                  >
-                    <FiRotateCcw className="text-[15px]" /> Undo approval
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={approve}
-                    disabled={busy}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 text-[12.5px] font-bold uppercase tracking-[0.06em] text-white shadow-[0_12px_26px_-10px_rgba(16,185,129,0.85)] transition hover:bg-emerald-600 disabled:opacity-60"
-                  >
-                    {busy ? <Spinner /> : <FiCheck className="text-[17px]" />}
-                    Approve
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={approve}
+                  disabled={busy || status === "approved"}
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 text-[12.5px] font-bold uppercase tracking-[0.06em] text-white shadow-[0_12px_26px_-10px_rgba(16,185,129,0.85)] transition hover:bg-emerald-600 disabled:opacity-50 disabled:shadow-none"
+                >
+                  {busy ? <Spinner /> : <FiCheck className="text-[17px]" />}
+                  {status === "approved" ? "Approved" : "Approve"}
+                </button>
                 <button
                   type="button"
                   onClick={() => setMode("changes")}
                   disabled={busy}
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50/60 text-[12.5px] font-bold uppercase tracking-[0.06em] text-rose-600 transition hover:bg-rose-100 disabled:opacity-60"
                 >
-                  <FiEdit3 className="text-[15px]" /> {status === "approved" ? "Request changes" : "Needs changes"}
+                  <FiEdit3 className="text-[15px]" /> {openCount ? "Add change" : "Needs changes"}
                 </button>
               </div>
 
-              {record?.entries?.length > 0 && (
+              <ErrorLine>{error}</ErrorLine>
+
+              {openCount > 0 && (
                 <div className="mt-6">
-                  <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/40">Activity</p>
-                  <ReviewHistory entries={record.entries} className="mt-3" />
+                  <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/40">
+                    Open requests &middot; {openCount}
+                  </p>
+                  <p className="mt-1 text-[11.5px] text-ink/45">
+                    Press Done when a change is made. It moves to History.
+                  </p>
+                  <ReviewRequests requests={requests} onAction={requestAction} className="mt-3" />
+                </div>
+              )}
+
+              {(status !== "pending" || requests.length > 0) && (
+                <div className="mt-6 border-t border-ink/10 pt-4">
+                  {confirmReset ? (
+                    <div className="rounded-xl bg-slate-50 p-3.5 ring-1 ring-slate-200">
+                      <p className="text-[12.5px] font-semibold text-ink">Reset this section?</p>
+                      <p className="mt-0.5 text-[11.5px] leading-relaxed text-ink/55">
+                        It goes back to &ldquo;Awaiting review&rdquo; and every open request is cleared. History
+                        keeps all of it.
+                      </p>
+                      <div className="mt-3 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmReset(false)}
+                          className="h-8 rounded-lg px-3 text-[12px] font-semibold text-ink/60 hover:text-ink"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={reset}
+                          disabled={busy}
+                          className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-slate-700 px-3.5 text-[12px] font-bold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                        >
+                          <FiRotateCcw /> {busy ? "Resetting..." : "Reset"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmReset(true)}
+                      className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-ink/50 transition hover:text-ink"
+                    >
+                      <FiRotateCcw /> Reset section
+                    </button>
+                  )}
                 </div>
               )}
             </div>
           )}
         </div>
-
-        {/* Footer: optional reviewer name */}
-        {!done && (
-          <label className="flex shrink-0 items-center gap-3 border-t border-ink/10 bg-ink/[0.025] px-5 py-3">
-            <span className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-ink/45">Your name</span>
-            <input
-              value={name}
-              onChange={(e) => onNameChange(e.target.value)}
-              maxLength={60}
-              placeholder="Optional"
-              className="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink/30"
-            />
-          </label>
-        )}
       </motion.aside>
     </div>
   );

@@ -19,9 +19,8 @@ import { REVIEW_PAGES } from "@/components/karmo/review/reviewConfig";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 const MAX_NOTE = 2000;
-const MAX_NAME = 60;
 const MAX_IMAGES = 6;
-const MAX_ENTRIES = 100;
+const MAX_ENTRIES = 300;
 
 /* -- storage location ----------------------------------------------------- */
 
@@ -94,36 +93,98 @@ function withLock(task) {
 
 /* -- public API ------------------------------------------------------------ */
 
+/**
+ * A section record:
+ *   status     "pending" | "approved" | "changes"
+ *   updatedAt  ISO time of the last action
+ *   requests   change requests the team still tracks: { id, at, note, images,
+ *              done, doneAt, editedAt }. Done ones stay (so they can be
+ *              reopened) until the section is reset.
+ *   entries    the full history log, oldest first. Never edited — every action
+ *              (approve, request, done, reopen, edit, delete, reset) appends.
+ *
+ * Records written before `requests` existed get them rebuilt from the log:
+ * every "changes" entry since the last reset is an open request.
+ */
+function normalise(sec) {
+  sec.entries ??= [];
+  if (!Array.isArray(sec.requests)) {
+    let since = 0;
+    sec.entries.forEach((e, i) => {
+      if (e.status === "reset") since = i + 1;
+    });
+    sec.requests = sec.entries
+      .slice(since)
+      .filter((e) => e.status === "changes")
+      .map((e) => ({ id: e.id, at: e.at, note: e.note || "", images: e.images || [], done: false }));
+  }
+  return sec;
+}
+
 export async function listPage(page) {
   const { dir, temporary } = await getStorage();
   const db = await readDb(dir);
-  return { sections: db.pages?.[page]?.sections ?? {}, temporary };
+  const sections = db.pages?.[page]?.sections ?? {};
+  Object.values(sections).forEach(normalise);
+  return { sections, temporary };
 }
 
-export async function recordDecision({ page, id, status, note, name, images }) {
+export async function recordDecision({ page, id, status, note, images, requestId }) {
   const { dir } = await getStorage();
   return withLock(async () => {
     const db = await readDb(dir);
     db.pages ??= {};
     const pageRec = (db.pages[page] ??= { sections: {} });
-    const sec = (pageRec.sections[id] ??= {
-      status: "pending",
-      updatedAt: null,
-      entries: [],
-    });
+    const sec = normalise(
+      (pageRec.sections[id] ??= { status: "pending", updatedAt: null, entries: [] }),
+    );
 
-    const entry = {
-      id: crypto.randomUUID(),
-      at: new Date().toISOString(),
-      status,
-      note,
-      name,
-      images,
+    const at = new Date().toISOString();
+    const entry = { id: crypto.randomUUID(), at, status };
+    const open = () => sec.requests.filter((r) => !r.done).length;
+    // Once the team has done every open request, the section goes back to
+    // the client for another look.
+    const settle = () => {
+      if (sec.status === "changes" && open() === 0) sec.status = "pending";
     };
+
+    if (status === "approved") {
+      sec.status = "approved";
+    } else if (status === "changes") {
+      sec.requests.push({ id: entry.id, at, note, images, done: false });
+      Object.assign(entry, { note, images });
+      sec.status = "changes";
+    } else if (status === "reset") {
+      sec.requests = [];
+      sec.status = "pending";
+    } else {
+      const req = sec.requests.find((r) => r.id === requestId);
+      if (!req) throw Object.assign(new Error("That request no longer exists."), { code: "GONE" });
+      entry.ref = req.id;
+      entry.note = req.note;
+      if (status === "done") {
+        req.done = true;
+        req.doneAt = at;
+        settle();
+      } else if (status === "reopened") {
+        req.done = false;
+        req.doneAt = null;
+        sec.status = "changes";
+      } else if (status === "edited") {
+        entry.before = req.note;
+        entry.note = note;
+        req.note = note;
+        req.editedAt = at;
+      } else if (status === "deleted") {
+        entry.images = req.images;
+        sec.requests = sec.requests.filter((r) => r.id !== req.id);
+        settle();
+      }
+    }
+
     sec.entries.push(entry);
     if (sec.entries.length > MAX_ENTRIES) sec.entries = sec.entries.slice(-MAX_ENTRIES);
-    sec.status = status === "reset" ? "pending" : status;
-    sec.updatedAt = entry.at;
+    sec.updatedAt = at;
 
     await writeDb(dir, db);
     return sec;
@@ -133,6 +194,9 @@ export async function recordDecision({ page, id, status, note, name, images }) {
 /* -- validation ------------------------------------------------------------ */
 
 const ID_RE = /^[a-z0-9-]{1,40}$/;
+const REQ_ID_RE = /^[a-f0-9-]{36}$/;
+const REQUEST_ACTIONS = ["done", "reopened", "edited", "deleted"];
+const STATUSES = ["approved", "changes", "reset", ...REQUEST_ACTIONS];
 const IMG_URL_RE = /^\/api\/review\/file\/[a-z0-9]+-[a-f0-9]{12}\.(?:png|jpg|webp|gif)$/;
 export const FILE_RE = /^[a-z0-9]+-[a-f0-9]{12}\.(png|jpg|webp|gif)$/;
 
@@ -147,12 +211,11 @@ export function validateDecision(body) {
   }
 
   const status = body.status;
-  if (!["approved", "changes", "reset"].includes(status)) {
+  if (!STATUSES.includes(status)) {
     return { error: "Invalid status." };
   }
 
   const note = typeof body.note === "string" ? body.note.trim().slice(0, MAX_NOTE) : "";
-  const name = typeof body.name === "string" ? body.name.trim().slice(0, MAX_NAME) : "";
   const images = Array.isArray(body.images)
     ? body.images.filter((u) => typeof u === "string" && IMG_URL_RE.test(u)).slice(0, MAX_IMAGES)
     : [];
@@ -161,8 +224,20 @@ export function validateDecision(body) {
     return { error: "Tell us what to change, or attach an image." };
   }
 
+  const onRequest = REQUEST_ACTIONS.includes(status);
+  const requestId = typeof body.requestId === "string" ? body.requestId : "";
+  if (onRequest && !REQ_ID_RE.test(requestId)) return { error: "Unknown request." };
+  if (status === "edited" && !note) return { error: "The note can't be empty." };
+
   return {
-    value: { page, id, status, note, name, images: status === "changes" ? images : [] },
+    value: {
+      page,
+      id,
+      status,
+      note: status === "changes" || status === "edited" ? note : "",
+      images: status === "changes" ? images : [],
+      requestId: onRequest ? requestId : undefined,
+    },
   };
 }
 

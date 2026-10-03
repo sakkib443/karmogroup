@@ -12,7 +12,6 @@ import ReviewPanel from "@/components/karmo/review/ReviewPanel";
 
 const MARKER = 34;
 const LS_HIDDEN = "karmo-review-hidden";
-const LS_NAME = "karmo-review-name";
 
 const MARKER_STYLE = {
   pending:
@@ -84,7 +83,6 @@ function ReviewLayerInner({ page, config }) {
   const [temporary, setTemporary] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [openId, setOpenId] = useState(null);
-  const [name, setName] = useState("");
 
   const markers = useRef({});
   const bars = useRef({});
@@ -100,7 +98,6 @@ function ReviewLayerInner({ page, config }) {
   useEffect(() => {
     try {
       setHidden(localStorage.getItem(LS_HIDDEN) === "1");
-      setName(localStorage.getItem(LS_NAME) || "");
     } catch {
       /* private mode: preferences simply do not persist */
     }
@@ -111,15 +108,6 @@ function ReviewLayerInner({ page, config }) {
     if (next) setOpenId(null);
     try {
       localStorage.setItem(LS_HIDDEN, next ? "1" : "0");
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const changeName = (value) => {
-    setName(value);
-    try {
-      localStorage.setItem(LS_NAME, value);
     } catch {
       /* ignore */
     }
@@ -339,8 +327,6 @@ function ReviewLayerInner({ page, config }) {
             index={openIndex + 1}
             total={sections.length}
             record={records[openSection.id]}
-            name={name}
-            onNameChange={changeName}
             onClose={() => setOpenId(null)}
             onSubmit={(payload) => handleSubmit(openSection.id, payload)}
           />
