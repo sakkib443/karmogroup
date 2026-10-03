@@ -35,8 +35,8 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  *                        tablet doesn't blow the shoe up.
  */
 
-const BG = "/karmo/images/home-02/footwear/rolled-black-foam-bg.jpg";
-const SHOE = "/karmo/images/home-02/footwear/shoe-catalog-real.png";
+const BG = "/karmo/images/home-02/footwear/rolled-black-foam-bg.webp";
+const SHOE = "/karmo/images/home-02/footwear/shoe-catalog-real.webp";
 
 /* The shoe PNG is 1223×528 but the shoe itself only fills (27,72)–(1198,505):
    13% of the height above it is empty. Laid out as-is, the shoe sits visibly
@@ -53,7 +53,7 @@ const SHOE_TRIM = {
 const SOLES = [
   {
     id: "cream",
-    src: "/karmo/images/home-02/footwear/sole-high-v3.png",
+    src: "/karmo/images/home-02/footwear/sole-high-v3.webp",
     alt: "Cream Karmo foam insole",
     width: 320,
     height: 965,
@@ -62,7 +62,7 @@ const SOLES = [
   },
   {
     id: "pink",
-    src: "/karmo/images/home-02/footwear/sole-mid-v3.png",
+    src: "/karmo/images/home-02/footwear/sole-mid-v3.webp",
     alt: "Magenta Karmo foam insole",
     width: 335,
     height: 946,
@@ -71,7 +71,7 @@ const SOLES = [
   },
   {
     id: "navy",
-    src: "/karmo/images/home-02/footwear/sole-low-v3.png",
+    src: "/karmo/images/home-02/footwear/sole-low-v3.webp",
     alt: "Navy Karmo foam insole",
     width: 347,
     height: 1004,
@@ -191,7 +191,7 @@ export default function ShoeSole() {
               <Pool />
               <div className="absolute left-0 top-0 z-[1] aspect-square w-[66%] overflow-hidden shadow-[0_16px_34px_-10px_rgba(0,0,0,0.7)] ring-1 ring-white/25">
                 <Image
-                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-purple.jpg"
+                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-purple.webp"
                   alt="Load-bearing purple foam sheet"
                   fill
                   sizes="(min-width: 1280px) 14vw, 30vw"
@@ -200,7 +200,7 @@ export default function ShoeSole() {
               </div>
               <div className="absolute bottom-0 right-0 z-[2] aspect-square w-[66%] overflow-hidden shadow-[0_16px_34px_-10px_rgba(0,0,0,0.7)] ring-1 ring-white/25">
                 <Image
-                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-grey.jpg"
+                  src="/karmo/images/home-02/footwear/catalog-foam-sheet-grey.webp"
                   alt="Load-bearing grey foam sheet"
                   fill
                   sizes="(min-width: 1280px) 14vw, 30vw"

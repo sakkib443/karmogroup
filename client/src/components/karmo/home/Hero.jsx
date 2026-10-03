@@ -14,7 +14,7 @@ const SLIDES = [
     veil: true,
     headingLead: "The Journey Since 1965",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-01-mustard-room-hq.png",
+      src: "/karmo/images/home-02/hero/home-hero-slide-01-mustard-room-hq.webp",
       alt: "Mustard sofa in a blue-walled living room with plants and wood shelves",
       width: 1979,
       height: 795,
@@ -28,7 +28,7 @@ const SLIDES = [
     veil: true,
     headingLead: "The Journey Since 1965",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-living-scandi-v3-hq.png",
+      src: "/karmo/images/home-02/hero/home-hero-slide-living-scandi-v3-hq.webp",
       alt: "Warm living room with a cream sofa, wood shelves and round coffee table",
       width: 1978,
       height: 795,
@@ -41,7 +41,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Industrial chemistry built to last",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.jpg",
+      src: "/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.webp",
       alt: "Organized Karmo chemicals warehouse with blue drums in cinematic light",
       width: 1536,
       height: 1024,
@@ -54,7 +54,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Moments that make a house",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-quilts-v2-hq.jpg",
+      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-quilts-v2-hq.webp",
       alt: "Stacked Karmo HomeTex floral quilts on a sunlit bed",
       width: 2560,
       height: 1019,
@@ -68,7 +68,7 @@ const SLIDES = [
     veil: true,
     headingLead: "Foam crafted for living",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-foam-real-v23-hq.jpg",
+      src: "/karmo/images/home-02/hero/home-hero-slide-foam-real-v23-hq.webp",
       alt: "KARMO HD and KARMO 280 foam stacks in a sunlit mustard living room",
       width: 2560,
       height: 1017,
@@ -81,7 +81,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Crafted for nights that last",
     image: {
-      src: "/karmo/images/mattress/hero/cooling-cat-karmo-handle-hq.jpg",
+      src: "/karmo/images/mattress/hero/cooling-cat-karmo-handle-hq.webp",
       alt: "Karmo mattress in a calm bedroom with a sleeping cat",
       unoptimized: true,
       width: 1983,

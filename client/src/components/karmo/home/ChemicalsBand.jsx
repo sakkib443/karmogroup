@@ -44,7 +44,7 @@ export default function ChemicalsBand() {
       aria-label="Karmo Chemicals"
     >
       <Image
-        src="/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.jpg"
+        src="/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.webp"
         alt="Organized Karmo chemicals warehouse with blue industrial drums"
         fill
         sizes="100vw"

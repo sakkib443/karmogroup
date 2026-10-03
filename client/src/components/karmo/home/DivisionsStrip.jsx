@@ -19,26 +19,26 @@ const divisions = [
   {
     name: "Foam",
     href: "/foam",
-    image: "/karmo/images/home-02/divisions/foam-catalog-match-v1.jpg",
+    image: "/karmo/images/home-02/divisions/foam-catalog-match-v1.webp",
     alt: "Blue Karmo letter-cushion sofa in a cream catalog studio",
   },
   {
     name: "Mattress",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-catalog-v9.png",
+    image: "/karmo/images/home-02/divisions/mattress-catalog-v9.webp",
     alt: "Hand pressing a red floral quilted Karmo mattress",
     position: "object-[center_58%]",
   },
   {
     name: "HomeTex",
     href: "/hometex",
-    image: "/karmo/images/home-02/divisions/hometex-catalog-match-v1.jpg",
+    image: "/karmo/images/home-02/divisions/hometex-catalog-match-v1.webp",
     alt: "Stacked floral Karmo HomeTex quilts in a cream catalog studio",
   },
   {
     name: "Chemicals",
     href: "/chemicals",
-    image: "/karmo/images/home-02/divisions/chemicals-catalog-v6.jpg",
+    image: "/karmo/images/home-02/divisions/chemicals-catalog-v6.webp",
     alt: "Karmo Chemicals adhesive tins in a professional studio",
   },
 ];

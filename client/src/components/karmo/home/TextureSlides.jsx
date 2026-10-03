@@ -11,7 +11,7 @@ import { FiChevronRight } from "react-icons/fi";
 const SLIDES = [
   {
     id: "quilt-side",
-    image: "/karmo/images/home-02/divisions/karmo-pattern-quilt-tuft.jpg",
+    image: "/karmo/images/home-02/divisions/karmo-pattern-quilt-tuft.webp",
     imageOpacity: 0.24,
     overlay: "bg-white/50",
   },
