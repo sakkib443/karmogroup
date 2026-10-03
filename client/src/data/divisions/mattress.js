@@ -57,6 +57,9 @@ const mattress = {
     ],
   },
 
+  /* Homepage StandardStrip — same six cartoon icons, same 5K+ badge. */
+  useHomeTrustStrip: true,
+
   /* Same six pillars + cartoon-v3 icons as the homepage trust strip. */
   features: [
     {
@@ -97,10 +100,14 @@ const mattress = {
     },
   ],
 
-  /* Brochure page 3 — official brand marks. */
+  /* Brochure page 3 — official catalogue spread + bedroom backdrop. */
   brochureBrands: {
     heading: "Our mattress brands",
     kicker: "We test every mattress. Every single one.",
+    image: "/karmo/images/mattress/brochure/page-03-brands-dusk.jpg",
+    imageAlt:
+      "Our mattress brands — Imperial, King, Prestige, Orthopaedic, Bonnell Spring, Natural and Pocket Spring",
+    background: "/karmo/images/mattress/bands/lounge-woman-resting-hq.jpg",
     items: [
       {
         id: "imperial",
@@ -173,10 +180,15 @@ const mattress = {
     ],
   },
 
-  /* Feature mosaic.
+  /* Feature mosaic — hidden on this mattress page.
+     Parked for the mattress details page / single mattress page.
+     Set hidden back to false there (or move this block onto that page)
+     to show Long Lasting, Anti Allergic, Quality Certified, Designed to
+     de-stress, Pocket Springs, Doctor Recommended and the cutaway photo.
      skin: "organized" is the current layout (site type + 2-col layers).
      Set skin back to "mosaic" to restore the previous full-width tile grid. */
   shapeGrid: {
+    hidden: true,
     skin: "organized",
     background: "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg",
     highlights: [
@@ -309,39 +321,6 @@ const mattress = {
     cta: { label: "Find your mattress", href: "#mattress-offers" },
   },
 
-  /* Photo band under the icon strip: empty navy wall on the left for copy,
-     woman resting on a Karmo mattress on the right. Same overlay template
-     as the hero, one left-aligned slide. */
-  lounge: {
-    layout: "overlay",
-    headingLead: "The rest you take",
-    headingAccent: "before night",
-    kicker: "Sink into a Karmo mattress",
-    cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
-    image: {
-      src: "/karmo/images/mattress/bands/lounge-woman-resting-hq.jpg",
-      alt: "A woman resting on a Karmo mattress in a calm bedroom",
-      width: 2000,
-      height: 848,
-    },
-    slides: [
-      {
-        id: "lounge",
-        align: "left",
-        headingLead: "The rest you take",
-        headingAccent: "before night",
-        kicker: "Sink into a Karmo mattress",
-        cta: [{ label: "Find your perfect mattress", href: "#mattress-offers", primary: true }],
-        image: {
-          src: "/karmo/images/mattress/bands/lounge-woman-resting-hq.jpg",
-          alt: "A woman resting on a Karmo mattress in a calm bedroom",
-          width: 2000,
-          height: 848,
-        },
-      },
-    ],
-  },
-
   about: {
     /* Full-bleed photo band used as the mattress hero. First slide is the
        Long Lasting still (beach mattress) — it sits under the header. */
@@ -376,11 +355,12 @@ const mattress = {
           alt: "Karmo mattress on the sand — long-lasting rest by the sea",
           width: 1916,
           height: 821,
-          className: "mattress-hero-first",
+          position: "object-[center_72%]",
         },
       },
       {
         id: "float",
+        paused: true,
         align: "right",
         titleCard: true,
         headingLead: "Crafted for nights that last",
