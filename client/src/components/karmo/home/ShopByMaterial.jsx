@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { FiChevronRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
@@ -29,7 +31,10 @@ const materials = [
     name: "Rebonded Foam",
     line: "Support that lasts",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/rebonded-foam-v5.webp",
+    slides: [
+      "/karmo/images/home-02/materials/rebonded-foam-v14.webp",
+      "/karmo/images/home-02/materials/rebonded-foam-v5.webp",
+    ],
     alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
@@ -72,19 +77,32 @@ const materials = [
 ];
 
 function MaterialCard({ item }) {
+  const slides = item.slides ?? [item.src];
+  const [active, setActive] = useState(0);
+  const reduceMotion = useReducedMotion();
+
   return (
     <motion.article
       variants={fade}
+      whileHover={
+        reduceMotion
+          ? undefined
+          : { y: -8, transition: { duration: 0.7, ease: [0.45, 0, 0.2, 1] } }
+      }
       className={`group relative overflow-hidden bg-[#EFE9E3] ${item.ratio} ${item.span} lg:aspect-auto lg:h-full`}
     >
       <Link href={item.href} className="group relative block h-full overflow-hidden">
-        <Image
-          src={item.src}
-          alt={item.alt}
-          fill
-          sizes={item.sizes}
-          className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-        />
+        {slides.map((src, i) => (
+          <Image
+            key={src}
+            src={src}
+            alt={i === active ? item.alt : ""}
+            aria-hidden={i !== active}
+            fill
+            sizes={item.sizes}
+            className={`object-cover transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.45,0,0.2,1)] group-hover:scale-[1.03] ${i === active ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
 
         <span
           aria-hidden
@@ -109,6 +127,31 @@ function MaterialCard({ item }) {
           </h3>
         </div>
       </Link>
+
+      {slides.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => setActive((a) => (a + 1) % slides.length)}
+            aria-label={`Show ${item.name} image ${((active + 1) % slides.length) + 1} of ${slides.length}`}
+            className="absolute top-1/2 right-3 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-ink/15 bg-white text-ink shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition hover:border-ink/30 hover:text-brand sm:h-11 sm:w-11 lg:right-4"
+          >
+            <FiChevronRight className="text-[20px]" aria-hidden />
+          </button>
+          <div className="absolute bottom-4 left-1/2 z-[2] flex -translate-x-1/2 gap-2">
+            {slides.map((src, i) => (
+              <button
+                key={src}
+                type="button"
+                onClick={() => setActive(i)}
+                aria-label={`Show ${item.name} image ${i + 1}`}
+                aria-current={i === active}
+                className={`h-1.5 rounded-full transition-all ${i === active ? "w-6 bg-white" : "w-1.5 bg-white/55 hover:bg-white/80"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </motion.article>
   );
 }
