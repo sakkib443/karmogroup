@@ -15,6 +15,7 @@ import {
 import { REVIEW_PAGES, STATUS_LABEL } from "@/components/karmo/review/reviewConfig";
 import { fetchReview, formatWhen, submitDecision } from "@/components/karmo/review/reviewApi";
 import ReviewHistory from "@/components/karmo/review/ReviewHistory";
+import ReviewRequests from "@/components/karmo/review/ReviewRequests";
 
 const PAGE = "/";
 const config = REVIEW_PAGES[PAGE];
@@ -36,11 +37,8 @@ const DOT = { pending: "bg-amber-400", approved: "bg-emerald-500", changes: "bg-
 
 const statusOf = (record) => record?.status ?? "pending";
 
-/** Latest "changes" entry of a section (the one the team still has to action). */
-function latestChange(record) {
-  const list = (record?.entries ?? []).filter((e) => e.status === "changes");
-  return list[list.length - 1];
-}
+/** Change requests the team still has to action, oldest first. */
+const openRequests = (record) => (record?.requests ?? []).filter((r) => !r.done);
 
 function StatCard({ label, value, tone }) {
   return (
@@ -90,27 +88,28 @@ export default function ReviewDashboard() {
     return c;
   }, [sections, records]);
 
+  const openTotal = sections.reduce((n, s) => n + openRequests(records[s.id]).length, 0);
   const pct = sections.length ? Math.round((counts.approved / sections.length) * 100) : 0;
   const visible = sections.filter((s) => filter === "all" || statusOf(records[s.id]) === filter);
 
-  const reset = async (id) => {
-    try {
-      const section = await submitDecision({ page: PAGE, id, status: "reset", name: "Team" });
-      setRecords((prev) => ({ ...prev, [id]: section }));
-    } catch {
-      /* the next poll will show the truth */
-    }
+  const act = async (id, payload) => {
+    const section = await submitDecision({ page: PAGE, id, ...payload });
+    setRecords((prev) => ({ ...prev, [id]: section }));
   };
 
+  // A failed reset just waits for the next poll to show the truth.
+  const reset = (id) => act(id, { status: "reset" }).catch(() => {});
+
   const copyChangeList = async () => {
-    const lines = [`HOMEPAGE - CHANGE REQUESTS (${counts.changes})`, ""];
+    const lines = [`HOMEPAGE - OPEN CHANGE REQUESTS (${openTotal})`, ""];
     sections.forEach((s) => {
-      const rec = records[s.id];
-      if (statusOf(rec) !== "changes") return;
-      const entry = latestChange(rec);
-      lines.push(`[ ] ${s.label}`);
-      if (entry?.note) lines.push(`    ${entry.note.replace(/\n/g, "\n    ")}`);
-      (entry?.images ?? []).forEach((u) => lines.push(`    image: ${window.location.origin}${u}`));
+      const open = openRequests(records[s.id]);
+      if (!open.length) return;
+      lines.push(s.label);
+      open.forEach((req) => {
+        lines.push(`  [ ] ${(req.note || "(image only)").replace(/\n/g, "\n      ")}`);
+        (req.images ?? []).forEach((u) => lines.push(`      image: ${window.location.origin}${u}`));
+      });
       lines.push("");
     });
     try {
@@ -198,7 +197,7 @@ export default function ReviewDashboard() {
           <button
             type="button"
             onClick={copyChangeList}
-            disabled={!counts.changes}
+            disabled={!openTotal}
             className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-[12px] font-bold text-white shadow-[0_10px_22px_-10px_rgba(212,67,72,0.8)] transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
           >
             {copied ? <FiCheck /> : <FiClipboard />}
@@ -219,7 +218,8 @@ export default function ReviewDashboard() {
             const record = records[section.id];
             const status = statusOf(record);
             const open = openId === section.id;
-            const change = latestChange(record);
+            const pendingReqs = openRequests(record);
+            const change = pendingReqs[pendingReqs.length - 1];
             return (
               <li
                 key={section.id}
@@ -270,7 +270,7 @@ export default function ReviewDashboard() {
                       >
                         <FiExternalLink /> View on page
                       </Link>
-                      {status !== "pending" && (
+                      {(status !== "pending" || record?.requests?.length > 0) && (
                         <button
                           type="button"
                           onClick={() => reset(section.id)}
@@ -280,8 +280,28 @@ export default function ReviewDashboard() {
                         </button>
                       )}
                     </div>
+                    {pendingReqs.length > 0 && (
+                      <div className="mt-5">
+                        <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/40">
+                          Open requests &middot; {pendingReqs.length}
+                        </p>
+                        <ReviewRequests
+                          requests={record.requests}
+                          onAction={(action, requestId, note) => act(section.id, { status: action, requestId, note })}
+                          className="mt-3"
+                        />
+                      </div>
+                    )}
                     {record?.entries?.length ? (
-                      <ReviewHistory entries={record.entries} className="mt-5" />
+                      <div className="mt-6">
+                        <p className="text-[10.5px] font-bold uppercase tracking-[0.2em] text-ink/40">History</p>
+                        <ReviewHistory
+                          entries={record.entries}
+                          requests={record.requests}
+                          onReopen={(requestId) => act(section.id, { status: "reopened", requestId })}
+                          className="mt-3"
+                        />
+                      </div>
                     ) : (
                       <p className="mt-4 text-[13px] text-ink/50">No activity on this section yet.</p>
                     )}

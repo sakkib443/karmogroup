@@ -55,7 +55,10 @@ export async function POST(request) {
   try {
     const section = await recordDecision(checked.value);
     return NextResponse.json({ ok: true, section }, { headers: NO_STORE });
-  } catch {
+  } catch (err) {
+    if (err?.code === "GONE") {
+      return NextResponse.json({ ok: false, error: err.message }, { status: 409, headers: NO_STORE });
+    }
     return NextResponse.json(
       { ok: false, error: "Could not save. Please try again." },
       { status: 500, headers: NO_STORE },

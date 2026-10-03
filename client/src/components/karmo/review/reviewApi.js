@@ -67,6 +67,21 @@ export function formatWhen(iso) {
   }
 }
 
+/** Exact moment, kept on every history line: "3 Oct 2026, 4:05 PM". */
+export function formatFull(iso) {
+  try {
+    return new Date(iso).toLocaleString(undefined, {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
 export function timeAgo(iso) {
   const secs = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
   if (secs < 60) return "just now";
