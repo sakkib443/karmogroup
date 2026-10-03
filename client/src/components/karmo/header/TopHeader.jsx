@@ -23,7 +23,7 @@ const socials = [
 export default function TopHeader() {
   return (
     <div className="bg-brand text-white">
-      <div className="shell-home-two flex h-8 items-center justify-between gap-3 sm:gap-6">
+      <div className="shell-header flex h-8 items-center justify-between gap-3 sm:gap-6">
         <p className="flex min-w-0 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] sm:gap-3 sm:text-[11px] sm:tracking-[0.12em]">
           <a
             href="tel:+8801713483284"

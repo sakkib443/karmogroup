@@ -16,26 +16,26 @@ const pillars = [
     id: "number-one",
     src: "/karmo/images/home-02/trust/badge-number-one-gold-fullheight.webp",
     alt: "Bangladesh’s number one comfort brand badge",
-    title: "Number one",
+    title: "Number one brand",
     body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
   },
   {
     id: "iso",
-    src: "/karmo/images/home-02/certified/logos/logo-iso-9001-gold.webp",
+    src: "/karmo/images/home-02/certified/logos/logo-iso-9001-gold-v9.webp",
     alt: "ISO 9001 quality management gold seal",
     title: "ISO 9001",
     body: "International Organization for Standardization — the international standard for quality management.",
   },
   {
     id: "ukas",
-    src: "/karmo/images/home-02/certified/logos/logo-ukas-gold-v5.webp",
+    src: "/karmo/images/home-02/certified/logos/logo-ukas-gold-v10.webp",
     alt: "UKAS Quality Management gold badge, registration number 014",
     title: "UKAS Quality Management",
     body: "Registration Number 014 — registered name Karmo Foam & Adhesive Industries Ltd.",
   },
   {
     id: "moody",
-    src: "/karmo/images/home-02/certified/logos/logo-moody-gold-v5.webp",
+    src: "/karmo/images/home-02/certified/logos/logo-moody-gold-matte.webp",
     alt: "Moody International gold mark — ISO 9001 Approved",
     title: "Moody International",
     body: "ISO 9001 Approved — independent certification of the quality-management system.",
@@ -108,7 +108,7 @@ export default function CertifiedBy() {
                   width={1024}
                   height={1024}
                   sizes="(min-width: 1024px) 272px, 248px"
-                  quality={80}
+                  unoptimized
                   className="h-full w-full object-contain"
                 />
               </div>

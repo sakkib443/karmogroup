@@ -83,7 +83,7 @@ export default function DivisionsStrip() {
 
   return (
     <section className="relative overflow-hidden bg-white py-8 md:py-10">
-      <TextureSlides />
+      <TextureSlides lighter />
 
       <motion.div
         variants={group}
