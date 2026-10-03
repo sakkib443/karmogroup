@@ -124,7 +124,7 @@ export default function Partners() {
       className="relative overflow-hidden pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
       aria-label="Partners and clients"
     >
-      <TextureSlides />
+      <TextureSlides lighter />
 
       <motion.div
         variants={group}

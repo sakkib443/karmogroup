@@ -25,6 +25,7 @@ import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
+import StandardStrip from "@/components/karmo/home/StandardStrip";
 
 /** Scroll to `#hash` after navigation (Next client router often skips this). */
 function useHashScroll() {
@@ -120,7 +121,11 @@ export default function DivisionPage({ data }) {
       {data.about?.asHero && !data.bedAutomotiveHero && !data.videoHero && (
         <DivisionAbout {...data.about} />
       )}
-      <DivisionFeatures items={data.features} />
+      {data.useHomeTrustStrip ? (
+        <StandardStrip />
+      ) : (
+        <DivisionFeatures items={data.features} />
+      )}
       {data.furnitureBrands && <FurnitureBrands {...data.furnitureBrands} />}
       {data.furnitureGrades && (
         <FurnitureGradesLineup {...data.furnitureGrades} />
@@ -136,7 +141,7 @@ export default function DivisionPage({ data }) {
       {data.about && !data.about.asHero && data.about.beforeShapeGrid && (
         <DivisionAbout {...data.about} />
       )}
-      {data.shapeGrid &&
+      {data.shapeGrid && !data.shapeGrid.hidden &&
         (data.shapeGridVariant === "hometex" ? (
           <HometexShapeGrid {...data.shapeGrid} />
         ) : data.shapeGridVariant === "bed-automotive-legacy" ? (

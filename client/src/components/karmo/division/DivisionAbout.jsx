@@ -60,7 +60,7 @@ export default function DivisionAbout({
   if (layout === "overlay") {
     const frames =
       slides?.length > 0
-        ? slides
+        ? slides.filter((s) => !s.paused)
         : [
             {
               id: "about",
