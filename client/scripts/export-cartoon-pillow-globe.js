@@ -10,7 +10,7 @@ const OUT = path.join(
 const SIZE = 320;
 
 const JOBS = [
-  { src: "sketch-pillow-clean.jpg", out: "sketch-pillow-clean.webp", inner: 308 },
+  { src: "stores-noface.jpg", out: "stores-v3.webp", inner: 300 },
 ];
 
 const LEAF = [165, 206, 103];
@@ -43,10 +43,14 @@ function punchPackColors(data) {
 function isPaper(r, g, b) {
   const min = Math.min(r, g, b);
   const max = Math.max(r, g, b);
-  return min > 246 && max - min < 10;
+  return min > 232 && max - min < 18;
 }
 
-function knockEdgePaper(data, width, height) {
+function isLetterbox(r, g, b) {
+  return Math.max(r, g, b) < 36;
+}
+
+function knockEdge(data, width, height, pred) {
   const n = width * height;
   const seen = new Uint8Array(n);
   const q = [];
@@ -55,7 +59,8 @@ function knockEdgePaper(data, width, height) {
     const i = y * width + x;
     if (seen[i]) return;
     const o = i * 4;
-    if (!isPaper(data[o], data[o + 1], data[o + 2])) return;
+    if (data[o + 3] < 8) return;
+    if (!pred(data[o], data[o + 1], data[o + 2])) return;
     seen[i] = 1;
     q.push(i);
   };
@@ -79,14 +84,74 @@ function knockEdgePaper(data, width, height) {
   }
 }
 
+function isFrameGrey(r, g, b) {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  return max - min < 16 && max >= 36 && max <= 220;
+}
+
+function knockMatchingFromClear(data, width, height, pred) {
+  const seen = new Uint8Array(width * height);
+  const q = [];
+  const tryPush = (x, y) => {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const i = y * width + x;
+    if (seen[i]) return;
+    const o = i * 4;
+    if (data[o + 3] < 8) return;
+    if (!pred(data[o], data[o + 1], data[o + 2])) return;
+    seen[i] = 1;
+    q.push(i);
+  };
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const o = (y * width + x) * 4;
+      const edge = x === 0 || y === 0 || x === width - 1 || y === height - 1;
+      if (data[o + 3] < 8 || edge) {
+        if (edge) tryPush(x, y);
+        tryPush(x - 1, y);
+        tryPush(x + 1, y);
+        tryPush(x, y - 1);
+        tryPush(x, y + 1);
+      }
+    }
+  }
+  while (q.length) {
+    const i = q.pop();
+    const x = i % width;
+    const y = (i - x) / width;
+    data[i * 4 + 3] = 0;
+    tryPush(x - 1, y);
+    tryPush(x + 1, y);
+    tryPush(x, y - 1);
+    tryPush(x, y + 1);
+  }
+}
+
+function wipeFarCorners(data, width, height, frac = 0.08) {
+  const m = Math.round(Math.min(width, height) * frac);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const far =
+        (x < m && y < m) ||
+        (x > width - 1 - m && y < m) ||
+        (x < m && y > height - 1 - m) ||
+        (x > width - 1 - m && y > height - 1 - m);
+      if (far) data[(y * width + x) * 4 + 3] = 0;
+    }
+  }
+}
+
 async function toClearSquare(file, inner) {
   const { data, info } = await sharp(file)
-    .flatten({ background: "#ffffff" })
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const buf = Buffer.from(data);
-  knockEdgePaper(buf, info.width, info.height);
+  knockEdge(buf, info.width, info.height, isLetterbox);
+  knockMatchingFromClear(buf, info.width, info.height, isFrameGrey);
+  knockMatchingFromClear(buf, info.width, info.height, isPaper);
+  wipeFarCorners(buf, info.width, info.height);
   punchPackColors(buf);
   const knocked = await sharp(buf, {
     raw: { width: info.width, height: info.height, channels: 4 },
