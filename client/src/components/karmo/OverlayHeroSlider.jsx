@@ -33,6 +33,45 @@ const copyItem = {
  * band: photo fills the frame, copy sits left or right per slide, autoplay +
  * dots. Used on the homepage (viewport tall) and division overlay bands.
  */
+/**
+ * Video slide background: muted, inline, restarts from the first frame each
+ * time its slide comes on and pauses while another slide is showing.
+ */
+function SlideVideo({ video, on }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (on) {
+      // React does not render the `muted` attribute, and browsers refuse to
+      // autoplay a video they don't know is muted — set it before playing.
+      el.muted = true;
+      el.playbackRate = video.rate || 1;
+      el.currentTime = 0;
+      const start = () => el.play().catch(() => {});
+      start();
+      // First load: the clip may not be ready yet, try again once it is.
+      el.addEventListener("canplay", start, { once: true });
+      return () => el.removeEventListener("canplay", start);
+    } else {
+      el.pause();
+    }
+  }, [on, video.rate]);
+  return (
+    <video
+      ref={ref}
+      src={video.src}
+      poster={video.poster}
+      muted
+      playsInline
+      loop={Boolean(video.loop)}
+      preload="auto"
+      aria-hidden
+      className={`absolute inset-0 h-full w-full object-cover ${video.position || "object-center"}`}
+    />
+  );
+}
+
 export default function OverlayHeroSlider({
   slides = [],
   asHero = false,
@@ -57,14 +96,16 @@ export default function OverlayHeroSlider({
 
   useEffect(() => {
     if (reduce || slides.length < 2) return undefined;
+    // A slide can set its own hold time (a video slide holds for the clip).
     const delay =
-      !firstAdvanceDone.current && active === 0 ? firstSlideMs : autoplayMs;
+      slides[active]?.holdMs ??
+      (!firstAdvanceDone.current && active === 0 ? firstSlideMs : autoplayMs);
     const t = setTimeout(() => {
       firstAdvanceDone.current = true;
       setActive((a) => (a + 1) % slides.length);
     }, delay);
     return () => clearTimeout(t);
-  }, [active, reduce, slides.length, autoplayMs, firstSlideMs]);
+  }, [active, reduce, slides, autoplayMs, firstSlideMs]);
 
   const fadeMs = useMemo(
     () => (reduce ? { duration: 0 } : { duration: fadeDuration, ease: EASE }),
@@ -118,6 +159,9 @@ export default function OverlayHeroSlider({
                 transition={fadeMs}
                 className="absolute inset-0 will-change-transform"
               >
+                {s.video ? (
+                  <SlideVideo video={s.video} on={on} />
+                ) : (
                 <Image
                   src={s.image.src}
                   alt={on ? s.image.alt : ""}
@@ -131,7 +175,8 @@ export default function OverlayHeroSlider({
                     s.image.position || "object-center"
                   } ${s.image.className || ""}`}
                 />
-                {s.image.overlay ? (
+                )}
+                {s.image?.overlay ? (
                   <Image
                     src={s.image.overlay}
                     alt=""

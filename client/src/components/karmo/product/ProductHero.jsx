@@ -149,6 +149,17 @@ export default function ProductHero({ product }) {
     }
   };
 
+  // Open on the size passed from a listing card (/mattress/king?size=king),
+  // overriding the Queen default. Runs after the slug reset above.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const wanted = new URLSearchParams(window.location.search).get("size");
+    if (!wanted) return;
+    const match = product.sizes?.find((s) => s.id === wanted);
+    if (match) pickSize(match);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.slug]);
+
   const discountPct = OFFER_DISCOUNT_PCT;
 
   const quote = useMemo(() => {

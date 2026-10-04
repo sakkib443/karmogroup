@@ -93,7 +93,7 @@ export const KARMO_LETTER_GALLERY = KING_LETTER_GALLERY;
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/karmo/images/mattress/products/king-cover-hq.png",
+  "/karmo/images/mattress/products/king-cover-luxury-floral-v2.png",
   "/karmo/images/mattress/products/king-gallery/angle-front-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-side-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-detail-v4.webp",

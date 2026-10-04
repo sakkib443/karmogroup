@@ -6,8 +6,50 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import {
+  quoteMattressPrice,
+  sizePresetsFor,
+} from "@/components/karmo/product/mattressPricing";
 
 const ORANGE = "#FF9A1F";
+
+/* Card size label (Single/Double/Queen/King) -> pricing preset id. */
+const SIZE_TO_PRESET = { Single: "single", Double: "double", Queen: "queen", King: "king" };
+/* The catalogue now/was pair is the Queen quote at this discount; keep it. */
+const OFFER_DISCOUNT = 15;
+
+/* The pricing SKU slug for an item: the last segment of its detail href
+   (matches the keys in PRICING_RULES), falling back to the item id. */
+function pricingSlugFor(item) {
+  const seg = String(item.href || "").split("/").filter(Boolean).pop();
+  return seg && seg !== "mattress" ? seg : item.id;
+}
+
+const taka = (n) => `৳ ${Math.round(n).toLocaleString("en-US")}`;
+
+/* Real now/was for one size from the client sales formulas. Falls back to the
+   item's static strings when the SKU has no pricing rule (e.g. topper). */
+function priceForSize(item, sizeLabel) {
+  const slug = pricingSlugFor(item);
+  const presetId = SIZE_TO_PRESET[sizeLabel] || "queen";
+  const preset = sizePresetsFor(slug).find((s) => s.id === presetId);
+  if (preset) {
+    const args = { length: preset.l, width: preset.w, height: preset.h };
+    const base = quoteMattressPrice(slug, { ...args, discountPct: 0 });
+    const off = quoteMattressPrice(slug, { ...args, discountPct: OFFER_DISCOUNT });
+    if (base.ok && off.ok) {
+      return { now: taka(off.total), was: item.was ? taka(base.base) : null };
+    }
+  }
+  return { now: item.now, was: item.was };
+}
+
+/* Carry the chosen size to the detail page so its calculator opens on it. */
+function sizedHref(href, sizeLabel) {
+  const presetId = SIZE_TO_PRESET[sizeLabel];
+  if (!href || !presetId) return href;
+  return `${href}${href.includes("?") ? "&" : "?"}size=${presetId}`;
+}
 
 const SIZE_OPTIONS = [
   {
@@ -142,9 +184,10 @@ function ProductTile({ item, detailHref }) {
 
 /** 3D float offer card — raised product, center-aligned info stack. */
 function MattressFloatCard({ item }) {
-  const href = item.href || "/mattress";
   const [size, setSize] = useState(item.defaultSize || "Queen");
-  const pct = discountPct(item.was, item.now);
+  const price = priceForSize(item, size);
+  const href = sizedHref(item.href || "/mattress", size);
+  const pct = discountPct(price.was, price.now);
   const rating = item.rating ?? 4.8;
   const reviews = item.reviews ?? 120;
   const specs = item.specs || [];
@@ -211,10 +254,10 @@ function MattressFloatCard({ item }) {
           <div className="mt-4 flex flex-col items-center">
             <div className="flex items-baseline justify-center gap-2.5">
               <span className="text-[1.35rem] font-bold tabular-nums leading-none text-brand sm:text-[1.5rem]">
-                {item.now}
+                {price.now}
               </span>
-              {item.was ? (
-                <s className="text-[13px] tabular-nums text-ink/35">{item.was}</s>
+              {price.was ? (
+                <s className="text-[13px] tabular-nums text-ink/35">{price.was}</s>
               ) : null}
             </div>
             {pct != null ? (
@@ -306,9 +349,10 @@ function MattressFloatCard({ item }) {
 
 /** Mattress catalogue card — rating, specs, cartoon sizes. */
 function MattressCatalogueCard({ item }) {
-  const href = item.href || "/mattress";
   const [size, setSize] = useState(item.defaultSize || "Queen");
-  const pct = discountPct(item.was, item.now);
+  const price = priceForSize(item, size);
+  const href = sizedHref(item.href || "/mattress", size);
+  const pct = discountPct(price.was, price.now);
   const rating = item.rating ?? 4.8;
   const reviews = item.reviews ?? 120;
   const specs = item.specs || [];
@@ -322,7 +366,7 @@ function MattressCatalogueCard({ item }) {
     >
       <Link
         href={href}
-        className="relative block aspect-[5/4] shrink-0 overflow-hidden bg-[#F4F6F8] focus-visible:outline-none"
+        className="relative block aspect-[5/4] shrink-0 overflow-hidden bg-white focus-visible:outline-none"
       >
         <Image
           src={item.image}
@@ -341,6 +385,7 @@ function MattressCatalogueCard({ item }) {
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             aria-hidden
             className="object-contain object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
+            style={{ objectFit: "contain", objectPosition: "center" }}
           />
         ) : null}
         {badge ? (
@@ -377,10 +422,10 @@ function MattressCatalogueCard({ item }) {
 
           <div className="flex min-w-0 flex-col items-end justify-start text-right">
             <span className="text-[18px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
-              {item.now}
+              {price.now}
             </span>
-            {item.was ? (
-              <s className="mt-1 text-[12px] tabular-nums text-ink/40">{item.was}</s>
+            {price.was ? (
+              <s className="mt-1 text-[12px] tabular-nums text-ink/40">{price.was}</s>
             ) : null}
             {pct != null ? (
               <span
