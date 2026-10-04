@@ -93,7 +93,7 @@ export const KARMO_LETTER_GALLERY = KING_LETTER_GALLERY;
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/karmo/images/mattress/products/king-cover-luxury-floral-v2.png",
+  "/karmo/images/mattress/products/king-cover-luxury-floral-v2.webp",
   "/karmo/images/mattress/products/king-gallery/angle-front-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-side-v4.webp",
   "/karmo/images/mattress/products/king-gallery/angle-detail-v4.webp",
@@ -124,7 +124,7 @@ function buildRealGallery(item) {
   const shots = [
     item.image,
     item.imageHover,
-    "/karmo/images/mattress/products/matrex-p1.jpg",
+    "/karmo/images/mattress/products/matrex-p1.webp",
   ].filter(Boolean);
   return [...new Set(shots)];
 }
