@@ -79,10 +79,12 @@ function ClaimRow() {
   );
 }
 
+/* Wraps (balanced) instead of overflowing: in the narrow side panel on a
+   smaller laptop the one-line title ran off the screen. */
 function Heading({ className = "" }) {
   return (
     <h2
-      className={`display title-card-line whitespace-nowrap uppercase text-white ${className}`}
+      className={`display title-card-line max-w-full text-balance break-words uppercase text-white ${className}`}
       style={TITLE_STYLE}
     >
       Soles built to carry the day
