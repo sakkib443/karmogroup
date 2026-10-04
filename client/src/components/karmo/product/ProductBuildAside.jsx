@@ -260,7 +260,7 @@ export default function ProductBuildAside() {
 
           <div className="relative mt-5 w-full max-w-[24rem]">
             <Image
-              src="/karmo/images/mattress/brochure/inside/pocket-cutaway-cutout.png"
+              src="/karmo/images/mattress/brochure/inside/pocket-cutaway-cutout.webp"
               alt="Karmo pocket-spring mattress with the pillow top peeled back to show foam wadding and coils"
               width={1280}
               height={720}

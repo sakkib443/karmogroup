@@ -9,7 +9,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * Full-bleed mattress story band — heading + description dead-centre.
  */
 
-const BG = "/karmo/images/mattress/bands/sleep-well-film-still-hq.jpg";
+const BG = "/karmo/images/mattress/bands/sleep-well-film-still-hq.webp";
 
 export default function ProductMattressBanner() {
   const reduceMotion = useReducedMotion();
