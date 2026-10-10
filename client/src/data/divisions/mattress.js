@@ -579,7 +579,7 @@ const mattress = {
         shortName: "Prestige",
         href: "/mattress/prestige",
         image: "/karmo/images/mattress/products/prestige-cover-luxury-floral.webp",
-        imageHover: "/karmo/images/mattress/products/prestige-hover-white-v3.webp",
+        imageHover: "/karmo/images/mattress/products/prestige-hover-white-v4.webp",
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
         now: "৳ 10,447",
