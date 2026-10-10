@@ -138,7 +138,7 @@ const foamFurniture = {
 
   shapeGrid: {
     skin: "organized",
-    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
     highlights: [
       {
         id: "no-filler",
@@ -179,7 +179,7 @@ const foamFurniture = {
       heading: "Inside every",
       accent: "set",
       body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
-      background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+      background: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
       layers: [
         {
           id: "open-cell",
@@ -328,7 +328,7 @@ const foamFurniture = {
     headingAccent: "for you",
     body: "Furniture grades from the Karmo Foam Catalogue — Poly, 280, 480, 2001, HD, 4G, 1965 and Signature. Cut as sets. No filler used.",
     textured: true,
-    textureSrc: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    textureSrc: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
     variant: "catalogue",
     offersId: "foam-offers",
     items: [

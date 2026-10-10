@@ -104,7 +104,7 @@ const hometex = {
 
   shapeGrid: {
     skin: "organized",
-    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
     highlights: [
       {
         id: "luxury-woven",
@@ -255,7 +255,7 @@ const hometex = {
         id: "comforters",
         name: "Comforters",
         line: "Season-ready warmth",
-        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
+        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.webp",
         alt: "Karmo HomeTex comforter",
       },
       {
@@ -297,7 +297,7 @@ const hometex = {
         id: "premium-comforter",
         category: "comforters",
         name: "Premium Comforter",
-        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
+        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.webp",
         alt: "Karmo premium comforter",
         was: "৳ 4,500",
         now: "৳ 3,825",
@@ -333,7 +333,7 @@ const hometex = {
         id: "studio-duvet",
         category: "comforters",
         name: "Studio Duvet",
-        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png",
+        image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.webp",
         alt: "Karmo studio duvet",
         was: "৳ 5,200",
         now: "৳ 4,420",

@@ -42,7 +42,7 @@ const chemicals = {
     },
     {
       id: "certified",
-      icon: "/karmo/images/trust/trusted-families.png",
+      icon: "/karmo/images/trust/trusted-families.webp",
       title: "Quality Certified",
       note: "Consistent, tested batches",
     },
@@ -118,7 +118,7 @@ const chemicals = {
 
   _shapeGrid: {
     className: "px-4 md:px-2 lg:px-4 2xl:px-6",
-    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+    background: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
     highlights: [
       {
         id: "no-filler",

@@ -13,15 +13,15 @@ const INTERVAL_MS = 1100;
 
 const DEFAULT_SLIDES = [
   {
-    src: "/karmo/images/product/lifestyle/pose-side.jpg",
+    src: "/karmo/images/product/lifestyle/pose-side.webp",
     alt: "Resting on the side on a Karmo mattress",
   },
   {
-    src: "/karmo/images/product/lifestyle/pose-back.jpg",
+    src: "/karmo/images/product/lifestyle/pose-back.webp",
     alt: "Resting on the back on a Karmo mattress",
   },
   {
-    src: "/karmo/images/product/lifestyle/pose-sit.jpg",
+    src: "/karmo/images/product/lifestyle/pose-sit.webp",
     alt: "Sitting up in bed on a Karmo mattress",
   },
 ];

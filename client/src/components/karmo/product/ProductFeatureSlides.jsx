@@ -26,17 +26,17 @@ const Y_TO = "-1.6%";
 const SLIDES = [
   {
     id: "pose-01",
-    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-01.png",
+    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-01.webp",
     alt: "Side sleep on a Karmo mattress — young woman at rest",
   },
   {
     id: "pose-02",
-    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-02d.png",
+    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-02d.webp",
     alt: "Back sleep on the same Karmo mattress — young man at rest",
   },
   {
     id: "pose-03",
-    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-03.png",
+    src: "/karmo/images/product/lifestyle/karmo-comfort-v3-pose-03.webp",
     alt: "Stomach sleep on the same Karmo mattress — mature sleeper",
   },
 ];
@@ -88,7 +88,7 @@ export default function ProductFeatureSlides() {
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.webp"
           alt=""
           fill
           sizes="100vw"

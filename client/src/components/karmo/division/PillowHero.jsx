@@ -16,7 +16,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * flat-lay, which now lives in the lower "Cloud-Like Comfort" band.
  */
 const HERO = {
-  src: "/karmo/images/hometex/pillow/karmo-pillow-cane-sideboard-hero.png",
+  src: "/karmo/images/hometex/pillow/karmo-pillow-cane-sideboard-hero.webp",
   alt: "Two white Karmo pillows stacked on a light wood cane sideboard, one with an open corner showing its soft filling beside a pile of feathers, with dried-branch vases and a lantern against a cream wall",
   title: "PREMIUM COMFORT",
 };

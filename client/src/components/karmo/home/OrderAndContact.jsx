@@ -114,7 +114,7 @@ export default function OrderAndContact({ textureSlides = false }) {
       ) : (
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <Image
-            src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+            src="/karmo/images/mattress/mosaic/karmo-pattern-texture.webp"
             alt=""
             fill
             sizes="100vw"

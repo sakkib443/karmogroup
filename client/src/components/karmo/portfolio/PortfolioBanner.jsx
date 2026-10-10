@@ -16,7 +16,7 @@ export default function PortfolioBanner() {
   return (
     <section className="relative h-[min(72vw,520px)] min-h-[280px] w-full overflow-hidden bg-ink lg:h-[min(46vw,540px)]">
       <Image
-        src="/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.png"
+        src="/karmo/images/home-02/divisions/hometex-karmo-bedding-studio.webp"
         alt="A Karmo HomeTex bedding set photographed in studio"
         fill
         priority

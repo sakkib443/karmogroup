@@ -12,10 +12,33 @@ const DESKTOP_H = "calc(100svh - 64px)";
 
 export default function MattressBrands({
   heading,
+  imageAlt,
   background,
+  composed = false,
   items = [],
 }) {
   if (!items.length && !background) return null;
+
+  if (composed && background) {
+    return (
+      <section
+        id="our-mattress-brands"
+        aria-label={heading || "Our mattress brands"}
+        className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0c1c33]"
+        style={{ ["--mattress-brands-h"]: "auto" }}
+      >
+        <div className="relative aspect-[1916/821] w-full">
+          <Image
+            src={background}
+            alt={imageAlt || heading || "Our mattress brands"}
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

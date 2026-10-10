@@ -183,7 +183,7 @@ export default function ProductFoamBuildAside() {
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/foam/foam-texture-bg.jpg"
+          src="/karmo/images/foam/foam-texture-bg.webp"
           alt=""
           fill
           sizes="100vw"
@@ -250,11 +250,11 @@ export default function ProductFoamBuildAside() {
           >
             <TallMorph />
             <StillTile
-              src="/karmo/images/foam-2/pdp/build-02.jpg"
+              src="/karmo/images/foam-2/pdp/build-02.webp"
               label={foamProductFeatures[0]?.title || "Pure rubber"}
             />
             <StillTile
-              src="/karmo/images/foam-2/pdp/build-03.jpg"
+              src="/karmo/images/foam-2/pdp/build-03.webp"
               label={foamProductFeatures[1]?.title || "Cut clean"}
             />
           </div>

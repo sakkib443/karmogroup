@@ -843,7 +843,7 @@ export default function HometexShapeGrid({
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const bg =
-    background || "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg";
+    background || "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp";
   const hasInside = Boolean(inside);
   const hasFilm = Boolean(film || still);
   const organized = skin === "organized";

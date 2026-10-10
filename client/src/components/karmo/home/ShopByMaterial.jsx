@@ -31,11 +31,10 @@ const materials = [
     name: "Rebonded Foam",
     line: "Support that lasts",
     href: "/mattress",
-    slides: [
-      "/karmo/images/home-02/materials/rebonded-foam-v14.webp",
-      "/karmo/images/home-02/materials/rebonded-foam-v5.webp",
-    ],
+    src: "/karmo/images/home-02/materials/rebonded-foam-v14.webp",
     alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
+    /* The chip colour is the point of this photo — only a soft wash behind the type. */
+    wash: "bg-gradient-to-r from-black/35 via-black/10 to-transparent",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
     span: "lg:col-start-1 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
@@ -106,10 +105,10 @@ function MaterialCard({ item }) {
 
         <span
           aria-hidden
-          className="absolute inset-0 bg-black/40"
+          className={`absolute inset-0 ${item.wash || "bg-black/40"}`}
         />
 
-        <div className="absolute inset-0 z-[1] flex flex-col items-start justify-start px-5 pb-5 pt-24 sm:px-6 sm:pt-32 lg:justify-center lg:px-9 lg:pb-0 lg:pt-0">
+        <div className={`absolute inset-0 z-[1] flex flex-col items-start justify-start px-5 pb-5 pt-24 sm:px-6 sm:pt-32 lg:justify-center lg:px-9 lg:pb-0 lg:pt-0 ${item.wash ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.45)]" : ""}`}>
           <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/85 sm:text-[11px]">
             {item.name}
           </span>

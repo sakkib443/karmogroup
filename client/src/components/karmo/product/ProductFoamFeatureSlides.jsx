@@ -63,7 +63,7 @@ export default function ProductFoamFeatureSlides() {
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/foam/foam-texture-bg.jpg"
+          src="/karmo/images/foam/foam-texture-bg.webp"
           alt=""
           fill
           sizes="100vw"

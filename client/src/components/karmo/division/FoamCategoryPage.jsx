@@ -41,7 +41,7 @@ const CATEGORIES = {
 // footwear content, which does not belong on this page. Only the highlight-0
 // background (train) and the spotlight image (banner-01) are this page's own.
 const BED_AUTOMOTIVE_SHAPEGRID = {
-  background: "/karmo/images/foam-2/mosaic/foam-texture-hq.jpg",
+  background: "/karmo/images/foam-2/mosaic/foam-texture-hq.webp",
   highlights: [
     {
       id: "no-filler",
@@ -50,7 +50,7 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
       title: "No Filler",
       overview:
         "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-      background: "/karmo/images/bed_&_automotive/train.png",
+      background: "/karmo/images/bed_&_automotive/train.webp",
     },
     {
       id: "long-durability",
@@ -70,7 +70,7 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
     },
   ],
   spotlight: {
-    image: "/karmo/images/foam/banner-01.png",
+    image: "/karmo/images/foam/banner-01.webp",
     alt: "A calm living room with deep foam sofa seating",
     /* Light scrim so the dark heading stays readable against the bright sky —
        the client's ask; the image had none before. */
@@ -120,19 +120,19 @@ export function buildFoamCategoryData(key) {
       columns: [
         {
           id: "sleep",
-          image: "/karmo/images/foam-2/bed-automotive/why-sleep-landscape-v2.png",
+          image: "/karmo/images/foam-2/bed-automotive/why-sleep-landscape-v2.webp",
           alt: "A woman resting comfortably on a bed in a naturally lit bedroom",
           caption: "Comfort that supports restful sleep",
         },
         {
           id: "journey",
-          image: "/karmo/images/foam-2/bed-automotive/why-journey-landscape-v2.png",
+          image: "/karmo/images/foam-2/bed-automotive/why-journey-landscape-v2.webp",
           alt: "A passenger relaxing in a cushioned bus seat beside a coastal view",
           caption: "Comfort that travels with you",
         },
         {
           id: "support",
-          image: "/karmo/images/foam-2/bed-automotive/why-support-landscape-v2.png",
+          image: "/karmo/images/foam-2/bed-automotive/why-support-landscape-v2.webp",
           alt: "Bed and bus seat cushioning shown together with their foam layers",
           caption: "Support for beds and beyond",
         },
@@ -145,7 +145,7 @@ export function buildFoamCategoryData(key) {
       ...foam.lounge,
       image: {
         ...foam.lounge.image,
-        src: "/karmo/images/bed_&_automotive/banner-01.png",
+        src: "/karmo/images/bed_&_automotive/banner-01.webp",
         position: "object-top"
       },
       slides: [{
@@ -156,7 +156,7 @@ export function buildFoamCategoryData(key) {
         kicker: "",
         cta: null,
         image: { 
-          src: "/karmo/images/bed_&_automotive/banner-01.png", 
+          src: "/karmo/images/bed_&_automotive/banner-01.webp", 
           alt: "Bed & Automotive Banner",
           position: "object-top"
         },

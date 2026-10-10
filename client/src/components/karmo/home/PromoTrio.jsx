@@ -21,8 +21,8 @@ const feature = {
   eyebrow: "Our popular products",
   titleLines: ["Foam seating", "collection"],
   href: "/foam",
-  src: "/karmo/images/home-02/promo-trio/feature-foam-seating-pro-v3.webp",
-  alt: "Cream armchair with gold legs in a sunlit Karmo living room",
+  src: "/karmo/images/home-02/promo-trio/feature-foam-seating-bion-shadow.webp",
+  alt: "Taupe velvet sofa with tan leather arm, window light and plant shadow",
   cta: "Shop the collection",
 };
 
@@ -105,7 +105,7 @@ export default function PromoTrio() {
             fill
             unoptimized
             sizes="(max-width: 1024px) 100vw, 66vw"
-            className="object-cover object-[center_bottom]"
+            className="object-cover object-[0%_center]"
             priority
           />
           <span
@@ -114,9 +114,9 @@ export default function PromoTrio() {
           />
           <Link
             href={feature.href}
-            className="group absolute inset-0 z-20 flex flex-col items-end justify-center py-8 pl-6 pr-10 text-right sm:pl-8 sm:pr-14 lg:pl-10 lg:pr-20 xl:pr-24"
+            className="group absolute inset-0 z-20 flex flex-col items-end justify-start pt-16 pl-6 pr-10 text-right sm:pt-20 sm:pl-8 sm:pr-14 lg:pt-24 lg:pl-10 lg:pr-20 xl:pt-28 xl:pr-24"
           >
-            <div className="relative z-20 w-[min(22rem,46%)] -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 xl:-translate-y-12">
+            <div className="relative z-20 w-[min(22rem,42%)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
                 {feature.eyebrow}
               </span>

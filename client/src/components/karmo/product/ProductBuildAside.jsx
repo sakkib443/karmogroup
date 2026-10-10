@@ -32,19 +32,19 @@ const Y_TO = "-0.6%";
 const SLIDES = [
   {
     id: "sleep-01",
-    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-01.png",
+    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-01.webp",
     alt: "Back sleep on a Karmo navy floral mattress — pillow and katha",
     label: "Quiet rest",
   },
   {
     id: "sleep-02",
-    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-02.png",
+    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-02.webp",
     alt: "Side sleep on a Karmo navy floral mattress — pillow hug with katha",
     label: "Pillow hug",
   },
   {
     id: "sleep-03",
-    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-03.png",
+    src: "/karmo/images/product/lifestyle/build-morph/karmo-morph-v3-03.webp",
     alt: "Deep sleep on a Karmo navy floral mattress — pillow and light cover",
     label: "Deep sleep",
   },
@@ -220,7 +220,7 @@ export default function ProductBuildAside() {
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg"
+          src="/karmo/images/mattress/mosaic/karmo-pattern-texture.webp"
           alt=""
           fill
           sizes="100vw"
