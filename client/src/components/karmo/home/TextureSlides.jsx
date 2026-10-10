@@ -18,14 +18,14 @@ const SLIDES = [
   },
   {
     id: "damask",
-    image: "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg",
+    image: "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp",
     imageOpacity: 0.38,
     overlay: "bg-white/50",
     hidden: true,
   },
   {
     id: "damask-quilted",
-    image: "/karmo/images/home-02/divisions/karmo-damask-quilted-v3.jpg",
+    image: "/karmo/images/home-02/divisions/karmo-damask-quilted-v3.webp",
     imageOpacity: 0.5,
     overlay: "bg-white/45",
   },

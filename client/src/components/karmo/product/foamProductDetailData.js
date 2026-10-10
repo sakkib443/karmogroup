@@ -47,19 +47,19 @@ export const foamProductFeatures = [
 
 export const FOAM_BUYBOX_ICONS = [
   {
-    src: "/karmo/images/product/buybox-icons/warranty-10.png",
+    src: "/karmo/images/product/buybox-icons/warranty-10.webp",
     label: "Long durability",
   },
   {
-    src: "/karmo/images/product/buybox-icons/dual-side.png",
+    src: "/karmo/images/product/buybox-icons/dual-side.webp",
     label: "Custom cut sizes",
   },
   {
-    src: "/karmo/images/product/buybox-icons/antimicrobial.png",
+    src: "/karmo/images/product/buybox-icons/antimicrobial.webp",
     label: "No fillers",
   },
   {
-    src: "/karmo/images/product/buybox-icons/nights-100.png",
+    src: "/karmo/images/product/buybox-icons/nights-100.webp",
     label: "Maker ready",
   },
 ];
@@ -176,7 +176,7 @@ function toDetail(item) {
     features: foamProductFeatures,
     imageAlt: item.alt,
     buyboxIcons: FOAM_BUYBOX_ICONS,
-    textureSrc: "/karmo/images/foam/foam-texture-bg.jpg",
+    textureSrc: "/karmo/images/foam/foam-texture-bg.webp",
     pricingFamily: "foam",
   };
 }
@@ -215,13 +215,13 @@ export const foamBuildSlides = [
   },
   {
     id: "build-02",
-    src: `${PDP}/build-02.jpg`,
+    src: `${PDP}/build-02.webp`,
     alt: "Open-cell Karmo Foam texture close-up",
     label: "Open-cell craft",
   },
   {
     id: "build-03",
-    src: `${PDP}/build-03.jpg`,
+    src: `${PDP}/build-03.webp`,
     alt: "Stacked Karmo Foam grades on showroom floor",
     label: "Every grade",
   },

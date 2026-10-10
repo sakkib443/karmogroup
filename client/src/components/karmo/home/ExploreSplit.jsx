@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FiChevronRight } from "react-icons/fi";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
@@ -46,6 +47,27 @@ const DEFAULT_PANELS = [
     /* Sofa left — keep copy on the open yellow wall at right. */
     align: "right",
     position: "object-center",
+  },
+];
+
+/* Two readings of the same foam story — the August banner art and the current
+   sunlit-sofa still. The right arrow swaps them so the client can compare. */
+const FLAGSHIP_SHOTS = [
+  {
+    id: "banner",
+    src: "/karmo/images/home-02/banners/magnific-3zzTfKCREY.webp",
+    alt: "A Karmo Magnific lifestyle scene",
+    position: "object-center",
+    tone: "bg-[#d8d8d8]",
+    wash: "bg-gradient-to-r from-shade-deep/25 via-shade-deep/20 to-shade-deep/45",
+  },
+  {
+    id: "sunlit",
+    src: "/karmo/images/foam/furniture/hero/foam-sunlit-sofa-v2.webp",
+    alt: "Cream armchair and Karmo foam slabs in a sunlit living room",
+    position: "object-[20%_bottom]",
+    tone: "bg-white",
+    wash: "bg-gradient-to-l from-shade-deep/28 via-shade-deep/10 to-transparent",
   },
 ];
 
@@ -242,6 +264,7 @@ export default function ExploreSplit({
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const bandH = half ? VIEW_H_HALF : VIEW_H;
+  const [flagshipShot, setFlagshipShot] = useState(1);
 
   return (
     <section data-home-two-snap className={`bg-white ${className}`}>
@@ -268,22 +291,28 @@ export default function ExploreSplit({
             variants={fade}
             {...reveal}
             viewport={VIEWPORT}
-            className={`explore-band relative overflow-hidden bg-[#f3eee6] ${bandH}`}
+            className={`explore-band relative overflow-hidden ${FLAGSHIP_SHOTS[flagshipShot].tone} ${bandH}`}
           >
-            <Image
-              src="/karmo/images/foam/furniture/hero/foam-sunlit-sofa-user.webp"
-              alt="Sunlit sofa and foam showcase"
-              fill
-              unoptimized
-              sizes="100vw"
-              className="object-cover object-[20%_bottom]"
-              priority={false}
-            />
-
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-gradient-to-l from-shade-deep/58 via-shade-deep/22 to-shade-deep/8"
-            />
+            {FLAGSHIP_SHOTS.map((shot, i) => (
+              <span key={shot.id} aria-hidden={i !== flagshipShot}>
+                <Image
+                  src={shot.src}
+                  alt={i === flagshipShot ? shot.alt : ""}
+                  fill
+                  unoptimized
+                  sizes="100vw"
+                  className={`object-cover ${shot.position} transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    i === flagshipShot ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+                <span
+                  aria-hidden
+                  className={`pointer-events-none absolute inset-0 ${shot.wash} transition-opacity duration-[900ms] ${
+                    i === flagshipShot ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              </span>
+            ))}
 
             <div className="relative z-[1] mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-6 md:px-14 lg:pr-16 xl:pr-20">
               <div className="-translate-y-10 text-right sm:-translate-y-12 lg:-translate-y-14">
@@ -308,6 +337,17 @@ export default function ExploreSplit({
                 </Link>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setFlagshipShot((i) => (i + 1) % FLAGSHIP_SHOTS.length)
+              }
+              aria-label="Show next foam layout"
+              className="absolute top-1/2 right-2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-ink/15 bg-white text-ink shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition hover:border-ink/30 hover:text-brand sm:right-3 sm:h-11 sm:w-11 lg:right-4"
+            >
+              <FiChevronRight className="text-[20px]" aria-hidden />
+            </button>
           </motion.div>
         )}
       </motion.div>

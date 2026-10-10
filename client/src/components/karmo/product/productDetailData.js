@@ -36,12 +36,12 @@ export const productFeatures = [
 
 /** Cover / damask swatches — same fabric set as the buy box. */
 export const fabricOptions = [
-  { id: "fabric-1", label: "Damask 1", image: "/karmo/images/product/fabrics/fabric1.jpg" },
-  { id: "fabric-2", label: "Damask 2", image: "/karmo/images/product/fabrics/fabric2.jpg" },
-  { id: "fabric-3", label: "Damask 3", image: "/karmo/images/product/fabrics/fabric3.jpg" },
-  { id: "fabric-4", label: "Damask 4", image: "/karmo/images/product/fabrics/fabric4.jpg" },
-  { id: "fabric-5", label: "Damask 5", image: "/karmo/images/product/fabrics/fabric5.jpg" },
-  { id: "fabric-6", label: "Damask 6", image: "/karmo/images/product/fabrics/fabric6.jpg" },
+  { id: "fabric-1", label: "Damask 1", image: "/karmo/images/product/fabrics/fabric1.webp" },
+  { id: "fabric-2", label: "Damask 2", image: "/karmo/images/product/fabrics/fabric2.webp" },
+  { id: "fabric-3", label: "Damask 3", image: "/karmo/images/product/fabrics/fabric3.webp" },
+  { id: "fabric-4", label: "Damask 4", image: "/karmo/images/product/fabrics/fabric4.webp" },
+  { id: "fabric-5", label: "Damask 5", image: "/karmo/images/product/fabrics/fabric5.webp" },
+  { id: "fabric-6", label: "Damask 6", image: "/karmo/images/product/fabrics/fabric6.webp" },
 ];
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */

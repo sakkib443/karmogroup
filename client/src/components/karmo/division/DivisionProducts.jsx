@@ -384,8 +384,7 @@ function MattressCatalogueCard({ item }) {
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             aria-hidden
-            className="object-contain object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
-            style={{ objectFit: "contain", objectPosition: "center" }}
+            className="object-cover object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
           />
         ) : null}
         {badge ? (
@@ -523,7 +522,7 @@ export default function DivisionProducts({
   categoryId = "all",
   detailHref,
   textured = false,
-  textureSrc = "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg",
+  textureSrc = "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp",
   /** `catalogue` = mattress-style offer cards. */
   variant = "default",
 }) {

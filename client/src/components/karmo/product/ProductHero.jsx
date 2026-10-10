@@ -29,19 +29,19 @@ import {
 
 const DEFAULT_BUYBOX_ICONS = [
   {
-    src: "/karmo/images/product/buybox-icons/warranty-10.png",
+    src: "/karmo/images/product/buybox-icons/warranty-10.webp",
     label: "10-years warranty",
   },
   {
-    src: "/karmo/images/product/buybox-icons/dual-side.png",
+    src: "/karmo/images/product/buybox-icons/dual-side.webp",
     label: "Dual side usage",
   },
   {
-    src: "/karmo/images/product/buybox-icons/antimicrobial.png",
+    src: "/karmo/images/product/buybox-icons/antimicrobial.webp",
     label: "Anti Microbial Fabric",
   },
   {
-    src: "/karmo/images/product/buybox-icons/nights-100.png",
+    src: "/karmo/images/product/buybox-icons/nights-100.webp",
     label: "100 night returns",
   },
 ];
@@ -115,7 +115,7 @@ export default function ProductHero({ product }) {
   const fabricTitle = product.fabricTitle || "Fabric";
   const textureSrc =
     product.textureSrc ||
-    "/karmo/images/mattress/mosaic/karmo-pattern-texture.jpg";
+    "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp";
 
   const [mainSrc, setMainSrc] = useState(cover);
   const [fabric, setFabric] = useState(product.fabrics?.[0]?.id || "");

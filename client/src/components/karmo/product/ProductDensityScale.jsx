@@ -42,7 +42,7 @@ export default function ProductDensityScale({ highlight = "Firm support" }) {
       <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
         <div className="relative h-[min(50svh,520px)] w-full min-h-[280px] sm:min-h-[340px] lg:h-[min(52svh,580px)]">
           <Image
-            src="/karmo/images/foam-2/pdp/density-scale-hq.jpg"
+            src="/karmo/images/foam-2/pdp/density-scale-hq.webp"
             alt={`Karmo foam density scale — ${highlight} highlighted for this grade`}
             fill
             sizes="100vw"

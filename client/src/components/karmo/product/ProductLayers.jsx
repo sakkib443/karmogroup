@@ -65,7 +65,7 @@ export default function ProductLayers() {
         >
           <div className="relative mx-auto aspect-[4/5] w-full max-w-[260px] sm:max-w-[300px] lg:max-h-[460px] lg:max-w-none">
             <Image
-              src="/karmo/images/product/build-4-layers.png"
+              src="/karmo/images/product/build-4-layers.webp"
               alt="Karmo mattress build — five layered construction"
               fill
               sizes="(min-width: 1024px) 32vw, 300px"

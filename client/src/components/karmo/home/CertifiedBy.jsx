@@ -28,14 +28,14 @@ const pillars = [
   },
   {
     id: "ukas",
-    src: "/karmo/images/home-02/certified/logos/logo-ukas-gold-v10.webp",
+    src: "/karmo/images/home-02/certified/logos/logo-ukas-gold-v11.webp",
     alt: "UKAS Quality Management gold badge, registration number 014",
     title: "UKAS Quality Management",
     body: "Registration Number 014 — registered name Karmo Foam & Adhesive Industries Ltd.",
   },
   {
     id: "moody",
-    src: "/karmo/images/home-02/certified/logos/logo-moody-gold-matte.webp",
+    src: "/karmo/images/home-02/certified/logos/logo-moody-gold-sharp.webp",
     alt: "Moody International gold mark — ISO 9001 Approved",
     title: "Moody International",
     body: "ISO 9001 Approved — independent certification of the quality-management system.",
@@ -105,8 +105,8 @@ export default function CertifiedBy() {
                 <Image
                   src={src}
                   alt={alt}
-                  width={1024}
-                  height={1024}
+                  width={2048}
+                  height={2048}
                   sizes="(min-width: 1024px) 272px, 248px"
                   unoptimized
                   className="h-full w-full object-contain"

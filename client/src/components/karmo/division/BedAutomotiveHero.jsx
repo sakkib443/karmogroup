@@ -10,7 +10,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * and the bottom-left placement are specific to this page.
  */
 const SLIDE = {
-  image: "/karmo/images/foam-2/bed-automotive/bed-approved-banner.png",
+  image: "/karmo/images/foam-2/bed-automotive/bed-approved-banner.webp",
   alt: "A sunlit bedroom with exposed blue and cream mattress foam and Karmo branding",
   title: "THE COMFORT BEHIND YOUR SLEEP",
   objectPosition: "75% center",

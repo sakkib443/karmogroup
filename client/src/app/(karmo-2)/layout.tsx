@@ -28,8 +28,6 @@ import {
 } from "next/font/google";
 
 import Footer from "@/components/karmo/Footer";
-import ReviewLayer from "@/components/karmo/review/ReviewLayer";
-import ReviewSection from "@/components/karmo/review/ReviewSection";
 import CertifiedBy from "@/components/karmo/home/CertifiedBy";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 import Header from "@/components/karmo/header/Header";
@@ -241,22 +239,14 @@ export default function KarmoTwoLayout({
     >
       <SmoothScroll />
       <HomeTwoSectionSnap />
-      <ReviewSection id="header">
-        <Header />
-      </ReviewSection>
+      <Header />
       {/* Clears the fixed header exactly: 32px top bar + 80px menu bar. */}
       <main className="min-h-screen overflow-x-clip bg-white pt-[112px]">
         {children}
       </main>
       {/* Always glued above the footer on every karmo-2 page */}
-      <ReviewSection id="certified-by">
-        <CertifiedBy />
-      </ReviewSection>
-      <ReviewSection id="footer">
-        <Footer />
-      </ReviewSection>
-      {/* Client-review markers: only draws on pages listed in reviewConfig. */}
-      <ReviewLayer />
+      <CertifiedBy />
+      <Footer />
     </ThemeControl>
   );
 }

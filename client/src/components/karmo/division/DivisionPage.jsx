@@ -21,6 +21,7 @@ import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
 import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
 import BedAutomotiveShapeGrid from "@/components/karmo/division/BedAutomotiveShapeGrid";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
+import MattressLayers from "@/components/karmo/division/MattressLayers";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
@@ -173,7 +174,8 @@ export default function DivisionPage({ data }) {
           still={data.promise.still}
         />
       )}
-      {data.zones && (
+      {data.zones?.layout === "editorial" && <MattressLayers {...data.zones} />}
+      {data.zones && data.zones.layout !== "editorial" && (
         <section className="relative mb-0 grid w-full overflow-hidden bg-[#0b1a33] lg:grid-cols-[minmax(17rem,0.34fr)_minmax(0,1fr)] lg:aspect-[3.2/1]">
           {/* Left rail — copy + icons + CTA */}
           <div className="relative z-[1] flex flex-col items-center justify-center px-5 py-8 text-center sm:px-7 lg:px-9 lg:py-6">
@@ -236,7 +238,9 @@ export default function DivisionPage({ data }) {
           </div>
         </section>
       )}
-      {data.zones && (
+      {/* Quilted damask ribbon — the editorial zones band already closes with
+          its own feature strip, so mattress skips it. */}
+      {data.zones && data.zones.layout !== "editorial" && (
         <div
           aria-hidden
           className="mattress-side-ribbon flex w-full overflow-hidden"
