@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
   // until that interaction is resolved upstream.
   reactCompiler: false,
   images: {
+    // Serve images as-is, skipping Next's on-demand optimizer.
+    //
+    // On the Coolify VPS the /_next/image route re-encodes each image per
+    // request with sharp; the box is weak, so even a 77 KB file took ~5 s and
+    // 40+ images queued into a 5-6 s load. The sources are already small WebP
+    // (converted and capped at 2000px by scripts/optimize-aggressive.mjs), so
+    // the optimizer added latency for no real size win. Unoptimized serves the
+    // static files straight from disk with long cache headers — far faster on
+    // a low-powered server. (formats/qualities/deviceSizes below are ignored
+    // while this is on, kept for when a stronger host makes optimizing worth it.)
+    unoptimized: true,
     // WebP only — no AVIF.
     //
     // AVIF encoding stalls on the detailed background textures: the mattress
