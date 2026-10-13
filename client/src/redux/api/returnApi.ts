@@ -88,7 +88,7 @@ export const returnApi = baseApi.injectEndpoints({
             invalidatesTags: ['Returns', 'Orders'],
         }),
 
-    }),
+}),
 });
 
 export const {

@@ -12,6 +12,9 @@ export interface CartItem {
     color?: string;
     colorHex?: string;
     size?: string;
+    variantId?: string;
+    wholesalePrice?: number;
+    discount?: number;
 }
 
 interface CartState {
@@ -26,7 +29,7 @@ const loadCartFromStorage = (): CartState => {
         return { items: [], totalQuantity: 0, totalPrice: 0 };
     }
     try {
-        const stored = localStorage.getItem('skawsarsunnahmart_cart');
+        const stored = localStorage.getItem('shohozkrishi_cart');
         if (stored) {
             const parsed = JSON.parse(stored);
             return {
@@ -43,7 +46,7 @@ const loadCartFromStorage = (): CartState => {
 const saveCartToStorage = (state: CartState) => {
     if (typeof window !== 'undefined') {
         try {
-            localStorage.setItem('skawsarsunnahmart_cart', JSON.stringify({
+            localStorage.setItem('shohozkrishi_cart', JSON.stringify({
                 items: state.items,
                 totalQuantity: state.totalQuantity,
                 totalPrice: state.totalPrice,
@@ -154,9 +157,12 @@ const cartSlice = createSlice({
                 price?: number;
                 mrp?: number;
                 image?: string;
+                variantId?: string;
+                wholesalePrice?: number;
+                discount?: number;
             }>
         ) => {
-            const { id, color, colorHex, size, price, mrp, image } = action.payload;
+            const { id, color, colorHex, size, price, mrp, image, variantId, wholesalePrice, discount } = action.payload;
             const item = state.items.find(i => i.id === id);
             if (!item) return;
 
@@ -172,6 +178,9 @@ const cartSlice = createSlice({
             item.size = size || undefined;
             if (typeof price === 'number') item.price = price;
             if (typeof mrp === 'number') item.mrp = mrp;
+            if (typeof discount === 'number') item.discount = discount;
+            if (typeof variantId === 'string' || variantId === undefined) item.variantId = variantId;
+            if (typeof wholesalePrice === 'number') item.wholesalePrice = wholesalePrice;
             if (image) item.image = image;
 
             if (newId !== id) {

@@ -1,9 +1,35 @@
 import { Schema, model } from 'mongoose';
 
+/**
+ * Karmo's order desk, in the order an order moves through it: placed on the site,
+ * confirmed by phone, sent to the factory, challans printed, entered with the
+ * courier, and handed over (shipped).
+ */
+export const ORDER_FLOW = ['pending', 'confirmed', 'factory', 'challan_ready', 'courier_entry', 'shipped'] as const;
+
+/** Every status an order can hold: the flow, what happens after it, and the older courier steps kept for existing data. */
+export const ORDER_STATUSES = [
+    ...ORDER_FLOW,
+    'delivered', 'cancelled', 'returned', 'refunded',
+    'processing', 'on_the_way', 'out_for_delivery', 'delivery_attempt',
+] as const;
+
+export const ORDER_STATUS_LABEL: Record<string, string> = {
+    pending: 'Pending', confirmed: 'Confirmed', factory: 'Factory', challan_ready: 'Challan Ready',
+    courier_entry: 'Courier Entry', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled',
+    returned: 'Returned', refunded: 'Refunded', processing: 'Processing', on_the_way: 'On the way',
+    out_for_delivery: 'Out for delivery', delivery_attempt: 'Delivery attempt',
+};
+
 const orderItemSchema = new Schema({
-    product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
+    // A product from the products collection. Empty for Karmo catalogue lines
+    // (mattress, foam, pillows…), which live in the website's data and arrive by slug.
+    product: { type: Schema.Types.ObjectId, ref: 'Product' },
+    slug: { type: String, default: '' },
+    // Which factory makes it — one challan per division (mattress, foam, fiber_pillow, hometex…).
+    division: { type: String, default: '' },
     name: { type: String, required: true },
-    thumbnail: { type: String, required: true },
+    thumbnail: { type: String, default: '' },
     price: { type: Number, required: true },
     // Unit cost (buying price) snapshotted at purchase time — powers COGS / net-profit.
     // Kept internal; never surfaced to the customer.
@@ -49,7 +75,7 @@ const orderSchema = new Schema(
         // Status
         status: {
             type: String,
-            enum: ['pending', 'confirmed', 'processing', 'shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt', 'delivered', 'cancelled', 'returned', 'refunded'],
+            enum: ORDER_STATUSES,
             default: 'pending',
         },
         cancelReason: { type: String, default: '' },
@@ -71,8 +97,9 @@ const orderSchema = new Schema(
         },
         trackingNumber: { type: String, default: '' },
         carrier: { type: String, default: '' },
-        consignmentId: { type: String, default: '' },   // Steadfast consignment id
-        courierStatus: { type: String, default: '' },   // raw Steadfast delivery_status
+        consignmentId: { type: String, default: '' },   // courier consignment id (Pathao or Steadfast)
+        courierStatus: { type: String, default: '' },   // raw courier status as the courier reports it
+        courierFee: { type: Number, default: 0 },        // what the courier charges Karmo for this parcel
         courierBookedAt: { type: Date },
 
         note: { type: String, default: '' },
@@ -86,7 +113,7 @@ const orderSchema = new Schema(
 orderSchema.pre('save', async function (next) {
     if (!this.orderId) {
         const count = await (this.constructor as any).countDocuments();
-        this.orderId = `ABM-${String(count + 1).padStart(4, '0')}`;
+        this.orderId = `KRM-${String(count + 1).padStart(4, '0')}`;
     }
     next();
 });

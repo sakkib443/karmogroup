@@ -67,6 +67,13 @@ const AdminNotificationsPage: React.FC = () => {
 
     const unreadCount = useMemo(() => items.filter((n) => !n.isRead).length, [items]);
 
+    const resolveLink = (link?: string) => {
+        if (!link) return '';
+        let target = link.trim();
+        if (target.startsWith('/admin/')) target = target.replace('/admin/', '/dashboard/admin/');
+        return target;
+    };
+
     const handleItemClick = async (n: NotificationItem) => {
         if (!n.isRead) {
             try {
@@ -75,7 +82,8 @@ const AdminNotificationsPage: React.FC = () => {
                 /* non-blocking */
             }
         }
-        if (n.link) router.push(n.link);
+        const targetUrl = resolveLink(n.link);
+        if (targetUrl) router.push(targetUrl);
     };
 
     const handleMarkAll = async () => {

@@ -19,9 +19,8 @@ export {
   defaultFoamHeightFor,
 } from "@/components/karmo/product/foamPricing";
 
-const IMG = "/karmo/images/foam-2";
-const PDP = `${IMG}/pdp`;
-const PROD = `${IMG}/products`;
+const PDP = "/products/foam/detail";
+const PROD = "/products/foam/catalog";
 
 export const foamColorOptions = [
   { id: "coral", label: "Coral 280", image: `${PDP}/swatches/coral.jpg` },
@@ -36,41 +35,41 @@ export const foamProductFeatures = [
   {
     title: "Pure rubber grade",
     body: "No filler fluff — dense open-cell foam that holds shape for furniture, footwear and specialty builds across Bangladesh.",
-    video: "/karmo/video/m.mp4",
+    video: "/products/videos/m.mp4",
   },
   {
     title: "Cut clean. Ready to build.",
     body: "Sheets and blocks cut to the inch for makers and workshops — airflow that lasts, edges that stay true.",
-    video: "/karmo/video/p.mp4",
+    video: "/products/videos/p.mp4",
   },
 ];
 
 export const FOAM_BUYBOX_ICONS = [
   {
-    src: "/karmo/images/product/buybox-icons/warranty-10.webp",
+    src: "/products/common/buybox-icons/warranty-10.webp",
     label: "Long durability",
   },
   {
-    src: "/karmo/images/product/buybox-icons/dual-side.webp",
+    src: "/products/common/buybox-icons/dual-side.webp",
     label: "Custom cut sizes",
   },
   {
-    src: "/karmo/images/product/buybox-icons/antimicrobial.webp",
+    src: "/products/common/buybox-icons/antimicrobial.webp",
     label: "No fillers",
   },
   {
-    src: "/karmo/images/product/buybox-icons/nights-100.webp",
+    src: "/products/common/buybox-icons/nights-100.webp",
     label: "Maker ready",
   },
 ];
 
 /** Shared letter strip — reuse Matrexx KARMO plates until foam letters ship. */
 export const FOAM_LETTER_GALLERY = [
-  "/products/product-01/gallery-3.jpg",
-  "/products/product-01/gallery-5.jpg",
-  "/products/product-01/gallery-4.jpg",
-  "/products/product-01/gallery-1.jpg",
-  "/products/product-01/gallery-2.jpg",
+  "/products/foam/gallery/gallery-3.jpg",
+  "/products/foam/gallery/gallery-5.jpg",
+  "/products/foam/gallery/gallery-4.jpg",
+  "/products/foam/gallery/gallery-1.jpg",
+  "/products/foam/gallery/gallery-2.jpg",
 ];
 
 const REAL_BY_ID = {
@@ -176,7 +175,7 @@ function toDetail(item) {
     features: foamProductFeatures,
     imageAlt: item.alt,
     buyboxIcons: FOAM_BUYBOX_ICONS,
-    textureSrc: "/karmo/images/foam/foam-texture-bg.webp",
+    textureSrc: "/products/foam/foam-texture-bg.webp",
     pricingFamily: "foam",
   };
 }

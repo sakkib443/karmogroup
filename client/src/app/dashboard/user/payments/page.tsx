@@ -3,24 +3,24 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-    LuCreditCard,
-    LuCircleCheck,
-    LuClock,
-    LuCircleX,
-    LuSlash,
-    LuRefreshCw,
-    LuChevronRight,
-    LuExternalLink,
-} from 'react-icons/lu';
+    FiCreditCard,
+    FiCheckCircle,
+    FiClock,
+    FiXCircle,
+    FiSlash,
+    FiRefreshCw,
+    FiChevronRight,
+    FiExternalLink,
+} from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { useGetMyPaymentsQuery, useRetryPaymentMutation } from '@/redux/api/paymentApi';
 
 const statusConfig: Record<string, { bg: string; text: string; icon: React.ElementType; label: string }> = {
-    success: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: LuCircleCheck, label: 'Paid' },
-    pending: { bg: 'bg-amber-50', text: 'text-amber-700', icon: LuClock, label: 'Pending' },
-    initiated: { bg: 'bg-blue-50', text: 'text-blue-700', icon: LuClock, label: 'Initiated' },
-    failed: { bg: 'bg-red-50', text: 'text-red-700', icon: LuCircleX, label: 'Failed' },
-    cancelled: { bg: 'bg-gray-100', text: 'text-gray-600', icon: LuSlash, label: 'Cancelled' },
+    success: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: FiCheckCircle, label: 'Paid' },
+    pending: { bg: 'bg-amber-50', text: 'text-amber-700', icon: FiClock, label: 'Pending' },
+    initiated: { bg: 'bg-blue-50', text: 'text-blue-700', icon: FiClock, label: 'Initiated' },
+    failed: { bg: 'bg-red-50', text: 'text-red-700', icon: FiXCircle, label: 'Failed' },
+    cancelled: { bg: 'bg-gray-100', text: 'text-gray-600', icon: FiSlash, label: 'Cancelled' },
 };
 
 const methodLabel = (m: string) =>
@@ -84,7 +84,7 @@ export default function MyPaymentsPage() {
                         className="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl font-semibold text-sm hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all flex items-center gap-2"
                     >
                         View Orders
-                        <LuChevronRight size={16} />
+                        <FiChevronRight size={16} />
                     </Link>
                 </div>
             </div>
@@ -104,7 +104,7 @@ export default function MyPaymentsPage() {
                 </div>
             ) : payments.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 p-12 shadow-sm text-center">
-                    <LuCreditCard size={48} className="mx-auto text-gray-200 mb-4" />
+                    <FiCreditCard size={48} className="mx-auto text-gray-200 mb-4" />
                     <h3 className="text-lg font-bold text-gray-600 mb-1">No payments yet</h3>
                     <p className="text-sm text-gray-400 mb-6">Your online payment transactions will show up here.</p>
                     <Link
@@ -143,7 +143,7 @@ export default function MyPaymentsPage() {
                                                         className="inline-flex items-center gap-1 font-semibold text-gray-700 hover:text-[var(--color-primary)] transition-colors"
                                                     >
                                                         {orderLabel(p.order)}
-                                                        <LuExternalLink size={12} />
+                                                        <FiExternalLink size={12} />
                                                     </Link>
                                                 ) : (
                                                     <span className="text-gray-400">—</span>
@@ -159,7 +159,7 @@ export default function MyPaymentsPage() {
                                                         disabled={isRetrying}
                                                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-primary)] text-white text-xs font-semibold hover:brightness-95 transition-all disabled:opacity-60"
                                                     >
-                                                        <LuRefreshCw size={12} />
+                                                        <FiRefreshCw size={12} />
                                                         Retry
                                                     </button>
                                                 ) : (
@@ -195,7 +195,7 @@ export default function MyPaymentsPage() {
                                                 className="inline-flex items-center gap-1 font-semibold text-gray-600 hover:text-[var(--color-primary)]"
                                             >
                                                 {orderLabel(p.order)}
-                                                <LuExternalLink size={11} />
+                                                <FiExternalLink size={11} />
                                             </Link>
                                         ) : (
                                             <span className="text-gray-300">—</span>
@@ -207,7 +207,7 @@ export default function MyPaymentsPage() {
                                             disabled={isRetrying}
                                             className="mt-3 w-full inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold hover:brightness-95 transition-all disabled:opacity-60"
                                         >
-                                            <LuRefreshCw size={13} />
+                                            <FiRefreshCw size={13} />
                                             Retry Payment
                                         </button>
                                     )}

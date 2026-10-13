@@ -16,32 +16,32 @@ const ICONS = [
   {
     title: "A legacy of 60 years",
     note: "of healthy sleep",
-    icon: "/karmo/images/trust/cartoon-v3/legacy-60-v5.webp",
+    icon: "/shared/trust/cartoon-v3/legacy-60-v5.webp",
   },
   {
     title: "Largest Raw Material",
     note: "Stock",
-    icon: "/karmo/images/trust/cartoon-v3/chem-stock-v3.webp",
+    icon: "/shared/trust/cartoon-v3/chem-stock-v3.webp",
   },
   {
     title: "International Quality",
     note: "Certification",
-    icon: "/karmo/images/trust/cartoon-v3/cartoon-globe-v4.webp",
+    icon: "/shared/trust/cartoon-v3/cartoon-globe-v4.webp",
   },
   {
     title: "Natural and",
     note: "Sustainable Products",
-    icon: "/karmo/images/trust/cartoon-v3/natural-v5.webp",
+    icon: "/shared/trust/cartoon-v3/natural-v5.webp",
   },
   {
     title: "Free Delivery",
     note: "Available",
-    icon: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
+    icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
   },
   {
     title: "5k+ Stores",
     note: "Pan Bangladesh",
-    icon: "/karmo/images/trust/cartoon-v3/stores-v5.webp",
+    icon: "/shared/trust/cartoon-v3/stores-v5.webp",
   },
 ];
 

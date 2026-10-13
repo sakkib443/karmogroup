@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 
+import { FeatureIcon } from "@/components/karmo/division/mattressFeatureIcons";
+
 /**
  * Mattress "Built layer by layer" band.
  *
@@ -11,42 +13,6 @@ import { FiArrowRight } from "react-icons/fi";
  * callouts pinned to the photo, and a light feature strip underneath.
  * Driven by `zones` on the mattress division only (layout: "editorial").
  */
-
-const line = {
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.3,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-};
-
-function LayerIcon({ id, className = "" }) {
-  return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      {id === "foam" && (
-        <>
-          <path d="M4 11.5 16 6l12 5.5-12 5.5L4 11.5Z" {...line} />
-          <path d="M4 16.5 16 22l12-5.5" {...line} />
-          <path d="M4 21.5 16 27l12-5.5" {...line} />
-        </>
-      )}
-      {id === "pillow" && (
-        <>
-          <path d="M4 17.5c0-2.2 1.6-4 3.6-4h16.8c2 0 3.6 1.8 3.6 4v4.8c0 1-.8 1.7-1.7 1.7H5.7c-.9 0-1.7-.7-1.7-1.7v-4.8Z" {...line} />
-          <path d="M6.6 13.5c0-2.6 2-4.6 4.4-4.6h10c2.4 0 4.4 2 4.4 4.6" {...line} />
-          <path d="M4 19.6h24" {...line} />
-        </>
-      )}
-      {id === "springs" && (
-        <>
-          <rect x="4" y="8" width="24" height="16" rx="1.6" {...line} />
-          <path d="M10 8v16M16 8v16M22 8v16" {...line} />
-          <path d="M4 12.5h24M4 16h24M4 19.5h24" {...line} />
-        </>
-      )}
-    </svg>
-  );
-}
 
 export default function MattressLayers({
   src,
@@ -64,25 +30,19 @@ export default function MattressLayers({
   return (
     <section
       aria-label={heading}
-      className="relative mb-0 w-full bg-[#0a1830]"
+      className="relative mb-0 w-full bg-[#0b1a33]"
     >
       <div className="relative w-full overflow-hidden lg:aspect-[2.85/1]">
         {/* Cutaway — pushed right so the navy panel has room to breathe. Its
             left edge fades out so the photo melts into the navy instead of
             cutting against it. */}
-        <div
-          className="absolute inset-y-0 right-0 hidden w-[90%] lg:block"
-          style={{
-            WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 26%)",
-            maskImage: "linear-gradient(to right, transparent 0%, #000 26%)",
-          }}
-        >
+        <div className="absolute inset-0 hidden overflow-hidden lg:block">
           <Image
             src={src}
             alt={alt}
             fill
-            sizes="90vw"
-            className="object-cover object-[center_62%]"
+            sizes="100vw"
+            className="object-cover object-center"
             priority={false}
           />
         </div>
@@ -91,15 +51,15 @@ export default function MattressLayers({
             melts into the photo (no hard edge). */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 hidden w-[52%] lg:block"
+          className="pointer-events-none absolute inset-y-0 left-0 hidden w-[42%] lg:block"
           style={{
             background:
-              "linear-gradient(to right, #0a1830 0%, rgba(10,24,48,0.8) 30%, rgba(10,24,48,0.45) 55%, rgba(10,24,48,0.18) 78%, rgba(10,24,48,0) 100%)",
+              "linear-gradient(to right, #0b1a33 0%, #0b1a33 52%, rgba(11,26,51,0.7) 68%, rgba(11,26,51,0.32) 84%, rgba(11,26,51,0) 100%)",
           }}
         />
 
         {/* Callouts — desktop only, pinned to the photo box */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[84%] lg:block">
+        <div className="pointer-events-none absolute inset-0 hidden lg:block">
           {callouts.map((c) => {
             const above = c.place === "above";
             const top = Math.min(c.y, c.anchorY);
@@ -137,7 +97,7 @@ export default function MattressLayers({
             alt={alt}
             fill
             sizes="100vw"
-            className="object-cover object-[62%_58%]"
+            className="object-cover object-[78%_center]"
           />
         </div>
 
@@ -177,8 +137,10 @@ export default function MattressLayers({
             <ul className="mt-7 grid grid-cols-3 gap-x-4 gap-y-5 xl:mt-8 xl:gap-x-6">
               {icons.map((icon) => (
                 <li key={icon.id}>
-                  <LayerIcon id={icon.id} className="h-7 w-7 text-white xl:h-8 xl:w-8" />
-                  <p className="mt-2.5 text-[9.5px] font-bold uppercase leading-tight tracking-[0.08em] text-white xl:text-[10.5px]">
+                  <span className="relative flex h-14 w-14 items-center justify-center overflow-hidden bg-white xl:h-16 xl:w-16">
+                    <FeatureIcon id={icon.id} />
+                  </span>
+                  <p className="mt-1.5 text-[9.5px] font-bold uppercase leading-tight tracking-[0.08em] text-white xl:text-[10.5px]">
                     {icon.label}
                   </p>
                   {icon.note && (
@@ -194,7 +156,7 @@ export default function MattressLayers({
           {cta && (
             <Link
               href={cta.href}
-              className="group mt-8 inline-flex h-[42px] w-fit items-center justify-center gap-3 rounded-full border border-white/35 px-7 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-[#0a1830] xl:mt-9 xl:h-[46px] xl:text-[12px]"
+              className="group mt-8 inline-flex h-[42px] w-fit items-center justify-center gap-2 bg-brand px-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand-dark xl:mt-9 xl:h-[46px] xl:px-8 xl:text-[12px]"
             >
               {cta.label}
               <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-1" />
@@ -214,18 +176,9 @@ export default function MattressLayers({
                   i > 0 ? "lg:border-l lg:border-ink/10" : "lg:pl-0"
                 }`}
               >
-                {f.src ? (
-                  <span className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16">
-                    <Image
-                      src={f.src}
-                      alt=""
-                      aria-hidden="true"
-                      fill
-                      sizes="64px"
-                      className="object-contain"
-                    />
-                  </span>
-                ) : null}
+                <span className="relative h-16 w-16 shrink-0 sm:h-[4.5rem] sm:w-[4.5rem]">
+                  <FeatureIcon id={f.id} />
+                </span>
                 <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase leading-tight tracking-[0.08em] text-ink xl:text-[11px]">
                     {f.title}

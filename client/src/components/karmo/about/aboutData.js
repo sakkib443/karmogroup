@@ -17,7 +17,7 @@
 /* ── The banner ─────────────────────────────────────────────────────────── */
 
 export const aboutBanner = {
-  src: "/karmo/images/collections/popular.jpg",
+  src: "/pages/about/collections/popular.jpg",
   alt: "A Karmo-furnished living room — foam, mattress and bedding made in Bangladesh",
   eyebrow: "About us",
   title: "The Journey Since 1965",
@@ -60,7 +60,7 @@ export const aboutStory = {
   titleLead: "First in Bangladesh to",
   titleAccent: "pour polyurethane",
   image: {
-    src: "/karmo/images/mattress/mosaic/suite-interior.jpg",
+    src: "/pages/about/mosaic/suite-interior.jpg",
     alt: "A Karmo mattress dressed in a styled bedroom suite",
   },
   plaque: { figure: "1965", label: "Since" },
@@ -98,7 +98,7 @@ export const aboutDivisions = [
     name: "Karmo Foam",
     line: "We create the chemistry of comfort",
     href: "/foam",
-    image: "/karmo/images/home-02/divisions/foam-karmo-sofa-blocks-studio.png",
+    image: "/shared/divisions/foam-karmo-sofa-blocks-studio.png",
     alt: "A Karmo Foam sofa beside stacked foam blocks in a studio",
     points: [
       "Furniture and automotive grades",
@@ -110,7 +110,7 @@ export const aboutDivisions = [
     name: "Karmo Mattress",
     line: "Your perfect partner for complete bedding",
     href: "/mattress",
-    image: "/karmo/images/home-02/divisions/mattress-karmo-floral-bedroom.webp",
+    image: "/shared/divisions/mattress-karmo-floral-bedroom.webp",
     alt: "A Karmo floral mattress on an upholstered bed",
     points: [
       "Pocket springs that move independently, head to toe",
@@ -122,7 +122,7 @@ export const aboutDivisions = [
     name: "Karmo HomeTex",
     line: "Where comfort meets elegance",
     href: "/hometex",
-    image: "/karmo/images/home-02/divisions/hometex-karmo-bedding-room.png",
+    image: "/shared/divisions/hometex-karmo-bedding-room.png",
     alt: "Karmo HomeTex bedding in a styled bedroom",
     points: [
       "Cotton twill, sateen and Egyptian cotton bedsheets",
@@ -134,7 +134,7 @@ export const aboutDivisions = [
     name: "Karmo Chemical & Adhesives",
     line: "Excelling in chemicals and polymers",
     href: "/chemicals",
-    image: "/karmo/images/home-02/divisions/chemicals-karmo-adhesive-tins.png",
+    image: "/shared/divisions/chemicals-karmo-adhesive-tins.png",
     alt: "Karmo Adhesive tins arranged in a showroom",
     points: [
       "Industrial-grade adhesives for footwear, board and furniture",

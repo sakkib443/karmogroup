@@ -136,4 +136,19 @@ export default {
         auto_sync: process.env.STEADFAST_AUTO_SYNC === 'true',
         auto_sync_minutes: Number(process.env.STEADFAST_AUTO_SYNC_MINUTES) || 30,
     },
+
+    // Pathao Courier merchant API — "Send with Pathao" on the order desk.
+    // Sandbox until PATHAO_BASE_URL is set to the live host (https://api-hermes.pathao.com).
+    pathao: {
+        base_url: process.env.PATHAO_BASE_URL || 'https://courier-api-sandbox.pathao.com',
+        client_id: process.env.PATHAO_CLIENT_ID || '',
+        client_secret: process.env.PATHAO_CLIENT_SECRET || '',
+        username: process.env.PATHAO_USERNAME || '',
+        password: process.env.PATHAO_PASSWORD || '',
+        store_id: process.env.PATHAO_STORE_ID || '',
+        // Optional: Pathao reads the city and zone from the address when these are empty.
+        city_id: process.env.PATHAO_CITY_ID || '',
+        zone_id: process.env.PATHAO_ZONE_ID || '',
+        item_weight_kg: Number(process.env.PATHAO_ITEM_WEIGHT_KG) || 0.5,
+    },
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @next/next/no-img-element, react-hooks/set-state-in-effect, @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -5,10 +6,11 @@ import { useGetSiteContentQuery, useUpdateSiteContentMutation, useGetAllLegalPag
 import { toast } from 'react-hot-toast';
 import dynamic from 'next/dynamic';
 import {
-    LuPhone, LuMessageCircle, LuLayoutDashboard, LuFileText, LuImage,
-    LuSave, LuPlus, LuTrash2, LuCircleCheck, LuArrowUp, LuArrowDown, LuCreditCard,
-} from 'react-icons/lu';
-import { SingleImageUploader, MultipleImageUploader } from '@/components/ui/ImageUploader';
+    FiPhone, FiMessageCircle, FiLayout, FiFileText, FiImage,
+    FiSave, FiPlus, FiTrash2, FiCheckCircle, FiArrowUp, FiArrowDown,
+} from 'react-icons/fi';
+import { SingleImageUploader } from '@/components/ui/ImageUploader';
+import { telHref, whatsappHref, messengerHref, messengerId } from '@/utils/contactLinks';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false, loading: () => <div style={{ height: '350px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', animation: 'pulse 1.5s ease-in-out infinite' }} /> });
 import 'react-quill-new/dist/quill.snow.css';
@@ -24,12 +26,11 @@ const btnSmall: React.CSSProperties = { ...btn, background: '#f3f4f6', color: '#
 
 /* ─── Tabs Config ─── */
 const TABS = [
-    { key: 'hero', label: '🖼️ Hero Slides', icon: LuImage },
-    { key: 'contact', label: 'Contact Page', icon: LuPhone },
-    { key: 'payment', label: 'Payment Numbers', icon: LuCreditCard },
-    { key: 'floating', label: 'Floating Widget', icon: LuMessageCircle },
-    { key: 'footer', label: 'Footer', icon: LuLayoutDashboard },
-    { key: 'legal', label: 'Legal Pages', icon: LuFileText },
+    { key: 'hero', label: '🖼️ Hero Slides', icon: FiImage },
+    { key: 'contact', label: 'Contact Page', icon: FiPhone },
+    { key: 'floating', label: 'Floating Widget', icon: FiMessageCircle },
+    { key: 'footer', label: 'Footer', icon: FiLayout },
+    { key: 'legal', label: 'Legal Pages', icon: FiFileText },
 ];
 
 export default function SiteContentPage() {
@@ -41,7 +42,11 @@ export default function SiteContentPage() {
 
     useEffect(() => {
         if (res?.data) {
-            setFormData(JSON.parse(JSON.stringify(res.data)));
+            const copy = JSON.parse(JSON.stringify(res.data));
+            // Floating buttons that merely repeat Contact Info are switched to follow it.
+            const relinked = linkFloatingToContact(copy);
+            if (relinked.length) copy.__floatingRelinked = relinked;
+            setFormData(copy);
         }
     }, [res]);
 
@@ -50,12 +55,17 @@ export default function SiteContentPage() {
         try {
             const payload: any = {};
             if (activeTab === 'hero') {
-                // The Hero tab owns both the carousel slides and the mid-page promo banner.
                 payload.heroSlides = formData.heroSlides;
-                payload.homeBanner = formData.homeBanner;
             } else {
                 payload[activeTab] = formData[activeTab];
             }
+            if (activeTab === 'contact') {
+                const tidy = (list: unknown) => (Array.isArray(list) ? list : []).map((v) => String(v ?? '').trim()).filter(Boolean);
+                payload.contact = { ...formData.contact, phones: tidy(formData.contact?.phones), emails: tidy(formData.contact?.emails) };
+            }
+            // Saving Contact Info also stores the floating buttons' link to it, so a later
+            // change of number reaches the buttons too.
+            if (activeTab === 'contact' && (formData.__floatingRelinked || formData.__saveFloatingWithContact)) payload.floating = formData.floating;
             await updateContent(payload).unwrap();
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 2000);
@@ -82,7 +92,7 @@ export default function SiteContentPage() {
                     <p style={{ fontSize: '12px', color: '#888', margin: '2px 0 0' }}>Manage dynamic content across your website</p>
                 </div>
                 <button onClick={handleSave} disabled={isSaving} style={{ ...btnPrimary, opacity: isSaving ? 0.6 : 1 }}>
-                    {saveSuccess ? <><LuCircleCheck size={14} /> Saved!</> : <><LuSave size={14} /> {isSaving ? 'Saving...' : 'Save Changes'}</>}
+                    {saveSuccess ? <><FiCheckCircle size={14} /> Saved!</> : <><FiSave size={14} /> {isSaving ? 'Saving...' : 'Save Changes'}</>}
                 </button>
             </div>
 
@@ -112,7 +122,6 @@ export default function SiteContentPage() {
             {/* Tab Content */}
             {activeTab === 'hero' && <HeroSlidesTab data={formData} setData={setFormData} onSave={handleSave} isSaving={isSaving} />}
             {activeTab === 'contact' && <ContactTab data={formData} setData={setFormData} />}
-            {activeTab === 'payment' && <PaymentTab data={formData} setData={setFormData} />}
             {activeTab === 'floating' && <FloatingTab data={formData} setData={setFormData} />}
             {activeTab === 'footer' && <FooterTab data={formData} setData={setFormData} />}
             {activeTab === 'legal' && <LegalPagesTab />}
@@ -127,6 +136,35 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
 
     const updateField = (field: string, value: any) => {
         setData((p: any) => ({ ...p, contact: { ...p.contact, [field]: value } }));
+    };
+
+    // Phones / emails are lists (the storefront shows them all); the first one is also the
+    // main `phone` / `email` used for tel: / mailto: links.
+    const listOf = (listKey: string, singleKey: string): string[] =>
+        Array.isArray(c[listKey]) && c[listKey].length > 0 ? c[listKey] : c[singleKey] ? [c[singleKey]] : [];
+    const setList = (listKey: string, singleKey: string, list: string[]) =>
+        setData((p: any) => ({
+            ...p,
+            contact: { ...p.contact, [listKey]: list, [singleKey]: list.map((v) => v.trim()).find(Boolean) || '' },
+        }));
+    const phones = listOf('phones', 'phone');
+    const emails = listOf('emails', 'email');
+
+    // Empties every contact detail (and the floating buttons' own copies) — the storefront
+    // then shows no number, email or address until new ones are added. Saved on "Save Changes".
+    const clearAll = () => {
+        if (!window.confirm('Clear all phone numbers, WhatsApp, Messenger, emails, addresses and the website? Nothing will be clickable on the website until you add new ones.')) return;
+        setData((p: any) => ({
+            ...p,
+            contact: {
+                ...p.contact,
+                phone: '', phones: [], whatsapp: '', messenger: '', email: '', emails: [],
+                address: '', corporateOffice: '', warehouse: '', website: '',
+            },
+            floating: { ...p.floating, phone: '', whatsapp: '', messenger: '' },
+            __saveFloatingWithContact: true,
+        }));
+        toast.success('Cleared — click Save Changes to apply');
     };
 
     const addHour = () => {
@@ -168,19 +206,69 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
             {/* Status Badge */}
             <div style={{ ...card, background: 'var(--color-primary-lightest)', borderColor: '#bbf7d0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <LuCircleCheck size={16} color="#16a34a" />
+                    <FiCheckCircle size={16} color="#16a34a" />
                     <span style={{ fontSize: '12px', fontWeight: 600, color: '#16a34a' }}>Active — This data is used on the <strong>Contact Us</strong> page</span>
                 </div>
             </div>
 
             {/* Basic Info */}
             <div style={card}>
-                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 14px' }}>Contact Information</h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', margin: '0 0 14px' }}>
+                    <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Contact Information</h3>
+                    <button type="button" onClick={clearAll} style={btnDanger}><FiTrash2 size={13} /> Clear all contact details</button>
+                </div>
+                <p style={{ fontSize: '11px', color: '#888', margin: '0 0 12px' }}>
+                    Empty fields are hidden on the website and nothing is clickable for them.
+                </p>
+
+                {/* Phone numbers (first = main) */}
+                <div style={{ marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
+                        <label style={{ ...label, marginBottom: 0 }}>Phone Numbers <span style={{ fontWeight: 400, color: '#999' }}>(the first one is the main number)</span></label>
+                        <button type="button" onClick={() => setList('phones', 'phone', [...phones, ''])} style={btnSmall}><FiPlus size={13} /> Add phone</button>
+                    </div>
+                    {phones.map((ph, idx) => (
+                        <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
+                            <input value={ph} onChange={e => setList('phones', 'phone', phones.map((v, i) => (i === idx ? e.target.value : v)))} placeholder="01XXXXXXXXX" style={{ ...input, flex: 1 }} />
+                            <button type="button" onClick={() => setList('phones', 'phone', phones.filter((_, i) => i !== idx))} style={btnDanger}><FiTrash2 size={13} /></button>
+                        </div>
+                    ))}
+                    {phones.length === 0 && <p style={{ fontSize: '12px', color: '#bbb', margin: '4px 0 0' }}>No phone number added.</p>}
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div><label style={label}>Phone Number</label><input value={c.phone || ''} onChange={e => updateField('phone', e.target.value)} style={input} /></div>
-                    <div><label style={label}>WhatsApp Number</label><input value={c.whatsapp || ''} onChange={e => updateField('whatsapp', e.target.value)} style={input} /></div>
-                    <div><label style={label}>Email</label><input value={c.email || ''} onChange={e => updateField('email', e.target.value)} style={input} /></div>
-                    <div><label style={label}>Address</label><input value={c.address || ''} onChange={e => updateField('address', e.target.value)} style={input} /></div>
+                    <div style={{ gridColumn: 'span 2' }}><label style={label}>WhatsApp Number</label><input value={c.whatsapp || ''} onChange={e => updateField('whatsapp', e.target.value)} placeholder="01XXXXXXXXX" style={input} /></div>
+                    <div style={{ gridColumn: 'span 2' }}>
+                        <label style={label}>Messenger (Facebook page link or username)</label>
+                        <input value={c.messenger || ''} onChange={e => updateField('messenger', e.target.value)} placeholder="facebook.com/shohozkrishi  or  shohozkrishi" style={input} />
+                        <p style={{ fontSize: '11px', color: messengerId(c.messenger) || !c.messenger ? '#888' : '#dc2626', margin: '4px 0 0' }}>
+                            {!c.messenger
+                                ? 'Leave empty if you do not use Messenger.'
+                                : messengerId(c.messenger)
+                                    ? <>Opens <a href={messengerHref(c.messenger)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)' }}>{messengerHref(c.messenger)}</a></>
+                                    : 'This does not look like a Facebook page link or username.'}
+                        </p>
+                    </div>
+                    <p style={{ gridColumn: 'span 2', fontSize: '11px', color: '#888', margin: 0 }}>
+                        The Phone, WhatsApp and Messenger above also power the floating Call / WhatsApp / Messenger buttons on every page (see the Floating Widget tab).
+                    </p>
+                    <div style={{ gridColumn: 'span 2' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '5px' }}>
+                            <label style={{ ...label, marginBottom: 0 }}>Emails <span style={{ fontWeight: 400, color: '#999' }}>(the first one is the main email)</span></label>
+                            <button type="button" onClick={() => setList('emails', 'email', [...emails, ''])} style={btnSmall}><FiPlus size={13} /> Add email</button>
+                        </div>
+                        {emails.map((em, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
+                                <input value={em} onChange={e => setList('emails', 'email', emails.map((v, i) => (i === idx ? e.target.value : v)))} placeholder="name@example.com" style={{ ...input, flex: 1 }} />
+                                <button type="button" onClick={() => setList('emails', 'email', emails.filter((_, i) => i !== idx))} style={btnDanger}><FiTrash2 size={13} /></button>
+                            </div>
+                        ))}
+                        {emails.length === 0 && <p style={{ fontSize: '12px', color: '#bbb', margin: '4px 0 0' }}>No email added.</p>}
+                    </div>
+                    <div><label style={label}>Primary Address</label><input value={c.address || ''} onChange={e => updateField('address', e.target.value)} style={input} /></div>
+                    <div><label style={label}>Corporate Office</label><input value={c.corporateOffice || ''} onChange={e => updateField('corporateOffice', e.target.value)} placeholder="Head office address" style={input} /></div>
+                    <div><label style={label}>Warehouse Address</label><input value={c.warehouse || ''} onChange={e => updateField('warehouse', e.target.value)} placeholder="Warehouse address" style={input} /></div>
+                    <div style={{ gridColumn: 'span 2' }}><label style={label}>Website URL</label><input value={c.website || ''} onChange={e => updateField('website', e.target.value)} placeholder="shohozkrishi.com" style={input} /></div>
                 </div>
             </div>
 
@@ -188,13 +276,13 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
             <div style={card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Business Hours</h3>
-                    <button onClick={addHour} style={btnSmall}><LuPlus size={13} /> Add</button>
+                    <button onClick={addHour} style={btnSmall}><FiPlus size={13} /> Add</button>
                 </div>
                 {(c.hours || []).map((h: any, idx: number) => (
                     <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
                         <input value={h.day} onChange={e => updateHour(idx, 'day', e.target.value)} placeholder="Day (e.g. Sunday – Thursday)" style={{ ...input, flex: 1 }} />
                         <input value={h.time} onChange={e => updateHour(idx, 'time', e.target.value)} placeholder="Time (e.g. 9 AM – 6 PM)" style={{ ...input, flex: 1 }} />
-                        <button onClick={() => removeHour(idx)} style={btnDanger}><LuTrash2 size={13} /></button>
+                        <button onClick={() => removeHour(idx)} style={btnDanger}><FiTrash2 size={13} /></button>
                     </div>
                 ))}
                 {(c.hours || []).length === 0 && <p style={{ fontSize: '12px', color: '#bbb', textAlign: 'center', padding: '12px' }}>No hours added yet.</p>}
@@ -204,12 +292,12 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
             <div style={card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Form Subjects</h3>
-                    <button onClick={addSubject} style={btnSmall}><LuPlus size={13} /> Add</button>
+                    <button onClick={addSubject} style={btnSmall}><FiPlus size={13} /> Add</button>
                 </div>
                 {(c.subjects || []).map((s: string, idx: number) => (
                     <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
                         <input value={s} onChange={e => updateSubject(idx, e.target.value)} placeholder="Subject option..." style={{ ...input, flex: 1 }} />
-                        <button onClick={() => removeSubject(idx)} style={btnDanger}><LuTrash2 size={13} /></button>
+                        <button onClick={() => removeSubject(idx)} style={btnDanger}><FiTrash2 size={13} /></button>
                     </div>
                 ))}
                 {(c.subjects || []).length === 0 && <p style={{ fontSize: '12px', color: '#bbb', textAlign: 'center', padding: '12px' }}>No subjects added yet.</p>}
@@ -219,12 +307,12 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
             <div style={card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Quick Tips</h3>
-                    <button onClick={addTip} style={btnSmall}><LuPlus size={13} /> Add</button>
+                    <button onClick={addTip} style={btnSmall}><FiPlus size={13} /> Add</button>
                 </div>
                 {(c.tips || []).map((t: string, idx: number) => (
                     <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
                         <input value={t} onChange={e => updateTip(idx, e.target.value)} placeholder="Tip text..." style={{ ...input, flex: 1 }} />
-                        <button onClick={() => removeTip(idx)} style={btnDanger}><LuTrash2 size={13} /></button>
+                        <button onClick={() => removeTip(idx)} style={btnDanger}><FiTrash2 size={13} /></button>
                     </div>
                 ))}
                 {(c.tips || []).length === 0 && <p style={{ fontSize: '12px', color: '#bbb', textAlign: 'center', padding: '12px' }}>No tips added yet.</p>}
@@ -234,14 +322,14 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
             <div style={card}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Social Links</h3>
-                    <button onClick={addSocial} style={btnSmall}><LuPlus size={13} /> Add</button>
+                    <button onClick={addSocial} style={btnSmall}><FiPlus size={13} /> Add</button>
                 </div>
                 {(c.socials || []).map((s: any, idx: number) => (
                     <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px', alignItems: 'center' }}>
                         <input value={s.label} onChange={e => updateSocial(idx, 'label', e.target.value)} placeholder="Label" style={{ ...input, width: '120px' }} />
                         <input value={s.url} onChange={e => updateSocial(idx, 'url', e.target.value)} placeholder="URL" style={{ ...input, flex: 1 }} />
                         <input type="color" value={s.color} onChange={e => updateSocial(idx, 'color', e.target.value)} style={{ width: '36px', height: '32px', border: '1px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', padding: '2px' }} />
-                        <button onClick={() => removeSocial(idx)} style={btnDanger}><LuTrash2 size={13} /></button>
+                        <button onClick={() => removeSocial(idx)} style={btnDanger}><FiTrash2 size={13} /></button>
                     </div>
                 ))}
                 {(c.socials || []).length === 0 && <p style={{ fontSize: '12px', color: '#bbb', textAlign: 'center', padding: '12px' }}>No socials added yet.</p>}
@@ -251,147 +339,104 @@ function ContactTab({ data, setData }: { data: any; setData: any }) {
 }
 
 /* ─── FLOATING TAB ─── */
-function FloatingTab({ data, setData }: { data: any; setData: any }) {
-    const f = data.floating || {};
-    const update = (field: string, value: any) => setData((p: any) => ({ ...p, floating: { ...p.floating, [field]: value } }));
+// The floating Call / WhatsApp / Messenger buttons. Each one follows Contact Info
+// (empty value here) unless the admin gives it its own number or page.
+const FLOATING_CHANNELS = [
+    { key: 'phone', showKey: 'showPhone', title: 'Call button', contactLabel: 'Phone Number', href: telHref, placeholder: '01XXXXXXXXX', color: '#2563eb', invalid: 'Enter a phone number.' },
+    { key: 'whatsapp', showKey: 'showWhatsapp', title: 'WhatsApp button', contactLabel: 'WhatsApp Number', href: whatsappHref, placeholder: '01XXXXXXXXX', color: '#25D366', invalid: 'Enter a WhatsApp number.' },
+    { key: 'messenger', showKey: 'showMessenger', title: 'Messenger button', contactLabel: 'Messenger', href: messengerHref, placeholder: 'facebook.com/shohozkrishi  or  shohozkrishi', color: '#0084FF', invalid: 'Enter a Facebook page link or username.' },
+] as const;
 
-    return (
-        <div style={card}>
-            <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Floating Contact Widget</h3>
-            <p style={{ fontSize: '12px', color: '#888', margin: '0 0 16px' }}>Manage the floating WhatsApp/Messenger/Phone button that appears on every page.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                    <label style={label}>Phone Number</label>
-                    <input value={f.phone || ''} onChange={e => update('phone', e.target.value)} style={input} />
-                </div>
-                <div>
-                    <label style={label}>Show Phone</label>
-                    <select value={f.showPhone ? 'true' : 'false'} onChange={e => update('showPhone', e.target.value === 'true')} style={input}>
-                        <option value="true">Yes</option><option value="false">No</option>
-                    </select>
-                </div>
-                <div>
-                    <label style={label}>WhatsApp Number (with country code)</label>
-                    <input value={f.whatsapp || ''} onChange={e => update('whatsapp', e.target.value)} placeholder="8801XXXXXXXXX" style={input} />
-                </div>
-                <div>
-                    <label style={label}>Show WhatsApp</label>
-                    <select value={f.showWhatsapp ? 'true' : 'false'} onChange={e => update('showWhatsapp', e.target.value === 'true')} style={input}>
-                        <option value="true">Yes</option><option value="false">No</option>
-                    </select>
-                </div>
-                <div>
-                    <label style={label}>Messenger Page Username</label>
-                    <input value={f.messenger || ''} onChange={e => update('messenger', e.target.value)} placeholder="YOUR_PAGE_USERNAME" style={input} />
-                </div>
-                <div>
-                    <label style={label}>Show Messenger</label>
-                    <select value={f.showMessenger ? 'true' : 'false'} onChange={e => update('showMessenger', e.target.value === 'true')} style={input}>
-                        <option value="true">Yes</option><option value="false">No</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    );
+/**
+ * Floating values that only repeat Contact Info (or the seed's "YOUR_PAGE_USERNAME")
+ * become '' so those buttons follow Contact Info. Returns the keys that changed.
+ */
+function linkFloatingToContact(site: any): string[] {
+    const f = site?.floating;
+    if (!f) return [];
+    const c = site.contact || {};
+    const changed: string[] = [];
+    for (const ch of FLOATING_CHANNELS) {
+        const own = String(f[ch.key] || '').trim();
+        if (!own) continue;
+        const sameAsContact = !!c[ch.key] && ch.href(own) !== '' && ch.href(own) === ch.href(c[ch.key]);
+        const placeholder = ch.key === 'messenger' && !messengerId(own);
+        if (sameAsContact || placeholder) { f[ch.key] = ''; changed.push(ch.title); }
+    }
+    return changed;
 }
 
-/* ─── PAYMENT TAB ─── */
-function PaymentTab({ data, setData }: { data: any; setData: any }) {
-    const methods = [
-        { key: 'bkash', label: 'bKash', color: '#E2136E' },
-        { key: 'rocket', label: 'Rocket', color: '#8332AC' },
-        { key: 'nagad', label: 'Nagad', color: '#F47920' },
-        { key: 'cod', label: 'Cash on Delivery', color: '#16a34a' },
-    ];
-
-    const p = data.payment || {};
-    const updateMethod = (method: string, field: string, value: any) => {
-        setData((prev: any) => ({
-            ...prev,
-            payment: {
-                ...prev.payment,
-                [method]: { ...(prev.payment?.[method] || {}), [field]: value },
-            },
-        }));
-    };
-    const updateInstructions = (value: string) => {
-        setData((prev: any) => ({ ...prev, payment: { ...prev.payment, instructions: value } }));
-    };
+function FloatingTab({ data, setData }: { data: any; setData: any }) {
+    const f = data.floating || {};
+    const c = data.contact || {};
+    const update = (field: string, value: any) => setData((p: any) => ({ ...p, floating: { ...p.floating, [field]: value } }));
+    // Remembered per channel while the admin is typing an own number (it starts empty).
+    const [custom, setCustom] = useState<Record<string, boolean>>({});
+    const relinked: string[] = data.__floatingRelinked || [];
 
     return (
         <div>
-            {/* Info */}
-            <div style={{ ...card, background: 'var(--color-primary-lightest)', borderColor: '#bbf7d0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <LuCircleCheck size={16} color="#16a34a" />
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#16a34a' }}>
-                        These numbers appear on the <strong>Checkout</strong> page. Customers send money to the active number.
-                    </span>
-                </div>
+            <div style={card}>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Floating Contact Buttons</h3>
+                <p style={{ fontSize: '12px', color: '#888', margin: 0 }}>
+                    The round Call / WhatsApp / Messenger buttons at the bottom-right of every page. By default each one uses the number or page from the <strong>Contact Page</strong> tab, so you only change it in one place.
+                </p>
+                {relinked.length > 0 && (
+                    <p style={{ fontSize: '12px', color: '#92400e', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '7px', padding: '8px 10px', margin: '12px 0 0' }}>
+                        {relinked.join(', ')} had its own copy of the contact details (or the sample “YOUR_PAGE_USERNAME”). It is now set to follow Contact Info — click <strong>Save Changes</strong> to keep this.
+                    </p>
+                )}
             </div>
 
-            {/* Method cards */}
-            {methods.map(m => {
-                const md = p[m.key] || {};
-                const isCOD = m.key === 'cod';
+            {FLOATING_CHANNELS.map((ch) => {
+                const own = String(f[ch.key] || '');
+                const linked = !own && !custom[ch.key];
+                const value = linked ? String(c[ch.key] || '') : own;
+                const href = ch.href(value);
+                const shown = f[ch.showKey] !== false;
                 return (
-                    <div key={m.key} style={{ ...card, borderLeft: `3px solid ${m.color}` }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isCOD ? 0 : '14px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: m.color }} />
-                                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: m.color }}>{m.label}</h3>
-                                {isCOD && <span style={{ fontSize: '11px', color: '#888', fontWeight: 400 }}>— no payment number needed</span>}
-                            </div>
-                            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: '#555', cursor: 'pointer' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={md.active !== false}
-                                    onChange={e => updateMethod(m.key, 'active', e.target.checked)}
-                                    style={{ width: '15px', height: '15px', accentColor: m.color, cursor: 'pointer' }}
-                                />
-                                {md.active !== false ? 'Active' : 'Hidden'}
+                    <div key={ch.key} style={{ ...card, borderLeft: `4px solid ${ch.color}` }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                            <h3 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>{ch.title}</h3>
+                            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', fontWeight: 600, color: '#555', cursor: 'pointer' }}>
+                                <input type="checkbox" checked={shown} onChange={(e) => update(ch.showKey, e.target.checked)} />
+                                Show on the website
                             </label>
                         </div>
-                        {!isCOD && (
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px' }}>
-                                <div>
-                                    <label style={label}>{m.label} Number</label>
-                                    <input
-                                        value={md.number || ''}
-                                        onChange={e => updateMethod(m.key, 'number', e.target.value)}
-                                        placeholder="01XXXXXXXXX"
-                                        style={input}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={label}>Account Type</label>
-                                    <select
-                                        value={md.accountType || 'Personal'}
-                                        onChange={e => updateMethod(m.key, 'accountType', e.target.value)}
-                                        style={input}
-                                    >
-                                        <option value="Personal">Personal</option>
-                                        <option value="Agent">Agent</option>
-                                        <option value="Merchant">Merchant</option>
-                                    </select>
-                                </div>
+
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#333', cursor: 'pointer', marginBottom: '8px' }}>
+                            <input
+                                type="checkbox"
+                                checked={linked}
+                                onChange={(e) => {
+                                    if (e.target.checked) { update(ch.key, ''); setCustom((m) => ({ ...m, [ch.key]: false })); }
+                                    else setCustom((m) => ({ ...m, [ch.key]: true }));
+                                }}
+                            />
+                            Same as Contact Info ({ch.contactLabel})
+                        </label>
+
+                        {linked ? (
+                            <div style={{ ...input, background: '#f9fafb', color: c[ch.key] ? '#333' : '#aaa' }}>
+                                {c[ch.key] || `Not set in the Contact Page tab yet`}
                             </div>
+                        ) : (
+                            <input value={own} onChange={(e) => update(ch.key, e.target.value)} placeholder={ch.placeholder} style={input} autoFocus={!!custom[ch.key] && !own} />
                         )}
+
+                        <p style={{ fontSize: '11px', margin: '6px 0 0', color: href ? '#888' : '#dc2626' }}>
+                            {href ? (
+                                <>
+                                    {shown ? 'Opens ' : 'Hidden. Would open '}
+                                    <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)' }}>{href}</a>
+                                </>
+                            ) : (
+                                <>{ch.invalid} Until then this button stays hidden.</>
+                            )}
+                        </p>
                     </div>
                 );
             })}
-
-            {/* Instructions */}
-            <div style={card}>
-                <label style={label}>Payment Instructions (shown to customer)</label>
-                <textarea
-                    value={p.instructions || ''}
-                    onChange={e => updateInstructions(e.target.value)}
-                    placeholder="e.g. Send Money to the number above, then submit your number, transaction ID and time."
-                    rows={2}
-                    style={{ ...input, resize: 'vertical' as const, fontFamily: 'inherit' }}
-                />
-            </div>
         </div>
     );
 }
@@ -469,7 +514,7 @@ function LegalPagesTab() {
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <button onClick={() => setEditingSlug(null)} style={{ ...btn, background: '#f3f4f6', color: '#555' }}>Cancel</button>
                             <button onClick={handleSaveLegal} disabled={isSavingLegal} style={{ ...btnPrimary, opacity: isSavingLegal ? 0.6 : 1 }}>
-                                <LuSave size={13} /> {isSavingLegal ? 'Saving...' : 'Save Page'}
+                                <FiSave size={13} /> {isSavingLegal ? 'Saving...' : 'Save Page'}
                             </button>
                         </div>
                     </div>
@@ -563,40 +608,20 @@ function LegalPagesTab() {
     );
 }
 
+/* ═══════════════════════════════════════════════════════════════════ */
 /* ─── HERO SLIDES TAB ─── */
 function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData: any; onSave: () => void; isSaving: boolean }) {
     const slides = data.heroSlides || [];
 
-    // The homepage carousel re-sorts slides by their numeric `order`, so every mutation
-    // must renumber `order` to match the array position — otherwise reordering/removal
-    // saves fine but the live homepage restores the original sequence.
-    const renumber = (arr: any[]) => arr.map((s: any, i: number) => ({ ...s, order: i }));
-    const commit = (arr: any[]) => setData((p: any) => ({ ...p, heroSlides: renumber(arr) }));
-
     const addSlide = (imageUrl: string) => {
         if (!imageUrl) return;
-        commit([...slides, { imageUrl, active: true }]);
-    };
-
-    // Bulk-add: append every uploaded image as a new slide.
-    const addSlides = (urls: string[]) => {
-        const clean = (urls || []).filter(Boolean);
-        if (!clean.length) return;
-        commit([...slides, ...clean.map((imageUrl) => ({ imageUrl, active: true }))]);
-    };
-
-    const updateSlide = (idx: number, field: string, value: any) => {
-        commit(slides.map((s: any, i: number) => (i === idx ? { ...s, [field]: value } : s)));
-    };
-
-    // Mid-page promo banner — a single object, saved alongside the slides.
-    const banner = data.homeBanner || {};
-    const updateBanner = (field: string, value: any) => {
-        setData((p: any) => ({ ...p, homeBanner: { ...(p.homeBanner || {}), [field]: value } }));
+        const newSlides = [...slides, { imageUrl, active: true, order: slides.length }];
+        setData((p: any) => ({ ...p, heroSlides: newSlides }));
     };
 
     const removeSlide = (idx: number) => {
-        commit(slides.filter((_: any, i: number) => i !== idx));
+        const newSlides = slides.filter((_: any, i: number) => i !== idx);
+        setData((p: any) => ({ ...p, heroSlides: newSlides }));
     };
 
     const moveSlide = (idx: number, direction: 'up' | 'down') => {
@@ -604,7 +629,7 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
         const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
         if (swapIdx < 0 || swapIdx >= newSlides.length) return;
         [newSlides[idx], newSlides[swapIdx]] = [newSlides[swapIdx], newSlides[idx]];
-        commit(newSlides);
+        setData((p: any) => ({ ...p, heroSlides: newSlides }));
     };
 
     const handleSaveHero = async () => {
@@ -618,9 +643,6 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
             <div style={{ ...card, background: '#fffbeb', borderColor: '#fde68a' }}>
                 <p style={{ fontSize: '12px', color: '#b45309', fontWeight: 600, margin: 0 }}>
                     🖼️ Hero slides appear at the top of your homepage as a banner carousel. Add multiple images and they will auto-rotate.
-                    Recommended size <strong>1920 × 540</strong>. Headline / sub-text / button are drawn as live text over the banner —
-                    set <strong>Text: Left / Right</strong> to match the empty side of your artwork, and leave the text fields blank
-                    if the image already has its own wording baked in.
                 </p>
             </div>
 
@@ -639,57 +661,6 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
                                     alt={`Slide ${idx + 1}`}
                                     style={{ width: '100%', height: '120px', objectFit: 'cover' }}
                                 />
-                                {/* Live text overlay — leave every field blank for a banner
-                                    whose artwork already carries its own wording. */}
-                                <div style={{ padding: '8px 8px 0', display: 'grid', gap: '6px' }}>
-                                    <input
-                                        value={slide.title || ''}
-                                        onChange={e => updateSlide(idx, 'title', e.target.value)}
-                                        placeholder="Headline (optional)"
-                                        style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                    />
-                                    <input
-                                        value={slide.subtitle || ''}
-                                        onChange={e => updateSlide(idx, 'subtitle', e.target.value)}
-                                        placeholder="Sub-text (optional)"
-                                        style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                    />
-                                    <div style={{ display: 'flex', gap: '6px' }}>
-                                        <input
-                                            value={slide.ctaLabel || ''}
-                                            onChange={e => updateSlide(idx, 'ctaLabel', e.target.value)}
-                                            placeholder="Button text"
-                                            style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                        />
-                                        <input
-                                            value={slide.ctaHref || ''}
-                                            onChange={e => updateSlide(idx, 'ctaHref', e.target.value)}
-                                            placeholder="/products"
-                                            style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                        />
-                                    </div>
-                                    <div style={{ display: 'flex', gap: '6px' }}>
-                                        <select
-                                            value={slide.align || 'left'}
-                                            onChange={e => updateSlide(idx, 'align', e.target.value)}
-                                            style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                            title="Which side of the artwork the text sits on"
-                                        >
-                                            <option value="left">Text: Left</option>
-                                            <option value="center">Text: Center</option>
-                                            <option value="right">Text: Right</option>
-                                        </select>
-                                        <select
-                                            value={slide.textTone || 'light'}
-                                            onChange={e => updateSlide(idx, 'textTone', e.target.value)}
-                                            style={{ ...input, padding: '6px 8px', fontSize: '11px' }}
-                                            title="Use light text on dark banners"
-                                        >
-                                            <option value="light">Light text</option>
-                                            <option value="dark">Dark text</option>
-                                        </select>
-                                    </div>
-                                </div>
                                 <div style={{ padding: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontSize: '11px', fontWeight: 700, color: '#555' }}>Slide {idx + 1}</span>
                                     <div style={{ display: 'flex', gap: '4px' }}>
@@ -699,7 +670,7 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
                                             style={{ ...btnSmall, padding: '4px 6px', opacity: idx === 0 ? 0.3 : 1 }}
                                             title="Move Up"
                                         >
-                                            <LuArrowUp size={12} />
+                                            <FiArrowUp size={12} />
                                         </button>
                                         <button
                                             onClick={() => moveSlide(idx, 'down')}
@@ -707,14 +678,14 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
                                             style={{ ...btnSmall, padding: '4px 6px', opacity: idx === slides.length - 1 ? 0.3 : 1 }}
                                             title="Move Down"
                                         >
-                                            <LuArrowDown size={12} />
+                                            <FiArrowDown size={12} />
                                         </button>
                                         <button
                                             onClick={() => removeSlide(idx)}
                                             style={{ ...btnSmall, padding: '4px 6px', background: '#fef2f2', color: '#dc2626' }}
                                             title="Delete"
                                         >
-                                            <LuTrash2 size={12} />
+                                            <FiTrash2 size={12} />
                                         </button>
                                     </div>
                                 </div>
@@ -724,108 +695,23 @@ function HeroSlidesTab({ data, setData, onSave, isSaving }: { data: any; setData
                 </div>
             )}
 
-            {/* Add New Slides — upload one or many at once */}
+            {/* Add New Slide */}
             <div style={card}>
-                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Add Banner Images</h3>
-                <p style={{ fontSize: '11px', color: '#888', margin: '0 0 8px' }}>
-                    Select <strong>one or more</strong> images at once — each becomes a slide that auto-rotates on the homepage. You can reorder or remove them above, and change them anytime.
-                </p>
-                <div style={{
-                    fontSize: '12px', color: '#b45309', fontWeight: 700, margin: '0 0 14px',
-                    background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '8px 12px',
-                }}>
-                    📐 Recommended banner size: <strong>1920 × 540 px</strong> (16 : 4.5 ratio, wide &amp; short) &nbsp;·&nbsp; JPG / PNG / WebP &nbsp;·&nbsp; under 10&nbsp;MB each.
-                    <br />Design all banners at this exact size so every slide looks sharp and aligned.
-                </div>
-                <MultipleImageUploader
-                    label="Banner Images"
-                    values={[]}
-                    onChange={(urls) => addSlides(urls)}
-                    max={10}
-                />
-            </div>
-
-            {/* ── Mid-page promo banner ── */}
-            <div style={card}>
-                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>🎯 Homepage Promo Banner</h3>
+                <h3 style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 6px' }}>Add New Slide</h3>
                 <p style={{ fontSize: '11px', color: '#888', margin: '0 0 12px' }}>
-                    A single wide banner shown on the homepage <strong>between “Popular Products” and “New Arrivals”</strong>.
-                    Leave the image empty (or switch it off) to hide the section entirely. Same recommended size — <strong>1920 × 540 px</strong>.
+                    Upload a high-quality banner image (recommended: 1920×540px or 16:4.5 ratio)
                 </p>
-
-                <div style={{ display: 'grid', gap: '10px' }}>
-                    <SingleImageUploader
-                        label="Banner Image"
-                        value={banner.imageUrl || ''}
-                        onChange={(url: string) => updateBanner('imageUrl', url)}
-                    />
-
-                    {banner.imageUrl && (
-                        <img
-                            src={banner.imageUrl}
-                            alt="Promo banner preview"
-                            style={{ width: '100%', maxHeight: '130px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                        />
-                    )}
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                        <div>
-                            <label style={label}>Show on homepage</label>
-                            <select
-                                value={banner.active === false ? 'false' : 'true'}
-                                onChange={e => updateBanner('active', e.target.value === 'true')}
-                                style={input}
-                            >
-                                <option value="true">Yes — visible</option>
-                                <option value="false">No — hidden</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style={label}>Click goes to</label>
-                            <input
-                                value={banner.link || ''}
-                                onChange={e => updateBanner('link', e.target.value)}
-                                placeholder="/products"
-                                style={input}
-                            />
-                        </div>
-                    </div>
-
-                    <p style={{ fontSize: '11px', color: '#888', margin: '4px 0 0' }}>
-                        Text below is optional — leave blank if your artwork already has its own wording.
-                    </p>
-
-                    <div><label style={label}>Headline</label>
-                        <input value={banner.title || ''} onChange={e => updateBanner('title', e.target.value)} style={input} /></div>
-                    <div><label style={label}>Sub-text</label>
-                        <input value={banner.subtitle || ''} onChange={e => updateBanner('subtitle', e.target.value)} style={input} /></div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                        <div><label style={label}>Button text</label>
-                            <input value={banner.ctaLabel || ''} onChange={e => updateBanner('ctaLabel', e.target.value)} style={input} /></div>
-                        <div>
-                            <label style={label}>Text side</label>
-                            <select value={banner.align || 'left'} onChange={e => updateBanner('align', e.target.value)} style={input}>
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style={label}>Text colour</label>
-                            <select value={banner.textTone || 'light'} onChange={e => updateBanner('textTone', e.target.value)} style={input}>
-                                <option value="light">Light</option>
-                                <option value="dark">Dark</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <SingleImageUploader
+                    label="Slide Image"
+                    value=""
+                    onChange={(url) => { if (url) addSlide(url); }}
+                />
             </div>
 
             {/* Save Button */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
                 <button onClick={handleSaveHero} disabled={isSaving} style={{ ...btnPrimary, opacity: isSaving ? 0.6 : 1 }}>
-                    <LuSave size={13} /> {isSaving ? 'Saving...' : 'Save Banners'}
+                    <FiSave size={13} /> {isSaving ? 'Saving...' : 'Save Hero Slides'}
                 </button>
             </div>
         </div>

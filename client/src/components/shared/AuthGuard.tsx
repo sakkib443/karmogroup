@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -5,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 
-type Role = 'superadmin' | 'admin' | 'user';
+type Role = 'superadmin' | 'admin' | 'editor' | 'user';
 
 interface AuthGuardProps {
     children: ReactNode;
@@ -20,17 +21,12 @@ interface AuthGuardProps {
 function AuthGuard({ children, requiredRole }: AuthGuardProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const { user, token, isAuthenticated, isRestoring } = useSelector((state: RootState) => state.auth);
+    const { user, token } = useSelector((state: RootState) => state.auth);
 
     // Hydration flag: avoid SSR mismatch and don't flash a redirect before
     // the persisted auth state / localStorage token is available on the client.
     const [mounted, setMounted] = useState(false);
     useEffect(() => { setMounted(true); }, []);
-
-    // On a refresh the saved token is still in localStorage but the user has to
-    // be fetched again (see restoreSession in redux/provider). Until that
-    // settles we know nothing — deciding now would log a signed-in user out.
-    const settling = !mounted || isRestoring;
 
     // Resolve a token from either Redux or localStorage (in case the slice
     // hasn't rehydrated the token yet but it persists in storage).
@@ -42,7 +38,9 @@ function AuthGuard({ children, requiredRole }: AuthGuardProps) {
         return false;
     })();
 
-    const authed = (isAuthenticated || hasToken) && !!user;
+    // If there is a token in storage, but user object is not yet loaded into Redux:
+    // Auth is still hydrating! Do NOT redirect to login; wait for AuthHydrator.
+    const isHydrating = !mounted || (hasToken && !user);
 
     const allowedRoles: Role[] | null = requiredRole
         ? (Array.isArray(requiredRole) ? requiredRole : [requiredRole])
@@ -56,33 +54,39 @@ function AuthGuard({ children, requiredRole }: AuthGuardProps) {
         (!!user?.role && allowedRoles.includes(user.role));
 
     useEffect(() => {
-        if (settling) return;
+        // While still mounting or hydrating from token, do nothing
+        if (isHydrating) return;
 
-        if (!authed) {
+        // If no token exists and no user exists -> genuinely unauthenticated
+        if (!hasToken && !user) {
             const redirect = encodeURIComponent(pathname || '/');
             router.replace(`/login?redirect=${redirect}`);
             return;
         }
 
-        if (!roleAllowed) {
+        // If user is authenticated but doesn't have role permission
+        if (user && !roleAllowed) {
             router.replace('/');
         }
-    }, [settling, authed, roleAllowed, pathname, router]);
+    }, [isHydrating, hasToken, user, roleAllowed, pathname, router]);
 
-    // Still hydrating / restoring the session: render a lightweight loader.
-    if (settling) {
+    // Still hydrating: render a sleek, lightweight loader (no redirect flash).
+    if (isHydrating) {
         return (
             <div style={{
                 minHeight: '60vh', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', color: '#94A3B8', fontSize: '14px',
             }}>
-                Loading...
+                <div className="flex flex-col items-center gap-2.5">
+                    <div className="w-8 h-8 border-3 border-green-600/20 border-t-green-600 rounded-full animate-spin" />
+                    <span className="text-xs text-gray-400 font-medium">Verifying access...</span>
+                </div>
             </div>
         );
     }
 
     // Not authenticated or not authorized: render nothing while redirecting.
-    if (!authed || !roleAllowed) {
+    if (!user || !roleAllowed) {
         return null;
     }
 

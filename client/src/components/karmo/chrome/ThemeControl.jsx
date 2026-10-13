@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useMattressHeroVeil } from "@/components/karmo/chrome/mattressHeroVeil";
 
 /**
  * Theme Control — a preview panel for the homepage only.
@@ -210,6 +212,8 @@ const WIDTH_KEY = { hero: "widthHero", heading: "widthHeading" };
 export default function ThemeControl({ children, families, classNames }) {
   const [open, setOpen] = useState(false);
   const [cfg, setCfg] = useState(DEFAULTS);
+  const [veil, setVeil] = useMattressHeroVeil();
+  const onMattress = usePathname() === "/mattress";
   const rootRef = useRef(null);
 
   useEffect(() => {
@@ -341,6 +345,44 @@ export default function ThemeControl({ children, families, classNames }) {
           </svg>
           Theme Control
         </button>
+
+        {/* Mattress hero only. The number is the wash at the bottom of this
+            photo (50% as drawn). Other heroes are left alone. */}
+        {onMattress ? (
+        <div className="mt-1.5 w-[15.5rem] rounded border border-[#0b6e78] bg-[#14919B] p-2.5 text-white shadow-[0_12px_28px_-16px_rgba(0,0,0,0.45)]">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.14em]">
+              Mattress
+            </span>
+            <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-white/75">
+              Hero overlay
+            </span>
+          </div>
+          <div className="mt-2 flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setVeil(veil - 5)}
+              disabled={veil <= 0}
+              aria-label="Lighter mattress hero overlay"
+              className="flex h-7 w-7 items-center justify-center rounded border border-white/40 text-[13px] font-bold text-white transition-colors hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              &minus;
+            </button>
+            <span className="flex-1 text-center text-[12px] font-semibold tabular-nums">
+              {veil}%
+            </span>
+            <button
+              type="button"
+              onClick={() => setVeil(veil + 5)}
+              disabled={veil >= 90}
+              aria-label="Darker mattress hero overlay"
+              className="flex h-7 w-7 items-center justify-center rounded border border-white/40 text-[13px] font-bold text-white transition-colors hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              +
+            </button>
+          </div>
+        </div>
+        ) : null}
 
         {open ? (
           <div className="mt-1.5 w-[15.5rem] rounded border border-ink/15 bg-white p-3 shadow-[0_18px_44px_-18px_rgba(0,0,0,0.45)]">

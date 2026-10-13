@@ -1,11 +1,12 @@
-import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
+import Header from "@/components/karmo/header/Header";
+import CertifiedBy from "@/components/karmo/home/CertifiedBy";
 import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 import Link from "next/link";
 
 /**
  * Auth routes (login, register, password reset, verify).
- * Same HeaderTwo + Footer chrome as the public storefront / Home 02.
+ * Same karmo Header + CertifiedBy + Footer chrome as the rest of the site.
  */
 export default function AuthLayout({
   children,
@@ -15,8 +16,8 @@ export default function AuthLayout({
   return (
     <>
       <SmoothScroll />
-      <HeaderTwo />
-      <main className="relative min-h-screen overflow-hidden bg-cream pt-[109px] lg:pt-[178px]">
+      <Header />
+      <main className="relative min-h-screen overflow-hidden bg-cream pt-[136px] sm:pt-[144px]">
         {/* Soft brand wash — atmosphere without the old purple aurora. */}
         <div className="pointer-events-none absolute inset-0">
           <div
@@ -70,6 +71,7 @@ export default function AuthLayout({
           </div>
         </div>
       </main>
+      <CertifiedBy />
       <Footer />
     </>
   );

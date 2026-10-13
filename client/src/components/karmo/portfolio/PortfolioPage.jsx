@@ -1,6 +1,6 @@
 import PortfolioBanner from "@/components/karmo/portfolio/PortfolioBanner";
 import PortfolioGallery from "@/components/karmo/portfolio/PortfolioGallery";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import OrderAndContact from "@/components/karmo/about/OrderAndContactClassic";
 
 /**
  * `/portfolio` — filterable gallery. CertifiedBy is in the karmo-2 layout

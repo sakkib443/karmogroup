@@ -3,10 +3,7 @@
  * Opens wa.me in a new tab with a pre-filled message.
  */
 
-// The admin's WhatsApp number comes from site-content (passed in as adminPhone).
-// It is deliberately not hardcoded here: a baked-in number kept messaging the old
-// account after the shop's number changed in Settings. With none configured, the
-// helpers below no-op.
+const ADMIN_WHATSAPP = ''; // no sample number: nothing opens until siteContent has one
 
 export function sendOrderToWhatsApp(data: {
     adminPhone?: string;
@@ -17,13 +14,13 @@ export function sendOrderToWhatsApp(data: {
     totalPrice?: number;
     note?: string;
 }) {
-    const phone = data.adminPhone || '';
-    if (!phone) return; // no WhatsApp number configured yet
+    const phone = data.adminPhone || ADMIN_WHATSAPP;
+    if (!phone.replace(/[^0-9]/g, '')) return; // no WhatsApp number set yet
     const itemLines = data.items.map((item, i) =>
         `${i + 1}. ${item.name || 'Product'} × ${item.quantity}${item.color ? ` (${item.color})` : ''}${item.size ? ` [${item.size}]` : ''}${item.price ? ` — ৳${item.price}` : ''}`
     ).join('\n');
 
-    const msg = `🛒 *New Order — S Kawsar Sunnah Mart*
+    const msg = `🛒 *New Order — Shohoz Krishi*
 
 👤 *Name:* ${data.customerName}
 📞 *Contact:* ${data.customerContact}
@@ -49,11 +46,11 @@ export function sendInquiryToWhatsApp(data: {
     color?: string;
     size?: string;
 }) {
-    const phone = data.adminPhone || '';
-    if (!phone) return; // no WhatsApp number configured yet
+    const phone = data.adminPhone || ADMIN_WHATSAPP;
+    if (!phone.replace(/[^0-9]/g, '')) return; // no WhatsApp number set yet
     const variantInfo = [data.color, data.size].filter(Boolean).join(' / ');
 
-    const msg = `❓ *New Inquiry — S Kawsar Sunnah Mart*
+    const msg = `❓ *New Inquiry — Shohoz Krishi*
 
 👤 *Name:* ${data.customerName}
 📞 *Contact:* ${data.customerContact}

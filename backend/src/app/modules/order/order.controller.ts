@@ -31,6 +31,11 @@ const OrderController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Order status updated', data: order });
     }),
 
+    sendWithPathao: catchAsync(async (req: Request, res: Response) => {
+        const order = await OrderService.sendWithPathao(req.params.id);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Sent with Pathao', data: order });
+    }),
+
     updatePaymentStatus: catchAsync(async (req: Request, res: Response) => {
         const order = await OrderService.updatePaymentStatus(req.params.id, req.body.paymentStatus);
         sendResponse(res, { statusCode: 200, success: true, message: 'Payment status updated', data: order });

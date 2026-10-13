@@ -11,21 +11,21 @@ import { FiChevronRight } from "react-icons/fi";
 const SLIDES = [
   {
     id: "quilt-side",
-    image: "/karmo/images/home-02/divisions/karmo-pattern-quilt-tuft.webp",
+    image: "/shared/divisions/karmo-pattern-quilt-tuft.webp",
     imageOpacity: 0.24,
     overlay: "bg-white/50",
     hidden: true,
   },
   {
     id: "damask",
-    image: "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp",
+    image: "/products/mattress/mosaic/karmo-pattern-texture.webp",
     imageOpacity: 0.38,
     overlay: "bg-white/50",
     hidden: true,
   },
   {
     id: "damask-quilted",
-    image: "/karmo/images/home-02/divisions/karmo-damask-quilted-v3.webp",
+    image: "/shared/divisions/karmo-damask-quilted-v3.webp",
     imageOpacity: 0.5,
     overlay: "bg-white/45",
   },

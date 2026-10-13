@@ -1,73 +1,158 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import {
-    LuSearch,
-    LuDownload,
-    LuEye,
-    LuPackage,
-    LuChevronLeft,
-    LuChevronRight,
-    LuRefreshCw,
-    LuCalendar,
-    LuEllipsisVertical,
-    LuX
-} from 'react-icons/lu';
+import { LuPlus, LuDownload, LuEye, LuExternalLink, LuStickyNote, LuX, LuPackage, LuBarcode, LuReceiptText, LuRepeat, LuCheck } from 'react-icons/lu';
 import {
     useGetAdminOrdersQuery,
     useUpdateOrderStatusMutation,
     useUpdatePaymentStatusMutation,
-    useGetOrderStatsQuery
+    useGetOrderStatsQuery,
+    useAddAdminNoteMutation,
 } from '@/redux/api/orderApi';
+import { useGetProductsQuery } from '@/redux/api/productApi';
 import { toast } from 'react-hot-toast';
+import { ORDER_STATUS_CONFIG, getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
 import {
-    ORDER_STATUS_CONFIG,
-    getStatusConfig,
-    paymentMethodLabel,
-    paymentMethodBadge,
-} from '@/lib/orderStatus';
-import OrderItemsPreview from '@/components/shared/OrderItemsPreview';
+    PageHeader, Btn, SearchInput, SelectPill, FilterBar, StatTile, Badge, BadgeSelect, TableCard,
+    TH, TD, TR, EmptyRow, SkeletonRows, RowMenu, Modal, TEXTAREA, taka, fmtDateTime, cx, type Tone,
+} from '@/components/admin/ui';
+import PrintOrdersModal, { type PrintJob, type PrintKind } from '@/components/admin/print/PrintOrdersModal';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
-// Payment Method Badge (shared label + colors, incl. sslcommerz)
-const PaymentMethodBadge = ({ method }: { method: string }) => {
-    const key = (method || '').toLowerCase();
-    const label = method ? paymentMethodLabel(method) : '—';
-    const c = paymentMethodBadge[key] || { bg: '#f3f4f6', color: '#6b7280' };
+// Orders load 50 at a time and "See more" adds the next 50 BELOW the ones already
+// shown, so a long selection for printing or a bulk status change is never split
+// across pages.
+const PAGE_SIZE = 50;
+
+/**
+ * Same phone, same day. Two parcels to one customer are paid for twice at the courier
+ * and are often one order placed again by mistake, so the row links straight to the
+ * other order. The server works this out (repeatToday on each order).
+ */
+function RepeatTodayChip({ info }: { info?: { count: number; position: number; other: { _id: string; orderId: string } } | null }) {
+    if (!info?.other?._id) return null;
+    const nth = (n: number) => (n === 1 ? '1st' : n === 2 ? '2nd' : n === 3 ? '3rd' : `${n}th`);
+    const label = info.position > 1 ? `${nth(info.position)} order today` : `1st of ${info.count} today`;
     return (
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold" style={{ background: c.bg, color: c.color }}>
-            {label}
-        </span>
+        <Link
+            href={`/dashboard/admin/orders/${info.other._id}`}
+            title={`Same phone ordered ${info.count} times today — open ${info.other.orderId}`}
+            className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200 transition hover:bg-amber-100"
+        >
+            <LuRepeat size={11} /> {label}
+        </Link>
     );
+}
+
+/** One click from Pending to Confirmed — the call to the customer is the check. */
+function ConfirmButton({ onClick }: { onClick: () => void }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className="mt-1.5 flex h-7 w-fit items-center gap-1 rounded-full bg-blue-600 px-3 text-xs font-medium text-white transition hover:bg-blue-700"
+        >
+            <LuCheck size={13} /> Confirm
+        </button>
+    );
+}
+
+const ORDER_TONE: Record<string, Tone> = {
+    pending: 'orange', confirmed: 'blue', factory: 'purple', challan_ready: 'red', courier_entry: 'lime',
+    shipped: 'rose', delivered: 'green', cancelled: 'gray', returned: 'gray', refunded: 'indigo',
+    processing: 'purple', on_the_way: 'sky', out_for_delivery: 'teal', delivery_attempt: 'amber',
 };
 
+const PAYMENT: Record<string, { label: string; tone: Tone }> = {
+    pending: { label: 'Unpaid', tone: 'red' },
+    paid: { label: 'Paid', tone: 'green' },
+    failed: { label: 'Failed', tone: 'red' },
+    refunded: { label: 'Refunded', tone: 'purple' },
+};
+
+const STATUS_OPTIONS = Object.entries(ORDER_STATUS_CONFIG).map(([value, cfg]) => ({ value, label: cfg.label }));
+const PAYMENT_OPTIONS = Object.entries(PAYMENT).map(([value, p]) => ({ value, label: p.label }));
+
+const customerName = (o: any) =>
+    o.shippingAddress?.fullName || `${o.user?.firstName || ''} ${o.user?.lastName || ''}`.trim() || 'Guest';
+const customerPhone = (o: any) => o.shippingAddress?.phone || o.user?.phone || '';
+const parcelId = (o: any) => (o.packages || []).map((p: any) => p.consignmentId).filter(Boolean).join(', ');
+
+/** What has been paid and what is still owed on an order. */
+function money(o: any) {
+    const total = Number(o.total || 0);
+    if (o.paymentStatus === 'paid') return { paid: total, due: 0 };
+    if (o.paymentStatus === 'refunded') return { paid: 0, due: 0, refunded: true };
+    // A cancelled order is owed nothing.
+    if (o.status === 'cancelled') return { paid: 0, due: 0 };
+    return { paid: 0, due: total };
+}
+
+function useDebounced<T>(value: T, ms = 300) {
+    const [v, setV] = useState(value);
+    useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
+    return v;
+}
+
+// useSearchParams needs a Suspense boundary (Next.js falls back to client rendering up to it).
 export default function OrdersPage() {
+    return (
+        <Suspense fallback={null}>
+            <OrdersPageInner />
+        </Suspense>
+    );
+}
+
+function OrdersPageInner() {
+    // ?status=pending (the Dashboard's links) pre-selects the status filter.
+    const statusParam = useSearchParams().get('status');
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [page, setPage] = useState(1);
+    const [statusFilter, setStatusFilter] = useState(
+        statusParam && Object.prototype.hasOwnProperty.call(ORDER_STATUS_CONFIG, statusParam) ? statusParam : 'all',
+    );
+    const [paymentFilter, setPaymentFilter] = useState('all');
+    const [productFilter, setProductFilter] = useState('all');
+    const [visible, setVisible] = useState(PAGE_SIZE);
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [bulkStatus, setBulkStatus] = useState('');
-    const limit = 10;
+    const [noteFor, setNoteFor] = useState<any>(null);
+    const [noteText, setNoteText] = useState('');
+    const [printJob, setPrintJob] = useState<PrintJob | null>(null);
+    const q = useDebounced(search);
 
-    // API Hooks
-    const { data: ordersData, isLoading, refetch } = useGetAdminOrdersQuery({
-        page,
-        limit,
+    const { data: ordersData, isLoading, isFetching } = useGetAdminOrdersQuery({
+        page: 1,
+        limit: visible,
         status: statusFilter !== 'all' ? statusFilter : undefined,
-        search: search || undefined,
+        paymentStatus: paymentFilter !== 'all' ? paymentFilter : undefined,
+        'items.product': productFilter !== 'all' ? productFilter : undefined,
+        searchTerm: q || undefined,
     });
-
     const { data: statsData } = useGetOrderStatsQuery({});
+    const { data: productsData } = useGetProductsQuery({ limit: 200, sort: 'name', fields: 'name' });
     const [updateStatus] = useUpdateOrderStatusMutation();
     const [updatePayment] = useUpdatePaymentStatusMutation();
+    // Editors confirm orders and print; payments and creating orders are for admins.
+    const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
+    const [addNote, { isLoading: isSavingNote }] = useAddAdminNoteMutation();
+
+    const orders: any[] = ordersData?.data || [];
+    const meta = ordersData?.meta || { total: 0, totalPages: 1 };
+    const stats = statsData?.data || {};
+    const products: any[] = productsData?.data || [];
+
+    // Any change of filter goes back to the first 50 and starts a fresh selection.
+    const resetPage = () => { setVisible(PAGE_SIZE); setSelected(new Set()); };
+    const hasMore = orders.length < (meta.total || 0);
 
     const handleStatusChange = async (orderId: string, newStatus: string) => {
         try {
             await updateStatus({ id: orderId, status: newStatus }).unwrap();
-            toast.success(`Order status updated to ${newStatus}`, {
-                style: { borderRadius: '8px', background: 'var(--color-primary)', color: '#fff' },
-            });
-            refetch();
+            toast.success(`Status changed to ${getStatusConfig(newStatus).label}`);
         } catch (err: any) {
             toast.error(err?.data?.message || 'Failed to update status');
         }
@@ -76,39 +161,30 @@ export default function OrdersPage() {
     const handlePaymentChange = async (orderId: string, newStatus: string) => {
         try {
             await updatePayment({ id: orderId, paymentStatus: newStatus }).unwrap();
-            toast.success(`Payment status updated to ${newStatus}`, {
-                style: { borderRadius: '8px', background: 'var(--color-primary)', color: '#fff' },
-            });
-            refetch();
+            toast.success(`Payment marked ${PAYMENT[newStatus]?.label || newStatus}`);
         } catch (err: any) {
             toast.error(err?.data?.message || 'Failed to update payment');
         }
     };
 
-    const orders = ordersData?.data || [];
-    const totalPages = ordersData?.meta?.totalPages || 1;
-    const totalOrders = ordersData?.meta?.total || 0;
-
     const exportOrdersCsv = (list: any[], suffix: string) => {
-        if (!list.length) {
-            toast.error('No orders to export');
-            return;
-        }
-        const headers = ['Order ID', 'Customer', 'Items', 'Total', 'Payment Method', 'Payment Status', 'Status', 'Date'];
+        if (!list.length) { toast.error('No orders to export'); return; }
+        const headers = ['Order No', 'Parcel', 'Customer', 'Phone', 'Items', 'Total', 'Paid', 'Due', 'Payment Method', 'Payment Status', 'Status', 'Placed'];
         const escapeCell = (val: any) => {
             const s = String(val ?? '');
             return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
         };
-        const rows = list.map((order: any) => [
-            order.orderId || order.orderNumber || order._id,
-            `${order.user?.firstName || ''} ${order.user?.lastName || ''}`.trim() || order.shippingAddress?.fullName || 'Guest',
-            order.items?.length || 0,
-            order.total ?? 0,
-            order.paymentMethod ? paymentMethodLabel(order.paymentMethod) : '',
-            order.paymentStatus || '',
-            getStatusConfig(order.status).label,
-            order.createdAt ? new Date(order.createdAt).toLocaleString() : '',
-        ]);
+        const rows = list.map((o: any) => {
+            const m = money(o);
+            return [
+                o.orderId || o._id, parcelId(o), customerName(o), customerPhone(o),
+                o.items?.length || 0, o.total ?? 0, m.paid, m.due,
+                o.paymentMethod ? paymentMethodLabel(o.paymentMethod) : '',
+                PAYMENT[o.paymentStatus]?.label || o.paymentStatus || '',
+                getStatusConfig(o.status).label,
+                o.createdAt ? new Date(o.createdAt).toLocaleString() : '',
+            ];
+        });
         const csv = [headers, ...rows].map((r) => r.map(escapeCell).join(',')).join('\n');
         const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -122,455 +198,308 @@ export default function OrdersPage() {
         toast.success(`Exported ${list.length} orders`);
     };
 
-    const handleExportOrders = () => exportOrdersCsv(orders, `page-${page}`);
-
     // ── Bulk selection ──
-    useEffect(() => { setSelected(new Set()); }, [page, statusFilter, search]);
-
     const allSelected = orders.length > 0 && orders.every((o: any) => selected.has(o._id));
     const someSelected = selected.size > 0 && !allSelected;
 
-    const toggleOne = (id: string) => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id);
-            else next.add(id);
-            return next;
-        });
-    };
-
-    const toggleAll = () => {
-        setSelected((prev) => {
-            const next = new Set(prev);
-            if (orders.every((o: any) => next.has(o._id))) {
-                orders.forEach((o: any) => next.delete(o._id));
-            } else {
-                orders.forEach((o: any) => next.add(o._id));
-            }
-            return next;
-        });
-    };
-
+    const toggleOne = (id: string) => setSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) next.delete(id); else next.add(id);
+        return next;
+    });
+    const toggleAll = () => setSelected((prev) => {
+        const next = new Set(prev);
+        if (orders.every((o: any) => next.has(o._id))) orders.forEach((o: any) => next.delete(o._id));
+        else orders.forEach((o: any) => next.add(o._id));
+        return next;
+    });
     const clearSelection = () => setSelected(new Set());
+
+    // Labels / invoices for the selected orders, in the order the table shows them.
+    const printSelected = (kind: PrintKind) => {
+        const shown = orders.filter((o: any) => selected.has(o._id)).map((o: any) => o._id as string);
+        const others = Array.from(selected).filter((id) => !shown.includes(id));
+        setPrintJob({ kind, ids: [...shown, ...others] });
+    };
 
     const handleBulkStatus = async (newStatus: string) => {
         const ids = Array.from(selected);
         if (!ids.length || !newStatus) return;
-        const tId = toast.loading(`Updating ${ids.length} order${ids.length > 1 ? 's' : ''}...`);
-        const results = await Promise.allSettled(
-            ids.map((id) => updateStatus({ id, status: newStatus }).unwrap())
-        );
+        const tId = toast.loading(`Updating ${ids.length} order${ids.length > 1 ? 's' : ''}…`);
+        const results = await Promise.allSettled(ids.map((id) => updateStatus({ id, status: newStatus }).unwrap()));
         const ok = results.filter((r) => r.status === 'fulfilled').length;
         const failed = results.length - ok;
-        if (ok > 0) {
-            toast.success(
-                `Updated ${ok} order${ok > 1 ? 's' : ''} to ${getStatusConfig(newStatus).label}${failed ? ` · ${failed} failed` : ''}`,
-                { id: tId }
-            );
-        } else {
-            toast.error('Could not update the selected orders', { id: tId });
-        }
+        if (ok > 0) toast.success(`Updated ${ok} order${ok > 1 ? 's' : ''} to ${getStatusConfig(newStatus).label}${failed ? ` · ${failed} failed` : ''}`, { id: tId });
+        else toast.error('Could not update the selected orders', { id: tId });
         clearSelection();
         setBulkStatus('');
-        refetch();
     };
 
-    const handleExportSelected = () =>
-        exportOrdersCsv(orders.filter((o: any) => selected.has(o._id)), 'selected');
-
-    const formatDate = (dateString: string) => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
+    const saveNote = async () => {
+        if (!noteText.trim()) { toast.error('Write a note first'); return; }
+        try {
+            await addNote({ id: noteFor._id, note: noteText.trim() }).unwrap();
+            toast.success('Note added to the order timeline');
+            setNoteFor(null);
+            setNoteText('');
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Failed to add note');
+        }
     };
 
-    const statsConfig = [
-        { label: 'All Orders', value: statsData?.data?.total || 0, color: 'text-gray-700', bg: 'bg-white border-gray-200', key: 'all' },
-        { label: 'Pending', value: statsData?.data?.pending || 0, color: 'text-yellow-700', bg: 'bg-white border-yellow-200', key: 'pending' },
-        { label: 'Confirmed', value: statsData?.data?.confirmed || 0, color: 'text-blue-700', bg: 'bg-white border-blue-200', key: 'confirmed' },
-        { label: 'Processing', value: statsData?.data?.processing || 0, color: 'text-purple-700', bg: 'bg-white border-purple-200', key: 'processing' },
-        { label: 'Shipped', value: statsData?.data?.shipped || 0, color: 'text-indigo-700', bg: 'bg-white border-indigo-200', key: 'shipped' },
-        { label: 'Delivered', value: statsData?.data?.delivered || 0, color: 'text-green-700', bg: 'bg-white border-green-200', key: 'delivered' },
+    const tiles = [
+        { key: 'all', label: 'All orders', value: stats.total },
+        { key: 'pending', label: 'Pending', value: stats.pending },
+        { key: 'confirmed', label: 'Confirmed', value: stats.confirmed },
+        { key: 'factory', label: 'Factory', value: stats.factory },
+        { key: 'challan_ready', label: 'Challan Ready', value: stats.challan_ready },
+        { key: 'courier_entry', label: 'Courier Entry', value: stats.courier_entry },
+        { key: 'shipped', label: 'Shipped', value: stats.shipped },
+        { key: 'cancelled', label: 'Cancelled', value: stats.cancelled },
     ];
 
-    return (
-        <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Orders Management</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage and track all customer orders from one place</p>
-                </div>
-                <div className="flex gap-3">
-                    <button
-                        onClick={() => refetch()}
-                        className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
-                    >
-                        <LuRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
-                        Refresh
-                    </button>
-                    <button
-                        onClick={handleExportOrders}
-                        className="px-5 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:bg-[var(--color-primary-dark)] transition-all shadow-md flex items-center gap-2"
-                    >
-                        <LuDownload size={16} />
-                        Export Orders
-                    </button>
-                </div>
-            </div>
+    const rowMenu = (o: any) => (
+        <RowMenu items={[
+            { label: 'Open full page', icon: <LuExternalLink size={15} />, href: `/dashboard/admin/orders/${o._id}` },
+            { label: 'Add note', icon: <LuStickyNote size={15} />, onClick: () => { setNoteFor(o); setNoteText(''); } },
+            { label: 'Print label', icon: <LuBarcode size={15} />, onClick: () => setPrintJob({ kind: 'labels', ids: [o._id] }) },
+            { label: 'Print invoice', icon: <LuReceiptText size={15} />, onClick: () => setPrintJob({ kind: 'invoices', ids: [o._id] }) },
+        ]} />
+    );
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                {statsConfig.map((stat, i) => (
-                    <div
-                        key={i}
-                        className={`${stat.bg} border rounded-md p-4 cursor-pointer transition-all hover:shadow-md bg-white ${statusFilter === stat.key ? 'ring-2 ring-[var(--color-primary)] border-transparent' : ''}`}
-                        onClick={() => {
-                            setStatusFilter(stat.key);
-                            setPage(1);
-                        }}
-                    >
-                        <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                        <p className={`text-sm ${stat.color} opacity-80 font-medium`}>{stat.label}</p>
-                    </div>
+    return (
+        <div>
+            <PageHeader
+                title="Orders"
+                subtitle="Customer sales orders - from the store and taken by phone."
+                actions={<>
+                    <Btn icon={<LuDownload size={15} />} onClick={() => exportOrdersCsv(orders, 'orders')}>Export</Btn>
+                    <Btn variant="primary" icon={<LuPlus size={16} />} href="/dashboard/admin/orders/new">New order</Btn>
+                </>}
+            />
+
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+                {tiles.map((t) => (
+                    <StatTile
+                        key={t.key}
+                        label={t.label}
+                        value={(t.value || 0).toLocaleString('en-IN')}
+                        active={statusFilter === t.key}
+                        onClick={() => { setStatusFilter(t.key); resetPage(); }}
+                    />
                 ))}
             </div>
 
-            {/* Filters */}
-            <div className="bg-white rounded-md p-4 shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4">
-                {/* Search */}
-                <div className="flex-1 relative">
-                    <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                    <input
-                        type="text"
-                        placeholder="Search by order number, customer name..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-1 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] focus:bg-white transition-all outline-none text-sm"
-                    />
-                </div>
-
-                {/* Status Filter */}
-                <div className="flex gap-3">
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => {
-                            setStatusFilter(e.target.value);
-                            setPage(1);
-                        }}
-                        className="px-4 py-2.5 border border-gray-200 rounded-md focus:ring-1 focus:ring-[var(--color-primary)]/20 focus:border-[var(--color-primary)] transition-all outline-none text-sm bg-white min-w-[150px]"
-                    >
-                        <option value="all">Total Orders</option>
-                        {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-                            <option key={key} value={key}>{cfg.label}</option>
-                        ))}
-                    </select>
-
-                    <button className="px-4 py-2.5 border border-gray-200 rounded-md hover:bg-gray-50 flex items-center gap-2 text-sm font-medium transition-all shadow-sm text-gray-600">
-                        <LuCalendar size={16} />
-                        Filter Date
-                    </button>
-                </div>
-            </div>
+            <FilterBar>
+                <SearchInput value={search} onChange={(v) => { setSearch(v); resetPage(); }} placeholder="Search order no, customer, phone…" />
+                <SelectPill ariaLabel="Status" className="sm:w-44" value={statusFilter} onChange={(v) => { setStatusFilter(v); resetPage(); }}
+                    options={[{ value: 'all', label: 'All statuses' }, ...STATUS_OPTIONS]} />
+                <SelectPill ariaLabel="Payment" className="sm:w-40" value={paymentFilter} onChange={(v) => { setPaymentFilter(v); resetPage(); }}
+                    options={[{ value: 'all', label: 'All payments' }, ...PAYMENT_OPTIONS]} />
+                <SelectPill ariaLabel="Product" className="sm:w-56" value={productFilter} onChange={(v) => { setProductFilter(v); resetPage(); }}
+                    options={[{ value: 'all', label: 'All products' }, ...products.map((p) => ({ value: p._id, label: p.name }))]} />
+            </FilterBar>
 
             {/* Bulk action bar */}
             {selected.size > 0 && (
-                <div className="bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/30 rounded-md px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                        <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[var(--color-primary)] text-white text-xs">
-                            {selected.size}
-                        </span>
+                <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)] px-4 py-3 sm:flex-row sm:items-center">
+                    <p className="text-sm font-medium text-gray-800">
+                        <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-[var(--color-primary)] px-2 text-xs text-white">{selected.size}</span>
                         order{selected.size > 1 ? 's' : ''} selected
-                    </div>
-                    <div className="flex items-center gap-2 flex-wrap sm:ml-auto">
-                        <select
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
+                        <SelectPill
+                            ariaLabel="Change status"
+                            className="w-48"
                             value={bulkStatus}
-                            onChange={(e) => handleBulkStatus(e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-md text-sm bg-white outline-none focus:border-[var(--color-primary)] cursor-pointer"
-                        >
-                            <option value="">Change status to…</option>
-                            {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-                                <option key={key} value={key}>{cfg.label}</option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={handleExportSelected}
-                            className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all"
-                        >
-                            <LuDownload size={15} /> Export selected
-                        </button>
-                        <button
-                            onClick={clearSelection}
-                            className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center gap-1.5"
-                        >
-                            <LuX size={15} /> Clear
-                        </button>
+                            onChange={handleBulkStatus}
+                            options={[{ value: '', label: 'Change status to…' }, ...STATUS_OPTIONS]}
+                        />
+                        <Btn icon={<LuBarcode size={15} />} onClick={() => printSelected('labels')}>Print labels</Btn>
+                        <Btn icon={<LuReceiptText size={15} />} onClick={() => printSelected('invoices')}>Print invoices</Btn>
+                        <Btn icon={<LuDownload size={15} />} onClick={() => exportOrdersCsv(orders.filter((o) => selected.has(o._id)), 'selected')}>Export selected</Btn>
+                        <Btn variant="ghost" icon={<LuX size={15} />} onClick={clearSelection}>Clear</Btn>
                     </div>
                 </div>
             )}
 
-            {/* Orders Table */}
-            <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
-                {/* Desktop / tablet: table */}
-                <div className="hidden lg:block overflow-x-auto">
-                    <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100">
-                            <tr>
-                                <th className="px-6 py-4 w-12">
-                                    <input
-                                        type="checkbox"
-                                        aria-label="Select all orders on this page"
-                                        ref={(el) => { if (el) el.indeterminate = someSelected; }}
-                                        checked={allSelected}
-                                        onChange={toggleAll}
-                                        className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-[var(--color-primary)]"
-                                    />
-                                </th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Items</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Payment</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 italicContent">
-                            {isLoading ? (
-                                [...Array(limit)].map((_, i) => (
-                                    <tr key={i} className="animate-pulse">
-                                        <td className="px-6 py-4"><div className="h-4 w-4 bg-gray-100 rounded"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-24"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-32"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-20"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-16"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-16"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-20"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-24"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-100 rounded w-10 ml-auto"></div></td>
-                                    </tr>
-                                ))
-                            ) : orders.length === 0 ? (
-                                <tr>
-                                    <td colSpan={9} className="px-6 py-12 text-center">
-                                        <LuPackage size={48} className="mx-auto text-gray-200 mb-4" />
-                                        <p className="text-gray-500">No orders found matching your filters</p>
-                                    </td>
-                                </tr>
-                            ) : (
-                                orders.map((order: any) => (
-                                    <tr key={order._id} className={`transition-colors group ${selected.has(order._id) ? 'bg-[var(--color-primary)]/5' : 'hover:bg-gray-50/50'}`}>
-                                        <td className="px-6 py-4">
-                                            <input
-                                                type="checkbox"
-                                                aria-label="Select order"
-                                                checked={selected.has(order._id)}
-                                                onChange={() => toggleOne(order._id)}
-                                                className="w-4 h-4 rounded border-gray-300 cursor-pointer accent-[var(--color-primary)]"
-                                            />
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-semibold text-[var(--color-primary)]">{order.orderId || order.orderNumber}</p>
-                                            <div className="mt-1">
-                                                <PaymentMethodBadge method={order.paymentMethod} />
-                                            </div>
-                                            {order.transactionId && (
-                                                <p className="text-[10px] text-gray-400 font-mono mt-1 truncate max-w-[100px]" title={order.transactionId}>
-                                                    TxID: {order.transactionId}
-                                                </p>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-medium text-gray-800">
-                                                {order.user?.firstName} {order.user?.lastName}
-                                            </p>
-                                            <p className="text-xs text-gray-400">{order.user?.email}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <OrderItemsPreview items={order.items} totalCount={order.items?.length} />
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="font-bold text-gray-800">৳{order.total?.toLocaleString()}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <select
-                                                value={order.paymentStatus || 'pending'}
-                                                onChange={(e) => handlePaymentChange(order._id, e.target.value)}
-                                                className={`text-xs font-semibold px-2 py-1 rounded-md border-0 outline-none cursor-pointer transition-all ${
-                                                    order.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
-                                                    order.paymentStatus === 'failed' ? 'bg-red-100 text-red-700' :
-                                                    order.paymentStatus === 'refunded' ? 'bg-purple-100 text-purple-700' :
-                                                    'bg-yellow-100 text-yellow-700'
-                                                }`}
-                                            >
-                                                <option value="pending">Pending</option>
-                                                <option value="paid">Paid</option>
-                                                <option value="failed">Failed</option>
-                                                <option value="refunded">Refunded</option>
-                                            </select>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <select
-                                                value={order.status || 'pending'}
-                                                onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                                                className={`text-xs font-semibold px-2 py-1 rounded-md border-0 outline-none cursor-pointer transition-all ${getStatusConfig(order.status).badgeBg} ${getStatusConfig(order.status).badgeText}`}
-                                            >
-                                                {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-                                                    <option key={key} value={key}>{cfg.label}</option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Link
-                                                    href={`/dashboard/admin/orders/${order._id}`}
-                                                    className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-[var(--color-primary)] transition-all border border-transparent hover:border-gray-100"
-                                                    title="View Details"
-                                                >
-                                                    <LuEye size={18} />
-                                                </Link>
-                                                <button className="p-2 hover:bg-white hover:shadow-md rounded-md text-gray-400 hover:text-gray-600 transition-all border border-transparent hover:border-gray-100">
-                                                    <LuEllipsisVertical size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Mobile: cards */}
-                <div className="lg:hidden divide-y divide-gray-100">
-                    {isLoading ? (
-                        [...Array(5)].map((_, i) => (
-                            <div key={i} className="p-4 animate-pulse">
-                                <div className="h-24 bg-gray-100 rounded-lg" />
-                            </div>
-                        ))
-                    ) : orders.length === 0 ? (
-                        <div className="px-6 py-12 text-center">
-                            <LuPackage size={44} className="mx-auto text-gray-200 mb-3" />
-                            <p className="text-gray-500">No orders found matching your filters</p>
-                        </div>
-                    ) : (
-                        orders.map((order: any) => (
-                            <div key={order._id} className={`p-4 space-y-3 ${selected.has(order._id) ? 'bg-[var(--color-primary)]/5' : ''}`}>
-                                {/* Header: checkbox + order no + date + payment method */}
-                                <div className="flex items-start justify-between gap-2">
-                                    <div className="flex items-start gap-2 min-w-0">
+            <TableCard
+                className="hidden lg:block"
+                footer={null}
+            >
+                <table className={cx('w-full', isFetching && !isLoading && 'opacity-60')}>
+                    <thead>
+                        <tr>
+                            <th className={`${TH} w-10`}>
+                                <input
+                                    type="checkbox"
+                                    aria-label="Select all orders shown"
+                                    ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                                    checked={allSelected}
+                                    onChange={toggleAll}
+                                    className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
+                                />
+                            </th>
+                            <th className={`${TH} w-10`}>#</th>
+                            <th className={TH}>Order No</th>
+                            <th className={TH}>Customer</th>
+                            <th className={TH}>Status</th>
+                            <th className={TH}>Payment</th>
+                            <th className={`${TH} text-right`}>Items</th>
+                            <th className={`${TH} text-right`}>Total</th>
+                            <th className={`${TH} text-right`}>Paid / due</th>
+                            <th className={TH}>Placed</th>
+                            <th className={`${TH} w-20`} />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? <SkeletonRows cols={11} /> : orders.length === 0 ? (
+                            <EmptyRow colSpan={11}>
+                                <LuPackage size={28} className="mx-auto mb-2 text-gray-300" />
+                                No orders match these filters.
+                            </EmptyRow>
+                        ) : orders.map((o, i) => {
+                            const m = money(o);
+                            const pay = PAYMENT[o.paymentStatus] || PAYMENT.pending;
+                            const itemCount = (o.items || []).reduce((n: number, it: any) => n + (it.quantity || 0), 0);
+                            return (
+                                <tr key={o._id} className={cx(TR, selected.has(o._id) && 'bg-[var(--color-primary-lightest)] hover:bg-[var(--color-primary-lightest)]')}>
+                                    <td className={TD}>
                                         <input
                                             type="checkbox"
                                             aria-label="Select order"
-                                            checked={selected.has(order._id)}
-                                            onChange={() => toggleOne(order._id)}
-                                            className="w-4 h-4 mt-1 shrink-0 rounded border-gray-300 cursor-pointer accent-[var(--color-primary)]"
+                                            checked={selected.has(o._id)}
+                                            onChange={() => toggleOne(o._id)}
+                                            className="h-4 w-4 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]"
                                         />
+                                    </td>
+                                    <td className={`${TD} text-gray-400`}>{i + 1}</td>
+                                    <td className={TD}>
+                                        <Link href={`/dashboard/admin/orders/${o._id}`} className="font-semibold text-gray-900 hover:text-[var(--color-primary)]">{o.orderId}</Link>
+                                        <p className="mt-0.5 text-xs text-gray-400" title="Steadfast consignment">{parcelId(o) || 'Not booked'}</p>
+                                        <RepeatTodayChip info={o.repeatToday} />
+                                    </td>
+                                    <td className={TD}>
+                                        <p className="max-w-[180px] truncate text-gray-900">{customerName(o)}</p>
+                                        <p className="mt-0.5 text-xs text-gray-400">{customerPhone(o)}</p>
+                                    </td>
+                                    <td className={TD}>
+                                        <BadgeSelect ariaLabel="Order status" tone={ORDER_TONE[o.status] || 'gray'} value={o.status || 'pending'}
+                                            onChange={(v) => handleStatusChange(o._id, v)} options={STATUS_OPTIONS} />
+                                        {o.status === 'pending' && <ConfirmButton onClick={() => handleStatusChange(o._id, 'confirmed')} />}
+                                    </td>
+                                    <td className={TD}>
+                                        {isEditor ? <Badge tone={pay.tone}>{pay.label}</Badge> : (
+                                        <BadgeSelect ariaLabel="Payment status" tone={pay.tone} value={o.paymentStatus || 'pending'}
+                                            onChange={(v) => handlePaymentChange(o._id, v)} options={PAYMENT_OPTIONS} />
+                                        )}
+                                        <p className="mt-1 text-xs text-gray-400">{o.paymentMethod ? paymentMethodLabel(o.paymentMethod) : '—'}</p>
+                                    </td>
+                                    <td className={`${TD} text-right`} title={(o.items || []).map((it: any) => `${it.quantity} × ${it.name}`).join('\n')}>{itemCount}</td>
+                                    <td className={`${TD} whitespace-nowrap text-right font-medium text-gray-900`}>{taka(o.total)}</td>
+                                    <td className={`${TD} whitespace-nowrap text-right`}>
+                                        {m.refunded ? <span className="text-gray-400">refunded</span> : <>
+                                            <span className="text-gray-900">{taka(m.paid)}</span>
+                                            <span className={cx('block text-xs', m.due > 0 ? 'text-gray-400' : 'text-emerald-600')}>
+                                                {m.due > 0 ? `due ${taka(m.due)}` : 'settled'}
+                                            </span>
+                                        </>}
+                                    </td>
+                                    <td className={`${TD} whitespace-nowrap text-gray-500`}>{fmtDateTime(o.createdAt)}</td>
+                                    <td className={`${TD} whitespace-nowrap text-right`}>
+                                        <Link href={`/dashboard/admin/orders/${o._id}`} aria-label="View order" className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                                            <LuEye size={16} />
+                                        </Link>
+                                        {rowMenu(o)}
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </TableCard>
+
+            {/* Phones & tablets: cards */}
+            <div className="space-y-3 lg:hidden">
+                {isLoading ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-36 animate-pulse rounded-2xl bg-gray-100" />)
+                    : orders.length === 0 ? (
+                        <div className="rounded-2xl border border-gray-200 px-4 py-12 text-center text-sm text-gray-500">No orders match these filters.</div>
+                    ) : orders.map((o) => {
+                        const m = money(o);
+                        const pay = PAYMENT[o.paymentStatus] || PAYMENT.pending;
+                        return (
+                            <div key={o._id} className={cx('rounded-2xl border bg-white p-4', selected.has(o._id) ? 'border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)]' : 'border-gray-200')}>
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex min-w-0 items-start gap-2.5">
+                                        <input type="checkbox" aria-label="Select order" checked={selected.has(o._id)} onChange={() => toggleOne(o._id)}
+                                            className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 accent-[var(--color-primary)]" />
                                         <div className="min-w-0">
-                                            <p className="font-semibold text-[var(--color-primary)]">{order.orderId || order.orderNumber}</p>
-                                            <p className="text-[11px] text-gray-400 mt-0.5">{formatDate(order.createdAt)}</p>
+                                            <Link href={`/dashboard/admin/orders/${o._id}`} className="font-semibold text-gray-900">{o.orderId}</Link>
+                                            <p className="text-xs text-gray-400">{fmtDateTime(o.createdAt)}</p>
+                                            <RepeatTodayChip info={o.repeatToday} />
                                         </div>
                                     </div>
-                                    <PaymentMethodBadge method={order.paymentMethod} />
+                                    {rowMenu(o)}
                                 </div>
-
-                                {/* Product preview */}
-                                <OrderItemsPreview items={order.items} totalCount={order.items?.length} />
-
-                                {/* Customer + total */}
-                                <div className="flex items-center justify-between gap-3">
+                                <div className="mt-3 flex items-end justify-between gap-3">
                                     <div className="min-w-0">
-                                        <p className="font-medium text-gray-800 text-sm truncate">{order.user?.firstName} {order.user?.lastName}</p>
-                                        <p className="text-xs text-gray-400 truncate">{order.user?.email}</p>
+                                        <p className="truncate text-sm text-gray-900">{customerName(o)}</p>
+                                        <p className="text-xs text-gray-400">{customerPhone(o)}{parcelId(o) && ` · ${parcelId(o)}`}</p>
                                     </div>
-                                    <p className="font-bold text-gray-800 shrink-0">৳{order.total?.toLocaleString()}</p>
+                                    <div className="shrink-0 text-right">
+                                        <p className="font-semibold text-gray-900">{taka(o.total)}</p>
+                                        {!m.refunded && <p className="text-xs text-gray-400">{m.due > 0 ? `due ${taka(m.due)}` : 'settled'}</p>}
+                                    </div>
                                 </div>
-
-                                {/* Status controls + view */}
-                                <div className="flex items-center gap-2 flex-wrap pt-1">
-                                    <select
-                                        value={order.paymentStatus || 'pending'}
-                                        onChange={(e) => handlePaymentChange(order._id, e.target.value)}
-                                        className={`text-xs font-semibold px-2 py-1.5 rounded-md border-0 outline-none cursor-pointer ${
-                                            order.paymentStatus === 'paid' ? 'bg-green-100 text-green-700' :
-                                            order.paymentStatus === 'failed' ? 'bg-red-100 text-red-700' :
-                                            order.paymentStatus === 'refunded' ? 'bg-purple-100 text-purple-700' :
-                                            'bg-yellow-100 text-yellow-700'
-                                        }`}
-                                    >
-                                        <option value="pending">Pending</option>
-                                        <option value="paid">Paid</option>
-                                        <option value="failed">Failed</option>
-                                        <option value="refunded">Refunded</option>
-                                    </select>
-                                    <select
-                                        value={order.status || 'pending'}
-                                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                                        className={`text-xs font-semibold px-2 py-1.5 rounded-md border-0 outline-none cursor-pointer ${getStatusConfig(order.status).badgeBg} ${getStatusConfig(order.status).badgeText}`}
-                                    >
-                                        {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-                                            <option key={key} value={key}>{cfg.label}</option>
-                                        ))}
-                                    </select>
-                                    <Link
-                                        href={`/dashboard/admin/orders/${order._id}`}
-                                        className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20"
-                                    >
-                                        <LuEye size={14} /> View
-                                    </Link>
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                    <BadgeSelect ariaLabel="Order status" tone={ORDER_TONE[o.status] || 'gray'} value={o.status || 'pending'}
+                                        onChange={(v) => handleStatusChange(o._id, v)} options={STATUS_OPTIONS} />
+                                    {o.status === 'pending' && <ConfirmButton onClick={() => handleStatusChange(o._id, 'confirmed')} />}
+                                    {isEditor ? <Badge tone={pay.tone}>{pay.label}</Badge> : (
+                                    <BadgeSelect ariaLabel="Payment status" tone={pay.tone} value={o.paymentStatus || 'pending'}
+                                        onChange={(v) => handlePaymentChange(o._id, v)} options={PAYMENT_OPTIONS} />
+                                    )}
+                                    <span className="text-xs text-gray-400">{o.paymentMethod ? paymentMethodLabel(o.paymentMethod) : ''}</span>
                                 </div>
                             </div>
-                        ))
-                    )}
-                </div>
-
-                {/* Pagination */}
-                <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
-                    <p className="text-sm text-gray-500 font-medium">
-                        Showing <span className="text-gray-900">{orders.length}</span> of <span className="text-gray-900">{totalOrders}</span> orders
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-                        >
-                            <LuChevronLeft size={18} />
-                        </button>
-                        <div className="flex items-center gap-1">
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setPage(i + 1)}
-                                    className={`w-8 h-8 rounded-md text-sm font-medium transition-all ${page === i + 1
-                                            ? 'bg-[var(--color-primary)] text-white shadow-md'
-                                            : 'text-gray-600 hover:bg-gray-100'
-                                        }`}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                            disabled={page === totalPages}
-                            className="p-2 border border-gray-200 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
-                        >
-                            <LuChevronRight size={18} />
-                        </button>
-                    </div>
-                </div>
+                        );
+                    })}
             </div>
+
+            <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+                <p className="text-sm text-gray-500">
+                    {meta.total === 0 ? 'No orders' : `Showing ${orders.length} of ${(meta.total || 0).toLocaleString('en-IN')} orders`}
+                </p>
+                {hasMore && (
+                    <Btn onClick={() => setVisible((n) => n + PAGE_SIZE)} disabled={isFetching}>
+                        {isFetching ? 'Loading…' : `See more (${Math.min(PAGE_SIZE, (meta.total || 0) - orders.length)})`}
+                    </Btn>
+                )}
+            </div>
+
+            <Modal
+                open={!!noteFor}
+                onClose={() => setNoteFor(null)}
+                title="Add note"
+                subtitle={noteFor ? `${noteFor.orderId} · ${customerName(noteFor)}` : ''}
+                width="max-w-md"
+                footer={<>
+                    <Btn onClick={() => setNoteFor(null)}>Cancel</Btn>
+                    <Btn variant="primary" onClick={saveNote} disabled={isSavingNote}>{isSavingNote ? 'Saving…' : 'Add note'}</Btn>
+                </>}
+            >
+                <textarea
+                    className={TEXTAREA}
+                    rows={4}
+                    autoFocus
+                    placeholder="e.g. Customer asked for delivery after 5 pm"
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                />
+                <p className="mt-2 text-xs text-gray-400">Staff-only. It is added to the order’s timeline.</p>
+            </Modal>
+
+            <PrintOrdersModal job={printJob} onClose={() => setPrintJob(null)} />
         </div>
     );
 }

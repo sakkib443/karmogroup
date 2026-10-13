@@ -1,399 +1,270 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-    LuSearch, LuDownload, LuMail, LuEye, LuEllipsisVertical,
-    LuChevronLeft, LuChevronRight, LuRefreshCw, LuUsers,
-    LuUserCheck, LuUserX, LuCalendar, LuPhone, LuMapPin,
-    LuX, LuUserPlus, LuShield, LuPencil, LuSave,
-} from 'react-icons/lu';
+import { LuPlus, LuEye, LuBan, LuCircleCheck, LuPencil, LuUsers } from 'react-icons/lu';
 import {
     useGetAdminUsersQuery,
     useGetAdminUserStatsQuery,
+    useUpdateUserMutation,
+    useCreateCustomerMutation,
 } from '@/redux/api/userApi';
-import { useUpdateUserRoleMutation } from '@/redux/api/roleApi';
-import { useRegisterMutation } from '@/redux/api/authApi';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 import toast from 'react-hot-toast';
+import {
+    PageHeader, Btn, SearchInput, SelectPill, FilterBar, StatTile, Badge, TableCard,
+    TH, TD, TR, EmptyRow, SkeletonRows, Pager, RowMenu, Modal, Field, INPUT, taka, fmtDate, type Tone,
+} from '@/components/admin/ui';
 
-// Status Badge
-const StatusBadge = ({ status }: { status: string }) => {
-    const config: Record<string, { bg: string; text: string; border: string }> = {
-        active: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
-        pending: { bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-100' },
-        blocked: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-100' },
-    };
-    const { bg, text, border } = config[status] || config.pending;
-    return (
-        <span className={`px-2.5 py-1 rounded-md text-xs font-semibold capitalize border ${bg} ${text} ${border}`}>
-            {status}
-        </span>
-    );
-};
+// Buyers only. Staff accounts live on their own page (Settings → Staff).
+const PAGE_SIZE = 10;
+const COLS = 9;
 
-// Role Badge
-const RoleBadge = ({ role }: { role: string }) => {
-    if (role === 'admin') {
-        return (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold bg-purple-50 text-purple-700 border border-purple-100">
-                <LuShield size={11} /> Admin
-            </span>
-        );
-    }
-    return (
-        <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-100">
-            User
-        </span>
-    );
-};
+const STATUS_TONE: Record<string, Tone> = { active: 'green', blocked: 'red', pending: 'amber' };
 
-// Customer Avatar
-const Avatar = ({ name, avatar }: { name: string; avatar?: string }) => {
-    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500', 'bg-red-500'];
-    const colorIndex = name.charCodeAt(0) % colors.length;
-    if (avatar) return <img src={avatar} alt={name} className="w-10 h-10 rounded-md object-cover border border-gray-100" />;
-    return (
-        <div className={`w-10 h-10 rounded-md ${colors[colorIndex]} flex items-center justify-center text-white font-bold text-sm shadow-sm`}>
-            {initials}
-        </div>
-    );
-};
+function useDebounced<T>(value: T, ms = 300) {
+    const [v, setV] = useState(value);
+    useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
+    return v;
+}
+
+const errMsg = (err: any, fallback: string) =>
+    err?.data?.errorMessages?.[0]?.message || err?.data?.message || fallback;
+
+const EMPTY_CUSTOMER = { firstName: '', lastName: '', phone: '', email: '', defaultDiscount: '', loyaltyPoints: '' };
 
 export default function CustomersPage() {
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('all');
-    const [roleFilter, setRoleFilter] = useState('all');
+    const [status, setStatus] = useState('all');
     const [page, setPage] = useState(1);
-    const [editingRole, setEditingRole] = useState<string | null>(null);
-    const [showCreateAdmin, setShowCreateAdmin] = useState(false);
-    const [createForm, setCreateForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '' });
+    const q = useDebounced(search);
 
-    const {
-        data: usersData, isLoading: isUsersLoading, isFetching: isUsersFetching, refetch: refetchUsers
-    } = useGetAdminUsersQuery({
-        page, limit: 10,
-        role: roleFilter !== 'all' ? roleFilter : undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        // Backend QueryBuilder.search() reads `searchTerm` (not `search`)
-        searchTerm: search || undefined
+    const currentUser = useSelector((s: RootState) => s.auth.user);
+
+    const { data: usersData, isLoading, isFetching } = useGetAdminUsersQuery({
+        page,
+        limit: PAGE_SIZE,
+        role: 'user',
+        status: status !== 'all' ? status : undefined,
+        searchTerm: q || undefined,
     });
+    const { data: statsData } = useGetAdminUserStatsQuery(undefined);
+    const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+    const [createCustomer, { isLoading: isCreatingCustomer }] = useCreateCustomerMutation();
 
-    const { data: statsData, isLoading: isStatsLoading, refetch: refetchStats } = useGetAdminUserStatsQuery(undefined);
-    // Role changes must go through the role module (PATCH /roles/:userId); the generic
-    // admin update (PATCH /users/admin/:id) intentionally ignores `role`. This endpoint
-    // is superadmin-gated, so a non-superadmin gets a clear 403 instead of a silent no-op.
-    const [updateUserRole, { isLoading: isUpdatingRole }] = useUpdateUserRoleMutation();
-    const [registerUser, { isLoading: isCreating }] = useRegisterMutation();
+    const rows: any[] = usersData?.data || [];
+    const meta = usersData?.meta || { total: 0, totalPages: 1 };
+    const c = statsData?.data?.customers || { total: 0, active: 0, blocked: 0, newThisMonth: 0 };
 
-    const handleRefresh = () => { refetchUsers(); refetchStats(); toast.success('Data refreshed'); };
+    const pickStatus = (s: string) => { setStatus(s); setPage(1); };
 
-    const handleRoleChange = async (userId: string, newRole: string) => {
-        try {
-            await updateUserRole({ userId, role: newRole, permissions: [] }).unwrap();
-            toast.success(`Role updated to ${newRole}`);
-            setEditingRole(null);
-            refetchUsers();
-        } catch (err: any) {
-            toast.error(err?.data?.message || 'Failed to update role');
-        }
-    };
+    /* ─── Add customer ─── */
+    const [addOpen, setAddOpen] = useState(false);
+    const [cForm, setCForm] = useState(EMPTY_CUSTOMER);
 
-    const handleCreateAdmin = async () => {
-        if (!createForm.firstName || !createForm.email || !createForm.password) {
-            toast.error('Name, email and password are required');
-            return;
-        }
-        if (createForm.password.length < 6) {
-            toast.error('Password must be at least 6 characters');
+    const handleAddCustomer = async () => {
+        if (!cForm.firstName.trim() || !cForm.phone.trim()) {
+            toast.error('Name and phone number are required');
             return;
         }
         try {
-            // Step 1: Register as user
-            const res = await registerUser({ ...createForm }).unwrap();
-            const newUserId = res?.data?.user?._id;
-
-            // Step 2: Promote to admin via the role module (superadmin-gated)
-            if (newUserId) {
-                await updateUserRole({ userId: newUserId, role: 'admin', permissions: [] }).unwrap();
-            }
-
-            toast.success('Admin account created!');
-            setShowCreateAdmin(false);
-            setCreateForm({ firstName: '', lastName: '', email: '', phone: '', password: '' });
-            refetchUsers();
-            refetchStats();
+            await createCustomer({
+                firstName: cForm.firstName.trim(),
+                lastName: cForm.lastName.trim() || undefined,
+                phone: cForm.phone.trim(),
+                email: cForm.email.trim() || undefined,
+                defaultDiscount: cForm.defaultDiscount ? Number(cForm.defaultDiscount) : undefined,
+                loyaltyPoints: cForm.loyaltyPoints ? Number(cForm.loyaltyPoints) : undefined,
+            }).unwrap();
+            toast.success('Customer added');
+            setAddOpen(false);
+            setCForm(EMPTY_CUSTOMER);
         } catch (err: any) {
-            toast.error(err?.data?.message || 'Failed to create admin');
+            toast.error(errMsg(err, 'Failed to add customer'));
         }
     };
 
-    const formatDate = (d: string) => {
-        if (!d) return 'N/A';
-        return new Date(d).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    /* ─── Loyalty & discount ─── */
+    const [editing, setEditing] = useState<any>(null);
+    const [lForm, setLForm] = useState({ loyaltyPoints: '0', defaultDiscount: '0' });
+
+    const openLoyalty = (u: any) => {
+        setEditing(u);
+        setLForm({ loyaltyPoints: String(u.loyaltyPoints || 0), defaultDiscount: String(u.defaultDiscount || 0) });
     };
 
-    const customers = usersData?.data || [];
-    const meta = usersData?.meta || { totalPages: 1, total: 0 };
-    // Backend getAdminStats returns { total, active, blocked, admins, users, newUsersThisMonth }
-    const stats = statsData?.data || { total: 0, active: 0, blocked: 0, newUsersThisMonth: 0 };
+    const handleSaveLoyalty = async () => {
+        const points = Number(lForm.loyaltyPoints || 0);
+        const discount = Number(lForm.defaultDiscount || 0);
+        if (!Number.isInteger(points) || points < 0) { toast.error('Points must be a whole number, 0 or more'); return; }
+        if (!(discount >= 0 && discount <= 100)) { toast.error('Discount must be between 0 and 100%'); return; }
+        try {
+            await updateUser({ id: editing._id, loyaltyPoints: points, defaultDiscount: discount }).unwrap();
+            toast.success('Saved');
+            setEditing(null);
+        } catch (err: any) {
+            toast.error(errMsg(err, 'Failed to save'));
+        }
+    };
 
-    const statCards = [
-        { label: 'Total Users', value: stats.total ?? meta.total, icon: LuUsers, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
-        { label: 'Active', value: stats.active ?? 0, icon: LuUserCheck, color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-100' },
-        { label: 'Blocked', value: stats.blocked ?? 0, icon: LuUserX, color: 'text-red-600', bg: 'bg-red-50', border: 'border-red-100' },
-        { label: 'New This Month', value: stats.newUsersThisMonth ?? 0, icon: LuCalendar, color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100' },
-    ];
+    /* ─── Block / unblock ─── */
+    // Every row here is a buyer; the only one you may not block is yourself.
+    const canBlock = (u: any) => u._id !== currentUser?.id;
 
-    const inputStyle = "w-full px-3 py-2.5 border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] transition-colors";
+    const handleToggleBlock = async (u: any) => {
+        const next = u.status === 'blocked' ? 'active' : 'blocked';
+        if (!window.confirm(`${next === 'blocked' ? 'Block' : 'Unblock'} ${u.firstName} ${u.lastName || ''}?`)) return;
+        try {
+            await updateUser({ id: u._id, status: next }).unwrap();
+            toast.success(next === 'blocked' ? 'Blocked' : 'Unblocked');
+        } catch (err: any) {
+            toast.error(errMsg(err, 'Failed to update status'));
+        }
+    };
 
     return (
-        <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Users & Admins</h1>
-                    <p className="text-gray-500 mt-1">Manage users, change roles, and create admin accounts</p>
-                </div>
-                <div className="flex gap-3">
-                    <button onClick={handleRefresh}
-                        className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm">
-                        <LuRefreshCw size={16} className={(isUsersFetching || isStatsLoading) ? 'animate-spin' : ''} /> Refresh
-                    </button>
-                    <button
-                        onClick={() => setShowCreateAdmin(true)}
-                        className="px-4 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] flex items-center gap-2 transition-all shadow-md"
-                    >
-                        <LuUserPlus size={16} /> Create Admin
-                    </button>
-                </div>
+        <div>
+            <PageHeader
+                title="Customers"
+                subtitle="Buyers, their spend, loyalty points and default discounts."
+                actions={<Btn variant="primary" icon={<LuPlus size={16} />} onClick={() => setAddOpen(true)}>Add customer</Btn>}
+            />
+
+            <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <StatTile label="Customers" value={c.total.toLocaleString('en-IN')} active={status === 'all'} onClick={() => pickStatus('all')} />
+                <StatTile label="Active" value={c.active.toLocaleString('en-IN')} active={status === 'active'} onClick={() => pickStatus('active')} />
+                <StatTile label="Blocked" value={c.blocked.toLocaleString('en-IN')} active={status === 'blocked'} onClick={() => pickStatus('blocked')} />
+                <StatTile label="New this month" value={c.newThisMonth.toLocaleString('en-IN')} />
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {statCards.map((stat, i) => (
-                    <div key={i} className={`${stat.bg} ${stat.border} border rounded-md p-5 shadow-sm hover:shadow-md transition-all`}>
-                        <div className="flex items-center gap-4">
-                            <div className={`p-3 rounded-md bg-white shadow-sm ${stat.color}`}><stat.icon size={22} /></div>
-                            <div>
-                                <p className={`text-2xl font-bold ${stat.color} leading-none`}>{isStatsLoading ? '...' : stat.value?.toLocaleString()}</p>
-                                <p className="text-xs font-semibold text-gray-500 mt-1 uppercase tracking-wider">{stat.label}</p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <FilterBar>
+                <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search name, phone, email…" />
+                <SelectPill
+                    ariaLabel="Status"
+                    value={status}
+                    onChange={pickStatus}
+                    className="sm:w-40"
+                    options={[
+                        { value: 'all', label: 'All statuses' },
+                        { value: 'active', label: 'Active' },
+                        { value: 'blocked', label: 'Blocked' },
+                        { value: 'pending', label: 'Pending' },
+                    ]}
+                />
+            </FilterBar>
 
-            {/* Filters */}
-            <div className="bg-white rounded-md p-4 shadow-sm border border-gray-200">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <div className="flex-1 relative">
-                        <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input type="text" placeholder="Search by name, email, phone..."
-                            value={search} onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all bg-gray-50/30" />
-                    </div>
-                    <div className="flex gap-3">
-                        <select value={roleFilter} onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
-                            className="px-4 py-2.5 border border-gray-200 rounded-md outline-none bg-white text-sm font-medium min-w-[130px]">
-                            <option value="all">All Roles</option>
-                            <option value="user">Users</option>
-                            <option value="admin">Admins</option>
-                        </select>
-                        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-                            className="px-4 py-2.5 border border-gray-200 rounded-md outline-none bg-white text-sm font-medium min-w-[140px]">
-                            <option value="all">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="pending">Pending</option>
-                            <option value="blocked">Blocked</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+            <TableCard footer={<Pager page={page} totalPages={meta.totalPages} total={meta.total} pageSize={PAGE_SIZE} count={rows.length} onPage={setPage} noun="customers" />}>
+                <table className={`w-full ${isFetching && !isLoading ? 'opacity-60' : ''}`}>
+                    <thead>
+                        <tr>
+                            <th className={`${TH} w-12`}>#</th>
+                            <th className={TH}>Customer</th>
+                            <th className={TH}>Status</th>
+                            <th className={`${TH} text-right`} title="Orders placed, excluding cancelled ones">Orders</th>
+                            <th className={`${TH} text-right`} title="Total of delivered orders">Spent</th>
+                            <th className={`${TH} text-right`}>Points</th>
+                            <th className={TH}>Discount</th>
+                            <th className={TH}>Joined</th>
+                            <th className={`${TH} w-12`} />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? <SkeletonRows cols={COLS} /> : rows.length === 0 ? (
+                            <EmptyRow colSpan={COLS}>
+                                <LuUsers size={28} className="mx-auto mb-2 text-gray-300" />
+                                {search || status !== 'all' ? 'Nobody matches these filters.' : 'No customers yet.'}
+                            </EmptyRow>
+                        ) : rows.map((u, i) => {
+                            const n = (page - 1) * PAGE_SIZE + i + 1;
+                            const fullName = `${u.firstName || ''} ${u.lastName || ''}`.trim() || '—';
+                            const statusBadge = <Badge tone={STATUS_TONE[u.status] || 'gray'}><span className="capitalize">{u.status}</span></Badge>;
+                            const blockItem = u.status === 'blocked'
+                                ? { label: 'Unblock', icon: <LuCircleCheck size={15} />, onClick: () => handleToggleBlock(u), hidden: !canBlock(u) }
+                                : { label: 'Block', icon: <LuBan size={15} />, onClick: () => handleToggleBlock(u), danger: true, hidden: !canBlock(u) };
 
-            {/* Users Table */}
-            <div className="bg-white rounded-md shadow-md border border-gray-200 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="bg-gray-50/80 border-b border-gray-200">
-                                <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Joined</th>
-                                <th className="text-right px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {isUsersLoading ? (
-                                [...Array(5)].map((_, i) => (
-                                    <tr key={i} className="animate-pulse">
-                                        <td className="px-6 py-4"><div className="flex items-center gap-3"><div className="w-10 h-10 bg-gray-200 rounded-md" /><div><div className="h-4 bg-gray-200 rounded w-24 mb-1" /><div className="h-3 bg-gray-200 rounded w-16" /></div></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-32" /></td>
-                                        <td className="px-6 py-4"><div className="h-6 bg-gray-200 rounded w-16" /></td>
-                                        <td className="px-6 py-4"><div className="h-6 bg-gray-200 rounded w-16" /></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-gray-200 rounded w-24" /></td>
-                                        <td className="px-6 py-4 text-right"><div className="h-8 bg-gray-200 rounded w-8 ml-auto" /></td>
-                                    </tr>
-                                ))
-                            ) : customers.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-16 text-center">
-                                        <div className="flex flex-col items-center">
-                                            <div className="w-16 h-16 bg-[var(--color-primary-lightest)] rounded-[20px] flex items-center justify-center mb-4 ring-1 ring-[var(--color-primary-border)]"><LuUsers size={30} className="text-[var(--color-primary)]" /></div>
-                                            <p className="text-gray-500 font-medium text-lg">No users found</p>
-                                            <p className="text-gray-400 text-sm mt-1">Try adjusting your filters or search</p>
-                                        </div>
+                            return (
+                                <tr key={u._id} className={TR}>
+                                    <td className={`${TD} text-gray-400`}>{n}</td>
+                                    <td className={TD}>
+                                        <Link href={`/dashboard/admin/customers/${u._id}`} className="font-medium text-gray-900 hover:text-[var(--color-primary)]">{fullName}</Link>
+                                        <p className="mt-0.5 text-xs text-gray-400">{u.phone || u.email}</p>
+                                    </td>
+                                    <td className={TD}>{statusBadge}</td>
+                                    <td className={`${TD} text-right`}>{(u.orderCount || 0).toLocaleString('en-IN')}</td>
+                                    <td className={`${TD} whitespace-nowrap text-right`}>{taka(u.spent)}</td>
+                                    <td className={`${TD} whitespace-nowrap text-right`}>{(u.loyaltyPoints || 0).toLocaleString('en-IN')} pts</td>
+                                    <td className={TD}>{u.defaultDiscount > 0 ? <Badge tone="orange">{u.defaultDiscount}% off</Badge> : <span className="text-gray-400">-</span>}</td>
+                                    <td className={`${TD} whitespace-nowrap text-gray-500`}>{fmtDate(u.createdAt)}</td>
+                                    <td className={`${TD} text-right`}>
+                                        <RowMenu items={[
+                                            { label: 'View details', icon: <LuEye size={15} />, href: `/dashboard/admin/customers/${u._id}` },
+                                            { label: 'Points & discount', icon: <LuPencil size={15} />, onClick: () => openLoyalty(u) },
+                                            blockItem,
+                                        ]} />
                                     </td>
                                 </tr>
-                            ) : (
-                                customers.map((user: any) => (
-                                    <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar name={`${user.firstName} ${user.lastName}`} avatar={user.avatar} />
-                                                <div>
-                                                    <p className="font-bold text-gray-800">{user.firstName} {user.lastName}</p>
-                                                    <p className="text-[10px] text-gray-400 font-mono mt-0.5 uppercase">ID: {user._id.slice(-8)}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-sm text-gray-700 flex items-center gap-1.5 font-medium">
-                                                <LuMail size={14} className="text-gray-400" /> {user.email}
-                                            </p>
-                                            <p className="text-xs text-gray-500 flex items-center gap-1.5 mt-1">
-                                                <LuPhone size={14} className="text-gray-400" /> {user.phone || 'N/A'}
-                                            </p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {editingRole === user._id ? (
-                                                <div className="flex items-center gap-2">
-                                                    <select
-                                                        defaultValue={user.role}
-                                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                                                        disabled={isUpdatingRole}
-                                                        className="text-xs border border-[var(--color-primary)] rounded-md px-2 py-1.5 outline-none bg-white font-bold"
-                                                    >
-                                                        <option value="user">User</option>
-                                                        <option value="admin">Admin</option>
-                                                    </select>
-                                                    <button onClick={() => setEditingRole(null)} className="text-gray-400 hover:text-gray-600">
-                                                        <LuX size={14} />
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-2">
-                                                    <RoleBadge role={user.role} />
-                                                    <button onClick={() => setEditingRole(user._id)}
-                                                        className="p-1 text-gray-300 hover:text-[var(--color-primary)] transition-colors" title="Change role">
-                                                        <LuPencil size={12} />
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4"><StatusBadge status={user.status} /></td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-sm text-gray-600 flex items-center gap-1.5 font-medium">
-                                                <LuCalendar size={14} className="text-gray-400" /> {formatDate(user.createdAt)}
-                                            </p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Link href={`/dashboard/admin/customers/${user._id}`}
-                                                    className="p-2 bg-gray-50 hover:bg-white text-gray-500 hover:text-[var(--color-primary)] border border-gray-100 hover:border-[var(--color-primary)]/30 rounded-md transition-all shadow-sm" title="View">
-                                                    <LuEye size={18} />
-                                                </Link>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </TableCard>
+
+            {/* ═══ Add customer ═══ */}
+            <Modal
+                open={addOpen}
+                onClose={() => setAddOpen(false)}
+                title="Add customer"
+                subtitle="For phone and walk-in buyers. They can set a password later with “Forgot password”."
+                footer={<>
+                    <Btn onClick={() => setAddOpen(false)}>Cancel</Btn>
+                    <Btn variant="primary" onClick={handleAddCustomer} disabled={isCreatingCustomer}>{isCreatingCustomer ? 'Adding…' : 'Add customer'}</Btn>
+                </>}
+            >
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="First name" required>
+                        <input className={INPUT} value={cForm.firstName} autoFocus onChange={(e) => setCForm({ ...cForm, firstName: e.target.value })} />
+                    </Field>
+                    <Field label="Last name">
+                        <input className={INPUT} value={cForm.lastName} onChange={(e) => setCForm({ ...cForm, lastName: e.target.value })} />
+                    </Field>
+                    <Field label="Phone" required>
+                        <input className={INPUT} inputMode="tel" placeholder="01XXXXXXXXX" value={cForm.phone} onChange={(e) => setCForm({ ...cForm, phone: e.target.value })} />
+                    </Field>
+                    <Field label="Email" hint="Optional.">
+                        <input className={INPUT} type="email" value={cForm.email} onChange={(e) => setCForm({ ...cForm, email: e.target.value })} />
+                    </Field>
+                    <Field label="Default discount (%)" hint="Optional.">
+                        <input className={INPUT} type="number" min={0} max={100} step="0.5" value={cForm.defaultDiscount} onChange={(e) => setCForm({ ...cForm, defaultDiscount: e.target.value })} />
+                    </Field>
+                    <Field label="Loyalty points" hint="Optional.">
+                        <input className={INPUT} type="number" min={0} step={1} value={cForm.loyaltyPoints} onChange={(e) => setCForm({ ...cForm, loyaltyPoints: e.target.value })} />
+                    </Field>
                 </div>
+            </Modal>
 
-                {/* Pagination */}
-                <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-sm text-gray-500 font-medium">
-                        Showing <span className="text-gray-800 font-bold">{customers.length}</span> of <span className="text-gray-800 font-bold">{meta.total}</span> users
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1 || isUsersLoading}
-                            className="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all">
-                            <LuChevronLeft size={18} />
-                        </button>
-                        <div className="flex items-center px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-bold text-gray-700 shadow-sm">
-                            Page {page} of {meta.totalPages}
-                        </div>
-                        <button onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))} disabled={page === meta.totalPages || isUsersLoading}
-                            className="p-2 bg-white border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all">
-                            <LuChevronRight size={18} />
-                        </button>
-                    </div>
+            {/* ═══ Points & discount ═══ */}
+            <Modal
+                open={!!editing}
+                onClose={() => setEditing(null)}
+                title="Points & discount"
+                subtitle={editing ? `${editing.firstName} ${editing.lastName || ''} · ${editing.phone || editing.email}` : ''}
+                width="max-w-md"
+                footer={<>
+                    <Btn onClick={() => setEditing(null)}>Cancel</Btn>
+                    <Btn variant="primary" onClick={handleSaveLoyalty} disabled={isUpdating}>{isUpdating ? 'Saving…' : 'Save'}</Btn>
+                </>}
+            >
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Loyalty points">
+                        <input className={INPUT} type="number" min={0} step={1} value={lForm.loyaltyPoints} onChange={(e) => setLForm({ ...lForm, loyaltyPoints: e.target.value })} />
+                    </Field>
+                    <Field label="Default discount (%)">
+                        <input className={INPUT} type="number" min={0} max={100} step="0.5" value={lForm.defaultDiscount} onChange={(e) => setLForm({ ...lForm, defaultDiscount: e.target.value })} />
+                    </Field>
                 </div>
-            </div>
-
-            {/* ═══ CREATE ADMIN MODAL ═══ */}
-            {showCreateAdmin && (
-                <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4" onClick={() => setShowCreateAdmin(false)}>
-                    <div onClick={e => e.stopPropagation()}
-                        className="bg-white rounded-xl w-full max-w-md p-7 shadow-2xl relative" style={{ animation: 'fadeIn 0.2s ease-out' }}>
-                        <button onClick={() => setShowCreateAdmin(false)}
-                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors">
-                            <LuX size={16} />
-                        </button>
-
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                                <LuShield size={20} className="text-purple-600" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-gray-900">Create Admin Account</h2>
-                                <p className="text-xs text-gray-500">This user will have full admin access</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">First Name *</label>
-                                    <input value={createForm.firstName} onChange={e => setCreateForm({ ...createForm, firstName: e.target.value })}
-                                        className={inputStyle} placeholder="First name" />
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Last Name</label>
-                                    <input value={createForm.lastName} onChange={e => setCreateForm({ ...createForm, lastName: e.target.value })}
-                                        className={inputStyle} placeholder="Last name" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Email *</label>
-                                <input type="email" value={createForm.email} onChange={e => setCreateForm({ ...createForm, email: e.target.value })}
-                                    className={inputStyle} placeholder="admin@example.com" />
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Phone</label>
-                                <input value={createForm.phone} onChange={e => setCreateForm({ ...createForm, phone: e.target.value })}
-                                    className={inputStyle} placeholder="01XXXXXXXXX" />
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase block mb-1.5">Password *</label>
-                                <input type="password" value={createForm.password} onChange={e => setCreateForm({ ...createForm, password: e.target.value })}
-                                    className={inputStyle} placeholder="Min 6 characters" />
-                            </div>
-                        </div>
-
-                        <button onClick={handleCreateAdmin} disabled={isCreating}
-                            className="w-full mt-6 py-3 bg-[var(--color-primary)] text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-[var(--color-primary-dark)] transition-all disabled:opacity-60 shadow-md">
-                            {isCreating ? 'Creating...' : <><LuUserPlus size={16} /> Create Admin Account</>}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <style>{`@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }`}</style>
+            </Modal>
         </div>
     );
 }

@@ -6,7 +6,7 @@ export interface User {
     email: string;
     phone?: string;
     avatar?: string;
-    role: 'user' | 'admin' | 'superadmin';
+    role: 'user' | 'editor' | 'admin' | 'superadmin';
     address?: {
         street: string;
         city: string;
@@ -22,12 +22,6 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
-    /**
-     * True until the stored session has been checked on first load. Redux state
-     * is lost on every refresh, so a saved token has to be exchanged for the
-     * user again — guards must wait for this instead of assuming logged-out.
-     */
-    isRestoring: boolean;
 }
 
 const initialState: AuthState = {
@@ -36,7 +30,6 @@ const initialState: AuthState = {
     isAuthenticated: false,
     isLoading: false,
     error: null,
-    isRestoring: true,
 };
 
 const authSlice = createSlice({
@@ -54,7 +47,14 @@ const authSlice = createSlice({
             state.user = action.payload.user;
             state.token = action.payload.token;
             state.error = null;
-            state.isRestoring = false;
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem('token', action.payload.token);
+                    localStorage.setItem('user', JSON.stringify(action.payload.user));
+                } catch {
+                    /* ignore */
+                }
+            }
         },
 
         loginFailure: (state, action: PayloadAction<string>) => {
@@ -63,7 +63,14 @@ const authSlice = createSlice({
             state.user = null;
             state.token = null;
             state.error = action.payload;
-            state.isRestoring = false;
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                } catch {
+                    /* ignore */
+                }
+            }
         },
 
         logout: (state) => {
@@ -72,17 +79,26 @@ const authSlice = createSlice({
             state.isAuthenticated = false;
             state.isLoading = false;
             state.error = null;
-            state.isRestoring = false;
-        },
-
-        /** No saved session to restore, or the check finished/failed. */
-        sessionRestoreFinished: (state) => {
-            state.isRestoring = false;
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                } catch {
+                    /* ignore */
+                }
+            }
         },
 
         updateUser: (state, action: PayloadAction<Partial<User>>) => {
             if (state.user) {
                 state.user = { ...state.user, ...action.payload };
+                if (typeof window !== 'undefined') {
+                    try {
+                        localStorage.setItem('user', JSON.stringify(state.user));
+                    } catch {
+                        /* ignore */
+                    }
+                }
             }
         },
 
@@ -103,7 +119,6 @@ export const {
     loginSuccess,
     loginFailure,
     logout,
-    sessionRestoreFinished,
     updateUser,
     updateAddress,
     clearError

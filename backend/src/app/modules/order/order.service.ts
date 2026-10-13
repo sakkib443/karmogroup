@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
-import { Order } from './order.model';
+import { Order, ORDER_STATUSES, ORDER_STATUS_LABEL } from './order.model';
+import PathaoService from '../courier/pathao.service';
 import { Product } from '../product/product.model';
 import { User } from '../user/user.model';
 import { Coupon } from '../coupon/coupon.model';
@@ -49,6 +50,57 @@ export const notifyOrderPayment = (order: any, paymentStatus: string): void => {
         // never block the payment flow on a notification failure
     }
 };
+
+/** Tell the customer their order moved. Fire-and-forget — never blocks the status change. */
+const notifyOrderStatus = (order: any, status: string): void => {
+    try {
+        const { NotificationService } = require('../notification/notification.service');
+        const orderIdStr = order._id.toString();
+        NotificationService.notify({
+            user: order.user.toString(),
+            type: 'order_status',
+            title: 'Order status updated',
+            message: `Your order ${order.orderId || orderIdStr} is now "${ORDER_STATUS_LABEL[status] || status}".`,
+            link: '/dashboard/user/orders/' + orderIdStr,
+            meta: { orderId: orderIdStr, status },
+        }).catch(() => {});
+    } catch {
+        // never block status update
+    }
+};
+
+/** A Mongo _id. Slugs are never 24 hex characters, so this tells the two kinds of line apart. */
+const isProductId = (v: unknown) => /^[a-f0-9]{24}$/i.test(String(v || ''));
+
+/** "Fiber Pillow" → "fiber_pillow" — the key the factory challans are grouped by. */
+const divisionKey = (v: unknown) => String(v || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+
+/**
+ * A line for Karmo's own catalogue. Mattresses, foam and pillows are priced by size and
+ * fabric on the product page and are not in the products collection, so the line arrives
+ * with its name, configured price and division. That price is checked by staff when the
+ * order is confirmed by phone — the first step of the order desk.
+ */
+function catalogueLine(item: any) {
+    const name = String(item.name || '').trim();
+    const price = Math.round(Number(item.price));
+    const quantity = Math.floor(Number(item.quantity));
+    if (!name) throw new AppError(400, `Missing product name for: ${item.product}`);
+    if (!Number.isFinite(price) || price <= 0) throw new AppError(400, `Missing price for: ${name}`);
+    if (!Number.isFinite(quantity) || quantity < 1 || quantity > 99) throw new AppError(400, `Invalid quantity for: ${name}`);
+    return {
+        slug: String(item.product),
+        division: divisionKey(item.division),
+        name,
+        thumbnail: item.image || '',
+        price,
+        cost: 0,
+        quantity,
+        total: price * quantity,
+        color: item.color || '',
+        size: item.size || '',
+    };
+}
 
 const OrderService = {
     async getAllOrders(query: Record<string, unknown>) {
@@ -135,6 +187,14 @@ const OrderService = {
         };
 
         for (const item of items) {
+            if (!isProductId(item.product)) {
+                const line = catalogueLine(item);
+                subtotal += line.total;
+                orderItems.push(line);
+                stagedItems.push({ product: null });
+                continue;
+            }
+
             const product = await Product.findOne({ _id: item.product, isDeleted: false, status: 'active' });
             if (!product) throw new AppError(404, `Product not found: ${item.product}`);
             if (product.stock < item.quantity) throw new AppError(400, `Insufficient stock for: ${product.name}`);
@@ -153,6 +213,7 @@ const OrderService = {
                 total: itemTotal,
                 color: item.color || '',
                 size: item.size || '',
+                division: divisionKey(item.division),
             });
             stagedItems.push({ product });
         }
@@ -244,8 +305,9 @@ const OrderService = {
             );
         }
 
-        // Update stock and product sold count
+        // Update stock and product sold count (catalogue lines have no stock record)
         for (const item of orderItems) {
+            if (!item.product) continue;
             await Product.findByIdAndUpdate(item.product, {
                 $inc: { stock: -item.quantity, totalSold: item.quantity },
             });
@@ -393,23 +455,50 @@ const OrderService = {
         await order.save();
         // Status/payment change can move revenue & net profit — refresh admins live.
         emitFinanceUpdate('order_status:' + status);
+        notifyOrderStatus(order, status);
 
-        // ── Notify the customer of the status change (fire-and-forget) ──
-        try {
-            const { NotificationService } = require('../notification/notification.service');
-            const orderIdStr = order._id.toString();
-            NotificationService.notify({
-                user: order.user.toString(),
-                type: 'order_status',
-                title: 'Order status updated',
-                message: `Your order ${order.orderId || orderIdStr} is now "${status}".`,
-                link: '/dashboard/user/orders/' + orderIdStr,
-                meta: { orderId: orderIdStr, status },
-            }).catch(() => {});
-        } catch {
-            // never block status update
+        return order;
+    },
+
+    /**
+     * Book the parcel with Pathao and mark the order shipped. Only from Courier Entry,
+     * and only once — a second booking would be a second parcel.
+     */
+    async sendWithPathao(id: string) {
+        const order: any = await Order.findById(id);
+        if (!order) throw new AppError(404, 'Order not found');
+        if (order.status !== 'courier_entry') {
+            throw new AppError(400, 'Move the order to Courier Entry before sending it with Pathao');
+        }
+        if (order.consignmentId) {
+            throw new AppError(400, `Already booked with ${order.carrier || 'the courier'} (${order.consignmentId})`);
         }
 
+        const a = order.shippingAddress || {};
+        const booked = await PathaoService.createOrder({
+            merchantOrderId: order.orderId || order._id.toString(),
+            recipientName: a.fullName,
+            recipientPhone: a.phone,
+            recipientAddress: [a.address, a.area, a.city].filter(Boolean).join(', '),
+            // Prepaid orders collect nothing at the door.
+            amountToCollect: order.paymentStatus === 'paid' ? 0 : order.total,
+            itemQuantity: (order.items || []).reduce((n: number, it: any) => n + (it.quantity || 0), 0) || 1,
+            itemDescription: (order.items || []).map((it: any) => `${it.quantity} x ${it.name}`).join(', '),
+            specialInstruction: order.note || '',
+        });
+
+        order.carrier = 'Pathao';
+        order.consignmentId = booked.consignmentId;
+        order.trackingNumber = booked.consignmentId;
+        order.courierStatus = booked.status;
+        order.courierFee = booked.deliveryFee;
+        order.courierBookedAt = new Date();
+        order.status = 'shipped';
+        order.timeline.push({ status: 'shipped', note: `Sent with Pathao · consignment ${booked.consignmentId}`, createdAt: new Date() });
+        await order.save();
+
+        emitFinanceUpdate('order_status:shipped');
+        notifyOrderStatus(order, 'shipped');
         return order;
     },
 
@@ -425,8 +514,9 @@ const OrderService = {
 
         await order.save();
 
-        // Restore stock
+        // Restore stock (catalogue lines have none)
         for (const item of order.items) {
+            if (!item.product) continue;
             await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity } });
         }
 
@@ -480,27 +570,22 @@ const OrderService = {
     },
 
     async getOrderStats() {
-        const [total, pending, confirmed, processing, shipped, on_the_way, out_for_delivery, delivery_attempt, delivered, cancelled, returned, refunded] = await Promise.all([
-            Order.countDocuments(),
-            Order.countDocuments({ status: 'pending' }),
-            Order.countDocuments({ status: 'confirmed' }),
-            Order.countDocuments({ status: 'processing' }),
-            Order.countDocuments({ status: 'shipped' }),
-            Order.countDocuments({ status: 'on_the_way' }),
-            Order.countDocuments({ status: 'out_for_delivery' }),
-            Order.countDocuments({ status: 'delivery_attempt' }),
-            Order.countDocuments({ status: 'delivered' }),
-            Order.countDocuments({ status: 'cancelled' }),
-            Order.countDocuments({ status: 'returned' }),
-            Order.countDocuments({ status: 'refunded' }),
+        const [counts, revenueData] = await Promise.all([
+            Order.aggregate([{ $group: { _id: '$status', n: { $sum: 1 } } }]),
+            Order.aggregate([
+                { $match: { status: 'delivered' } },
+                { $group: { _id: null, totalRevenue: { $sum: '$total' } } },
+            ]),
         ]);
 
-        const revenueData = await Order.aggregate([
-            { $match: { status: 'delivered' } },
-            { $group: { _id: null, totalRevenue: { $sum: '$total' } } },
-        ]);
-
-        return { total, pending, confirmed, processing, shipped, on_the_way, out_for_delivery, delivery_attempt, delivered, cancelled, returned, refunded, totalRevenue: revenueData[0]?.totalRevenue || 0 };
+        // One count per status (zero when none), plus the total.
+        const stats: Record<string, number> = { total: 0 };
+        for (const s of ORDER_STATUSES) stats[s] = 0;
+        for (const c of counts) {
+            stats[c._id] = c.n;
+            stats.total += c.n;
+        }
+        return { ...stats, totalRevenue: revenueData[0]?.totalRevenue || 0 };
     },
 
     // ════════════════════════════════════════════════════════════

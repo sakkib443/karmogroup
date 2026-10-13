@@ -1,54 +1,76 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
+import { LuPlus, LuPencil, LuTrash2, LuEye, LuEyeOff, LuLayoutGrid } from 'react-icons/lu';
 import {
-    LuPlus, LuSquarePen, LuTrash2, LuSearch, LuX, LuSave, LuLayoutGrid,
-} from 'react-icons/lu';
-import {
-    useGetCategoriesQuery,
+    useGetAdminCategoriesQuery,
     useDeleteCategoryMutation,
     useCreateCategoryMutation,
     useUpdateCategoryMutation,
 } from '@/redux/api/categoryApi';
+import { SingleImageUploader } from '@/components/ui/ImageUploader';
 import { toast } from 'react-hot-toast';
+import {
+    PageHeader, Btn, SearchInput, Segmented, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows,
+    RowMenu, Modal, Field, Toggle, INPUT, TEXTAREA, fmtDateTime, cx,
+} from '@/components/admin/ui';
 
-/* ─── Styles ─── */
-const inp: React.CSSProperties = { width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb', borderRadius: '7px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' };
-const lbl: React.CSSProperties = { fontSize: '12px', fontWeight: 600, color: '#555', display: 'block', marginBottom: '5px' };
-const errStyle: React.CSSProperties = { fontSize: '11px', color: '#ef4444', margin: '4px 0 0' };
 /* parent may be a populated object {_id,name} or a raw id string or null */
 const parentId = (cat: any): string => (cat?.parent && typeof cat.parent === 'object' ? cat.parent._id : cat?.parent) || '';
 const parentName = (cat: any): string => (cat?.parent && typeof cat.parent === 'object' ? cat.parent.name : '') || '';
+const isImg = (s?: string) => !!s && (s.startsWith('http') || s.startsWith('/'));
 
-/* Category icons - variety marketplace product categories */
+/* ─── 20 Default Icons ─── */
 const ICON_OPTIONS = [
-    { emoji: '📱', label: 'Electronics' },
-    { emoji: '💻', label: 'Computers' },
     { emoji: '👗', label: 'Fashion' },
-    { emoji: '👟', label: 'Footwear' },
-    { emoji: '💄', label: 'Beauty' },
-    { emoji: '🧴', label: 'Personal Care' },
-    { emoji: '🏠', label: 'Home & Living' },
-    { emoji: '🍳', label: 'Kitchen' },
-    { emoji: '🪑', label: 'Furniture' },
-    { emoji: '🔌', label: 'Appliances' },
-    { emoji: '🛒', label: 'Grocery' },
-    { emoji: '🧸', label: 'Toys & Baby' },
-    { emoji: '📚', label: 'Books' },
-    { emoji: '⚽', label: 'Sports' },
-    { emoji: '🎮', label: 'Gaming' },
-    { emoji: '⌚', label: 'Watches' },
-    { emoji: '💍', label: 'Jewelry' },
-    { emoji: '🎒', label: 'Bags' },
-    { emoji: '💊', label: 'Health' },
+    { emoji: '👔', label: 'Men Clothing' },
+    { emoji: '📱', label: 'Mobile' },
+    { emoji: '💻', label: 'Electronics' },
+    { emoji: '🏠', label: 'Home' },
+    { emoji: '🌾', label: 'Agriculture' },
     { emoji: '🚗', label: 'Automotive' },
-    { emoji: '🐾', label: 'Pet Supplies' },
-    { emoji: '🌿', label: 'Garden & Outdoor' },
+    { emoji: '🔧', label: 'Industrial' },
+    { emoji: '🏗️', label: 'Construction' },
+    { emoji: '⚡', label: 'Electrical' },
+    { emoji: '👶', label: 'Kids & Baby' },
+    { emoji: '💊', label: 'Healthcare' },
+    { emoji: '🎁', label: 'Gifts' },
+    { emoji: '👜', label: 'Bags' },
+    { emoji: '💄', label: 'Beauty' },
+    { emoji: '⚽', label: 'Sports' },
+    { emoji: '🌍', label: 'Global' },
+    { emoji: '📦', label: 'Wholesale' },
+    { emoji: '🍎', label: 'Food' },
+    { emoji: '💎', label: 'Jewelry' },
 ];
 
-const CategoriesPage = () => {
+const EMPTY_FORM = {
+    name: '',
+    icon: '',
+    image: '',
+    description: '',
+    parent: '',
+    isActive: true,
+    showInMenu: true,
+    showInHome: true,
+};
+
+function CategoryIcon({ cat, size = 36 }: { cat: any; size?: number }) {
+    const src = cat.image || (isImg(cat.icon) ? cat.icon : '');
+    return (
+        <div className="flex shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 text-lg" style={{ width: size, height: size }}>
+            {src ? <img src={src} alt="" className="h-full w-full object-cover" /> : cat.icon || <LuLayoutGrid className="text-gray-300" />}
+        </div>
+    );
+}
+
+export default function CategoriesPage() {
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: categoriesData, isLoading, refetch } = useGetCategoriesQuery({});
+    const [scope, setScope] = useState<'active' | 'all'>('active');
+    // Admin list must include INACTIVE categories too (so they stay manageable/re-activatable).
+    const { data: categoriesData, isLoading } = useGetAdminCategoriesQuery(undefined);
     const [deleteCategory] = useDeleteCategoryMutation();
     const [createCategory, { isLoading: isCreating }] = useCreateCategoryMutation();
     const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
@@ -56,25 +78,30 @@ const CategoriesPage = () => {
     /* ─── Modal State ─── */
     const [modalOpen, setModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [form, setForm] = useState({ name: '', icon: '', description: '', parent: '', isActive: true, showInMenu: true, showInHome: true });
+    const [iconTab, setIconTab] = useState<'emoji' | 'upload'>('upload');
+    const [form, setForm] = useState(EMPTY_FORM);
     /* per-field inline errors (mirrors backend errorMessages[].path → message) */
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-    const categories = categoriesData?.data || [];
+    const categories: any[] = useMemo(() => categoriesData?.data || [], [categoriesData]);
     const isSaving = isCreating || isUpdating;
 
     const openCreate = () => {
         setEditingId(null);
-        setForm({ name: '', icon: '', description: '', parent: '', isActive: true, showInMenu: true, showInHome: true });
+        setIconTab('upload');
+        setForm(EMPTY_FORM);
         setFieldErrors({});
         setModalOpen(true);
     };
 
     const openEdit = (cat: any) => {
         setEditingId(cat._id);
+        const imgSrc = cat.image || (isImg(cat.icon) ? cat.icon : '');
+        setIconTab(imgSrc ? 'upload' : 'emoji');
         setForm({
             name: cat.name || '',
             icon: cat.icon || '',
+            image: imgSrc,
             description: cat.description || '',
             parent: parentId(cat),
             isActive: cat.isActive !== false,
@@ -91,7 +118,7 @@ const CategoriesPage = () => {
     const validate = (): Record<string, string> => {
         const errs: Record<string, string> = {};
         if (!form.name.trim()) errs.name = 'Category name is required';
-        if (!form.icon) errs.icon = 'Please select an icon for this category';
+        if (!form.icon && !form.image) errs.icon = 'Please select an icon or upload an image';
         return errs;
     };
 
@@ -104,10 +131,10 @@ const CategoriesPage = () => {
         }
         setFieldErrors({});
 
-        // Build payload: parent as id or null
         const payload: any = {
             name: form.name.trim(),
-            icon: form.icon,
+            icon: form.icon || form.image,
+            image: form.image || '',
             description: form.description,
             isActive: form.isActive,
             showInMenu: form.showInMenu,
@@ -138,428 +165,272 @@ const CategoriesPage = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this category?')) {
-            try {
-                await deleteCategory(id).unwrap();
-                toast.success('Category deleted');
-            } catch (error: any) {
-                toast.error(error?.data?.message || 'Failed to delete');
-            }
+    const handleToggleActive = async (cat: any) => {
+        try {
+            await updateCategory({ id: cat._id, data: { isActive: !cat.isActive } }).unwrap();
+            toast.success(cat.isActive ? 'Category hidden' : 'Category activated');
+        } catch (error: any) {
+            toast.error(error?.data?.message || 'Failed to update');
         }
     };
 
-    const filtered = categories.filter((cat: any) =>
-        cat.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleDelete = async (cat: any) => {
+        if (!window.confirm(`Delete the category "${cat.name}"?`)) return;
+        try {
+            await deleteCategory(cat._id).unwrap();
+            toast.success('Category deleted');
+        } catch (error: any) {
+            toast.error(error?.data?.message || 'Failed to delete');
+        }
+    };
 
-    // Root categories available as parent options (exclude the category being edited)
-    const rootCategories = categories.filter((c: any) => !parentId(c) && c._id !== editingId);
+    // Descendants of the category being edited — it cannot become its own ancestor.
+    const descendantIdsOfEditing = useMemo(() => {
+        if (!editingId) return new Set<string>();
+        const set = new Set<string>([editingId]);
+        let added = true;
+        while (added) {
+            added = false;
+            categories.forEach((c: any) => {
+                const p = parentId(c);
+                if (p && set.has(p) && !set.has(c._id)) {
+                    set.add(c._id);
+                    added = true;
+                }
+            });
+        }
+        return set;
+    }, [editingId, categories]);
 
-    // Order list so each parent is followed by its sub-categories (indented). Falls back to flat order when searching.
-    const orderedList = (() => {
-        if (searchTerm.trim()) return filtered.map((c: any) => ({ cat: c, isSub: !!parentId(c) }));
-        const roots = filtered.filter((c: any) => !parentId(c));
-        const subsByParent: Record<string, any[]> = {};
-        filtered.forEach((c: any) => { const p = parentId(c); if (p) { (subsByParent[p] ||= []).push(c); } });
-        const out: { cat: any; isSub: boolean }[] = [];
-        roots.forEach((r: any) => {
-            out.push({ cat: r, isSub: false });
-            (subsByParent[r._id] || []).forEach((s: any) => out.push({ cat: s, isSub: true }));
-        });
-        // orphan sub-categories whose parent isn't in the current list
-        filtered.forEach((c: any) => { const p = parentId(c); if (p && !roots.some((r: any) => r._id === p)) out.push({ cat: c, isSub: true }); });
-        // de-dupe (orphans may already be appended)
+    // Parent options formatted with hierarchical tree indentation
+    const parentOptions = useMemo(() => {
+        const available = categories.filter((c: any) => !descendantIdsOfEditing.has(c._id));
+        const map: Record<string, any[]> = {};
+        available.forEach((c: any) => { (map[parentId(c)] ||= []).push(c); });
+
+        const out: { _id: string; label: string }[] = [];
+        const traverse = (pId: string, depth = 0) => {
+            (map[pId] || []).forEach((item: any) => {
+                const prefix = depth === 0 ? '' : depth === 1 ? '   └ ' : '      └── ';
+                out.push({ _id: item._id, label: `${prefix}${item.icon && !isImg(item.icon) ? item.icon + ' ' : ''}${item.name}` });
+                traverse(String(item._id), depth + 1);
+            });
+        };
+        traverse('');
+        return out;
+    }, [categories, descendantIdsOfEditing]);
+
+    // Each parent followed by its sub-categories (indented); a flat list while searching.
+    const orderedList = useMemo(() => {
+        const inScope = (c: any) => scope === 'all' || c.isActive !== false;
+        const q = searchTerm.trim().toLowerCase();
+        if (q) {
+            return categories
+                .filter((c: any) => inScope(c) && c.name.toLowerCase().includes(q))
+                .map((c: any) => ({ cat: c, depth: 0 }));
+        }
+        const map: Record<string, any[]> = {};
+        categories.forEach((c: any) => { (map[parentId(c)] ||= []).push(c); });
+
+        const out: { cat: any; depth: number }[] = [];
         const seen = new Set<string>();
-        return out.filter(({ cat }) => { if (seen.has(cat._id)) return false; seen.add(cat._id); return true; });
-    })();
+        const traverse = (pId: string, depth = 0) => {
+            (map[pId] || []).forEach((item: any) => {
+                if (seen.has(item._id)) return;
+                seen.add(item._id);
+                if (inScope(item)) out.push({ cat: item, depth });
+                traverse(String(item._id), depth + 1);
+            });
+        };
+        traverse('');
+        // Orphans (parent missing) still get listed.
+        categories.forEach((c: any) => {
+            if (!seen.has(c._id) && inScope(c)) out.push({ cat: c, depth: parentId(c) ? 1 : 0 });
+        });
+        return out;
+    }, [categories, scope, searchTerm]);
 
     return (
         <div>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div>
-                    <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#111', margin: 0 }}>Categories</h1>
-                    <p style={{ fontSize: '12px', color: '#888', margin: '2px 0 0' }}>Manage product categories</p>
-                </div>
-                <button onClick={openCreate} style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '8px 16px', background: 'var(--color-primary)', color: '#fff',
-                    border: 'none', borderRadius: '7px', fontSize: '12.5px', fontWeight: 700,
-                    cursor: 'pointer',
-                }}>
-                    <LuPlus size={14} /> Add Category
-                </button>
-            </div>
+            <PageHeader
+                title="Categories"
+                subtitle="Hierarchical product categories - a category can sit inside another."
+                actions={<>
+                    <Segmented value={scope} onChange={setScope} options={[{ value: 'active', label: 'Active' }, { value: 'all', label: 'All' }]} />
+                    <Btn variant="primary" icon={<LuPlus size={16} />} onClick={openCreate}>Add category</Btn>
+                </>}
+            />
 
-            {/* Search */}
-            <div style={{ position: 'relative', marginBottom: '14px' }}>
-                <LuSearch size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#bbb' }} />
-                <input
-                    type="text"
-                    placeholder="Search categories..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ ...inp, paddingLeft: '34px' }}
-                />
-            </div>
+            <FilterBar>
+                <SearchInput value={searchTerm} onChange={setSearchTerm} placeholder="Search categories…" />
+            </FilterBar>
 
-            {/* Categories List */}
-            <div style={{ background: '#fff', border: '1px solid #eee', borderRadius: '10px', overflow: 'hidden' }}>
-                {isLoading ? (
-                    <div style={{ padding: '40px', textAlign: 'center' }}>
-                        <div style={{ width: '28px', height: '28px', border: '3px solid #e5e7eb', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto' }} />
-                    </div>
-                ) : orderedList.length > 0 ? (
-                    <div>
-                        {orderedList.map(({ cat, isSub }: { cat: any; isSub: boolean }, i: number) => (
-                            <div key={cat._id} style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                padding: '12px 16px',
-                                paddingLeft: isSub ? '40px' : '16px',
-                                background: isSub ? '#fcfcfc' : '#fff',
-                                borderLeft: isSub ? '3px solid var(--color-primary-lightest)' : '3px solid transparent',
-                                borderBottom: i < orderedList.length - 1 ? '1px solid #f5f5f5' : 'none',
-                                transition: 'background 0.15s',
-                            }}
-                                onMouseEnter={e => e.currentTarget.style.background = '#fafafa'}
-                                onMouseLeave={e => e.currentTarget.style.background = isSub ? '#fcfcfc' : '#fff'}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    {isSub && <span style={{ color: '#ccc', fontSize: '14px', marginLeft: '-6px' }}>↳</span>}
-                                    <div style={{
-                                        width: '36px', height: '36px', borderRadius: '8px',
-                                        background: '#f5f5f5', display: 'flex', alignItems: 'center',
-                                        justifyContent: 'center', flexShrink: 0, fontSize: '18px',
-                                    }}>
-                                        {cat.icon || <LuLayoutGrid size={16} color="#bbb" />}
-                                    </div>
-                                    <div>
-                                        <p style={{ fontSize: '13px', fontWeight: 700, color: '#111', margin: 0, display: 'flex', alignItems: 'center', gap: '7px' }}>
-                                            {cat.name}
-                                            {isSub && (
-                                                <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '999px', background: '#eef2ff', color: '#6366f1' }}>
-                                                    Sub of {parentName(cat) || '—'}
-                                                </span>
-                                            )}
-                                        </p>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px', flexWrap: 'wrap' }}>
-                                            <span style={{ fontSize: '10.5px', color: '#aaa', fontFamily: 'monospace' }}>{cat.slug}</span>
-                                            <span style={{
-                                                fontSize: '9px', fontWeight: 700,
-                                                padding: '1px 6px', borderRadius: '999px',
-                                                background: cat.isActive ? 'var(--color-primary-lightest)' : '#fef2f2',
-                                                color: cat.isActive ? '#16a34a' : '#dc2626',
-                                            }}>
-                                                {cat.isActive ? 'Active' : 'Inactive'}
-                                            </span>
-                                            <span style={{ fontSize: '10px', color: '#ccc' }}>{cat.productCount || 0} products</span>
+            <TableCard footer={<p className="mt-4 text-sm text-gray-500">{orderedList.length} {orderedList.length === 1 ? 'category' : 'categories'}</p>}>
+                <table className="w-full">
+                    <thead>
+                        <tr>
+                            <th className={`${TH} w-12`}>#</th>
+                            <th className={TH}>Name</th>
+                            <th className={TH}>Slug</th>
+                            <th className={`${TH} text-right`}>Products</th>
+                            <th className={TH}>Status</th>
+                            <th className={TH}>Created</th>
+                            <th className={`${TH} w-12`} />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? <SkeletonRows cols={7} rows={4} /> : orderedList.length === 0 ? (
+                            <EmptyRow colSpan={7}>
+                                {searchTerm ? 'No categories match your search.' : scope === 'active' ? 'No active categories.' : 'No categories yet.'}
+                            </EmptyRow>
+                        ) : orderedList.map(({ cat, depth }, i) => (
+                            <tr key={cat._id} className={TR}>
+                                <td className={`${TD} text-gray-400`}>{i + 1}</td>
+                                <td className={TD}>
+                                    <div className="flex min-w-[220px] items-center gap-3" style={{ paddingLeft: depth * 22 }}>
+                                        {depth > 0 && <span className="-mr-1 font-mono text-gray-300">└</span>}
+                                        <CategoryIcon cat={cat} size={32} />
+                                        <div className="min-w-0">
+                                            <button type="button" onClick={() => openEdit(cat)} className="text-left font-medium text-gray-900 hover:text-[var(--color-primary)]">
+                                                {cat.name}
+                                            </button>
+                                            {depth > 0 && parentName(cat) && <p className="text-xs text-gray-400">in {parentName(cat)}</p>}
                                         </div>
                                     </div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                    <button onClick={() => openEdit(cat)} style={{
-                                        width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        background: 'transparent', border: '1px solid transparent', borderRadius: '6px',
-                                        cursor: 'pointer', color: 'var(--color-primary)', transition: 'all 0.15s',
-                                    }}
-                                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-lightest)'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
-                                    >
-                                        <LuSquarePen size={14} />
-                                    </button>
-                                    <button onClick={() => handleDelete(cat._id)} style={{
-                                        width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        background: 'transparent', border: '1px solid transparent', borderRadius: '6px',
-                                        cursor: 'pointer', color: '#dc2626', transition: 'all 0.15s',
-                                    }}
-                                        onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
-                                    >
-                                        <LuTrash2 size={14} />
-                                    </button>
-                                </div>
-                            </div>
+                                </td>
+                                <td className={`${TD} font-mono text-[13px] text-gray-500`}>{cat.slug}</td>
+                                <td className={`${TD} text-right`}>{cat.productCount || 0}</td>
+                                <td className={TD}>
+                                    <Badge tone={cat.isActive ? 'green' : 'gray'}>{cat.isActive ? 'Active' : 'Hidden'}</Badge>
+                                </td>
+                                <td className={`${TD} whitespace-nowrap text-gray-500`}>{fmtDateTime(cat.createdAt)}</td>
+                                <td className={`${TD} text-right`}>
+                                    <RowMenu items={[
+                                        { label: 'Edit', icon: <LuPencil size={15} />, onClick: () => openEdit(cat) },
+                                        cat.isActive
+                                            ? { label: 'Hide from store', icon: <LuEyeOff size={15} />, onClick: () => handleToggleActive(cat) }
+                                            : { label: 'Activate', icon: <LuEye size={15} />, onClick: () => handleToggleActive(cat) },
+                                        { label: 'Delete', icon: <LuTrash2 size={15} />, onClick: () => handleDelete(cat), danger: true },
+                                    ]} />
+                                </td>
+                            </tr>
                         ))}
-                    </div>
-                ) : (
-                    <div style={{
-                        padding: '56px 24px', textAlign: 'center',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    }}>
-                        {/* Icon badge */}
-                        <div style={{
-                            width: '72px', height: '72px', borderRadius: '20px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            background: 'linear-gradient(135deg, var(--color-primary-lightest) 0%, var(--color-primary-light) 100%)',
-                            boxShadow: 'inset 0 0 0 1px var(--color-primary-border)',
-                            marginBottom: '18px',
-                        }}>
-                            <LuLayoutGrid size={30} color="var(--color-primary)" />
-                        </div>
+                    </tbody>
+                </table>
+            </TableCard>
 
-                        <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#111', margin: '0 0 6px' }}>
-                            No categories yet
-                        </h3>
-                        <p style={{ fontSize: '13px', color: '#94a3b8', margin: '0 0 22px', maxWidth: '320px', lineHeight: 1.5 }}>
-                            Categories help you organize products so customers can find them faster. Create your first one to get started.
-                        </p>
+            {/* ═══ Add / edit ═══ */}
+            <Modal
+                open={modalOpen}
+                onClose={closeModal}
+                title={editingId ? 'Edit category' : 'Add category'}
+                footer={<>
+                    <Btn onClick={closeModal}>Cancel</Btn>
+                    <Btn variant="primary" onClick={handleSave} disabled={isSaving}>
+                        {isSaving ? 'Saving…' : editingId ? 'Save changes' : 'Create category'}
+                    </Btn>
+                </>}
+            >
+                <div className="space-y-4">
+                    <Field label="Name" required error={fieldErrors.name}>
+                        <input
+                            className={cx(INPUT, fieldErrors.name && 'border-red-300')}
+                            placeholder="e.g. Seeds, Fertilizers, Farm Tools"
+                            value={form.name}
+                            autoFocus
+                            onChange={(e) => { setForm((p) => ({ ...p, name: e.target.value })); if (fieldErrors.name) setFieldErrors((p) => ({ ...p, name: '' })); }}
+                        />
+                    </Field>
 
-                        <button onClick={openCreate} style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '8px',
-                            padding: '11px 24px', background: 'var(--color-primary)', color: '#fff',
-                            border: 'none', borderRadius: '10px', fontSize: '13.5px', fontWeight: 700,
-                            cursor: 'pointer', letterSpacing: '0.2px',
-                            boxShadow: '0 6px 16px rgba(var(--color-primary-rgb),0.28)',
-                            transition: 'transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease',
-                        }}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.background = 'var(--color-primary-dark)';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 10px 22px rgba(var(--color-primary-rgb),0.36)';
-                            }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.background = 'var(--color-primary)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(var(--color-primary-rgb),0.28)';
-                            }}
+                    <Field label="Parent category" hint="Leave empty for a top-level category." error={fieldErrors.parent}>
+                        <select
+                            className={cx(INPUT, 'cursor-pointer')}
+                            value={form.parent}
+                            onChange={(e) => { setForm((p) => ({ ...p, parent: e.target.value })); if (fieldErrors.parent) setFieldErrors((p) => ({ ...p, parent: '' })); }}
                         >
-                            <LuPlus size={16} strokeWidth={2.6} /> Create Category
-                        </button>
-                    </div>
-                )}
-            </div>
+                            <option value="">— None (top level) —</option>
+                            {parentOptions.map((opt) => <option key={opt._id} value={opt._id}>{opt.label}</option>)}
+                        </select>
+                    </Field>
 
-            {/* ═══ POPUP MODAL ═══ */}
-            {modalOpen && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 9999,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                    {/* Backdrop */}
-                    <div onClick={closeModal} style={{
-                        position: 'absolute', inset: 0,
-                        background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)',
-                    }} />
-
-                    {/* Modal */}
-                    <div style={{
-                        position: 'relative', background: '#fff',
-                        borderRadius: '12px', width: '500px', maxWidth: '95vw',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-                        animation: 'fadeIn 0.2s ease-out',
-                    }}>
-                        {/* Modal Header */}
-                        <div style={{
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            padding: '16px 20px', borderBottom: '1px solid #f0f0f0',
-                        }}>
-                            <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#111', margin: 0 }}>
-                                {editingId ? 'Edit Category' : 'Add Category'}
-                            </h3>
-                            <button onClick={closeModal} style={{
-                                width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: '#f5f5f5', border: 'none', borderRadius: '6px', cursor: 'pointer', color: '#888',
-                            }}>
-                                <LuX size={14} />
-                            </button>
+                    <div>
+                        <div className="mb-1.5 flex items-center justify-between">
+                            <span className="text-sm font-medium text-gray-700">Icon or image <span className="text-red-500">*</span></span>
+                            <Segmented
+                                value={iconTab}
+                                onChange={setIconTab}
+                                options={[{ value: 'emoji', label: 'Icon' }, { value: 'upload', label: 'Image' }]}
+                            />
                         </div>
 
-                        {/* Modal Body */}
-                        <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '70vh', overflowY: 'auto' }}>
-                            {/* Name */}
-                            <div>
-                                <label style={lbl}>Category Name <span style={{ color: '#ef4444' }}>*</span></label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. Electronics, Fashion"
-                                    value={form.name}
-                                    onChange={e => { setForm(p => ({ ...p, name: e.target.value })); if (fieldErrors.name) setFieldErrors(p => ({ ...p, name: '' })); }}
-                                    style={{ ...inp, borderColor: fieldErrors.name ? '#fca5a5' : '#e5e7eb' }}
-                                    autoFocus
-                                />
-                                {fieldErrors.name && <p style={errStyle}>{fieldErrors.name}</p>}
+                        {(form.image || form.icon) && (
+                            <div className="mb-2.5 flex items-center gap-3 rounded-xl border border-[var(--color-primary-border)] bg-[var(--color-primary-lightest)] px-3 py-2">
+                                {form.image
+                                    ? <img src={form.image} alt="" className="h-9 w-9 rounded-lg border border-gray-200 object-cover" />
+                                    : <span className="text-3xl leading-none">{form.icon}</span>}
+                                <p className="flex-1 text-sm text-gray-700">
+                                    {form.image ? 'Uploaded image' : (ICON_OPTIONS.find((i) => i.emoji === form.icon)?.label || 'Custom icon')}
+                                </p>
+                                <button type="button" onClick={() => setForm((p) => ({ ...p, icon: '', image: '' }))} className="text-sm text-gray-500 hover:text-gray-800">
+                                    Clear
+                                </button>
                             </div>
+                        )}
 
-                            {/* Parent Category (make this a sub-category) */}
-                            <div>
-                                <label style={lbl}>
-                                    Parent Category <span style={{ color: '#aaa', fontWeight: 400 }}>(optional — leave empty for a top-level category)</span>
-                                </label>
-                                <select
-                                    value={form.parent}
-                                    onChange={e => { setForm(p => ({ ...p, parent: e.target.value })); if (fieldErrors.parent) setFieldErrors(p => ({ ...p, parent: '' })); }}
-                                    style={{ ...inp, borderColor: fieldErrors.parent ? '#fca5a5' : '#e5e7eb', background: '#fff', cursor: 'pointer' }}
-                                >
-                                    <option value="">— None (top-level category) —</option>
-                                    {rootCategories.map((c: any) => (
-                                        <option key={c._id} value={c._id}>{c.icon ? `${c.icon} ` : ''}{c.name}</option>
-                                    ))}
-                                </select>
-                                {fieldErrors.parent && <p style={errStyle}>{fieldErrors.parent}</p>}
-                            </div>
-
-                            {/* Icon Picker */}
-                            <div>
-                                <label style={lbl}>
-                                    Category Icon <span style={{ color: '#ef4444' }}>*</span>
-                                    {form.icon && (
-                                        <span style={{
-                                            marginLeft: '10px', fontSize: '11px', fontWeight: 500,
-                                            color: '#16a34a', background: '#f0fdf4',
-                                            padding: '2px 8px', borderRadius: '999px',
-                                        }}>
-                                            Selected: {form.icon}
-                                        </span>
-                                    )}
-                                </label>
-
-                                {/* Preview Box */}
-                                {form.icon && (
-                                    <div style={{
-                                        display: 'flex', alignItems: 'center', gap: '10px',
-                                        padding: '10px 14px', background: '#f8fffe',
-                                        border: '1.5px solid var(--color-primary)',
-                                        borderRadius: '8px', marginBottom: '10px',
-                                    }}>
-                                        <span style={{ fontSize: '32px', lineHeight: 1 }}>{form.icon}</span>
-                                        <div>
-                                            <p style={{ margin: 0, fontSize: '12px', fontWeight: 700, color: '#111' }}>
-                                                {ICON_OPTIONS.find(i => i.emoji === form.icon)?.label || 'Custom'}
-                                            </p>
-                                            <p style={{ margin: 0, fontSize: '11px', color: '#888' }}>Selected icon preview</p>
-                                        </div>
-                                        <button
-                                            onClick={() => setForm(p => ({ ...p, icon: '' }))}
-                                            style={{
-                                                marginLeft: 'auto', background: 'none', border: 'none',
-                                                cursor: 'pointer', color: '#aaa', fontSize: '16px', lineHeight: 1,
-                                            }}
-                                            title="Clear selection"
-                                        >×</button>
-                                    </div>
-                                )}
-
-                                {/* Icon Grid */}
-                                <div style={{
-                                    display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px',
-                                    padding: '12px', background: '#fafafa',
-                                    border: `1.5px solid ${!form.icon ? '#fca5a5' : '#e5e7eb'}`,
-                                    borderRadius: '8px',
-                                }}>
-                                    {ICON_OPTIONS.map((opt) => (
+                        {iconTab === 'emoji' ? (
+                            <div className={cx('grid max-h-56 grid-cols-5 gap-1.5 overflow-y-auto rounded-xl border bg-gray-50 p-2.5', fieldErrors.icon ? 'border-red-300' : 'border-gray-200')}>
+                                {ICON_OPTIONS.map((opt) => {
+                                    const on = form.icon === opt.emoji && !form.image;
+                                    return (
                                         <button
                                             key={opt.emoji}
+                                            type="button"
                                             title={opt.label}
-                                            onClick={() => { setForm(p => ({ ...p, icon: opt.emoji })); if (fieldErrors.icon) setFieldErrors(p => ({ ...p, icon: '' })); }}
-                                            style={{
-                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                justifyContent: 'center', gap: '3px',
-                                                padding: '8px 4px', borderRadius: '8px', cursor: 'pointer',
-                                                border: form.icon === opt.emoji
-                                                    ? '2px solid var(--color-primary)'
-                                                    : '2px solid transparent',
-                                                background: form.icon === opt.emoji
-                                                    ? 'var(--color-primary-lightest, #f0fdf4)'
-                                                    : '#fff',
-                                                transition: 'all 0.15s',
-                                                boxShadow: form.icon === opt.emoji
-                                                    ? '0 0 0 1px var(--color-primary)'
-                                                    : '0 1px 3px rgba(0,0,0,0.06)',
-                                            }}
-                                            onMouseEnter={e => {
-                                                if (form.icon !== opt.emoji)
-                                                    (e.currentTarget as HTMLElement).style.background = '#f3f4f6';
-                                            }}
-                                            onMouseLeave={e => {
-                                                if (form.icon !== opt.emoji)
-                                                    (e.currentTarget as HTMLElement).style.background = '#fff';
-                                            }}
+                                            onClick={() => { setForm((p) => ({ ...p, icon: opt.emoji, image: '' })); if (fieldErrors.icon) setFieldErrors((p) => ({ ...p, icon: '' })); }}
+                                            className={cx(
+                                                'flex flex-col items-center gap-1 rounded-lg border bg-white px-1 py-2 transition',
+                                                on ? 'border-[var(--color-primary)] shadow-[0_0_0_2px_rgba(var(--color-primary-rgb),0.15)]' : 'border-transparent hover:bg-gray-100',
+                                            )}
                                         >
-                                            <span style={{ fontSize: '22px', lineHeight: 1 }}>{opt.emoji}</span>
-                                            <span style={{ fontSize: '9px', color: '#888', fontWeight: 500, textAlign: 'center', lineHeight: 1.2 }}>
-                                                {opt.label}
-                                            </span>
+                                            <span className="text-2xl leading-none">{opt.emoji}</span>
+                                            <span className="text-center text-[10px] leading-tight text-gray-500">{opt.label}</span>
                                         </button>
-                                    ))}
-                                </div>
-                                {(!form.icon || fieldErrors.icon) && (
-                                    <p style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', margin: '4px 0 0' }}>
-                                        ⚠ {fieldErrors.icon || 'Please select an icon to continue'}
-                                    </p>
-                                )}
+                                    );
+                                })}
                             </div>
-
-                            {/* Description */}
-                            <div>
-                                <label style={lbl}>Description <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
-                                <textarea
-                                    placeholder="Short description..."
-                                    rows={2}
-                                    value={form.description}
-                                    onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                                    style={{ ...inp, resize: 'vertical' }}
+                        ) : (
+                            <div className={cx('rounded-xl border bg-gray-50 p-3', fieldErrors.icon ? 'border-red-300' : 'border-gray-200')}>
+                                <SingleImageUploader
+                                    label="Category image"
+                                    value={form.image}
+                                    onChange={(url) => {
+                                        setForm((p) => ({ ...p, image: url, icon: url ? url : p.icon }));
+                                        if (url && fieldErrors.icon) setFieldErrors((p) => ({ ...p, icon: '' }));
+                                    }}
+                                    hint="PNG, JPG, SVG or WebP"
                                 />
                             </div>
+                        )}
+                        {fieldErrors.icon && !form.icon && !form.image && <p className="mt-1 text-xs text-red-600">{fieldErrors.icon}</p>}
+                    </div>
 
-                            {/* Toggles */}
-                            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                {[
-                                    { key: 'isActive', label: 'Active' },
-                                    { key: 'showInMenu', label: 'Show in Menu' },
-                                    { key: 'showInHome', label: 'Show on Homepage' },
-                                ].map((toggle) => (
-                                    <label key={toggle.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                                        <span style={{ fontSize: '12.5px', color: '#555', fontWeight: 500 }}>{toggle.label}</span>
-                                        <div
-                                            onClick={() => setForm(p => ({ ...p, [toggle.key]: !(p as any)[toggle.key] }))}
-                                            style={{
-                                                position: 'relative', width: '36px', height: '20px',
-                                                borderRadius: '999px', cursor: 'pointer',
-                                                background: (form as any)[toggle.key] ? 'var(--color-primary)' : '#ddd',
-                                                transition: 'background 0.2s',
-                                            }}
-                                        >
-                                            <div style={{
-                                                position: 'absolute', top: '3px',
-                                                left: (form as any)[toggle.key] ? '19px' : '3px',
-                                                width: '14px', height: '14px', borderRadius: '50%',
-                                                background: '#fff', transition: 'left 0.2s',
-                                                boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                                            }} />
-                                        </div>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                    <Field label="Description" hint="Optional.">
+                        <textarea
+                            className={TEXTAREA}
+                            rows={2}
+                            placeholder="Short description…"
+                            value={form.description}
+                            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
+                        />
+                    </Field>
 
-                        {/* Modal Footer */}
-                        <div style={{
-                            display: 'flex', gap: '8px', padding: '14px 20px',
-                            borderTop: '1px solid #f0f0f0',
-                        }}>
-                            <button onClick={closeModal} style={{
-                                flex: 1, padding: '9px', background: '#f5f5f5', color: '#666',
-                                border: 'none', borderRadius: '7px', fontSize: '12.5px', fontWeight: 600,
-                                cursor: 'pointer',
-                            }}>
-                                Cancel
-                            </button>
-                            <button onClick={handleSave} disabled={isSaving} style={{
-                                flex: 1, padding: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                                background: isSaving ? '#888' : 'var(--color-primary)', color: '#fff',
-                                border: 'none', borderRadius: '7px', fontSize: '12.5px', fontWeight: 700,
-                                cursor: isSaving ? 'not-allowed' : 'pointer',
-                            }}>
-                                <LuSave size={13} />
-                                {isSaving ? 'Saving...' : editingId ? 'Update' : 'Create'}
-                            </button>
-                        </div>
+                    <div className="space-y-1 border-t border-gray-100 pt-3">
+                        <Toggle label="Active" checked={form.isActive} onChange={(v) => setForm((p) => ({ ...p, isActive: v }))} />
+                        <Toggle label="Show in menu" checked={form.showInMenu} onChange={(v) => setForm((p) => ({ ...p, showInMenu: v }))} />
+                        <Toggle label="Show on homepage" checked={form.showInHome} onChange={(v) => setForm((p) => ({ ...p, showInHome: v }))} />
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
-};
-
-export default CategoriesPage;
+}

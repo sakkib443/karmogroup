@@ -44,8 +44,8 @@ export default function HomePage() {
       <ShopBySize />
       <FoamPromise
         filmMode="parallax"
-        film="/karmo/videos/product-film.mp4"
-        still="/karmo/images/home-02/promise/foam-promise-bg.webp"
+        film="/shared/videos/product-film.mp4"
+        still="/pages/home/promise/foam-promise-bg.webp"
         scrim="bg-black/55"
       />
 

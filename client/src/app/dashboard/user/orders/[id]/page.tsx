@@ -5,27 +5,33 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import {
-    LuArrowLeft,
-    LuPackage,
-    LuMapPin,
-    LuCreditCard,
-    LuPhone,
-    LuCopy,
-    LuSlash,
-    LuDownload,
-    LuMail,
-    LuRefreshCw,
-    LuX,
-    LuCloudUpload,
-    LuTrash2,
-} from 'react-icons/lu';
+    FiArrowLeft,
+    FiPackage,
+    FiClock,
+    FiCheckCircle,
+    FiTruck,
+    FiMapPin,
+    FiCreditCard,
+    FiPhone,
+    FiCopy,
+    FiSlash,
+    FiDownload,
+    FiMail,
+    FiRefreshCw,
+    FiX,
+    FiUploadCloud,
+    FiTrash2,
+} from 'react-icons/fi';
 import { useGetOrderByIdQuery, useCancelOrderMutation } from '@/redux/api/orderApi';
 import { useEmailInvoiceMutation } from '@/redux/api/invoiceApi';
 import { useCreateReturnMutation, RETURN_REASONS } from '@/redux/api/returnApi';
 import { useUploadMyImagesMutation } from '@/redux/api/uploadApi';
 import { downloadInvoicePdf } from '@/lib/downloadInvoice';
-import { getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
-import OrderProgressTracker from '@/components/orders/OrderProgressTracker';
+import {
+    getStatusConfig,
+    paymentMethodLabel,
+} from '@/lib/orderStatus';
+import OrderProgress from '@/components/order/OrderProgress';
 
 export default function OrderDetailPage() {
     const params = useParams();
@@ -179,7 +185,7 @@ export default function OrderDetailPage() {
     if (!order) {
         return (
             <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-                <LuPackage size={48} className="mx-auto text-gray-200 mb-4" />
+                <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
                 <h3 className="text-lg font-bold text-gray-600 mb-1">Order not found</h3>
                 <p className="text-sm text-gray-400 mb-4">The order you&apos;re looking for doesn&apos;t exist</p>
                 <Link href="/dashboard/user/orders" className="text-[var(--color-primary)] font-bold text-sm hover:underline">
@@ -197,7 +203,7 @@ export default function OrderDetailPage() {
                     onClick={() => router.back()}
                     className="flex items-center gap-2 text-sm text-gray-400 hover:text-[var(--color-primary)] mb-4 font-semibold transition-colors"
                 >
-                    <LuArrowLeft size={16} />
+                    <FiArrowLeft size={16} />
                     Back to My Orders
                 </button>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -207,7 +213,7 @@ export default function OrderDetailPage() {
                                 {order.orderId || order.orderNumber || `Order #${orderId.slice(-8).toUpperCase()}`}
                             </h1>
                             <button onClick={copyOrderId} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-300 hover:text-gray-600 transition-all">
-                                <LuCopy size={14} />
+                                <FiCopy size={14} />
                             </button>
                         </div>
                         <p className="text-sm text-gray-400 mt-1">
@@ -233,7 +239,7 @@ export default function OrderDetailPage() {
                                 disabled={isCancelling}
                                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 transition-all"
                             >
-                                <LuSlash size={15} />
+                                <FiSlash size={15} />
                                 {isCancelling ? 'Cancelling...' : 'Cancel Order'}
                             </button>
                         )}
@@ -242,7 +248,7 @@ export default function OrderDetailPage() {
                                 onClick={openReturnModal}
                                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-lightest)] transition-all"
                             >
-                                <LuRefreshCw size={15} />
+                                <FiRefreshCw size={15} />
                                 Request Return
                             </button>
                         )}
@@ -256,7 +262,7 @@ export default function OrderDetailPage() {
                         disabled={isDownloading}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold bg-[var(--color-primary)] text-white hover:opacity-90 disabled:opacity-50 transition-all"
                     >
-                        <LuDownload size={15} />
+                        <FiDownload size={15} />
                         {isDownloading ? 'Preparing...' : 'Download Invoice'}
                     </button>
                     <button
@@ -264,21 +270,14 @@ export default function OrderDetailPage() {
                         disabled={isEmailing}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary-lightest)] disabled:opacity-50 transition-all"
                     >
-                        <LuMail size={15} />
+                        <FiMail size={15} />
                         {isEmailing ? 'Sending...' : 'Email Invoice'}
                     </button>
                 </div>
             </div>
 
-            {/* Animated courier tracker — single shared component (also on admin + /track) */}
-            <OrderProgressTracker
-                status={order.status}
-                timeline={order.timeline}
-                carrier={order.carrier}
-                trackingNumber={order.trackingNumber}
-                courierStatus={order.courierStatus}
-                createdAt={order.createdAt}
-            />
+            {/* Order journey — professional animated responsive stepper */}
+            <OrderProgress status={order.status} timeline={order.timeline} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Items List */}
@@ -295,7 +294,7 @@ export default function OrderDetailPage() {
                                             <img src={item.thumbnail || item.image} alt={item.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                <LuPackage size={20} />
+                                                <FiPackage size={20} />
                                             </div>
                                         )}
                                     </div>
@@ -354,7 +353,7 @@ export default function OrderDetailPage() {
                     {/* Shipping Address */}
                     <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-4">
-                            <LuMapPin size={16} className="text-[var(--color-primary)]" />
+                            <FiMapPin size={16} className="text-[var(--color-primary)]" />
                             <h3 className="text-sm font-bold text-gray-800">Shipping Address</h3>
                         </div>
                         {order.shippingAddress ? (
@@ -364,7 +363,7 @@ export default function OrderDetailPage() {
                                 <p>{[order.shippingAddress.city, order.shippingAddress.area].filter(Boolean).join(', ')}</p>
                                 {order.shippingAddress.postalCode && <p>{order.shippingAddress.postalCode}</p>}
                                 <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-50 text-xs text-gray-400">
-                                    <LuPhone size={12} />
+                                    <FiPhone size={12} />
                                     {order.shippingAddress.phone}
                                 </div>
                             </div>
@@ -373,10 +372,82 @@ export default function OrderDetailPage() {
                         )}
                     </div>
 
+                    {/* Delivery / Tracking */}
+                    {(order.trackingNumber || order.carrier || order.estimatedDelivery || order.estimatedDeliveryDate ||
+                        (order.packages?.some((p: any) => p.trackingNumber || p.carrier))) && (
+                        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                            <div className="flex items-center gap-2 mb-4">
+                                <FiTruck size={16} className="text-[var(--color-primary)]" />
+                                <h3 className="text-sm font-bold text-gray-800">Delivery / Tracking</h3>
+                            </div>
+
+                            {/* Order-level tracking */}
+                            {(order.trackingNumber || order.carrier) && (
+                                <div className="space-y-3 mb-4">
+                                    {order.carrier && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">Carrier</span>
+                                            <span className="font-semibold text-gray-700">{order.carrier}</span>
+                                        </div>
+                                    )}
+                                    {order.trackingNumber && (
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-400">Tracking No.</span>
+                                            <span className="font-mono text-xs text-gray-600">{order.trackingNumber}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Estimated delivery hint (best-effort) */}
+                            {(order.estimatedDelivery || order.estimatedDeliveryDate) && (
+                                <div className="flex items-center gap-2 mb-4 text-xs font-semibold text-emerald-600">
+                                    <FiClock size={13} />
+                                    Est. delivery by{' '}
+                                    {new Date(order.estimatedDelivery || order.estimatedDeliveryDate).toLocaleDateString('en-US', {
+                                        day: 'numeric', month: 'short', year: 'numeric',
+                                    })}
+                                </div>
+                            )}
+
+                            {/* Per-package tracking */}
+                            {order.packages?.some((p: any) => p.trackingNumber || p.carrier || p.status) && (
+                                <div className="space-y-3 pt-1 border-t border-gray-50">
+                                    {order.packages.map((pkg: any, idx: number) => {
+                                        const pcfg = getStatusConfig(pkg.status);
+                                        return (
+                                            <div key={idx} className="pt-3">
+                                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                                    <p className="text-xs font-bold text-gray-700 truncate">
+                                                        {pkg.shopName || `Package ${idx + 1}`}
+                                                    </p>
+                                                    {pkg.status && (
+                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold ${pcfg.badgeBg} ${pcfg.badgeText}`}>
+                                                            {pcfg.label}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {(pkg.carrier || pkg.trackingNumber) && (
+                                                    <p className="text-[11px] text-gray-400">
+                                                        {pkg.carrier}
+                                                        {pkg.carrier && pkg.trackingNumber && ' · '}
+                                                        {pkg.trackingNumber && (
+                                                            <span className="font-mono text-gray-600">{pkg.trackingNumber}</span>
+                                                        )}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Payment Info */}
                     <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
                         <div className="flex items-center gap-2 mb-4">
-                            <LuCreditCard size={16} className="text-[var(--color-primary)]" />
+                            <FiCreditCard size={16} className="text-[var(--color-primary)]" />
                             <h3 className="text-sm font-bold text-gray-800">Payment</h3>
                         </div>
                         <div className="space-y-3">
@@ -449,14 +520,14 @@ export default function OrderDetailPage() {
                         {/* Header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                             <div className="flex items-center gap-2">
-                                <LuRefreshCw size={18} className="text-[var(--color-primary)]" />
+                                <FiRefreshCw size={18} className="text-[var(--color-primary)]" />
                                 <h3 className="text-base font-bold text-gray-900">Request a Return</h3>
                             </div>
                             <button
                                 onClick={closeReturnModal}
                                 className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-700 transition-all"
                             >
-                                <LuX size={18} />
+                                <FiX size={18} />
                             </button>
                         </div>
 
@@ -488,7 +559,7 @@ export default function OrderDetailPage() {
                                                         <img src={item.thumbnail || item.image} alt={item.name} className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                            <LuPackage size={16} />
+                                                            <FiPackage size={16} />
                                                         </div>
                                                     )}
                                                 </div>
@@ -545,7 +616,7 @@ export default function OrderDetailPage() {
                                                 onClick={() => removeReturnImage(url)}
                                                 className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/55 text-white flex items-center justify-center hover:bg-red-500 transition-all"
                                             >
-                                                <LuTrash2 size={12} />
+                                                <FiTrash2 size={12} />
                                             </button>
                                         </div>
                                     ))}
@@ -555,7 +626,7 @@ export default function OrderDetailPage() {
                                                 <span className="text-[10px] font-semibold">Uploading...</span>
                                             ) : (
                                                 <>
-                                                    <LuCloudUpload size={20} />
+                                                    <FiUploadCloud size={20} />
                                                     <span className="text-[10px] font-semibold">Add</span>
                                                 </>
                                             )}

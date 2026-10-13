@@ -67,6 +67,13 @@ const UserNotificationsPage: React.FC = () => {
 
     const unreadCount = useMemo(() => items.filter((n) => !n.isRead).length, [items]);
 
+    const resolveLink = (link?: string) => {
+        if (!link) return '';
+        let target = link.trim();
+        if (target.startsWith('/admin/')) target = target.replace('/admin/', '/dashboard/admin/');
+        return target;
+    };
+
     const handleItemClick = async (n: NotificationItem) => {
         if (!n.isRead) {
             try {
@@ -75,7 +82,8 @@ const UserNotificationsPage: React.FC = () => {
                 /* non-blocking */
             }
         }
-        if (n.link) router.push(n.link);
+        const targetUrl = resolveLink(n.link);
+        if (targetUrl) router.push(targetUrl);
     };
 
     const handleMarkAll = async () => {
@@ -160,7 +168,7 @@ const UserNotificationsPage: React.FC = () => {
                                     type="button"
                                     onClick={() => handleItemClick(n)}
                                     className={`flex w-full items-start gap-3 px-4 py-4 text-left transition hover:bg-gray-50 ${
-                                        n.isRead ? '' : 'bg-[var(--color-primary-lightest)]/50'
+                                        n.isRead ? '' : 'bg-green-50/50'
                                     }`}
                                 >
                                     <span

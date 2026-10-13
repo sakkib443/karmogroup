@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import TopHeader from "@/components/karmo/header/TopHeader";
 import Navbar from "@/components/karmo/header/Navbar";
 
-const DAMASK = "/karmo/images/header/mattress-side-texture.jpg";
+const DAMASK = "/shared/header/mattress-side-texture.jpg";
 
 /**
  * Site header for the live marketing chrome — TopHeader + Navbar.

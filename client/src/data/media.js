@@ -2,7 +2,7 @@
  * Media Center — three pages under `/media/*`.
  */
 
-const IMG = "/karmo/images/media";
+const IMG = "/pages/media";
 
 export const mediaNav = [
   { id: "news", name: "News & Blogs", href: "/media/news" },

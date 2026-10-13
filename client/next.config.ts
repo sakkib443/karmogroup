@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Super Admin entry point: the admin panel itself (login disabled for now).
+  async redirects() {
+    return [
+      { source: "/dashboard/super-admin", destination: "/dashboard/admin", permanent: false },
+      { source: "/dashboard/super-admin/:path*", destination: "/dashboard/admin/:path*", permanent: false },
+    ];
+  },
   // Emit .next/standalone so the Docker image ships only the server plus the
   // node_modules it actually imports (needed by the Dockerfile / Coolify).
   output: "standalone",

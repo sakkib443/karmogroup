@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    LuPlus,
-    LuSearch,
-    LuSquarePen,
-    LuTrash2,
-    LuRefreshCw,
-    LuZap,
-    LuCalendar,
-    LuX,
-    LuPackage,
-    LuTag,
-    LuImage,
-} from 'react-icons/lu';
+    FiPlus,
+    FiSearch,
+    FiEdit2,
+    FiTrash2,
+    FiRefreshCw,
+    FiZap,
+    FiCalendar,
+    FiX,
+    FiPackage,
+    FiTag,
+    FiImage,
+} from 'react-icons/fi';
 import {
     useGetOffersQuery,
     useCreateOfferMutation,
@@ -40,9 +40,9 @@ const displayDateTime = (date: string | Date) => {
 };
 
 const TYPE_META: Record<string, { label: string; color: string; icon: any }> = {
-    'flash-sale': { label: 'Flash Sale', color: 'text-red-600 bg-red-50', icon: LuZap },
-    deal: { label: 'Deal', color: 'text-amber-600 bg-amber-50', icon: LuTag },
-    banner: { label: 'Banner', color: 'text-purple-600 bg-purple-50', icon: LuImage },
+    'flash-sale': { label: 'Flash Sale', color: 'text-red-600 bg-red-50', icon: FiZap },
+    deal: { label: 'Deal', color: 'text-amber-600 bg-amber-50', icon: FiTag },
+    banner: { label: 'Banner', color: 'text-purple-600 bg-purple-50', icon: FiImage },
 };
 
 // Product multi-select box
@@ -62,7 +62,7 @@ const ProductPicker = ({
                 </span>
             </div>
             <div className="relative">
-                <LuSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
+                <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
                 <input
                     type="text"
                     placeholder="Search products..."
@@ -171,7 +171,7 @@ const OfferModal = ({
             <div className="bg-white rounded-md w-full max-w-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h3 className="font-bold text-gray-800 text-lg">{editing ? 'Edit' : 'Create'} Offer</h3>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><LuX size={20} /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><FiX size={20} /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-5 custom-scrollbar">
                     <div className="grid grid-cols-2 gap-4">
@@ -313,18 +313,18 @@ export default function OffersPage() {
                 <div className="flex gap-3">
                     <button onClick={() => refetch()}
                         className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm">
-                        <LuRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} /> Refresh
+                        <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} /> Refresh
                     </button>
                     <button onClick={() => { setEditing(null); setIsModalOpen(true); }}
                         className="px-4 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:bg-[var(--color-primary-dark)] flex items-center gap-2 transition-all shadow-sm">
-                        <LuPlus size={16} /> Add Offer
+                        <FiPlus size={16} /> Add Offer
                     </button>
                 </div>
             </div>
 
             <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex gap-4 items-center">
                 <div className="relative flex-1 w-full">
-                    <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input type="text" placeholder="Search by title..." value={search} onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none" />
                 </div>
@@ -368,11 +368,11 @@ export default function OffersPage() {
                                                 <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${meta.color}`}>{meta.label}</span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-xs text-gray-600 flex items-center gap-1.5"><LuPackage size={12} className="text-gray-400" /> {o.products?.length || 0}</span>
+                                                <span className="text-xs text-gray-600 flex items-center gap-1.5"><FiPackage size={12} className="text-gray-400" /> {o.products?.length || 0}</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col text-xs text-gray-600 gap-0.5">
-                                                    <span className="flex items-center gap-1.5"><LuCalendar size={11} className="text-gray-400" /> {displayDateTime(o.startTime)}</span>
+                                                    <span className="flex items-center gap-1.5"><FiCalendar size={11} className="text-gray-400" /> {displayDateTime(o.startTime)}</span>
                                                     <span className="flex items-center gap-1.5 text-gray-400">→ {displayDateTime(o.endTime)}</span>
                                                 </div>
                                             </td>
@@ -384,9 +384,9 @@ export default function OffersPage() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button onClick={() => { setEditing(o); setIsModalOpen(true); }}
-                                                        className="p-2 text-gray-400 hover:text-blue-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"><LuSquarePen size={16} /></button>
+                                                        className="p-2 text-gray-400 hover:text-blue-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"><FiEdit2 size={16} /></button>
                                                     <button onClick={() => handleDelete(o._id)}
-                                                        className="p-2 text-gray-400 hover:text-red-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"><LuTrash2 size={16} /></button>
+                                                        className="p-2 text-gray-400 hover:text-red-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"><FiTrash2 size={16} /></button>
                                                 </div>
                                             </td>
                                         </tr>

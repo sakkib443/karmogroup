@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { LuPackage } from 'react-icons/lu';
+import { FiPackage } from 'react-icons/fi';
 
 export interface PreviewItem {
     thumbnail?: string;
@@ -54,7 +54,7 @@ const OrderItemsPreview: React.FC<Props> = ({
                 className="rounded-lg ring-2 ring-white bg-gray-100 flex items-center justify-center"
                 style={{ width: size, height: size, marginLeft: idx === 0 ? 0 : -size * 0.32, zIndex: 10 - idx }}
             >
-                <LuPackage size={size * 0.45} className="text-gray-300" />
+                <FiPackage size={size * 0.45} className="text-gray-300" />
             </div>
         );
 

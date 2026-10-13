@@ -1,26 +1,23 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/purity */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import {
-    LuPlus,
-    LuSearch,
-    LuFilter,
-    LuSquarePen,
-    LuTrash2,
-    LuRefreshCw,
-    LuTag,
-    LuClock,
-    LuUsers,
-    LuCircleCheck,
-    LuCircleX,
-    LuPercent,
-    LuDollarSign,
-    LuCalendar,
-    LuX,
-    LuLayers,
-    LuPackage,
-    LuTruck,
-} from 'react-icons/lu';
+    FiPlus,
+    FiSearch,
+    FiEdit2,
+    FiTrash2,
+    FiRefreshCw,
+    FiTag,
+    FiPercent,
+    FiCalendar,
+    FiX,
+    FiLayers,
+    FiPackage,
+    FiTruck,
+} from 'react-icons/fi';
 import {
     useGetCouponsQuery,
     useCreateCouponMutation,
@@ -68,12 +65,12 @@ const SelectionBox = ({
         <div className="space-y-2 border border-gray-100 rounded-md p-3 bg-gray-50/30">
             <div className="flex justify-between items-center">
                 <label className="text-xs font-bold text-gray-500 uppercase">{label}</label>
-                <span className="text-[10px] font-bold text-[var(--color-primary)] bg-green-50 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold text-[var(--color-primary)] bg-[var(--color-primary-lightest)] px-2 py-0.5 rounded-full">
                     {selectedIds.length} Selected
                 </span>
             </div>
             <div className="relative">
-                <LuSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
+                <FiSearch className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={12} />
                 <input
                     type="text"
                     placeholder={`Search ${label.toLowerCase()}...`}
@@ -122,11 +119,13 @@ const CouponModal = ({
         name: '',
         description: '',
         discountType: 'percentage',
-        discountValue: 0,
-        maxDiscount: 0,
-        minPurchase: 0,
+        discountValue: '',
+        maxDiscount: '',
+        minPurchase: '',
+        startDate: formatDate(new Date()),
         endDate: formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
-        usageLimit: 0,
+        usageLimit: '',
+        usagePerUser: '1',
         applicableTo: 'all',
         specificProducts: [] as string[],
         specificCategories: [] as string[],
@@ -143,11 +142,13 @@ const CouponModal = ({
                 name: editingCoupon.name || '',
                 description: editingCoupon.description || '',
                 discountType: editingCoupon.discountType || 'percentage',
-                discountValue: editingCoupon.discountValue || 0,
-                maxDiscount: editingCoupon.maxDiscount || 0,
-                minPurchase: editingCoupon.minOrderAmount ?? editingCoupon.minPurchase ?? 0,
+                discountValue: editingCoupon.discountValue !== undefined && editingCoupon.discountValue !== null ? String(editingCoupon.discountValue) : '',
+                maxDiscount: editingCoupon.maxDiscount ? String(editingCoupon.maxDiscount) : '',
+                minPurchase: (editingCoupon.minOrderAmount ?? editingCoupon.minPurchase) ? String(editingCoupon.minOrderAmount ?? editingCoupon.minPurchase) : '',
+                startDate: editingCoupon.startDate ? formatDate(editingCoupon.startDate) : formatDate(new Date()),
                 endDate: editingCoupon.expiresAt ? formatDate(editingCoupon.expiresAt) : (editingCoupon.endDate ? formatDate(editingCoupon.endDate) : formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))),
-                usageLimit: editingCoupon.usageLimit || 0,
+                usageLimit: editingCoupon.usageLimit ? String(editingCoupon.usageLimit) : '',
+                usagePerUser: editingCoupon.usagePerUser ? String(editingCoupon.usagePerUser) : '1',
                 applicableTo: editingCoupon.applicableTo || 'all',
                 specificProducts: editingCoupon.specificProducts || [],
                 specificCategories: editingCoupon.specificCategories || [],
@@ -159,11 +160,13 @@ const CouponModal = ({
                 name: '',
                 description: '',
                 discountType: 'percentage',
-                discountValue: 0,
-                maxDiscount: 0,
-                minPurchase: 0,
+                discountValue: '',
+                maxDiscount: '',
+                minPurchase: '',
+                startDate: formatDate(new Date()),
                 endDate: formatDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
-                usageLimit: 0,
+                usageLimit: '',
+                usagePerUser: '1',
                 applicableTo: 'all',
                 specificProducts: [],
                 specificCategories: [],
@@ -174,12 +177,30 @@ const CouponModal = ({
 
     if (!isOpen) return null;
 
+    const numericFields = ['discountValue', 'minPurchase', 'maxDiscount', 'usageLimit', 'usagePerUser'];
+
+    const handleNumericKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key) ||
+            e.ctrlKey || e.metaKey) {
+            return;
+        }
+        if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
+        let finalValue = value;
+        if (numericFields.includes(name)) {
+            finalValue = value.replace(/[^0-9]/g, '');
+            if (name === 'discountValue' && formData.discountType === 'percentage' && Number(finalValue) > 100) {
+                finalValue = '100';
+            }
+        }
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked :
-                type === 'number' ? Number(value) : value
+            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : finalValue
         }));
     };
 
@@ -197,7 +218,7 @@ const CouponModal = ({
             <div className="bg-white rounded-md w-full max-w-2xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h3 className="font-bold text-gray-800 text-lg">{editingCoupon ? 'Edit' : 'Create'} Coupon</h3>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><LuX size={20} /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><FiX size={20} /></button>
                 </div>
                 <div className="p-6 overflow-y-auto space-y-5 custom-scrollbar">
                     <div className="grid grid-cols-2 gap-4">
@@ -242,16 +263,16 @@ const CouponModal = ({
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Apply Coupon To</label>
                             <div className="grid grid-cols-3 gap-3">
                                 {[
-                                    { id: 'all', label: 'Full Store', icon: LuPackage },
-                                    { id: 'specific_products', label: 'Specific Products', icon: LuTag },
-                                    { id: 'specific_categories', label: 'Specific Categories', icon: LuLayers },
+                                    { id: 'all', label: 'Full Store', icon: FiPackage },
+                                    { id: 'specific_products', label: 'Specific Products', icon: FiTag },
+                                    { id: 'specific_categories', label: 'Specific Categories', icon: FiLayers },
                                 ].map((option) => (
                                     <button
                                         key={option.id}
                                         type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, applicableTo: option.id }))}
                                         className={`flex flex-col items-center justify-center p-3 rounded-md border transition-all gap-2 ${formData.applicableTo === option.id
-                                                ? 'bg-green-50 border-[var(--color-primary)] text-[var(--color-primary)] shadow-sm'
+                                                ? 'bg-[var(--color-primary-lightest)] border-[var(--color-primary)] text-[var(--color-primary)] shadow-sm'
                                                 : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
                                             }`}
                                     >
@@ -301,11 +322,14 @@ const CouponModal = ({
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Discount Value</label>
                             <input
                                 name="discountValue"
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder={formData.discountType === 'percentage' ? 'e.g. 20 (for 20%)' : 'e.g. 100'}
                                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium disabled:bg-gray-100 disabled:text-gray-400"
                                 disabled={formData.discountType === 'free_shipping'}
-                                value={formData.discountType === 'free_shipping' ? 0 : formData.discountValue}
+                                value={formData.discountType === 'free_shipping' ? '' : formData.discountValue}
                                 onChange={handleChange}
+                                onKeyDown={handleNumericKeyDown}
                             />
                         </div>
                     </div>
@@ -315,26 +339,42 @@ const CouponModal = ({
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Min Purchase (৳)</label>
                             <input
                                 name="minPurchase"
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="e.g. 500 (optional)"
                                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium"
                                 value={formData.minPurchase}
                                 onChange={handleChange}
+                                onKeyDown={handleNumericKeyDown}
                             />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Max Discount (৳ - Percentage only)</label>
                             <input
                                 name="maxDiscount"
-                                type="number"
-                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="e.g. 200 (optional)"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium disabled:bg-gray-100 disabled:text-gray-400"
                                 disabled={formData.discountType !== 'percentage'}
                                 value={formData.maxDiscount}
                                 onChange={handleChange}
+                                onKeyDown={handleNumericKeyDown}
                             />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Start Date</label>
+                            <input
+                                name="startDate"
+                                type="date"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium"
+                                value={formData.startDate}
+                                onChange={handleChange}
+                            />
+                        </div>
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">End Date</label>
                             <input
@@ -345,15 +385,33 @@ const CouponModal = ({
                                 onChange={handleChange}
                             />
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Total Usage Limit</label>
                             <input
                                 name="usageLimit"
-                                type="number"
+                                type="text"
+                                inputMode="numeric"
                                 className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium"
-                                placeholder="0 for unlimited"
+                                placeholder="Leave empty for unlimited"
                                 value={formData.usageLimit}
                                 onChange={handleChange}
+                                onKeyDown={handleNumericKeyDown}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5">Limit Per User</label>
+                            <input
+                                name="usagePerUser"
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="e.g. 1"
+                                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-[var(--color-primary)] outline-none font-medium"
+                                value={formData.usagePerUser}
+                                onChange={handleChange}
+                                onKeyDown={handleNumericKeyDown}
                             />
                         </div>
                     </div>
@@ -425,10 +483,12 @@ export default function CouponsPage() {
             minOrderAmount: Number(data.minPurchase) || 0,
             expiresAt: data.endDate,
             isActive: data.isActive,
-            // Scope — which products the coupon applies to (was silently dropped before).
+            // Applicability + per-user + start date (now honored server-side).
             applicableTo: data.applicableTo || 'all',
             specificProducts: data.applicableTo === 'specific_products' ? (data.specificProducts || []) : [],
             specificCategories: data.applicableTo === 'specific_categories' ? (data.specificCategories || []) : [],
+            usagePerUser: Number(data.usagePerUser) || 1,
+            startDate: data.startDate || null,
         };
         if (data.usageLimit) payload.usageLimit = Number(data.usageLimit);
         try {
@@ -463,14 +523,14 @@ export default function CouponsPage() {
                         onClick={() => refetch()}
                         className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
                     >
-                        <LuRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+                        <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
                         Refresh
                     </button>
                     <button
                         onClick={handleCreate}
                         className="px-4 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-semibold hover:bg-[var(--color-primary-dark)] flex items-center gap-2 transition-all shadow-sm"
                     >
-                        <LuPlus size={16} />
+                        <FiPlus size={16} />
                         Add Coupon
                     </button>
                 </div>
@@ -479,7 +539,7 @@ export default function CouponsPage() {
             {/* Filters */}
             <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
-                    <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Search by code or name..."
@@ -519,8 +579,8 @@ export default function CouponsPage() {
                                     <tr key={coupon._id} className="hover:bg-gray-50/50">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-md bg-green-50 flex items-center justify-center text-[var(--color-primary)]">
-                                                    <LuTag size={20} />
+                                                <div className="w-10 h-10 rounded-md bg-[var(--color-primary-lightest)] flex items-center justify-center text-[var(--color-primary)]">
+                                                    <FiTag size={20} />
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-bold text-gray-800 uppercase tracking-wide">{coupon.code}</p>
@@ -531,8 +591,8 @@ export default function CouponsPage() {
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-bold text-emerald-600 flex items-center gap-1">
-                                                    {coupon.discountType === 'percentage' ? <><LuPercent size={14} /> {coupon.discountValue}%</>
-                                                        : coupon.discountType === 'free_shipping' ? <><LuTruck size={14} /> Free Shipping</>
+                                                    {coupon.discountType === 'percentage' ? <><FiPercent size={14} /> {coupon.discountValue}%</>
+                                                        : coupon.discountType === 'free_shipping' ? <><FiTruck size={14} /> Free Shipping</>
                                                         : <>৳{coupon.discountValue}</>}
                                                 </span>
                                                 <span className="text-[10px] text-gray-400 mt-0.5">Min. Order: ৳{coupon.minOrderAmount ?? coupon.minPurchase ?? 0}</span>
@@ -540,20 +600,24 @@ export default function CouponsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col gap-1">
-                                                <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
-                                                    {coupon.applicableTo === 'specific_products' ? (
-                                                        <><LuTag className="text-[var(--color-primary)]" size={12} /> {(coupon.specificProducts?.length || 0)} Product{(coupon.specificProducts?.length || 0) === 1 ? '' : 's'}</>
-                                                    ) : coupon.applicableTo === 'specific_categories' ? (
-                                                        <><LuPackage className="text-purple-500" size={12} /> {(coupon.specificCategories?.length || 0)} Categor{(coupon.specificCategories?.length || 0) === 1 ? 'y' : 'ies'}</>
-                                                    ) : (
-                                                        <><LuPackage className="text-blue-500" size={12} /> All Products</>
-                                                    )}
-                                                </span>
+                                                {coupon.applicableTo === 'specific_products' ? (
+                                                    <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
+                                                        <FiTag className="text-purple-500" size={12} /> {coupon.specificProducts?.length || 0} Product{(coupon.specificProducts?.length || 0) !== 1 ? 's' : ''}
+                                                    </span>
+                                                ) : coupon.applicableTo === 'specific_categories' ? (
+                                                    <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
+                                                        <FiLayers className="text-amber-500" size={12} /> {coupon.specificCategories?.length || 0} {(coupon.specificCategories?.length || 0) !== 1 ? 'Categories' : 'Category'}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-1.5">
+                                                        <FiPackage className="text-blue-500" size={12} /> All Products
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col text-xs text-gray-600 gap-1">
-                                                <p className="flex items-center gap-1.5 font-medium leading-none"><LuCalendar size={12} className="text-gray-400" /> {displayDate(coupon.expiresAt)}</p>
+                                                <p className="flex items-center gap-1.5 font-medium leading-none"><FiCalendar size={12} className="text-gray-400" /> {displayDate(coupon.expiresAt)}</p>
                                                 <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase w-fit mt-1 ${coupon.isActive && new Date(coupon.expiresAt) > new Date()
                                                         ? 'bg-green-50 text-green-700'
                                                         : 'bg-red-50 text-red-700'
@@ -568,13 +632,13 @@ export default function CouponsPage() {
                                                     onClick={() => handleEdit(coupon)}
                                                     className="p-2 text-gray-400 hover:text-blue-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"
                                                 >
-                                                    <LuSquarePen size={16} />
+                                                    <FiEdit2 size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(coupon._id)}
                                                     className="p-2 text-gray-400 hover:text-red-500 bg-gray-50 rounded-md border border-gray-100 transition-colors"
                                                 >
-                                                    <LuTrash2 size={16} />
+                                                    <FiTrash2 size={16} />
                                                 </button>
                                             </div>
                                         </td>

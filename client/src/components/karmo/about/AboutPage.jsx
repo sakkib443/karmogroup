@@ -7,7 +7,7 @@ import AboutStrength from "@/components/karmo/about/AboutStrength";
 import AboutFacilities from "@/components/karmo/about/AboutFacilities";
 import AboutReach from "@/components/karmo/about/AboutReach";
 import AboutPartners from "@/components/karmo/about/AboutPartners";
-import OrderAndContact from "@/components/karmo/home2/OrderAndContact";
+import OrderAndContact from "@/components/karmo/about/OrderAndContactClassic";
 
 /**
  * `/about` — the company page, written from the client's 31-page profile.

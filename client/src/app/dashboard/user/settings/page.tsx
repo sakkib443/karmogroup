@@ -5,8 +5,54 @@ import { useAppDispatch } from '@/redux/hooks';
 import { logout } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import { useUpdatePasswordMutation } from '@/redux/api/authApi';
-import { LuLock, LuEye, LuEyeOff, LuLogOut } from 'react-icons/lu';
+import { FiLock, FiEye, FiEyeOff, FiLogOut } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
+
+const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '10px 40px 10px 14px',
+    fontSize: '13px', border: '1px solid #e5e7eb',
+    borderRadius: '6px', outline: 'none',
+    boxSizing: 'border-box', fontFamily: 'inherit',
+    color: '#111', background: '#fff',
+    transition: 'border-color 0.2s',
+};
+
+// NOTE: defined at module scope (NOT inside SettingsPage). A component defined inside
+// the render body gets a new function identity every render, so React would unmount &
+// remount this input on each keystroke — making the password fields lose focus after
+// every character. Hoisting it fixes that.
+const Field = ({
+    label, value, onChange, show: showPw, onToggle,
+}: {
+    label: string;
+    value: string;
+    onChange: (v: string) => void;
+    show: boolean;
+    onToggle: () => void;
+}) => (
+    <div>
+        <label style={{ fontSize: '12px', fontWeight: 700, color: '#555', display: 'block', marginBottom: '6px' }}>
+            {label}
+        </label>
+        <div style={{ position: 'relative' }}>
+            <input
+                type={showPw ? 'text' : 'password'}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                style={inputStyle}
+                onFocus={(e) => (e.target.style.borderColor = '#555')}
+                onBlur={(e) => (e.target.style.borderColor = '#e5e7eb')}
+            />
+            <button
+                type="button"
+                onClick={onToggle}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0 }}
+            >
+                {showPw ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+            </button>
+        </div>
+    </div>
+);
 
 export default function SettingsPage() {
     const dispatch = useAppDispatch();
@@ -42,48 +88,6 @@ export default function SettingsPage() {
         }
     };
 
-    const inputStyle: React.CSSProperties = {
-        width: '100%', padding: '10px 40px 10px 14px',
-        fontSize: '13px', border: '1px solid #e5e7eb',
-        borderRadius: '6px', outline: 'none',
-        boxSizing: 'border-box', fontFamily: 'inherit',
-        color: '#111', background: '#fff',
-        transition: 'border-color 0.2s',
-    };
-
-    const Field = ({
-        label, value, onChange, show: showPw, onToggle,
-    }: {
-        label: string;
-        value: string;
-        onChange: (v: string) => void;
-        show: boolean;
-        onToggle: () => void;
-    }) => (
-        <div>
-            <label style={{ fontSize: '12px', fontWeight: 700, color: '#555', display: 'block', marginBottom: '6px' }}>
-                {label}
-            </label>
-            <div style={{ position: 'relative' }}>
-                <input
-                    type={showPw ? 'text' : 'password'}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    style={inputStyle}
-                    onFocus={(e) => (e.target.style.borderColor = '#555')}
-                    onBlur={(e) => (e.target.style.borderColor = '#e5e7eb')}
-                />
-                <button
-                    type="button"
-                    onClick={onToggle}
-                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', padding: 0 }}
-                >
-                    {showPw ? <LuEyeOff size={15} /> : <LuEye size={15} />}
-                </button>
-            </div>
-        </div>
-    );
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '520px' }}>
 
@@ -98,7 +102,7 @@ export default function SettingsPage() {
             {/* Password Change */}
             <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: '8px', padding: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
-                    <LuLock size={15} color="#555" />
+                    <FiLock size={15} color="#555" />
                     <h2 style={{ fontSize: '14px', fontWeight: 700, color: '#111', margin: 0 }}>Change Password</h2>
                 </div>
 
@@ -155,7 +159,7 @@ export default function SettingsPage() {
                         fontSize: '12px', fontWeight: 700, cursor: 'pointer',
                     }}
                 >
-                    <LuLogOut size={13} /> Logout
+                    <FiLogOut size={13} /> Logout
                 </button>
             </div>
         </div>

@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-    LuCircleCheck,
-    LuCircleAlert,
-    LuActivity,
-    LuPackage,
-    LuUsers,
-    LuShoppingCart,
-    LuDatabase,
-    LuRefreshCw
-} from 'react-icons/lu';
+    FiCheckCircle,
+    FiAlertCircle,
+    FiActivity,
+    FiPackage,
+    FiUsers,
+    FiShoppingCart,
+    FiDatabase,
+    FiRefreshCw
+} from 'react-icons/fi';
 import { useGetApiHealthQuery } from '@/redux/api/dashboardApi';
 import { useGetProductsQuery } from '@/redux/api/productApi';
 import { useGetAdminUsersQuery } from '@/redux/api/userApi';
@@ -36,16 +36,16 @@ const ApiHealthPage = () => {
     };
 
     const StatusBadge = ({ error, loading }: { error: boolean, loading: boolean }) => {
-        if (loading) return <span className="text-yellow-500 flex items-center gap-1 font-medium"><LuRefreshCw className="animate-spin" size={14} /> checking...</span>;
-        if (error) return <span className="text-red-500 flex items-center gap-1 font-medium"><LuCircleAlert size={14} /> offline</span>;
-        return <span className="text-emerald-500 flex items-center gap-1 font-medium"><LuCircleCheck size={14} /> online</span>;
+        if (loading) return <span className="text-yellow-500 flex items-center gap-1 font-medium"><FiRefreshCw className="animate-spin" size={14} /> checking...</span>;
+        if (error) return <span className="text-red-500 flex items-center gap-1 font-medium"><FiAlertCircle size={14} /> offline</span>;
+        return <span className="text-emerald-500 flex items-center gap-1 font-medium"><FiCheckCircle size={14} /> online</span>;
     };
 
     const modules = [
-        { name: 'Core API Server', icon: <LuActivity />, status: !healthError, loading: healthLoading, desc: 'Central backend system status' },
-        { name: 'Product Service', icon: <LuPackage />, status: !productError, loading: productLoading, desc: 'Manage inventory and listings' },
-        { name: 'User Management', icon: <LuUsers />, status: !userError, loading: userLoading, desc: 'Authentication and profile data' },
-        { name: 'Order & Analytics', icon: <LuShoppingCart />, status: !statsError, loading: statsLoading, desc: 'Sales tracking and reports' },
+        { name: 'Core API Server', icon: <FiActivity />, status: !healthError, loading: healthLoading, desc: 'Central backend system status' },
+        { name: 'Product Service', icon: <FiPackage />, status: !productError, loading: productLoading, desc: 'Manage inventory and listings' },
+        { name: 'User Management', icon: <FiUsers />, status: !userError, loading: userLoading, desc: 'Authentication and profile data' },
+        { name: 'Order & Analytics', icon: <FiShoppingCart />, status: !statsError, loading: statsLoading, desc: 'Sales tracking and reports' },
     ];
 
     return (
@@ -53,7 +53,7 @@ const ApiHealthPage = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
                 <div>
                     <h1 className="text-3xl font-black text-gray-900 flex items-center gap-3">
-                        <LuDatabase className="text-[var(--color-primary)]" />
+                        <FiDatabase className="text-[var(--color-primary)]" />
                         System Health Monitor
                     </h1>
                     <p className="text-gray-500 mt-1 font-medium italic">Monitoring real-time API connectivity and service status</p>
@@ -62,7 +62,7 @@ const ApiHealthPage = () => {
                     onClick={handleRefreshAll}
                     className="flex items-center gap-2 px-6 py-3 bg-[var(--color-primary)] text-white rounded-md font-bold hover:scale-105 transition-all shadow-lg shadow-[var(--color-primary)]/20 active:scale-95"
                 >
-                    <LuRefreshCw size={18} />
+                    <FiRefreshCw size={18} />
                     Run All Diagnostics
                 </button>
             </div>
@@ -71,7 +71,7 @@ const ApiHealthPage = () => {
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-8">
                 <div className="p-6 border-b border-gray-50 bg-gray-50/50 flex items-center justify-between">
                     <h2 className="font-bold text-gray-800 flex items-center gap-2">
-                        <LuActivity className="text-emerald-500" /> API Server Status
+                        <FiActivity className="text-emerald-500" /> API Server Status
                     </h2>
                     <span className="text-xs text-gray-400 font-bold uppercase tracking-wider">Last Check: {lastChecked}</span>
                 </div>
@@ -95,7 +95,7 @@ const ApiHealthPage = () => {
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center p-6 bg-emerald-50/50 rounded-lg border border-emerald-100">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 ${healthError ? 'bg-red-100 text-red-500' : 'bg-emerald-100 text-emerald-500'}`}>
-                            {healthError ? <LuCircleAlert size={32} /> : <LuCircleCheck size={32} />}
+                            {healthError ? <FiAlertCircle size={32} /> : <FiCheckCircle size={32} />}
                         </div>
                         <p className={`text-xl font-black ${healthError ? 'text-red-600' : 'text-emerald-600'}`}>
                             {healthError ? 'Critical System Error' : 'All systems operational'}
@@ -125,7 +125,7 @@ const ApiHealthPage = () => {
             {/* Footer Logic Test */}
             <div className="mt-12 p-6 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0">
-                    <LuRefreshCw size={24} />
+                    <FiRefreshCw size={24} />
                 </div>
                 <div>
                     <h4 className="font-bold text-blue-900">Developer Diagnostic Tool</h4>

@@ -29,19 +29,19 @@ import {
 
 const DEFAULT_BUYBOX_ICONS = [
   {
-    src: "/karmo/images/product/buybox-icons/warranty-10.webp",
+    src: "/products/common/buybox-icons/warranty-10.webp",
     label: "10-years warranty",
   },
   {
-    src: "/karmo/images/product/buybox-icons/dual-side.webp",
+    src: "/products/common/buybox-icons/dual-side.webp",
     label: "Dual side usage",
   },
   {
-    src: "/karmo/images/product/buybox-icons/antimicrobial.webp",
+    src: "/products/common/buybox-icons/antimicrobial.webp",
     label: "Anti Microbial Fabric",
   },
   {
-    src: "/karmo/images/product/buybox-icons/nights-100.webp",
+    src: "/products/common/buybox-icons/nights-100.webp",
     label: "100 night returns",
   },
 ];
@@ -52,11 +52,11 @@ const EASE = [0.22, 1, 0.36, 1];
 const OFFER_DISCOUNT_PCT = 15;
 
 const SIZE_ICONS = {
-  single: "/karmo/images/product/size-icons/single.webp",
-  double: "/karmo/images/product/size-icons/double.webp",
-  queen: "/karmo/images/product/size-icons/queen.webp",
-  king: "/karmo/images/product/size-icons/king.webp",
-  custom: "/karmo/images/product/size-icons/custom.webp",
+  single: "/products/common/size-icons/single.webp",
+  double: "/products/common/size-icons/double.webp",
+  queen: "/products/common/size-icons/queen.webp",
+  king: "/products/common/size-icons/king.webp",
+  custom: "/products/common/size-icons/custom.webp",
 };
 
 function OptionBlock({ title, children }) {
@@ -115,7 +115,7 @@ export default function ProductHero({ product }) {
   const fabricTitle = product.fabricTitle || "Fabric";
   const textureSrc =
     product.textureSrc ||
-    "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp";
+    "/products/mattress/mosaic/karmo-pattern-texture.webp";
 
   const [mainSrc, setMainSrc] = useState(cover);
   const [fabric, setFabric] = useState(product.fabrics?.[0]?.id || "");

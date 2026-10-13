@@ -1,5 +1,6 @@
 import { store } from '@/redux/store';
-import { API_URL } from '@/config/api';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 /**
  * Downloads an analytics report PDF for the given role and triggers a browser
@@ -8,9 +9,10 @@ import { API_URL } from '@/config/api';
  * Replicates baseApi auth: Bearer token from the redux auth slice, falling back
  * to localStorage('token'). SSR-safe — only runs in the browser.
  *
+ * @param path 'admin' -> /analytics/report/pdf
  * @throws Error on a non-ok response so callers can toast an error
  */
-export async function downloadReportPdf(): Promise<void> {
+export async function downloadReportPdf(path: 'admin'): Promise<void> {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
         return;
     }
@@ -40,7 +42,7 @@ export async function downloadReportPdf(): Promise<void> {
 
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
-    anchor.download = 'S Kawsar Sunnah Mart-Analytics-admin.pdf';
+    anchor.download = 'ShohozKrishi-Analytics-' + path + '.pdf';
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);

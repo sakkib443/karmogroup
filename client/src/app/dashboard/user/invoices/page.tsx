@@ -3,13 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { LuFileText, LuDownload, LuChevronRight } from 'react-icons/lu';
+import { FiFileText, FiDownload, FiChevronRight } from 'react-icons/fi';
 import { useGetMyOrdersQuery } from '@/redux/api/orderApi';
 import { downloadInvoicePdf } from '@/lib/downloadInvoice';
 import { getStatusConfig } from '@/lib/orderStatus';
 
 export default function UserInvoicesPage() {
-    const { data: ordersData, isLoading } = useGetMyOrdersQuery({});
+    // Surface far more than the default page (10) — this list has no pagination of its own.
+    const { data: ordersData, isLoading } = useGetMyOrdersQuery({ limit: 100 });
     const orders: any[] = ordersData?.data || ordersData?.orders || [];
 
     const [downloadingId, setDownloadingId] = React.useState<string | null>(null);
@@ -32,7 +33,7 @@ export default function UserInvoicesPage() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-xl bg-[var(--color-primary-lightest)] flex items-center justify-center text-[var(--color-primary)]">
-                        <LuFileText size={20} />
+                        <FiFileText size={20} />
                     </div>
                     <div>
                         <h1 className="text-xl font-bold text-gray-900">My Invoices</h1>
@@ -58,7 +59,7 @@ export default function UserInvoicesPage() {
             ) : orders.length === 0 ? (
                 /* Empty state */
                 <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-                    <LuFileText size={48} className="mx-auto text-gray-200 mb-4" />
+                    <FiFileText size={48} className="mx-auto text-gray-200 mb-4" />
                     <h3 className="text-lg font-bold text-gray-600 mb-1">No invoices yet</h3>
                     <p className="text-sm text-gray-400 mb-4">Place an order and your invoices will show up here</p>
                     <Link href="/products" className="inline-block text-[var(--color-primary)] font-bold text-sm hover:underline">
@@ -76,7 +77,7 @@ export default function UserInvoicesPage() {
                         return (
                             <div key={id} className="flex flex-col sm:flex-row sm:items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors">
                                 <div className="w-11 h-11 rounded-xl bg-[var(--color-primary-lightest)] flex items-center justify-center text-[var(--color-primary)] flex-shrink-0">
-                                    <LuFileText size={18} />
+                                    <FiFileText size={18} />
                                 </div>
 
                                 <div className="flex-1 min-w-0">
@@ -105,7 +106,7 @@ export default function UserInvoicesPage() {
                                         disabled={downloadingId === id}
                                         className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-[var(--color-primary)] text-white hover:opacity-90 disabled:opacity-50 transition-all"
                                     >
-                                        <LuDownload size={14} />
+                                        <FiDownload size={14} />
                                         {downloadingId === id ? '...' : 'Download'}
                                     </button>
                                     <Link
@@ -113,7 +114,7 @@ export default function UserInvoicesPage() {
                                         className="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-xl text-gray-300 hover:text-[var(--color-primary)] hover:bg-gray-100 transition-all"
                                         title="View order"
                                     >
-                                        <LuChevronRight size={18} />
+                                        <FiChevronRight size={18} />
                                     </Link>
                                 </div>
                             </div>

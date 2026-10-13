@@ -68,7 +68,7 @@ function LogoTile({ item }) {
   return (
     <span className="group relative mr-3 flex h-[4.75rem] shrink-0 items-center justify-center border border-ink/8 bg-white px-7 transition-colors duration-300 hover:border-brand/30 sm:h-[5.25rem] sm:px-8 lg:mr-4 lg:h-[5.75rem] lg:px-10">
       <Image
-        src={`/karmo/images/partners/${item.slug}.png`}
+        src={`/pages/home/partners/${item.slug}.png`}
         alt={item.name}
         width={item.w}
         height={item.h}

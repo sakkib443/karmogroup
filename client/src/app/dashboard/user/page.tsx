@@ -4,9 +4,9 @@ import React, { useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import Link from 'next/link';
 import {
-    LuArrowRight, LuPackage, LuCreditCard, LuMapPin, LuStar, LuHeart,
-    LuClock, LuTruck, LuBox, LuCircleCheck, LuSquarePen, LuChevronRight,
-} from 'react-icons/lu';
+    FiArrowRight, FiPackage, FiCreditCard, FiMapPin, FiStar, FiHeart,
+    FiClock, FiTruck, FiBox, FiCheckCircle, FiEdit2, FiChevronRight,
+} from 'react-icons/fi';
 import { useGetMyOrdersQuery } from '@/redux/api/orderApi';
 import { getStatusConfig } from '@/lib/orderStatus';
 
@@ -31,7 +31,7 @@ export default function UserDashboard() {
         const c = { toPay: 0, toShip: 0, toReceive: 0, toReview: 0 };
         orders.forEach(o => {
             if (o.status === 'pending') c.toPay++;
-            else if (o.status === 'confirmed' || o.status === 'processing') c.toShip++;
+            else if (['confirmed', 'factory', 'challan_ready', 'courier_entry', 'processing'].includes(o.status)) c.toShip++;
             else if (['shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt'].includes(o.status)) c.toReceive++;
             else if (o.status === 'delivered') c.toReview++;
         });
@@ -46,17 +46,17 @@ export default function UserDashboard() {
     };
 
     const orderTiles = [
-        { icon: LuClock, label: 'To Pay', value: counts.toPay, href: '/dashboard/user/orders?status=pending', color: '#D97706', bg: '#FFFBEB' },
-        { icon: LuBox, label: 'To Ship', value: counts.toShip, href: '/dashboard/user/orders?status=processing', color: '#7C3AED', bg: '#F5F3FF' },
-        { icon: LuTruck, label: 'To Receive', value: counts.toReceive, href: '/dashboard/user/orders?status=shipped', color: '#2563EB', bg: '#EFF6FF' },
-        { icon: LuStar, label: 'To Review', value: counts.toReview, href: '/dashboard/user/reviews', color: 'var(--color-primary)', bg: '#FFF1EA' },
+        { icon: FiClock, label: 'To Pay', value: counts.toPay, href: '/dashboard/user/orders?status=pending', color: '#D97706', bg: '#FFFBEB' },
+        { icon: FiBox, label: 'To Ship', value: counts.toShip, href: '/dashboard/user/orders?status=processing', color: '#7C3AED', bg: '#F5F3FF' },
+        { icon: FiTruck, label: 'To Receive', value: counts.toReceive, href: '/dashboard/user/orders?status=shipped', color: '#2563EB', bg: '#EFF6FF' },
+        { icon: FiStar, label: 'To Review', value: counts.toReview, href: '/dashboard/user/reviews', color: 'var(--color-primary)', bg: 'var(--color-primary-light)' },
     ];
 
     const quickLinks = [
-        { icon: LuMapPin, label: 'Address Book', desc: 'Manage your delivery addresses', href: '/dashboard/user/addresses', color: '#2563EB', bg: '#EFF6FF' },
-        { icon: LuCreditCard, label: 'My Payment Options', desc: 'Saved payment methods', href: '/dashboard/user/payments', color: '#059669', bg: '#ECFDF5' },
-        { icon: LuStar, label: 'My Reviews', desc: 'Rate & review your purchases', href: '/dashboard/user/reviews', color: '#D97706', bg: '#FFFBEB' },
-        { icon: LuHeart, label: 'Wishlist & Stores', desc: `${wishlistCount || 0} saved items`, href: '/dashboard/user/wishlist', color: '#DB2777', bg: '#FDF2F8' },
+        { icon: FiMapPin, label: 'Address Book', desc: 'Manage your delivery addresses', href: '/dashboard/user/addresses', color: '#2563EB', bg: '#EFF6FF' },
+        { icon: FiCreditCard, label: 'My Payment Options', desc: 'Saved payment methods', href: '/dashboard/user/payments', color: '#059669', bg: '#ECFDF5' },
+        { icon: FiStar, label: 'My Reviews', desc: 'Rate & review your purchases', href: '/dashboard/user/reviews', color: '#D97706', bg: '#FFFBEB' },
+        { icon: FiHeart, label: 'Wishlist & Stores', desc: `${wishlistCount || 0} saved items`, href: '/dashboard/user/wishlist', color: '#DB2777', bg: '#FDF2F8' },
     ];
 
     return (
@@ -75,7 +75,7 @@ export default function UserDashboard() {
                     </div>
                 </div>
                 <Link href="/dashboard/user/profile" className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-all flex items-center gap-2 flex-shrink-0">
-                    <LuSquarePen size={14} /> <span className="hidden sm:inline">Edit Profile</span>
+                    <FiEdit2 size={14} /> <span className="hidden sm:inline">Edit Profile</span>
                 </Link>
             </div>
 
@@ -84,7 +84,7 @@ export default function UserDashboard() {
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50">
                     <h2 className="text-sm font-bold text-gray-900">My Orders</h2>
                     <Link href="/dashboard/user/orders" className="text-xs font-bold text-[var(--color-primary)] flex items-center gap-1">
-                        View All <LuArrowRight size={13} />
+                        View All <FiArrowRight size={13} />
                     </Link>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-gray-50">
@@ -122,7 +122,7 @@ export default function UserDashboard() {
                 <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50">
                     <h2 className="text-sm font-bold text-gray-900">Recent Orders</h2>
                     <Link href="/dashboard/user/orders" className="text-xs font-bold text-[var(--color-primary)] flex items-center gap-1">
-                        View All <LuArrowRight size={13} />
+                        View All <FiArrowRight size={13} />
                     </Link>
                 </div>
 
@@ -133,13 +133,13 @@ export default function UserDashboard() {
                     </div>
                 ) : recent.length === 0 ? (
                     <div className="p-14 text-center">
-                        <div className="w-16 h-16 rounded-[20px] bg-[var(--color-primary-lightest)] flex items-center justify-center mx-auto mb-4 ring-1 ring-[var(--color-primary-border)]">
-                            <LuPackage size={26} className="text-[var(--color-primary)]" />
+                        <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
+                            <FiPackage size={26} className="text-gray-300" />
                         </div>
                         <p className="font-bold text-gray-600 mb-1">No orders yet</p>
                         <p className="text-sm text-gray-400 mb-5">Start shopping to see your orders here</p>
                         <Link href="/" className="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm">
-                            Start Shopping <LuArrowRight size={14} />
+                            Start Shopping <FiArrowRight size={14} />
                         </Link>
                     </div>
                 ) : (
@@ -149,7 +149,7 @@ export default function UserDashboard() {
                                 <div className="flex -space-x-2 flex-shrink-0">
                                     {(order.items?.slice(0, 2) || []).map((it: any, idx: number) => (
                                         <div key={idx} className="w-10 h-10 rounded-lg bg-gray-50 border-2 border-white overflow-hidden flex items-center justify-center">
-                                            {it.thumbnail || it.image ? <img src={it.thumbnail || it.image} alt="" className="w-full h-full object-cover" /> : <LuPackage size={14} className="text-gray-300" />}
+                                            {it.thumbnail || it.image ? <img src={it.thumbnail || it.image} alt="" className="w-full h-full object-cover" /> : <FiPackage size={14} className="text-gray-300" />}
                                         </div>
                                     ))}
                                 </div>
@@ -164,7 +164,7 @@ export default function UserDashboard() {
                                     <span className="text-sm font-bold text-[var(--color-primary)] whitespace-nowrap">৳{order.total?.toLocaleString()}</span>
                                     <StatusBadge status={order.status} />
                                 </div>
-                                <LuChevronRight size={16} className="text-gray-300 hidden sm:block flex-shrink-0" />
+                                <FiChevronRight size={16} className="text-gray-300 hidden sm:block flex-shrink-0" />
                             </Link>
                         ))}
                     </div>

@@ -249,7 +249,7 @@ export default function DivisionPage({ data }) {
           {Array.from({ length: 10 }).map((_, i) => (
             <Image
               key={`side-tex-${i}`}
-              src="/karmo/images/header/mattress-side-texture.jpg"
+              src="/shared/header/mattress-side-texture.jpg"
               alt=""
               width={1536}
               height={1024}
@@ -259,7 +259,9 @@ export default function DivisionPage({ data }) {
           ))}
         </div>
       )}
-      <DivisionProducts {...data.products} categoryId={categoryId} />
+      {data.products && !data.products.hidden ? (
+        <DivisionProducts {...data.products} categoryId={categoryId} />
+      ) : null}
       <OrderAndContact />
     </>
   );

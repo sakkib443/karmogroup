@@ -23,25 +23,25 @@ const ORANGE = "#FF9A1F";
 const steps = [
   {
     n: "01",
-    icon: "/karmo/images/trust/order-cartoon/select-v2.webp",
+    icon: "/shared/trust/order-cartoon/select-v2.webp",
     title: "Select your product",
     body: "Choose the foam, mattress or HomeTex piece that fits the room.",
   },
   {
     n: "02",
-    icon: "/karmo/images/trust/order-cartoon/cart-v2.webp",
+    icon: "/shared/trust/order-cartoon/cart-v2.webp",
     title: "Add it to the cart",
     body: "Drop your picks in — sizes and quantities stay with you.",
   },
   {
     n: "03",
-    icon: "/karmo/images/trust/order-cartoon/checkout-v2.webp",
+    icon: "/shared/trust/order-cartoon/checkout-v2.webp",
     title: "Complete the checkout",
     body: "Just three details: name, full address, and mobile number.",
   },
   {
     n: "04",
-    icon: "/karmo/images/trust/order-cartoon/enjoy-v2.webp",
+    icon: "/shared/trust/order-cartoon/enjoy-v2.webp",
     title: "Receive & enjoy",
     body: "We deliver. You settle in. Comfort shows up at the door.",
   },
@@ -114,7 +114,7 @@ export default function OrderAndContact({ textureSlides = false }) {
       ) : (
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
           <Image
-            src="/karmo/images/mattress/mosaic/karmo-pattern-texture.webp"
+            src="/products/mattress/mosaic/karmo-pattern-texture.webp"
             alt=""
             fill
             sizes="100vw"

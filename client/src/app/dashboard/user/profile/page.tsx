@@ -6,9 +6,9 @@ import { updateUser } from '@/redux/slices/authSlice';
 import { useUpdateProfileMutation, useGetMyAddressesQuery } from '@/redux/api/userApi';
 import { useUploadMyImagesMutation } from '@/redux/api/uploadApi';
 import {
-    LuUser, LuSave, LuCamera, LuMail, LuPhone, LuLock, LuMapPin,
-    LuSquarePen, LuX, LuShield, LuCircleCheck,
-} from 'react-icons/lu';
+    FiUser, FiSave, FiCamera, FiMail, FiPhone, FiLock, FiMapPin,
+    FiEdit2, FiX, FiShield, FiCheckCircle,
+} from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { toast } from 'react-hot-toast';
 
@@ -39,7 +39,7 @@ export default function ProfilePage() {
         if (user) setForm({ name: user.name || '', phone: user.phone || '' });
     }, [user]);
 
-    // ── Avatar upload (real — Cloudinary via /upload/my-images) ──
+    // ── Avatar upload (real — server disk via /upload/my-images) ──
     const pickAvatar = () => fileRef.current?.click();
     const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -136,7 +136,7 @@ export default function ProfilePage() {
                             >
                                 {uploading
                                     ? <span className="w-4 h-4 border-2 border-gray-300 border-t-[var(--color-primary)] rounded-full animate-spin" />
-                                    : <LuCamera size={15} />}
+                                    : <FiCamera size={15} />}
                             </button>
                         </div>
                         <div className="min-w-0">
@@ -156,22 +156,22 @@ export default function ProfilePage() {
                     <h2 className="text-base font-bold text-gray-800">Personal Information</h2>
                     {!editing ? (
                         <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 px-3 py-1.5 rounded-lg transition-all">
-                            <LuSquarePen size={14} /> Edit
+                            <FiEdit2 size={14} /> Edit
                         </button>
                     ) : (
                         <button onClick={cancelEdit} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-all">
-                            <LuX size={15} /> Cancel
+                            <FiX size={15} /> Cancel
                         </button>
                     )}
                 </div>
 
                 {!editing ? (
                     <div className="mt-2">
-                        <InfoRow icon={<LuUser size={16} />} label="Full Name" value={user?.name} />
-                        <InfoRow icon={<LuMail size={16} />} label="Email" value={user?.email} hint={<span className="text-[10px] bg-gray-100 text-gray-400 rounded px-1.5 py-0.5">Login ID</span>} />
-                        <InfoRow icon={<LuPhone size={16} />} label="Phone" value={user?.phone} />
+                        <InfoRow icon={<FiUser size={16} />} label="Full Name" value={user?.name} />
+                        <InfoRow icon={<FiMail size={16} />} label="Email" value={user?.email} hint={<span className="text-[10px] bg-gray-100 text-gray-400 rounded px-1.5 py-0.5">Login ID</span>} />
+                        <InfoRow icon={<FiPhone size={16} />} label="Phone" value={user?.phone} />
                         <InfoRow
-                            icon={<LuMapPin size={16} />}
+                            icon={<FiMapPin size={16} />}
                             label="Default Address"
                             value={addressText}
                             hint={<a href="/dashboard/user/addresses" className="text-[11px] text-[var(--color-primary)] hover:underline font-semibold">Manage →</a>}
@@ -181,22 +181,22 @@ export default function ProfilePage() {
                     <div className="mt-4 space-y-5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label className={labelCls}><LuUser size={12} className="inline mr-1" /> Full Name</label>
+                                <label className={labelCls}><FiUser size={12} className="inline mr-1" /> Full Name</label>
                                 <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="Your full name" />
                             </div>
                             <div>
-                                <label className={labelCls}><LuPhone size={12} className="inline mr-1" /> Phone</label>
+                                <label className={labelCls}><FiPhone size={12} className="inline mr-1" /> Phone</label>
                                 <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputCls} placeholder="01XXXXXXXXX" />
                             </div>
                             <div className="md:col-span-2">
-                                <label className={labelCls}><LuMail size={12} className="inline mr-1" /> Email (cannot be changed)</label>
+                                <label className={labelCls}><FiMail size={12} className="inline mr-1" /> Email (cannot be changed)</label>
                                 <input type="email" value={user?.email || ''} disabled className={`${inputCls} bg-gray-50 text-gray-400 cursor-not-allowed`} />
                             </div>
                         </div>
                         <div className="flex justify-end gap-3">
                             <button onClick={cancelEdit} className="px-5 py-2.5 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100 transition-all">Cancel</button>
                             <button onClick={handleSave} disabled={isLoading} className="px-6 py-2.5 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:brightness-95 transition-all shadow-md shadow-[var(--color-primary)]/20 disabled:opacity-50 flex items-center gap-2">
-                                <LuSave size={16} /> {isLoading ? 'Saving...' : 'Save Changes'}
+                                <FiSave size={16} /> {isLoading ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
                     </div>
@@ -205,52 +205,49 @@ export default function ProfilePage() {
 
             {/* ── Sign-in & Security ── */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2"><LuShield size={17} className="text-[var(--color-primary)]" /> Sign-in & Security</h2>
-                <p className="text-xs text-gray-400 mb-5">How you sign in to your S Kawsar Sunnah Mart account</p>
+                <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2"><FiShield size={17} className="text-[var(--color-primary)]" /> Sign-in & Security</h2>
+                <p className="text-xs text-gray-400 mb-5">How you sign in to your Shohoz Krishi account</p>
 
                 {/* Current method */}
                 <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gray-50 border border-gray-100">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500"><LuLock size={15} /></div>
+                        <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500"><FiLock size={15} /></div>
                         <div>
                             <p className="text-sm font-semibold text-gray-800">Email & Password</p>
                             <p className="text-xs text-gray-400">{user?.email}</p>
                         </div>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600"><LuCircleCheck size={13} /> Active</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600"><FiCheckCircle size={13} /> Active</span>
                 </div>
 
-                {/* Google — only shown once Google sign-in is configured (same gate as the
-                    login/register buttons). Linking needs no action: signing in with
-                    Google using this same address attaches it to this account. */}
-                {!!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
-                    <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-gray-100 mt-3">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center"><FcGoogle size={18} /></div>
-                            <div className="min-w-0">
-                                <p className="text-sm font-semibold text-gray-800">Google</p>
-                                <p className="text-xs text-gray-400 truncate">
-                                    Use &ldquo;Continue with Google&rdquo; with {user?.email} to sign in faster
-                                </p>
-                            </div>
+                {/* Google (placeholder — needs OAuth setup) */}
+                <div className="flex items-center justify-between py-3 px-4 rounded-xl border border-gray-100 mt-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center"><FcGoogle size={18} /></div>
+                        <div>
+                            <p className="text-sm font-semibold text-gray-800">Google</p>
+                            <p className="text-xs text-gray-400">Sign in faster with your Gmail</p>
                         </div>
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-400 flex-shrink-0">
-                            Links automatically
-                        </span>
                     </div>
-                )}
+                    <button
+                        onClick={() => toast('Google sign-in is coming soon — setup in progress.', { icon: '🔧' })}
+                        className="text-xs font-semibold text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-gray-300 transition-all"
+                    >
+                        Connect
+                    </button>
+                </div>
 
                 {/* Change password */}
                 <div className="mt-5">
                     {!showPw ? (
                         <button onClick={() => setShowPw(true)} className="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 border border-gray-200 rounded-xl px-4 py-2.5 hover:bg-gray-50 transition-all">
-                            <LuLock size={14} /> Change Password
+                            <FiLock size={14} /> Change Password
                         </button>
                     ) : (
                         <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/50">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-sm font-bold text-gray-700">Change Password</h3>
-                                <button onClick={() => { setShowPw(false); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); }} className="text-gray-400 hover:text-gray-600"><LuX size={16} /></button>
+                                <button onClick={() => { setShowPw(false); setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); }} className="text-gray-400 hover:text-gray-600"><FiX size={16} /></button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
@@ -268,7 +265,7 @@ export default function ProfilePage() {
                             </div>
                             <div className="flex justify-end mt-4">
                                 <button onClick={handlePasswordChange} disabled={isChangingPw} className="px-6 py-2.5 bg-gray-800 text-white rounded-xl font-semibold text-sm hover:bg-gray-900 transition-all disabled:opacity-50 flex items-center gap-2">
-                                    <LuLock size={15} /> {isChangingPw ? 'Changing...' : 'Update Password'}
+                                    <FiLock size={15} /> {isChangingPw ? 'Changing...' : 'Update Password'}
                                 </button>
                             </div>
                         </div>

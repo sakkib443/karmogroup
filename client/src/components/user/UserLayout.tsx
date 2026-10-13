@@ -6,13 +6,13 @@ import NotificationBell from '@/components/notifications/NotificationBell';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { logout } from '@/redux/slices/authSlice';
-import { LogoMark } from '@/components/shared/Logo';
+import { SiteMark } from '@/components/shared/SiteLogo';
 import {
-    LuUser, LuMapPin, LuCreditCard, LuSettings,
-    LuShoppingBag, LuRefreshCw, LuSlash, LuFileText,
-    LuStar, LuHeart,
-    LuLogOut, LuMenu, LuX, LuChevronRight, LuHouse, LuArrowLeft,
-} from 'react-icons/lu';
+    FiUser, FiMapPin, FiCreditCard, FiSettings,
+    FiShoppingBag, FiRefreshCw, FiSlash, FiFileText,
+    FiStar, FiMessageCircle, FiHeart,
+    FiLogOut, FiMenu, FiX, FiChevronRight, FiHome, FiArrowLeft,
+} from 'react-icons/fi';
 
 // ── Daraz-style grouped account menu ──────────────────────────────
 // Bold section header (optionally a link), with lighter indented children.
@@ -24,24 +24,25 @@ const SECTIONS: MenuSection[] = [
         title: 'Manage My Account',
         href: '/dashboard/user',
         children: [
-            { label: 'My Profile', href: '/dashboard/user/profile', icon: LuUser },
-            { label: 'Address Book', href: '/dashboard/user/addresses', icon: LuMapPin },
-            { label: 'Payment History', href: '/dashboard/user/payments', icon: LuCreditCard },
+            { label: 'My Profile', href: '/dashboard/user/profile', icon: FiUser },
+            { label: 'Address Book', href: '/dashboard/user/addresses', icon: FiMapPin },
+            { label: 'Payment History', href: '/dashboard/user/payments', icon: FiCreditCard },
         ],
     },
     {
         title: 'My Orders',
         href: '/dashboard/user/orders',
-        icon: LuShoppingBag,
+        icon: FiShoppingBag,
         children: [
-            { label: 'My Returns', href: '/dashboard/user/returns', icon: LuRefreshCw },
-            { label: 'My Cancellations', href: '/dashboard/user/orders?status=cancelled', icon: LuSlash },
-            { label: 'My Invoices', href: '/dashboard/user/invoices', icon: LuFileText },
+            { label: 'My Returns', href: '/dashboard/user/returns', icon: FiRefreshCw },
+            { label: 'My Cancellations', href: '/dashboard/user/orders?status=cancelled', icon: FiSlash },
+            { label: 'My Invoices', href: '/dashboard/user/invoices', icon: FiFileText },
         ],
     },
-    { title: 'My Reviews', href: '/dashboard/user/reviews', icon: LuStar, standalone: true },
-    { title: 'My Wishlist', href: '/dashboard/user/wishlist', icon: LuHeart, standalone: true },
-    { title: 'Account Settings', href: '/dashboard/user/settings', icon: LuSettings, standalone: true },
+    { title: 'My Reviews', href: '/dashboard/user/reviews', icon: FiStar, standalone: true },
+    { title: 'My Messages', href: '/dashboard/user/messages', icon: FiMessageCircle, standalone: true },
+    { title: 'My Wishlist', href: '/dashboard/user/wishlist', icon: FiHeart, standalone: true },
+    { title: 'Account Settings', href: '/dashboard/user/settings', icon: FiSettings, standalone: true },
 ];
 
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
@@ -95,7 +96,8 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
         const label = (link as any).label ?? (link as any).title;
         const Icon = (link as any).icon as React.ElementType;
         const active = isActive(href);
-        const badge = (link as any).badge === 'wishlist' || label === 'My Wishlist & Followed Stores';
+        // Keyed on the address, not the label, so renaming the item can't lose the count.
+        const badge = (link as any).badge === 'wishlist' || href === '/dashboard/user/wishlist';
         return (
             <Link
                 href={href}
@@ -108,7 +110,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                     fontSize: bold ? '13.5px' : '13px',
                     fontWeight: active ? 700 : bold ? 700 : 500,
                     color: active ? 'var(--color-primary)' : bold ? '#1f2937' : '#5b6470',
-                    background: active ? 'var(--color-primary-lightest, #FFF1EA)' : 'transparent',
+                    background: active ? 'var(--color-primary-lightest, var(--color-primary-light))' : 'transparent',
                     transition: 'all 0.14s ease', lineHeight: 1.3,
                 }}
                 onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = '#F6F7F9'; }}
@@ -167,7 +169,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
             }} className="user-sidebar">
                 {/* Brand */}
                 <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', padding: '18px 20px 14px', borderBottom: '1px solid #F2F2F2' }}>
-                    <LogoMark imgClassName="h-[28px] md:h-[32px]" />
+                    <SiteMark size={36} />
                     <p style={{ fontSize: '12px', color: '#9aa3af', margin: 0, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase' }}>My Account</p>
                 </Link>
 
@@ -191,12 +193,12 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                     <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', margin: '0 8px', borderRadius: '8px', textDecoration: 'none', fontSize: '13px', fontWeight: 600, color: '#5b6470' }}
                         onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#F6F7F9'}
                         onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                        <LuArrowLeft size={15} style={{ color: '#9aa3af' }} /> Back to Store
+                        <FiArrowLeft size={15} style={{ color: '#9aa3af' }} /> Back to Store
                     </Link>
                     <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', width: 'calc(100% - 16px)', margin: '2px 8px 0', padding: '9px 12px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#5b6470', textAlign: 'left' }}
                         onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#dc2626'; (e.currentTarget as HTMLElement).style.background = '#FEF2F2'; }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#5b6470'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}>
-                        <LuLogOut size={15} /> Logout
+                        <FiLogOut size={15} /> Logout
                     </button>
                 </div>
             </aside>
@@ -214,12 +216,12 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                                     <p style={{ fontSize: '11px', color: '#9aa3af', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '170px' }}>{user?.email}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', padding: '4px' }}><LuX size={20} /></button>
+                            <button onClick={() => setMobileMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', padding: '4px' }}><FiX size={20} /></button>
                         </div>
                         <Nav onNav={() => setMobileMenuOpen(false)} />
                         <div style={{ padding: '10px 0 16px', borderTop: '1px solid #F2F2F2' }}>
                             <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', width: 'calc(100% - 16px)', margin: '0 8px', padding: '10px 12px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, color: '#dc2626' }}>
-                                <LuLogOut size={16} /> Logout
+                                <FiLogOut size={16} /> Logout
                             </button>
                         </div>
                     </div>
@@ -232,13 +234,13 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                 <header className="user-topbar" style={{ background: '#fff', borderBottom: '1px solid #ECECEC', height: '54px', display: 'flex', alignItems: 'center', padding: '0 24px', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', padding: '4px', display: 'none' }} className="mobile-hamburger">
-                            <LuMenu size={20} />
+                            <FiMenu size={20} />
                         </button>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9aa3af' }}>
-                            <Link href="/" style={{ color: '#9aa3af', textDecoration: 'none', display: 'flex' }}><LuHouse size={13} /></Link>
-                            <LuChevronRight size={11} />
+                            <Link href="/" style={{ color: '#9aa3af', textDecoration: 'none', display: 'flex' }}><FiHome size={13} /></Link>
+                            <FiChevronRight size={11} />
                             <Link href="/dashboard/user" style={{ color: '#9aa3af', textDecoration: 'none' }}>My Account</Link>
-                            <LuChevronRight size={11} />
+                            <FiChevronRight size={11} />
                             <span style={{ color: '#111', fontWeight: 700 }}>{currentLabel}</span>
                         </div>
                     </div>

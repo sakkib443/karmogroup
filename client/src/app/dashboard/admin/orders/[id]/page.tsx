@@ -1,41 +1,55 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
-    LuArrowLeft,
-    LuTruck,
-    LuPackage,
-    LuDollarSign,
-    LuMapPin,
-    LuUser,
-    LuClock,
-    LuCircleCheck,
-    LuPrinter,
-    LuPencil,
-    LuSave,
-    LuCalendar,
-    LuMail,
-    LuPhone
-} from 'react-icons/lu';
+    FiArrowLeft,
+    FiTruck,
+    FiPackage,
+    FiDollarSign,
+    FiMapPin,
+    FiUser,
+    FiClock,
+    FiCheckCircle,
+    FiPrinter,
+    FiEdit3,
+    FiSave,
+    FiCalendar,
+    FiMail,
+    FiPhone,
+    FiTag,
+    FiFileText,
+    FiSend,
+    FiCopy,
+    FiExternalLink,
+    FiRefreshCw,
+    FiX,
+    FiAlertCircle
+} from 'react-icons/fi';
 import {
     useGetAdminOrderByIdQuery,
     useUpdateOrderStatusMutation,
     useUpdatePaymentStatusMutation,
-    useAddAdminNoteMutation,
-    useUpdateAdminOrderTrackingMutation
+    useAddAdminNoteMutation
 } from '@/redux/api/orderApi';
 import { useBookCourierPackageMutation, useRefreshCourierStatusMutation } from '@/redux/api/courierApi';
+import OrderProgress from '@/components/order/OrderProgress';
 import { toast } from 'react-hot-toast';
 import {
     ORDER_STATUS_CONFIG,
     getStatusConfig,
     paymentMethodLabel,
     paymentMethodBadge,
-    CARRIERS
+    courierStatusLabel,
+    courierStatusBadgeClass
 } from '@/lib/orderStatus';
 import { downloadInvoicePdf } from '@/lib/downloadInvoice';
-import OrderProgressTracker from '@/components/orders/OrderProgressTracker';
+import FraudOrderBanner from '../../fraud-check/FraudOrderBanner';
+import PrintOrdersModal, { type PrintKind } from '@/components/admin/print/PrintOrdersModal';
+import EditOrderModal from '@/components/admin/orders/EditOrderModal';
+import OrderPipeline from '@/components/admin/orders/OrderPipeline';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 // Shared status badge built from the canonical 11-state config
 const StatusBadge = ({ status }: { status: string }) => {
@@ -48,6 +62,210 @@ const StatusBadge = ({ status }: { status: string }) => {
     );
 };
 
+/** A saved order line. The list-price fields are newer — older orders do not have them. */
+interface OrderLine {
+    name: string;
+    image?: string;
+    product?: { thumbnail?: string } | null;
+    price: number;
+    quantity: number;
+    total?: number;
+    color?: string;
+    size?: string;
+    sku?: string;
+    variant?: { sku?: string };
+    originalPrice?: number;
+    discountPercent?: number;
+    priceOverridden?: boolean;
+}
+
+interface TimelineStep {
+    status: string;
+    note?: string;
+    createdAt?: string;
+}
+
+/** One shipment of the order (orders normally have exactly one). */
+interface OrderPackage {
+    _id: string;
+    status: string;
+    subtotal: number;
+    consignmentId?: string;
+    trackingNumber?: string;
+    courierStatus?: string;
+    courierBookedAt?: string;
+    courierAttemptAt?: string;
+}
+
+// An order may still be corrected while it is one of these and no parcel has gone to the
+// courier. Mirrors EDITABLE_STATUSES / editBlockedReason() in
+// ShohozKrishi_Server/src/app/modules/order/order.service.ts — change the two together.
+// The server decides; this only decides whether to offer the button, and says why not.
+const EDITABLE_STATUSES = ['pending', 'confirmed'];
+
+function editBlockedReason(order: { status?: string; packages?: OrderPackage[] }): string | null {
+    for (const pkg of order.packages || []) {
+        if (pkg.consignmentId) return 'Booked with Steadfast — their API cannot change a parcel, so edit it in the Steadfast panel.';
+        if (pkg.courierAttemptAt) return 'A send to Steadfast has not finished. Check the courier card below first.';
+        if (pkg.trackingNumber) return 'This order already carries a courier tracking number.';
+    }
+    if (!EDITABLE_STATUSES.includes(order.status || '')) {
+        return `An order that is ${getStatusConfig(order.status || '').label.toLowerCase()} can no longer be edited.`;
+    }
+    return null;
+}
+
+/** The order fields a Steadfast booking reads. */
+interface CourierOrder {
+    orderId?: string;
+    paymentMethod?: string;
+    paymentStatus?: string;
+    shippingCost?: number;
+    discount?: number;
+    note?: string;
+    shippingAddress?: { fullName?: string; phone?: string; address?: string; area?: string; city?: string; postalCode?: string };
+    packages?: { _id: string }[];
+}
+
+// Steadfast's public tracking page — the code must be pasted there; there is no verified deep-link format.
+const STEADFAST_TRACKING_URL = 'https://steadfast.com.bd/tracking';
+
+// Package statuses the API refuses to book (TERMINAL_STATUSES in ShohozKrishi_Server/src/app/modules/courier/courier.service.ts).
+const UNSENDABLE_STATUSES = ['delivered', 'cancelled', 'returned', 'refunded'];
+
+/** The server's error message from an RTK Query failure, else the fallback. */
+const apiError = (e: unknown, fallback: string) =>
+    (e as { data?: { message?: string } } | null)?.data?.message || fallback;
+
+// Mirrors codFor(order, pkg) in ShohozKrishi_Server/src/app/modules/courier/courier.service.ts —
+// change the two together. Read-only: it only shows the amount; the server works it out
+// again when it books.
+function codFor(order: CourierOrder, pkg: { _id: string; subtotal: number }): number {
+    if (order.paymentMethod !== 'cod' || order.paymentStatus === 'paid') return 0;
+    const isPrimary = !!order.packages?.[0] && String(order.packages[0]._id) === String(pkg._id);
+    const adjustment = isPrimary ? (order.shippingCost || 0) - (order.discount || 0) : 0;
+    return Math.max(0, pkg.subtotal + adjustment);
+}
+
+// What bookPackageCore() in courier.service.ts sends to Steadfast, rebuilt the same way,
+// so the confirmation shows exactly what will go out.
+function steadfastPayload(order: CourierOrder, pkg: OrderPackage) {
+    const a = order.shippingAddress || {};
+    return {
+        invoice: `${order.orderId}-${String(pkg._id).slice(-5)}`,
+        recipientName: a.fullName || '',
+        recipientPhone: (a.phone || '').replace(/\D/g, '').slice(-11),
+        recipientAddress: [a.address, a.area, a.city, a.postalCode].filter(Boolean).join(', '),
+        codAmount: codFor(order, pkg),
+        note: order.note || '',
+    };
+}
+
+/** Confirmation before a real Steadfast consignment is created. */
+function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onConfirm }: {
+    order: CourierOrder;
+    pkg: OrderPackage;
+    title: string;
+    sending: boolean;
+    error: string;
+    onCancel: () => void;
+    onConfirm: () => void;
+}) {
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !sending) onCancel(); };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [sending, onCancel]);
+
+    const p = steadfastPayload(order, pkg);
+    const method = (order.paymentMethod || '').toLowerCase();
+    const codHint = p.codAmount > 0 ? '' :
+        method !== 'cod' ? `Paid by ${paymentMethodLabel(order.paymentMethod || '') || 'another method'} — nothing to collect.` :
+        order.paymentStatus === 'paid' ? 'Already paid — nothing to collect.' : '';
+
+    return (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={sending ? undefined : onCancel} />
+            <div role="dialog" aria-modal="true" aria-labelledby="send-steadfast-title" className="relative w-full max-w-md bg-white rounded-md border border-gray-200 shadow-xl flex flex-col max-h-[90vh]">
+                <div className="flex items-start justify-between gap-4 px-6 py-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 text-gray-800">
+                        <FiSend className="text-[var(--color-primary)]" size={18} />
+                        <div>
+                            <h3 id="send-steadfast-title" className="font-bold">Send to Steadfast</h3>
+                            <p className="text-xs text-gray-500">{title}</p>
+                        </div>
+                    </div>
+                    <button type="button" onClick={onCancel} disabled={sending} aria-label="Close" className="p-1.5 rounded-md text-gray-500 hover:bg-gray-100 disabled:opacity-40">
+                        <FiX size={16} />
+                    </button>
+                </div>
+
+                <div className="px-6 py-4 space-y-4 overflow-y-auto">
+                    <div className="space-y-2.5 text-sm">
+                        <div className="flex gap-3">
+                            <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Name</span>
+                            <span className="font-semibold text-gray-800">{p.recipientName || '—'}</span>
+                        </div>
+                        <div className="flex gap-3">
+                            <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Phone</span>
+                            <span className="font-mono text-gray-800">{p.recipientPhone || '—'}</span>
+                        </div>
+                        <div className="flex gap-3">
+                            <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Address</span>
+                            <span className="text-gray-700 break-words min-w-0">{p.recipientAddress || '—'}</span>
+                        </div>
+                        <div className="flex gap-3">
+                            <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Note</span>
+                            <span className="text-gray-700 break-words min-w-0 whitespace-pre-line">{p.note || <span className="text-gray-400">No note</span>}</span>
+                        </div>
+                        <div className="flex gap-3">
+                            <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Invoice</span>
+                            <span className="font-mono text-xs text-gray-600 pt-0.5">{p.invoice}</span>
+                        </div>
+                    </div>
+
+                    <div className={`rounded-md border px-4 py-3 ${p.codAmount > 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
+                        <div className="flex items-center justify-between gap-3">
+                            <span className={`text-sm font-semibold ${p.codAmount > 0 ? 'text-emerald-700' : 'text-gray-600'}`}>COD amount Steadfast will collect</span>
+                            <span className={`text-lg font-bold ${p.codAmount > 0 ? 'text-emerald-700' : 'text-gray-500'}`}>৳{p.codAmount.toLocaleString()}</span>
+                        </div>
+                        {codHint && <p className="text-xs text-gray-500 mt-1">{codHint}</p>}
+                    </div>
+
+                    <p className="text-xs text-gray-400">Check these details first — after sending, changes must be made in the Steadfast panel.</p>
+
+                    {error && (
+                        <div role="alert" className="flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-md px-3 py-2.5">
+                            <FiAlertCircle size={14} className="shrink-0 mt-0.5" />
+                            <span>{error}</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className="flex justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                    <button
+                        type="button"
+                        onClick={onCancel}
+                        disabled={sending}
+                        className="px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onConfirm}
+                        disabled={sending}
+                        className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 flex items-center gap-2"
+                    >
+                        <FiSend size={14} />
+                        {sending ? 'Sending…' : 'Confirm & send'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function OrderDetailsPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -57,50 +275,76 @@ export default function OrderDetailsPage() {
     const [updateStatus, { isLoading: isUpdatingStatus }] = useUpdateOrderStatusMutation();
     const [updatePayment, { isLoading: isUpdatingPayment }] = useUpdatePaymentStatusMutation();
     const [addNote, { isLoading: isAddingNote }] = useAddAdminNoteMutation();
-    const [updateTracking, { isLoading: isUpdatingTracking }] = useUpdateAdminOrderTrackingMutation();
-    const [bookCourier] = useBookCourierPackageMutation();
+    const [bookCourier, { isLoading: isSending }] = useBookCourierPackageMutation();
     const [refreshCourier] = useRefreshCourierStatusMutation();
-    const [courierBusy, setCourierBusy] = useState(false);
+    const [busyPkg, setBusyPkg] = useState<string | null>(null);
+    // The package waiting in the "Send to Steadfast" confirmation, and why the last send failed.
+    const [sendPkgId, setSendPkgId] = useState<string | null>(null);
+    const [sendError, setSendError] = useState('');
+    // Editors confirm orders, add notes and print; payment, tracking and courier booking are for admins.
+    const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
 
-    const handleBookCourier = async () => {
-        if (!order?._id) return;
-        setCourierBusy(true);
-        try {
-            await bookCourier({ orderId: order._id }).unwrap();
-            toast.success('Booked with Steadfast — tracking number generated');
-        } catch (e: any) {
-            toast.error(e?.data?.message || 'Failed to book with Steadfast');
-        } finally { setCourierBusy(false); }
+    const openSendToSteadfast = (packageId: string) => {
+        setSendError('');
+        setSendPkgId(packageId);
     };
 
-    const handleRefreshCourier = async () => {
-        if (!order?._id) return;
-        setCourierBusy(true);
+    const closeSendToSteadfast = () => {
+        if (isSending) return;
+        setSendPkgId(null);
+        setSendError('');
+    };
+
+    const handleSendToSteadfast = async () => {
+        if (!order?._id || !sendPkgId) return;
+        setSendError('');
         try {
-            const res = await refreshCourier({ orderId: order._id }).unwrap();
-            toast.success(`Steadfast status: ${res?.data?.courierStatus || 'updated'}`);
+            const res = await bookCourier({ orderId: order._id, packageId: sendPkgId }).unwrap();
+            const code = res?.data?.trackingNumber;
+            toast.success(code ? `Sent to Steadfast — tracking code ${code}` : 'Sent to Steadfast');
+            setSendPkgId(null);
+        } catch (e) {
+            setSendError(apiError(e, 'Could not send to Steadfast.'));
+        }
+    };
+
+    const handleRefreshCourier = async (packageId: string) => {
+        if (!order?._id) return;
+        setBusyPkg(packageId);
+        try {
+            const res = await refreshCourier({ orderId: order._id, packageId }).unwrap();
+            toast.success(`Steadfast status: ${res?.data?.courierStatus ? courierStatusLabel(res.data.courierStatus) : 'updated'}`);
             if (res?.data?.needsConfirmation) {
-                toast(`Courier reports "${res.data.suggestedStatus}" — confirm via the Status control.`, { icon: 'ℹ️', duration: 6000 });
+                toast(`Courier reports "${res.data.suggestedStatus}" — confirm via the Status control to settle earnings/stock.`, { icon: 'ℹ️', duration: 6000 });
             }
-        } catch (e: any) {
-            toast.error(e?.data?.message || 'Failed to fetch Steadfast status');
-        } finally { setCourierBusy(false); }
+        } catch (e) {
+            toast.error(apiError(e, 'Failed to fetch Steadfast status'));
+        } finally { setBusyPkg(null); }
+    };
+
+    const copyTrackingCode = async (code: string) => {
+        try {
+            await navigator.clipboard.writeText(code);
+            toast.success('Copied');
+        } catch {
+            toast.error('Could not copy — select the code and copy it by hand');
+        }
     };
 
     const [adminNote, setAdminNote] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
-    const [trackingNumber, setTrackingNumber] = useState('');
-    const [carrier, setCarrier] = useState('');
     const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
+    const [printKind, setPrintKind] = useState<PrintKind | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleDownloadInvoice = async () => {
         if (!order?._id) return;
         setIsDownloadingInvoice(true);
         try {
             await downloadInvoicePdf(order._id);
-        } catch (error: any) {
-            toast.error(error?.message || 'Failed to download invoice');
+        } catch (error) {
+            toast.error((error instanceof Error && error.message) || 'Failed to download invoice');
         } finally {
             setIsDownloadingInvoice(false);
         }
@@ -112,8 +356,8 @@ export default function OrderDetailsPage() {
             await updateStatus({ id, status: selectedStatus }).unwrap();
             toast.success('Order status updated');
             setSelectedStatus('');
-        } catch (error: any) {
-            toast.error(error.data?.message || 'Failed to update status');
+        } catch (error) {
+            toast.error(apiError(error, 'Failed to update status'));
         }
     };
 
@@ -123,8 +367,8 @@ export default function OrderDetailsPage() {
             await updatePayment({ id, paymentStatus: selectedPaymentStatus }).unwrap();
             toast.success('Payment status updated');
             setSelectedPaymentStatus('');
-        } catch (error: any) {
-            toast.error(error.data?.message || 'Failed to update payment');
+        } catch (error) {
+            toast.error(apiError(error, 'Failed to update payment'));
         }
     };
 
@@ -134,21 +378,8 @@ export default function OrderDetailsPage() {
             await addNote({ id, note: adminNote }).unwrap();
             toast.success('Note added');
             setAdminNote('');
-        } catch (error: any) {
-            toast.error(error.data?.message || 'Failed to add note');
-        }
-    };
-
-    const handleUpdateTracking = async () => {
-        try {
-            await updateTracking({
-                id,
-                trackingNumber: trackingNumber ?? order?.trackingNumber ?? '',
-                carrier: carrier || order?.carrier || '',
-            }).unwrap();
-            toast.success('Tracking updated');
-        } catch (error: any) {
-            toast.error(error.data?.message || 'Failed to update tracking');
+        } catch (error) {
+            toast.error(apiError(error, 'Failed to add note'));
         }
     };
 
@@ -164,13 +395,23 @@ export default function OrderDetailsPage() {
         return <div className="p-8 text-center text-gray-500">Order not found</div>;
     }
 
+    const packages: OrderPackage[] = Array.isArray(order.packages) ? order.packages : [];
+    const sendPkg = sendPkgId ? packages.find((p) => p._id === sendPkgId) : undefined;
+    // Order-level tracking typed in by hand before the Steadfast integration. Shown read-only
+    // so older data is never hidden; tracking now comes from the Steadfast booking per package.
+    const editBlocked = editBlockedReason(order);
+    const legacyTracking = [order.carrier, order.trackingNumber]
+        .map((v: unknown) => (typeof v === 'string' ? v.trim() : ''))
+        .filter(Boolean)
+        .join(' · ');
+
     return (
         <div className="space-y-6 max-w-7xl mx-auto mb-10">
             {/* Header / Breadcrumbs */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-4">
                     <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-md transition-colors border border-gray-100">
-                        <LuArrowLeft size={20} className="text-gray-600" />
+                        <FiArrowLeft size={20} className="text-gray-600" />
                     </button>
                     <div>
                         <div className="flex items-center gap-3">
@@ -178,32 +419,51 @@ export default function OrderDetailsPage() {
                             <StatusBadge status={order.status} />
                         </div>
                         <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                            <LuCalendar size={14} />
+                            <FiCalendar size={14} />
                             Placed on {new Date(order.createdAt).toLocaleString()}
                         </p>
                     </div>
                 </div>
-                <div className="flex gap-3 w-full md:w-auto">
+                <div className="flex flex-wrap gap-3 w-full md:w-auto">
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        disabled={!!editBlocked}
+                        title={editBlocked || undefined}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <FiEdit3 size={16} />
+                        Edit order
+                    </button>
                     <button
                         onClick={handleDownloadInvoice}
                         disabled={isDownloadingInvoice}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm disabled:opacity-50"
                     >
-                        <LuPrinter size={16} />
+                        <FiPrinter size={16} />
                         {isDownloadingInvoice ? 'Preparing...' : 'Invoice'}
+                    </button>
+                    <button
+                        onClick={() => setPrintKind('labels')}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
+                    >
+                        <FiTag size={16} />
+                        Print label
+                    </button>
+                    <button
+                        onClick={() => setPrintKind('invoices')}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
+                    >
+                        <FiFileText size={16} />
+                        Print invoice
                     </button>
                 </div>
             </div>
 
-            {/* Animated courier tracker — same component the customer sees */}
-            <OrderProgressTracker
-                status={order.status}
-                timeline={order.timeline}
-                carrier={order.carrier}
-                trackingNumber={order.trackingNumber}
-                courierStatus={order.courierStatus}
-                createdAt={order.createdAt}
-            />
+            {/* Fraud check: shows only when this order was flagged */}
+            <FraudOrderBanner orderId={order._id} />
+
+            {/* Pending → Confirmed → Factory → Challan Ready → Courier Entry → Shipped */}
+            <OrderPipeline order={order} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left Column - Main Details */}
@@ -211,7 +471,7 @@ export default function OrderDetailsPage() {
                     {/* Items Table */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
                         <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-                            <LuPackage className="text-[var(--color-primary)]" size={20} />
+                            <FiPackage className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold text-gray-800">Order Items</h2>
                             <span className="ml-auto bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-bold">{order.items.length} Items</span>
                         </div>
@@ -226,15 +486,22 @@ export default function OrderDetailsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {order.items.map((item: any, idx: number) => (
+                                    {order.items.map((item: OrderLine, idx: number) => {
+                                        const price = item.price || 0;
+                                        // The saved line total; old data without one falls back to price × qty.
+                                        const lineTotal = typeof item.total === 'number' ? item.total : price * (item.quantity || 1);
+                                        const original = item.originalPrice || 0;
+                                        const soldBelowList = original > price;
+                                        const pctOff = !soldBelowList ? 0
+                                            : (item.discountPercent && item.discountPercent > 0 ? item.discountPercent : ((original - price) / original) * 100);
+                                        const sku = item.sku || item.variant?.sku;
+                                        return (
                                         <tr key={idx} className="hover:bg-gray-50/30 transition-colors">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-12 h-12 rounded-md bg-gray-50 overflow-hidden border border-gray-100 p-1">
-                                                        {/* Prefer the snapshot taken at purchase time — it is what the
-                                                            customer actually bought, and it survives the product being
-                                                            edited or deleted later. */}
-                                                        <img src={item.thumbnail || item.product?.thumbnail || ''} alt={item.name} className="w-full h-full object-cover rounded-sm" />
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={item.product?.thumbnail || item.image} alt={item.name} className="w-full h-full object-cover rounded-sm" />
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-gray-800">{item.name}</p>
@@ -252,19 +519,41 @@ export default function OrderDetailsPage() {
                                                                 )}
                                                             </div>
                                                         )}
-                                                        {item.variant && (
-                                                            <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">
-                                                                SKU: {item.variant.sku}
+                                                        {sku && (
+                                                            <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                                                                SKU: {sku}
                                                             </p>
                                                         )}
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-gray-600">৳{(item.price || 0).toLocaleString()}</td>
+                                            {soldBelowList || item.priceOverridden ? (
+                                                <td className="px-6 py-4 text-sm text-gray-600">
+                                                    {soldBelowList && (
+                                                        <span className="block text-xs text-gray-400 line-through">৳{original.toLocaleString()}</span>
+                                                    )}
+                                                    <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                                        ৳{price.toLocaleString()}
+                                                        {soldBelowList && (
+                                                            <span className="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                                                                −{Math.round(pctOff * 10) / 10}%
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                    {item.priceOverridden && (
+                                                        <span className="block w-fit mt-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded">
+                                                            Custom price
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            ) : (
+                                                <td className="px-6 py-4 text-sm text-gray-600">৳{price.toLocaleString()}</td>
+                                            )}
                                             <td className="px-6 py-4 text-sm text-gray-600">x{item.quantity}</td>
-                                            <td className="px-6 py-4 text-right text-sm font-bold text-gray-800">৳{(item.subtotal || (item.price || 0) * (item.quantity || 1)).toLocaleString()}</td>
+                                            <td className="px-6 py-4 text-right text-sm font-bold text-gray-800">৳{lineTotal.toLocaleString()}</td>
                                         </tr>
-                                    ))}
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -302,14 +591,17 @@ export default function OrderDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Timeline */}
+                    {/* Order journey — animated responsive progress stepper */}
+                    <OrderProgress status={order.status} timeline={order.timeline} className="!rounded-md" />
+
+                    {/* Detailed timeline / activity log */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                         <div className="flex items-center gap-2 mb-6 text-gray-800">
-                            <LuClock className="text-[var(--color-primary)]" size={20} />
-                            <h2 className="font-bold">Order Journey</h2>
+                            <FiClock className="text-[var(--color-primary)]" size={20} />
+                            <h2 className="font-bold">Activity Log</h2>
                         </div>
                         <div className="space-y-6">
-                            {order.timeline?.map((step: any, idx: number) => (
+                            {order.timeline?.map((step: TimelineStep, idx: number) => (
                                 <div key={idx} className="relative flex gap-4">
                                     {idx !== order.timeline.length - 1 && (
                                         <div className="absolute left-3 top-7 bottom-0 w-px bg-gray-100"></div>
@@ -338,7 +630,7 @@ export default function OrderDetailsPage() {
                     {/* Customer Info */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                         <div className="flex items-center gap-2 mb-4 text-gray-800">
-                            <LuUser className="text-[var(--color-primary)]" size={20} />
+                            <FiUser className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Customer Details</h2>
                         </div>
                         <div className="space-y-4">
@@ -353,11 +645,11 @@ export default function OrderDetailsPage() {
                             </div>
                             <div className="space-y-2 pt-2 border-t border-gray-50">
                                 <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <LuMail size={14} />
+                                    <FiMail size={14} />
                                     <span>{order.user?.email}</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <LuPhone size={14} />
+                                    <FiPhone size={14} />
                                     <span>{order.user?.phone || order.shippingAddress?.phone || 'N/A'}</span>
                                 </div>
                             </div>
@@ -367,7 +659,7 @@ export default function OrderDetailsPage() {
                     {/* Shipping Address */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                         <div className="flex items-center gap-2 mb-4 text-gray-800">
-                            <LuMapPin className="text-[var(--color-primary)]" size={20} />
+                            <FiMapPin className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Shipping To</h2>
                         </div>
                         <div className="text-sm text-gray-600 leading-relaxed">
@@ -376,7 +668,7 @@ export default function OrderDetailsPage() {
                             <p>{[order.shippingAddress?.area, order.shippingAddress?.city, order.shippingAddress?.postalCode].filter(Boolean).join(', ') || ''}</p>
                             {order.shippingAddress?.phone && <p>{order.shippingAddress.phone}</p>}
                             <p className="mt-2 font-bold text-gray-400 flex items-center gap-1 uppercase text-[10px]">
-                                <LuTruck size={12} />
+                                <FiTruck size={12} />
                                 {order.shippingMethod || 'Standard'} Delivery
                             </p>
                         </div>
@@ -385,7 +677,7 @@ export default function OrderDetailsPage() {
                     {/* Payment Information */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
                         <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100 text-gray-800">
-                            <LuDollarSign className="text-[var(--color-primary)]" size={20} />
+                            <FiDollarSign className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Payment Information</h2>
                         </div>
 
@@ -421,7 +713,7 @@ export default function OrderDetailsPage() {
                             {order.paymentDetails?.senderNumber && (
                                 <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-3">
                                     <span className="text-gray-500 flex items-center gap-1.5">
-                                        <LuPhone size={13} /> Sender Number:
+                                        <FiPhone size={13} /> {order.paymentMethod === 'bank' ? 'Paid from:' : 'Sender Number:'}
                                     </span>
                                     <span className="font-medium font-mono text-gray-800">{order.paymentDetails.senderNumber}</span>
                                 </div>
@@ -437,7 +729,7 @@ export default function OrderDetailsPage() {
                             {order.paymentDetails?.paymentTime && (
                                 <div className="flex justify-between items-center text-sm border-b border-gray-50 pb-3">
                                     <span className="text-gray-500 flex items-center gap-1.5">
-                                        <LuClock size={13} /> Payment Time:
+                                        <FiClock size={13} /> Payment Time:
                                     </span>
                                     <span className="text-gray-700 text-xs font-medium">
                                         {new Date(order.paymentDetails.paymentTime).toLocaleString('en-US')}
@@ -445,8 +737,8 @@ export default function OrderDetailsPage() {
                                 </div>
                             )}
 
-                            {/* Change Payment Status */}
-                            <div className="flex justify-between items-center text-sm pt-1">
+                            {/* Change Payment Status (not for editors) */}
+                            {!isEditor && <div className="flex justify-between items-center text-sm pt-1">
                                 <span className="text-gray-500">Change Status:</span>
                                 <div className="flex items-center gap-2">
                                     <select
@@ -461,18 +753,18 @@ export default function OrderDetailsPage() {
                                     </select>
                                     {selectedPaymentStatus && selectedPaymentStatus !== order.paymentStatus && (
                                         <button onClick={handleUpdatePayment} disabled={isUpdatingPayment} className="p-1.5 bg-[var(--color-primary)] text-white rounded-md shadow-sm">
-                                            <LuCircleCheck size={14} />
+                                            <FiCheckCircle size={14} />
                                         </button>
                                     )}
                                 </div>
-                            </div>
+                            </div>}
                         </div>
                     </div>
 
                     {/* Change Status */}
                     <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                         <div className="flex items-center gap-2 mb-4 text-gray-800">
-                            <LuPencil className="text-[var(--color-primary)]" size={20} />
+                            <FiEdit3 className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Order Actions</h2>
                         </div>
                         <div className="space-y-4">
@@ -493,7 +785,7 @@ export default function OrderDetailsPage() {
                                         disabled={!selectedStatus || isUpdatingStatus}
                                         className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50"
                                     >
-                                        <LuSave size={16} />
+                                        <FiSave size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -519,71 +811,131 @@ export default function OrderDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Tracking */}
-                    <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
-                        <div className="flex items-center gap-2 mb-4 text-gray-800">
-                            <LuTruck className="text-[var(--color-primary)]" size={20} />
-                            <h2 className="font-bold">Tracking</h2>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-400 uppercase">Tracking Number</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. SF1234567890"
-                                    value={trackingNumber || order.trackingNumber || ''}
-                                    onChange={(e) => setTrackingNumber(e.target.value)}
-                                    className="w-full border border-gray-200 rounded-md p-2 text-sm outline-none bg-gray-50/50 focus:bg-white transition-all font-mono"
-                                />
+                    {/* Courier — Steadfast, one block per shipment */}
+                    {(packages.length > 0 || legacyTracking) && (
+                        <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
+                            <div className="flex items-center gap-2 mb-1 text-gray-800">
+                                <FiTruck className="text-[var(--color-primary)]" size={20} />
+                                <h2 className="font-bold">Courier — Steadfast</h2>
                             </div>
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-400 uppercase">Carrier</label>
-                                <select
-                                    value={carrier || order.carrier || ''}
-                                    onChange={(e) => setCarrier(e.target.value)}
-                                    className="w-full border border-gray-200 rounded-md p-2 text-sm outline-none bg-gray-50/50"
-                                >
-                                    <option value="">Select carrier</option>
-                                    {CARRIERS.map((c) => (
-                                        <option key={c} value={c}>{c}</option>
-                                    ))}
-                                </select>
+                            <p className="text-[11px] text-gray-400 mb-4">Sending creates a real Steadfast consignment — they pick the parcel up and collect any COD. The parcel is marked as shipped.</p>
+                            <div className="space-y-3">
+                                {packages.map((pkg, idx) => {
+                                    const booked = !!(pkg.consignmentId || pkg.trackingNumber);
+                                    const busy = busyPkg === pkg._id;
+                                    const trackingCode = pkg.trackingNumber || '';
+                                    return (
+                                        <div key={pkg._id} className="border border-gray-100 rounded-md p-3 bg-gray-50/50">
+                                            <div className="flex items-center justify-between mb-3 gap-2">
+                                                <span className="text-sm font-bold text-gray-700 truncate">{packages.length > 1 ? `Package ${idx + 1}` : 'Parcel'}</span>
+                                                <StatusBadge status={pkg.status} />
+                                            </div>
+                                            {booked ? (
+                                                <div className="space-y-2.5">
+                                                    <div className="flex items-center justify-between gap-2 text-xs">
+                                                        <span className="text-gray-400">Courier status</span>
+                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md font-semibold ${courierStatusBadgeClass(pkg.courierStatus)}`}>
+                                                            {courierStatusLabel(pkg.courierStatus)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between gap-2 text-xs">
+                                                        <span className="text-gray-400">Consignment ID</span>
+                                                        <span className="font-mono text-gray-700">{pkg.consignmentId || '—'}</span>
+                                                    </div>
+                                                    {pkg.courierBookedAt && (
+                                                        <div className="flex justify-between gap-2 text-xs">
+                                                            <span className="text-gray-400">Sent</span>
+                                                            <span className="text-gray-600 text-right">{new Date(pkg.courierBookedAt).toLocaleString()}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="space-y-1.5">
+                                                        <span className="block text-xs text-gray-400">Tracking code</span>
+                                                        {trackingCode ? (
+                                                            <>
+                                                                <p className="font-mono text-sm font-bold text-gray-800 bg-white border border-gray-200 rounded-md px-2 py-1.5 break-all">{trackingCode}</p>
+                                                                {/* Copy first, then paste it on Steadfast's tracking page. */}
+                                                                <div className="flex gap-2">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => copyTrackingCode(trackingCode)}
+                                                                        aria-label="Copy tracking code"
+                                                                        className="shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-all"
+                                                                    >
+                                                                        <FiCopy size={13} /> Copy
+                                                                    </button>
+                                                                    <a
+                                                                        href={STEADFAST_TRACKING_URL}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        title="Opens Steadfast's tracking page — paste the code there"
+                                                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap"
+                                                                    >
+                                                                        Open Steadfast tracking <FiExternalLink size={13} />
+                                                                    </a>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <p className="font-mono text-xs text-gray-500">—</p>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRefreshCourier(pkg._id)}
+                                                        disabled={busy}
+                                                        className="w-full flex items-center justify-center gap-1.5 py-1.5 border border-[var(--color-primary)] text-[var(--color-primary)] bg-white rounded-md text-xs font-bold hover:bg-gray-50 transition-all disabled:opacity-50"
+                                                    >
+                                                        <FiRefreshCw size={13} className={busy ? 'animate-spin' : ''} />
+                                                        {busy ? 'Refreshing…' : 'Refresh status'}
+                                                    </button>
+                                                    <p className="text-[11px] text-gray-400">Editing after sending isn&apos;t supported — use the Steadfast panel.</p>
+                                                </div>
+                                            ) : UNSENDABLE_STATUSES.includes(pkg.status) ? (
+                                                <p className="text-xs text-gray-400">This parcel is {getStatusConfig(pkg.status).label.toLowerCase()}, so it can&apos;t be sent to Steadfast.</p>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openSendToSteadfast(pkg._id)}
+                                                    disabled={isSending}
+                                                    className="w-full py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+                                                >
+                                                    <FiSend size={16} />
+                                                    Send to Steadfast
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
-                            <button
-                                onClick={handleUpdateTracking}
-                                disabled={isUpdatingTracking}
-                                className="w-full py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
-                            >
-                                <LuSave size={16} />
-                                {isUpdatingTracking ? 'Saving...' : 'Save Tracking'}
-                            </button>
+                            {legacyTracking && (
+                                <p className={`text-[11px] text-gray-500 ${packages.length > 0 ? 'mt-3 pt-3 border-t border-gray-100' : ''}`}>
+                                    Legacy tracking: <span className="font-mono text-gray-700">{legacyTracking}</span>
+                                </p>
+                            )}
                         </div>
-                    </div>
-
-                    {/* Courier — Steadfast (order-level) */}
-                    <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
-                        <div className="flex items-center gap-2 mb-1 text-gray-800">
-                            <LuTruck className="text-[var(--color-primary)]" size={20} />
-                            <h2 className="font-bold">Courier — Steadfast</h2>
-                        </div>
-                        <p className="text-[11px] text-gray-400 mb-4">Auto-book this order&apos;s parcel and sync delivery status. Add <span className="font-mono">STEADFAST_API_KEY</span> / <span className="font-mono">STEADFAST_SECRET_KEY</span> to the server <span className="font-mono">.env</span> to go live.</p>
-                        {(order.consignmentId || order.trackingNumber) ? (
-                            <div className="space-y-1.5">
-                                <div className="flex justify-between text-xs"><span className="text-gray-400">Tracking</span><span className="font-mono font-bold text-gray-700">{order.trackingNumber || '—'}</span></div>
-                                <div className="flex justify-between text-xs"><span className="text-gray-400">Consignment</span><span className="font-mono text-gray-600">{order.consignmentId || '—'}</span></div>
-                                {order.courierStatus && <div className="flex justify-between text-xs"><span className="text-gray-400">Courier status</span><span className="font-semibold text-gray-700">{order.courierStatus}</span></div>}
-                                <button onClick={handleRefreshCourier} disabled={courierBusy} className="mt-1 w-full py-1.5 border border-[var(--color-primary)] text-[var(--color-primary)] rounded-md text-xs font-bold hover:bg-[var(--color-primary-lightest)] disabled:opacity-50">
-                                    {courierBusy ? 'Refreshing…' : '🔄 Refresh status'}
-                                </button>
-                            </div>
-                        ) : (
-                            <button onClick={handleBookCourier} disabled={courierBusy} className="w-full py-2 bg-[var(--color-primary)] text-white rounded-md text-xs font-bold hover:bg-[var(--color-primary-dark)] disabled:opacity-50">
-                                {courierBusy ? 'Booking…' : '📦 Book with Steadfast'}
-                            </button>
-                        )}
-                    </div>
+                    )}
                 </div>
             </div>
+
+            <PrintOrdersModal
+                job={printKind ? { kind: printKind, ids: [order._id] } : null}
+                onClose={() => setPrintKind(null)}
+            />
+
+            {isEditing && !editBlocked && (
+                <EditOrderModal order={order} onClose={() => setIsEditing(false)} />
+            )}
+
+            {sendPkg && (
+                <SendToSteadfastModal
+                    order={order}
+                    pkg={sendPkg}
+                    title={`Order ${order.orderId || order.orderNumber}${packages.length > 1 ? ` · Package ${packages.indexOf(sendPkg) + 1}` : ''}`}
+                    sending={isSending}
+                    error={sendError}
+                    onCancel={closeSendToSteadfast}
+                    onConfirm={handleSendToSteadfast}
+                />
+            )}
         </div>
     );
 }

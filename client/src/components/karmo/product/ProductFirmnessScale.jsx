@@ -53,11 +53,11 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
             loop
             playsInline
             preload="metadata"
-            poster="/karmo/images/product/Medium_Soft.webp"
+            poster="/products/common/medium-soft.webp"
             aria-label={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
           >
             <source
-              src="/karmo/videos/product/firmness-scale.mp4"
+              src="/products/foam/videos/firmness-scale.mp4"
               type="video/mp4"
             />
           </video>

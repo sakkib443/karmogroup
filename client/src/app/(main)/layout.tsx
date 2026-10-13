@@ -1,13 +1,14 @@
-import HeaderTwo from "@/components/karmo/home2/HeaderTwo";
+import Header from "@/components/karmo/header/Header";
+import CertifiedBy from "@/components/karmo/home/CertifiedBy";
 import Footer from "@/components/karmo/Footer";
 import SmoothScroll from "@/components/karmo/SmoothScroll";
 
 /**
- * Public storefront routes (cart, checkout, shop, contact, …).
+ * Public storefront routes (cart, checkout, products, product/[slug], category,
+ * wishlist, payment/*, privacy, terms, refund, track).
  *
- * Uses the same HeaderTwo + Footer chrome as the foam page. The homepage
- * itself sits in `(karmo-2)` and carries its own `Header` chrome, so
- * it is not wrapped here.
+ * Same chrome as every karmo page: the main karmo Header, CertifiedBy above the
+ * Footer. Offset clears the resting header (32px top bar + 104/112px nav row).
  */
 export default function MainLayout({
   children,
@@ -17,10 +18,11 @@ export default function MainLayout({
   return (
     <>
       <SmoothScroll />
-      <HeaderTwo />
-      <main className="min-h-screen bg-white pt-[109px] lg:pt-[178px]">
+      <Header />
+      <main className="min-h-screen bg-white pt-[136px] sm:pt-[144px]">
         {children}
       </main>
+      <CertifiedBy />
       <Footer />
     </>
   );

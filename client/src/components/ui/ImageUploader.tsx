@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useRef, useState } from 'react';
-import { LuCloudUpload, LuX, LuImage } from 'react-icons/lu';
+import { FiUploadCloud, FiX, FiImage } from 'react-icons/fi';
 import { useUploadImageMutation, useUploadImagesMutation } from '@/redux/api/uploadApi';
 
 /* ════════════════════════════════════════════
@@ -15,12 +17,14 @@ export function SingleImageUploader({
     onChange,
     required = false,
     folder = 'image',
+    hint,
 }: {
     label: string;
     value: string;
     onChange: (url: string) => void;
     required?: boolean;
     folder?: string;
+    hint?: string;
 }) {
     const [uploadImage, { isLoading }] = useUploadImageMutation();
     const [error, setError] = useState('');
@@ -50,6 +54,7 @@ export function SingleImageUploader({
         <div>
             <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '6px' }}>
                 {label} {required && <span style={{ color: 'var(--color-secondary)' }}>*</span>}
+                {hint && <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 400 }}> · {hint}</span>}
             </label>
 
             {/* Upload Zone */}
@@ -79,14 +84,15 @@ export function SingleImageUploader({
                             onClick={e => { e.stopPropagation(); onChange(''); }}
                             style={{ position: 'absolute', top: '-8px', right: '-8px', width: '22px', height: '22px', borderRadius: '50%', background: '#ef4444', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px' }}
                         >
-                            <LuX size={12} />
+                            <FiX size={12} />
                         </button>
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                        <LuCloudUpload size={28} color="#9ca3af" />
+                        <FiUploadCloud size={28} color="#9ca3af" />
                         <span style={{ fontSize: '12.5px', color: '#6b7280', fontWeight: 500 }}>Click or drag image here</span>
                         <span style={{ fontSize: '11px', color: '#9ca3af' }}>JPG, PNG, WebP — max 10MB</span>
+                        {hint && <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>{hint}</span>}
                     </div>
                 )}
             </div>
@@ -108,16 +114,16 @@ export function MultipleImageUploader({
     values,
     onChange,
     max = 8,
+    hint,
 }: {
     label: string;
     values: string[];
     onChange: (urls: string[]) => void;
     max?: number;
+    hint?: string;
 }) {
     const [uploadImages, { isLoading }] = useUploadImagesMutation();
     const [error, setError] = useState('');
-    const [dragIndex, setDragIndex] = useState<number | null>(null);
-    const [overIndex, setOverIndex] = useState<number | null>(null);
     const ref = useRef<HTMLInputElement>(null);
 
     const handleFiles = async (files: FileList) => {
@@ -139,50 +145,21 @@ export function MultipleImageUploader({
 
     const removeImage = (i: number) => onChange(values.filter((_, j) => j !== i));
 
-    // Drag-to-reorder: move the dragged image to the drop position.
-    const moveImage = (from: number, to: number) => {
-        if (from === to || from == null || to == null) return;
-        const next = [...values];
-        const [moved] = next.splice(from, 1);
-        next.splice(to, 0, moved);
-        onChange(next);
-    };
-
     return (
         <div>
             <label style={{ fontSize: '12px', fontWeight: 600, color: '#374151', display: 'block', marginBottom: '6px' }}>
                 {label} <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 400 }}>({values.length}/{max})</span>
+                {hint && <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 400 }}> · {hint}</span>}
             </label>
-            {values.length > 1 && (
-                <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 8px' }}>Drag to reorder · the first image is the main one</p>
-            )}
 
             {/* Existing images */}
             {values.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
                     {values.map((url, i) => (
-                        <div
-                            key={i}
-                            draggable
-                            onDragStart={() => setDragIndex(i)}
-                            onDragEnter={() => setOverIndex(i)}
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => { if (dragIndex !== null) moveImage(dragIndex, i); setDragIndex(null); setOverIndex(null); }}
-                            onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
-                            title="Drag to reorder"
-                            style={{
-                                position: 'relative', width: '72px', height: '72px', cursor: 'grab',
-                                opacity: dragIndex === i ? 0.4 : 1,
-                                outline: overIndex === i && dragIndex !== null && dragIndex !== i ? '2px solid var(--color-primary)' : 'none',
-                                outlineOffset: '2px', borderRadius: '8px', transition: 'opacity 0.15s ease',
-                            }}
-                        >
-                            <img src={url} alt={`img-${i}`} draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e5e7eb', pointerEvents: 'none' }} />
-                            {i === 0 && (
-                                <span style={{ position: 'absolute', bottom: '3px', left: '3px', background: 'var(--color-primary)', color: '#fff', fontSize: '8px', fontWeight: 700, padding: '1px 5px', borderRadius: '4px', letterSpacing: '0.03em' }}>MAIN</span>
-                            )}
+                        <div key={i} style={{ position: 'relative', width: '72px', height: '72px' }}>
+                            <img src={url} alt={`img-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
                             <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: '-6px', right: '-6px', width: '18px', height: '18px', borderRadius: '50%', background: '#ef4444', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
-                                <LuX size={10} />
+                                <FiX size={10} />
                             </button>
                         </div>
                     ))}
@@ -190,7 +167,7 @@ export function MultipleImageUploader({
                     {/* Add more slot */}
                     {values.length < max && (
                         <button type="button" onClick={() => ref.current?.click()} style={{ width: '72px', height: '72px', border: '2px dashed #d1d5db', borderRadius: '8px', background: '#f9fafb', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af' }}>
-                            {isLoading ? <div style={{ width: '18px', height: '18px', border: '2px solid #e5e7eb', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> : <LuImage size={20} />}
+                            {isLoading ? <div style={{ width: '18px', height: '18px', border: '2px solid #e5e7eb', borderTopColor: 'var(--color-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /> : <FiImage size={20} />}
                         </button>
                     )}
                 </div>
@@ -211,9 +188,10 @@ export function MultipleImageUploader({
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                            <LuCloudUpload size={26} color="#9ca3af" />
+                            <FiUploadCloud size={26} color="#9ca3af" />
                             <span style={{ fontSize: '12.5px', color: '#6b7280', fontWeight: 500 }}>Click or drag images</span>
                             <span style={{ fontSize: '11px', color: '#9ca3af' }}>Up to {max} images — max 10MB each</span>
+                            {hint && <span style={{ fontSize: '11px', color: 'var(--color-primary)', fontWeight: 600 }}>{hint}</span>}
                         </div>
                     )}
                 </div>

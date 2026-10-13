@@ -2,66 +2,38 @@
 
 import React, { useState } from 'react';
 import {
-    LuCreditCard, LuDollarSign, LuSearch,
-    LuCircleCheck, LuClock, LuCircleX,
-    LuTrendingUp, LuArrowUp, LuDownload,
-} from 'react-icons/lu';
+    FiCreditCard, FiDollarSign, FiSearch,
+    FiCheckCircle, FiClock, FiXCircle,
+    FiTrendingUp, FiArrowUp,
+} from 'react-icons/fi';
 import { useGetAdminOrdersQuery } from '@/redux/api/orderApi';
 import { useGetDashboardSummaryQuery } from '@/redux/api/dashboardApi';
-import { getSocket } from '@/lib/socket';
-import { downloadFinancePdf, downloadFinanceExcel } from '@/lib/downloadFinance';
-import { toast } from 'react-hot-toast';
 
 export default function PaymentsPage() {
     const [page, setPage] = useState(1);
     const [paymentFilter, setPaymentFilter] = useState('');
     const [search, setSearch] = useState('');
 
-    const { data: ordersData, isLoading, refetch: refetchOrders } = useGetAdminOrdersQuery({
+    const { data: ordersData, isLoading } = useGetAdminOrdersQuery({
         page,
         limit: 15,
         paymentStatus: paymentFilter || undefined,
         searchTerm: search || undefined,
     });
 
-    const { data: summaryData, refetch: refetchSummary } = useGetDashboardSummaryQuery(undefined);
-
-    // Real-time: refresh figures + the ledger the moment a payment is collected.
-    React.useEffect(() => {
-        const socket = getSocket();
-        if (!socket) return;
-        const onUpdate = () => { refetchSummary(); refetchOrders(); };
-        socket.on('finance:update', onUpdate);
-        return () => { socket.off('finance:update', onUpdate); };
-    }, [refetchSummary, refetchOrders]);
+    const { data: summaryData } = useGetDashboardSummaryQuery(undefined);
 
     const orders = ordersData?.data || [];
     const meta = ordersData?.meta || { total: 0, totalPages: 1 };
     const stats = summaryData?.data || {};
 
-    const [exportOpen, setExportOpen] = useState(false);
-    const [exporting, setExporting] = useState(false);
-    const runExport = async (format: 'pdf' | 'excel') => {
-        setExportOpen(false);
-        setExporting(true);
-        try {
-            if (format === 'pdf') await downloadFinancePdf();
-            else await downloadFinanceExcel();
-            toast.success(`Finance report (${format === 'pdf' ? 'PDF' : 'Excel'}) downloaded`);
-        } catch (e: any) {
-            toast.error(e?.message || 'Export failed');
-        } finally {
-            setExporting(false);
-        }
-    };
-
     const formatCurrency = (n: number) => `৳${(n || 0).toLocaleString()}`;
 
     const paymentStatusConfig: Record<string, { bg: string; text: string; icon: any }> = {
-        paid: { bg: 'bg-green-50', text: 'text-green-700', icon: LuCircleCheck },
-        pending: { bg: 'bg-amber-50', text: 'text-amber-700', icon: LuClock },
-        failed: { bg: 'bg-red-50', text: 'text-red-700', icon: LuCircleX },
-        refunded: { bg: 'bg-purple-50', text: 'text-purple-700', icon: LuArrowUp },
+        paid: { bg: 'bg-green-50', text: 'text-green-700', icon: FiCheckCircle },
+        pending: { bg: 'bg-amber-50', text: 'text-amber-700', icon: FiClock },
+        failed: { bg: 'bg-red-50', text: 'text-red-700', icon: FiXCircle },
+        refunded: { bg: 'bg-purple-50', text: 'text-purple-700', icon: FiArrowUp },
     };
 
     return (
@@ -72,38 +44,15 @@ export default function PaymentsPage() {
                     <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Payments</h1>
                     <p className="text-gray-500 mt-1">Track all payment transactions and revenue</p>
                 </div>
-                <div className="relative">
-                    <button
-                        onClick={() => setExportOpen((o) => !o)}
-                        disabled={exporting}
-                        className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm disabled:opacity-50"
-                    >
-                        <LuDownload size={16} />
-                        {exporting ? 'Preparing…' : 'Export Report'}
-                    </button>
-                    {exportOpen && (
-                        <>
-                            <div className="fixed inset-0 z-10" onClick={() => setExportOpen(false)} />
-                            <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg z-20 overflow-hidden">
-                                <button onClick={() => runExport('pdf')} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                                    <LuDownload size={14} className="text-red-500" /> Download PDF
-                                </button>
-                                <button onClick={() => runExport('excel')} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-t border-gray-50">
-                                    <LuDownload size={14} className="text-green-600" /> Download Excel
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
             </div>
 
             {/* Revenue Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue || 0), icon: LuDollarSign, color: '#059669', bg: 'bg-green-50' },
-                    { label: 'Net Profit', value: formatCurrency(stats.netProfit || 0), icon: LuTrendingUp, color: 'var(--color-primary)', bg: 'bg-[var(--color-primary-lightest)]' },
-                    { label: 'Paid Orders', value: (stats.paidOrders || 0).toLocaleString(), icon: LuCircleCheck, color: '#7C3AED', bg: 'bg-purple-50' },
-                    { label: "Today's Revenue", value: formatCurrency(stats.todayRevenue || 0), icon: LuTrendingUp, color: '#3B82F6', bg: 'bg-blue-50' },
+                    { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue || 0), icon: FiDollarSign, color: 'var(--color-primary)', bg: 'bg-green-50' },
+                    { label: "Today's Revenue", value: formatCurrency(stats.todayRevenue || 0), icon: FiTrendingUp, color: '#3B82F6', bg: 'bg-blue-50' },
+                    { label: 'Paid Orders', value: (stats.paidOrders || 0).toLocaleString(), icon: FiCheckCircle, color: 'var(--color-primary)', bg: 'bg-emerald-50' },
+                    { label: 'Pending Payments', value: (stats.pendingPayments || 0).toLocaleString(), icon: FiClock, color: '#D97706', bg: 'bg-amber-50' },
                 ].map((item, i) => (
                     <div key={i} className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
@@ -120,7 +69,7 @@ export default function PaymentsPage() {
             {/* Filters */}
             <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
-                    <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                         type="text"
                         placeholder="Search by order number, customer name..."
@@ -170,7 +119,7 @@ export default function PaymentsPage() {
                             ) : orders.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-16 text-center">
-                                        <LuCreditCard size={36} className="text-gray-200 mx-auto mb-3" />
+                                        <FiCreditCard size={36} className="text-gray-200 mx-auto mb-3" />
                                         <p className="text-gray-400 font-medium">No payment records found</p>
                                     </td>
                                 </tr>
@@ -180,20 +129,20 @@ export default function PaymentsPage() {
                                     return (
                                         <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                                             <td className="px-6 py-4">
-                                                <p className="text-sm font-bold text-gray-800">{order.orderId || order.orderNumber || '—'}</p>
+                                                <p className="text-sm font-bold text-gray-800">{order.orderId}</p>
                                                 <p className="text-[10px] text-gray-400 mt-0.5">{order.items?.length || 0} items</p>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <p className="text-sm font-medium text-gray-700">
-                                                    {order.user?.firstName ? `${order.user.firstName} ${order.user.lastName || ''}` : order.guestInfo?.name || 'Guest'}
+                                                    {order.user?.firstName ? `${order.user.firstName} ${order.user.lastName || ''}` : order.shippingAddress?.fullName || 'Guest'}
                                                 </p>
                                                 <p className="text-[10px] text-gray-400">
-                                                    {order.user?.email || order.guestInfo?.email || ''}
+                                                    {order.user?.email || ''}
                                                 </p>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 border border-gray-100 rounded text-xs font-bold text-gray-600 uppercase">
-                                                    <LuCreditCard size={12} />
+                                                    <FiCreditCard size={12} />
                                                     {order.paymentMethod || 'COD'}
                                                 </span>
                                             </td>

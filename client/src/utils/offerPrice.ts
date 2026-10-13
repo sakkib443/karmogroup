@@ -43,33 +43,21 @@ export function getDisplayPrice(product: OfferPriceProduct): DisplayPrice {
     const start = toDate(product.offerStartDate);
     const end = toDate(product.offerEndDate);
 
-    // Active when there are no offer dates at all, OR we are within whichever
-    // bounds are set (start <= now when a start exists; now <= end when an end exists).
     const afterStart = !start || now.getTime() >= start.getTime();
     const beforeEnd = !end || now.getTime() <= end.getTime();
-    const offerActive = afterStart && beforeEnd;
+    const offerActive = Boolean(end && afterStart && beforeEnd);
 
-    if (offerActive) {
-        return {
-            currentPrice: product.price,
-            originalPrice: product.originalPrice ?? undefined,
-            discount: product.discount ?? 0,
-            offerActive: true,
-            offerEndDate: end,
-        };
-    }
-
-    // Offer expired or not yet started → regular price, no discount.
-    const regularPrice =
-        product.originalPrice && product.originalPrice > 0
-            ? product.originalPrice
-            : product.price;
+    const basePrice = Number(product.price) || 0;
+    const hasOriginal = product.originalPrice !== null && product.originalPrice !== undefined && Number(product.originalPrice) > basePrice;
+    const originalPrice = hasOriginal ? Number(product.originalPrice) : undefined;
+    const calcDiscount = hasOriginal && originalPrice ? Math.round(((originalPrice - basePrice) / originalPrice) * 100) : 0;
+    const discount = product.discount && Number(product.discount) > 0 ? Number(product.discount) : calcDiscount;
 
     return {
-        currentPrice: regularPrice,
-        originalPrice: undefined,
-        discount: 0,
-        offerActive: false,
+        currentPrice: basePrice,
+        originalPrice: originalPrice,
+        discount: discount,
+        offerActive: offerActive,
         offerEndDate: end,
     };
 }

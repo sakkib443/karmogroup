@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
+import { useAppSelector } from "@/redux";
 import {
   FiMapPin,
   FiSearch,
@@ -29,7 +30,7 @@ const LOGO_EASE = "duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
  */
 
 /* Cartoon menu icons — same language as trust / order strips. */
-const MENU = "/karmo/images/header/menu-cartoon";
+const MENU = "/shared/header/menu";
 
 /*
  * Header menu — client sheet (Website Menu revised, Sep 2026):
@@ -52,7 +53,7 @@ const nav = [
     match: "/foam",
     icon: `${MENU}/nav-foam.webp?v=2`,
     texture: "foam",
-    textureSrc: "/karmo/images/header/foam-side-texture.webp",
+    textureSrc: "/shared/header/foam-side-texture.webp",
     panelAlign: "left",
     columns: [
       {
@@ -62,12 +63,13 @@ const nav = [
         items: [
           { name: "Karmo Poly", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-poly.webp` },
           { name: "Karmo 280", href: "/foam/combo-280", icon: `${MENU}/grade-280.webp` },
-          { name: "Karmo 480", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-480.webp` },
           { name: "Karmo 2001", href: "/foam/combo-2001", icon: `${MENU}/grade-2001.webp` },
           { name: "Karmo HD", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-hd.webp` },
           { name: "Karmo 4G", href: "/foam/combo-4g", icon: `${MENU}/grade-4g.webp` },
           { name: "Karmo 1965", href: "/foam/combo-1965", icon: `${MENU}/grade-1965.webp` },
           { name: "Karmo Signature", href: "/foam/combo-signature", icon: `${MENU}/grade-signature.webp` },
+          { name: "Foam (Sit)", href: "/foam/furniture#foam-offers", icon: `${MENU}/set-block.webp` },
+          { name: "Foam (Back)", href: "/foam/furniture#foam-offers", icon: `${MENU}/set-block.webp` },
         ],
       },
       {
@@ -103,7 +105,7 @@ const nav = [
     href: "/mattress",
     icon: `${MENU}/nav-mattress.webp?v=2`,
     texture: "mattress",
-    textureSrc: "/karmo/images/header/mattress-side-texture.jpg",
+    textureSrc: "/shared/header/mattress-side-texture.jpg",
     /* One division page — sub-rows are products, not category pages. */
     panelWidth: "25rem",
     columns: [
@@ -673,6 +675,7 @@ export default function Navbar({ scrolled = false }) {
   const [search, setSearch] = useState(false);
   const [panel, setPanel] = useState(null);
   const closeTimer = useRef(null);
+  const cartCount = useAppSelector((state) => state.cart.items.length);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -767,7 +770,7 @@ export default function Navbar({ scrolled = false }) {
           {/* Resting: the wide "Karmo Group" wordmark. Scrolled: the compact
               short "KARMO" mark. Cross-faded, same as the pair they replaced. */}
           <Logo
-            src="/karmo/logo-group-k3.png"
+            src="/brand/logo-group.png"
             width={1272}
             height={320}
             quality={100}
@@ -779,7 +782,7 @@ export default function Navbar({ scrolled = false }) {
             priority
           />
           <Logo
-            src="/karmo/logo-compact-k2.png"
+            src="/brand/logo-compact.png"
             width={412}
             height={120}
             quality={100}
@@ -803,7 +806,15 @@ export default function Navbar({ scrolled = false }) {
 
         <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <Tool icon={FiSearch} label="Search the Karmo range" onClick={() => setSearch((v) => !v)} />
-          <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={2} />
+          {/* Favourites + Account: in the mobile drawer below xl, in the bar from xl up
+              (they were HeaderTwo-only before the storefront moved to this header). */}
+          <span className="hidden xl:flex">
+            <Tool icon={FiHeart} label="Favourites" href="/wishlist" />
+          </span>
+          <span className="hidden xl:flex">
+            <Tool icon={FiUser} label="Account" href="/login" />
+          </span>
+          <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={cartCount} />
 
           <span className="ml-1.5 hidden md:block">
             <HeaderCtaButton compact />
