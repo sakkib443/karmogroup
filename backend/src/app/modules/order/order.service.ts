@@ -104,18 +104,70 @@ function catalogueLine(item: any) {
 
 const OrderService = {
     async getAllOrders(query: Record<string, unknown>) {
-        // The admin list sends `search` for order-number lookups, but QueryBuilder.search()
-        // reads `searchTerm` — normalise so the admin "search by order number" box works.
-        const normalizedQuery = { ...query };
-        if (normalizedQuery.search && !normalizedQuery.searchTerm) {
-            normalizedQuery.searchTerm = normalizedQuery.search;
+        // The order desk's own filters are pulled out here; everything else (status,
+        // paymentStatus, paymentMethod, items.product…) goes to QueryBuilder.filter() as is.
+        const { search, searchTerm, dateFrom, dateTo, minTotal, maxTotal, courier, division, places, zonePlaces, ...rest } = query;
+        const where: Record<string, any> = {};
+        const and: Record<string, any>[] = [];
+        const escapeRx = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        // One box for order no, customer name, phone and courier consignment.
+        const term = String(searchTerm || search || '').trim();
+        if (term) {
+            const rx = new RegExp(escapeRx(term), 'i');
+            and.push({ $or: [
+                { orderId: rx },
+                { 'shippingAddress.fullName': rx },
+                { 'shippingAddress.phone': rx },
+                { consignmentId: rx },
+                { trackingNumber: rx },
+            ] });
+        }
+
+        // Division / district (`places`) and delivery zone (`zonePlaces`): the admin sends
+        // every way the place is written, '|'-separated; any one of them as a whole word in
+        // the city, area or address is a match. The word edge is built from real Bangla
+        // characters (not \u escapes) so MongoDB's regex engine reads it.
+        const EDGE = `[^a-z${'ঀ'}-${'৿'}]`;
+        for (const list of [places, zonePlaces]) {
+            const terms = String(list || '').split('|').map((t) => t.trim()).filter(Boolean).slice(0, 400);
+            if (!terms.length) continue;
+            const alts = terms.map((t) => escapeRx(t).replace(/\s+/g, '\\s*')).join('|');
+            const rx = new RegExp(`(?:^|${EDGE})(?:${alts})(?:$|${EDGE})`, 'i');
+            and.push({ $or: [
+                { 'shippingAddress.city': rx },
+                { 'shippingAddress.area': rx },
+                { 'shippingAddress.address': rx },
+            ] });
+        }
+        if (and.length) where.$and = and;
+
+        // Placed between two moments — the browser sends the start / end of its local days.
+        if (dateFrom || dateTo) {
+            where.createdAt = {};
+            if (dateFrom) where.createdAt.$gte = new Date(String(dateFrom));
+            if (dateTo) where.createdAt.$lte = new Date(String(dateTo));
+        }
+
+        if (minTotal || maxTotal) {
+            where.total = {};
+            if (minTotal) where.total.$gte = Number(minTotal);
+            if (maxTotal) where.total.$lte = Number(maxTotal);
+        }
+
+        if (courier === 'booked') where.consignmentId = { $nin: ['', null] };
+        else if (courier === 'unbooked') where.consignmentId = { $in: ['', null] };
+
+        // Older pillow lines were filed as plain "pillow".
+        if (division) {
+            const d = divisionKey(division);
+            where['items.division'] = { $in: d === 'fiber_pillow' ? ['fiber_pillow', 'pillow'] : [d] };
         }
 
         const orderQuery = new QueryBuilder(
-            Order.find().populate('user', 'firstName lastName email phone').populate('items.product', 'name thumbnail'),
-            normalizedQuery
+            Order.find(where).populate('user', 'firstName lastName email phone').populate('items.product', 'name thumbnail'),
+            rest
         )
-            .search(['orderId'])   // enable admin order-list search by human order id (ABM-XXXX)
             .filter()              // status tabs (?status=shipped, etc.)
             .sort()
             .paginate();

@@ -185,7 +185,21 @@ export function openOrderPapers(order: any, paper: PaperKind): void {
     } else {
         pages = memoPage(order, origin) + orderDivisions(order).map((d) => challanPage(order, d, origin)).join('');
     }
+    printWindow(title, pages);
+}
 
+/** Memo + every challan for several orders, one after another, in one print window. */
+export function openOrdersPapers(orders: any[], paper: 'all' | 'memo' | 'challans' = 'all'): void {
+    const origin = window.location.origin;
+    const pages = orders.map((o) => [
+        paper !== 'challans' ? memoPage(o, origin) : '',
+        paper !== 'memo' ? orderDivisions(o).map((d) => challanPage(o, d, origin)).join('') : '',
+    ].join('')).join('');
+    const what = paper === 'memo' ? 'Memos' : paper === 'challans' ? 'Challans' : 'Papers';
+    printWindow(`${what} - ${orders.length} orders`, pages);
+}
+
+function printWindow(title: string, pages: string) {
     const w = window.open('', '_blank');
     if (!w) throw new Error('Allow pop-ups for this site to open the papers.');
     w.document.open();
