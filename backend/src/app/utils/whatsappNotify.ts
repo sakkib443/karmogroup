@@ -106,7 +106,7 @@ export async function notifyInquiryToWhatsApp(data: {
 
     const variant = [data.color, data.size].filter(Boolean).join(' / ');
 
-    const msg = `❓ *New Inquiry — S Kawsar Sunnah Mart*
+    const msg = `❓ *New Inquiry — Karmo Group*
 
 👤 *Name:* ${data.customerName}
 📞 *Contact:* ${data.customerPhone}

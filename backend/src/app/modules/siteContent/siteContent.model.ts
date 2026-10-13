@@ -66,7 +66,7 @@ const siteContentSchema = new Schema({
 
     // ── Footer ──
     footer: {
-        companyName: { type: String, default: 'S Kawsar Sunnah Mart' },
+        companyName: { type: String, default: 'Karmo Group' },
         copyright: { type: String, default: '' },
         links: [{
             label: { type: String, required: true },
@@ -79,9 +79,9 @@ const siteContentSchema = new Schema({
 
     // ── SEO / Meta ──
     seo: {
-        title: { type: String, default: 'S Kawsar Sunnah Mart - Your trusted online marketplace' },
-        description: { type: String, default: 'Shop the latest products with amazing deals at S Kawsar Sunnah Mart.' },
-        keywords: { type: String, default: 's kawsar sunnah mart, skawsarsunnahmart, ecommerce, online shopping' },
+        title: { type: String, default: 'Karmo Group - Your trusted online marketplace' },
+        description: { type: String, default: 'Shop the latest products with amazing deals at Karmo Group.' },
+        keywords: { type: String, default: 'karmo group, karmogroup, ecommerce, online shopping' },
     },
 
     // ── Announcement Bar ──

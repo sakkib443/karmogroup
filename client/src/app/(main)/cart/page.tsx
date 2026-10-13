@@ -17,7 +17,7 @@ import {
     couponDiscountTotal, couponHasFreeShipping,
 } from '@/lib/coupons';
 
-const SELECTED_STORAGE_KEY = 'skawsarsunnahmart_selected_cart';
+const SELECTED_STORAGE_KEY = 'karmogroup_selected_cart';
 
 // Resolve common colour names to a CSS hex so the swatch dot always renders.
 const COLOR_HEX_MAP: Record<string, string> = {

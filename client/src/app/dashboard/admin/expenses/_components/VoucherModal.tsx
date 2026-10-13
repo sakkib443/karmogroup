@@ -57,7 +57,7 @@ export function VoucherSheet({ expense }: { expense?: IExpense | null }) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/brand/logo-icon.png" alt="" className="h-10 w-10" />
                     <div>
-                        <p className="text-lg font-bold leading-tight">Shohoz Krishi</p>
+                        <p className="text-lg font-bold leading-tight">Karmo</p>
                         <p className="text-xs text-gray-500">Expense voucher</p>
                     </div>
                 </div>

@@ -179,7 +179,7 @@ const AnalyticsController = {
     getAdminReportPdf: catchAsync(async (req: Request, res: Response) => {
         const pdf = await AnalyticsService.generateAdminReportPdf();
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="S Kawsar Sunnah Mart-Platform-Analytics.pdf"`);
+        res.setHeader('Content-Disposition', `attachment; filename="Karmo Group-Platform-Analytics.pdf"`);
         res.send(pdf);
     }),
 };

@@ -33,7 +33,7 @@ cloudinary.config({
 const cloudStorage = new CloudinaryStorage({
     cloudinary,
     params: async (_req: any, _file: any) => ({
-        folder:         's-kawsar-sunnah-mart/products',
+        folder:         'karmo-group/products',
         allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'],
         transformation: [{ width: 1200, height: 1200, crop: 'limit', quality: 'auto:good' }],
         public_id:      `product_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,

@@ -4,7 +4,7 @@ import LegalPageLayout from '@/components/shared/LegalPageLayout';
 
 export const metadata: Metadata = {
     title: "Refund & Return Policy",
-    description: "Understand S Kawsar Sunnah Mart's refund and return policy — how to request a refund, eligibility, and timelines for orders in Bangladesh.",
+    description: "Understand Karmo Group's refund and return policy — how to request a refund, eligibility, and timelines for orders in Bangladesh.",
     alternates: { canonical: "/refund" },
 };
 

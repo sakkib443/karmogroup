@@ -42,7 +42,7 @@ export async function downloadReportPdf(path: 'admin'): Promise<void> {
 
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
-    anchor.download = 'ShohozKrishi-Analytics-' + path + '.pdf';
+    anchor.download = 'Karmo-Analytics-' + path + '.pdf';
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);

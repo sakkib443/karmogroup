@@ -22,8 +22,8 @@ export function whatsappHref(number?: string): string {
 }
 
 /**
- * The page's Messenger id from whatever the admin pasted: "shohozkrishi", "@shohozkrishi",
- * "m.me/shohozkrishi", "facebook.com/shohozkrishi", "fb.com/…", or a
+ * The page's Messenger id from whatever the admin pasted: "karmo", "@karmo",
+ * "m.me/karmo", "facebook.com/karmo", "fb.com/…", or a
  * "facebook.com/profile.php?id=123…" link. '' when it is empty or the seed placeholder.
  */
 export function messengerId(value?: string): string {

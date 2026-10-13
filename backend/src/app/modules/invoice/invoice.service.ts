@@ -19,7 +19,7 @@ export interface IInvoiceData {
     status: string;
     paymentMethod: string;
     paymentStatus: string;
-    brand: 'S Kawsar Sunnah Mart';
+    brand: 'Karmo Group';
     billTo: { name: string; phone: string; email: string };
     shipTo: {
         name: string;
@@ -75,7 +75,7 @@ const buildCustomerInvoice = (order: any): IInvoiceData => {
         status: order.status,
         paymentMethod: order.paymentMethod,
         paymentStatus: order.paymentStatus,
-        brand: 'S Kawsar Sunnah Mart',
+        brand: 'Karmo Group',
         billTo: {
             name,
             phone: ship.phone || user.phone || '',
@@ -117,7 +117,7 @@ const generateInvoicePdf = (invoice: IInvoiceData): Promise<Buffer> => {
 
             // ── Orange header band ──
             doc.rect(0, 0, pageWidth, 90).fill(ORANGE);
-            doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('S Kawsar Sunnah Mart', left, 24);
+            doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('Karmo Group', left, 24);
             doc.fontSize(13).font('Helvetica').text('INVOICE', left, 56);
 
             const dateStr = new Date(invoice.date).toLocaleDateString('en-GB', {
@@ -217,7 +217,7 @@ const generateInvoicePdf = (invoice: IInvoiceData): Promise<Buffer> => {
 
             // ── Footer ──
             doc.font('Helvetica-Oblique').fontSize(9).fillColor('#888888')
-                .text('Thank you for shopping with S Kawsar Sunnah Mart', left, doc.page.height - 60, {
+                .text('Thank you for shopping with Karmo Group', left, doc.page.height - 60, {
                     width: contentWidth, align: 'center',
                 });
 
@@ -246,7 +246,7 @@ const buildInvoiceEmailHtml = (invoice: IInvoiceData): string => {
     return `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #eee;">
     <div style="background:${ORANGE};color:#fff;padding:24px;">
-      <h1 style="margin:0;font-size:22px;">S Kawsar Sunnah Mart</h1>
+      <h1 style="margin:0;font-size:22px;">Karmo Group</h1>
       <p style="margin:4px 0 0;font-size:14px;">Invoice ${invoice.invoiceNumber}</p>
     </div>
     <div style="padding:24px;">
@@ -271,7 +271,7 @@ const buildInvoiceEmailHtml = (invoice: IInvoiceData): string => {
       <p style="margin:16px 0 0;color:#555;">Payment: ${invoice.paymentMethod} (${invoice.paymentStatus})</p>
     </div>
     <div style="background:#fafafa;padding:16px;text-align:center;color:#888;font-size:12px;">
-      Thank you for shopping with S Kawsar Sunnah Mart
+      Thank you for shopping with Karmo Group
     </div>
   </div>`;
 };
@@ -315,7 +315,7 @@ const emailInvoiceToCustomer = async (orderId: string): Promise<void> => {
         }
         await sendEmail({
             to,
-            subject: `Your S Kawsar Sunnah Mart Invoice ${invoice.invoiceNumber}`,
+            subject: `Your Karmo Group Invoice ${invoice.invoiceNumber}`,
             html: buildInvoiceEmailHtml(invoice),
             attachments: [
                 {

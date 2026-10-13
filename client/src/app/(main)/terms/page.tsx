@@ -4,7 +4,7 @@ import LegalPageLayout from '@/components/shared/LegalPageLayout';
 
 export const metadata: Metadata = {
     title: "Terms & Conditions",
-    description: "Read the Terms & Conditions for using S Kawsar Sunnah Mart's online marketplace and shopping services in Bangladesh.",
+    description: "Read the Terms & Conditions for using Karmo Group's online marketplace and shopping services in Bangladesh.",
     alternates: { canonical: "/terms" },
 };
 

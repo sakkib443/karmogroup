@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * S Kawsar Sunnah Mart brand logo.
+ * Karmo Group brand logo.
  *
  * Three renderings of the same mark:
  *
@@ -51,7 +51,7 @@ const Logo: React.FC<LogoProps> = ({
         // eslint-disable-next-line @next/next/no-img-element
         <img
             src={src}
-            alt="S Kawsar Sunnah Mart"
+            alt="Karmo Group"
             draggable={false}
             className={imgClassName}
             style={imgStyle}
@@ -75,10 +75,10 @@ const Logo: React.FC<LogoProps> = ({
                     height — the emblem stays the dominant element. */}
                 <span className="flex flex-col justify-center leading-none">
                     <span className="font-heading text-[16px] font-bold uppercase leading-[0.95] tracking-[0.01em] text-white sm:text-[18px] md:text-[21px]">
-                        S Kawsar
+                        Karmo
                     </span>
                     <span className="mt-[2px] text-[6px] font-semibold uppercase leading-none tracking-[0.30em] text-white/75 sm:text-[6.5px] md:text-[7.5px]">
-                        Sunnah Mart
+                        Group
                     </span>
                 </span>
             </span>

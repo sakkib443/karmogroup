@@ -11,10 +11,10 @@ import { TLoginInput, TRegisterInput } from './auth.validation';
 const sha256 = (value: string): string => crypto.createHash('sha256').update(value).digest('hex');
 
 const buildVerificationEmail = (verifyLink: string): { subject: string; html: string } => ({
-    subject: 'Verify your S Kawsar Sunnah Mart email',
+    subject: 'Verify your Karmo Group email',
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-            <h2 style="color: #F85606;">Welcome to S Kawsar Sunnah Mart!</h2>
+            <h2 style="color: #F85606;">Welcome to Karmo Group!</h2>
             <p>Please confirm your email address to activate your account.</p>
             <p style="text-align: center; margin: 28px 0;">
                 <a href="${verifyLink}" style="background: #F85606; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; display: inline-block;">Verify Email</a>
@@ -25,7 +25,7 @@ const buildVerificationEmail = (verifyLink: string): { subject: string; html: st
 });
 
 const buildOtpEmail = (otp: string, purpose: string): { subject: string; html: string } => ({
-    subject: `Your S Kawsar Sunnah Mart verification code: ${otp}`,
+    subject: `Your Karmo Group verification code: ${otp}`,
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
             <h2 style="color: #F85606;">Your verification code</h2>
@@ -36,7 +36,7 @@ const buildOtpEmail = (otp: string, purpose: string): { subject: string; html: s
 });
 
 const buildResetEmail = (resetLink: string): { subject: string; html: string } => ({
-    subject: 'Reset your S Kawsar Sunnah Mart password',
+    subject: 'Reset your Karmo Group password',
     html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
             <h2 style="color: #F85606;">Password reset request</h2>
@@ -64,7 +64,7 @@ const AuthService = {
         const { firstName, lastName, email, phone, password, location } = payload;
 
         // Auto-generate guest email if only phone provided
-        const userEmail = email || `${phone?.replace(/\s+/g, '')}@guest.skawsarsunnahmart.com`;
+        const userEmail = email || `${phone?.replace(/\s+/g, '')}@guest.karmogroup.com`;
 
         const isExists = await User.isUserExists(userEmail);
         if (isExists) throw new AppError(400, 'Account already exists with this email. Please login.');
@@ -233,7 +233,7 @@ const AuthService = {
             // server-to-server HTTPS call, so we can read its claims directly.
             payload = (jwt.decode(tokens.id_token) as any) || {};
             if (config.google.client_id && payload.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for S Kawsar Sunnah Mart.');
+                throw new AppError(401, 'This Google sign-in is not authorized for Karmo Group.');
             }
         } else if (idToken) {
             // ID token: tokeninfo validates signature + expiry and returns the claims.
@@ -244,7 +244,7 @@ const AuthService = {
             }
             // Must be minted for OUR app (prevents token reuse from another Google app).
             if (config.google.client_id && payload.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for S Kawsar Sunnah Mart.');
+                throw new AppError(401, 'This Google sign-in is not authorized for Karmo Group.');
             }
         } else if (accessToken) {
             // Access token: first confirm which app it was issued to (aud), then
@@ -255,7 +255,7 @@ const AuthService = {
                 throw new AppError(401, 'Could not verify your Google account. Please try again.');
             }
             if (config.google.client_id && ti.aud !== config.google.client_id) {
-                throw new AppError(401, 'This Google sign-in is not authorized for S Kawsar Sunnah Mart.');
+                throw new AppError(401, 'This Google sign-in is not authorized for Karmo Group.');
             }
             const uiRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                 headers: { Authorization: `Bearer ${accessToken}` },

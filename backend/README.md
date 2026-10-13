@@ -1,6 +1,6 @@
-# S Kawsar Sunnah Mart — Server
+# Karmo Group — Server
 
-Backend API for **S Kawsar Sunnah Mart**, a variety-products online marketplace.
+Backend API for **Karmo Group**, a variety-products online marketplace.
 
 Built with **Express**, **TypeScript**, **MongoDB / Mongoose**, JWT auth, and Cloudinary uploads.
 

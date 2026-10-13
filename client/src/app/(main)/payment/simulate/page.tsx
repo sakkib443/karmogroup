@@ -49,7 +49,7 @@ const PaymentSimulateInner = () => {
                 <div className="bg-[var(--color-primary)] px-6 py-5 text-white text-center">
                     <div className="flex items-center justify-center gap-2 mb-1">
                         <LuZap size={18} />
-                        <span className="font-bold text-lg tracking-tight">S Kawsar Sunnah Mart Pay</span>
+                        <span className="font-bold text-lg tracking-tight">Karmo Group Pay</span>
                     </div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
                         Sandbox / Test Gateway

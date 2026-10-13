@@ -39,5 +39,5 @@ export async function downloadSalesPdf(p: ReportPeriod): Promise<void> {
         headers: token ? { authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) throw new Error(`Failed to download report (status ${res.status})`);
-    saveBlob(await res.blob(), `ShohozKrishi-Sales-Report-${periodSlug(p)}.pdf`);
+    saveBlob(await res.blob(), `Karmo-Sales-Report-${periodSlug(p)}.pdf`);
 }

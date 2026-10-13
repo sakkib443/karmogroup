@@ -34,7 +34,7 @@ export function streamFinancePdf(res: Response, report: FinanceReport): void {
 
     // Header
     doc.rect(0, 0, doc.page.width, 90).fill(BRAND);
-    doc.fillColor('#fff').fontSize(20).font('Helvetica-Bold').text('S Kawsar Sunnah Mart', left, 26);
+    doc.fillColor('#fff').fontSize(20).font('Helvetica-Bold').text('Karmo Group', left, 26);
     doc.fontSize(11).font('Helvetica').text('Financial Report', left, 52);
     doc.fontSize(9).text(rangeLabel(report.range), left, 68);
     doc.fillColor('#000');
@@ -105,7 +105,7 @@ export function streamFinancePdf(res: Response, report: FinanceReport): void {
 // ── Excel: builds a multi-sheet .xlsx workbook buffer ────────────────
 export async function buildFinanceXlsx(report: FinanceReport): Promise<Buffer> {
     const wb = new ExcelJS.Workbook();
-    wb.creator = 'S Kawsar Sunnah Mart';
+    wb.creator = 'Karmo Group';
     wb.created = new Date();
 
     const headerFill = { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FFF85606' } };
@@ -121,7 +121,7 @@ export async function buildFinanceXlsx(report: FinanceReport): Promise<Buffer> {
     const s = report.summary;
     const sum = wb.addWorksheet('Summary');
     sum.columns = [{ width: 26 }, { width: 22 }];
-    sum.addRow(['S Kawsar Sunnah Mart — Financial Report']).font = { bold: true, size: 14 };
+    sum.addRow(['Karmo Group — Financial Report']).font = { bold: true, size: 14 };
     sum.addRow(['Range', rangeLabel(report.range)]);
     sum.addRow([]);
     const metricHeader = sum.addRow(['Metric', 'Value']);

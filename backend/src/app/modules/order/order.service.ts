@@ -384,7 +384,7 @@ const OrderService = {
         }
 
         // Auto-generate guest email from phone if not provided
-        const guestEmail = email || `${phone.replace(/\s+/g, '')}@guest.skawsarsunnahmart.com`;
+        const guestEmail = email || `${phone.replace(/\s+/g, '')}@guest.karmogroup.com`;
 
         // Check if user already exists
         let user = await User.findOne({ $or: [{ email: guestEmail.toLowerCase() }, { phone }] });
