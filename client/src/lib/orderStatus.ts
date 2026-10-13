@@ -155,6 +155,26 @@ export const FORWARD_STEPS: string[] = [
 /** The order desk's own steps — what staff move an order through before the courier takes over. */
 export const ORDER_DESK_STEPS: string[] = FORWARD_STEPS.slice(0, 6);
 
+/** Each status's solid colour, as on the order desk sheet (desk steps first). */
+export const STATUS_COLOR: Record<string, string> = {
+    pending: '#FF8C00',
+    confirmed: '#0047FF',
+    factory: '#6B00C2',
+    challan_ready: '#C00000',
+    courier_entry: '#33C200',
+    shipped: '#E0002A',
+    delivered: '#059669',
+    cancelled: '#6B7280',
+    returned: '#475569',
+    refunded: '#BE185D',
+    processing: '#7C3AED',
+    on_the_way: '#0284C7',
+    out_for_delivery: '#0D9488',
+    delivery_attempt: '#D97706',
+};
+
+export const statusColor = (status: string) => STATUS_COLOR[status] || '#9CA3AF';
+
 // Label map for the forward steps (reuses config labels)
 export const FORWARD_STEP_LABELS: Record<string, string> = FORWARD_STEPS.reduce(
     (acc, key) => {

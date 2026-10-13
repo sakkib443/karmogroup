@@ -5,18 +5,8 @@ import React, { useState } from 'react';
 import { LuCheck, LuCopy, LuZap, LuArrowRight, LuUndo2, LuTruck, LuX } from 'react-icons/lu';
 import { toast } from 'react-hot-toast';
 import { useUpdateOrderStatusMutation, useSendWithPathaoMutation } from '@/redux/api/orderApi';
-import { ORDER_DESK_STEPS, getStatusConfig } from '@/lib/orderStatus';
+import { ORDER_DESK_STEPS, STATUS_COLOR as STEP_COLOR, getStatusConfig } from '@/lib/orderStatus';
 import { orderSummaryText, orderDivisions, divisionLabel, openOrderPapers, type PaperKind } from './orderPapers';
-
-/** Each desk step's colour, as on the order desk sheet. */
-const STEP_COLOR: Record<string, string> = {
-    pending: '#FF8C00',
-    confirmed: '#0047FF',
-    factory: '#6B00C2',
-    challan_ready: '#C00000',
-    courier_entry: '#33C200',
-    shipped: '#E0002A',
-};
 
 /** What the step means for whoever is at the desk. */
 const STEP_HINT: Record<string, string> = {
