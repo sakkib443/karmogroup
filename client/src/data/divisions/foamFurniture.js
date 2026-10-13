@@ -16,7 +16,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "Poly Foam Combo Offer",
     href: "/foam/furniture#foam-offers",
-    image: `${COVER}/poly-cover.jpg`,
+    image: `${COVER}/poly-cover.webp`,
     alt: "Karmo Poly foam combo offer with five free cushions",
     was: "৳ 5,569",
     now: "৳ 4,734",
@@ -33,7 +33,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "280 Foam Combo Offer",
     href: "/foam/combo-280",
-    image: `${COVER}/280-cover.jpg`,
+    image: `${COVER}/280-cover.webp`,
     alt: "Karmo 280 foam combo offer with five free cushions",
     was: "৳ 6,427",
     now: "৳ 5,463",
@@ -50,7 +50,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "2001 Foam Combo Offer",
     href: "/foam/combo-2001",
-    image: `${COVER}/2001-cover.jpg`,
+    image: `${COVER}/2001-cover.webp`,
     alt: "Karmo 2001 foam combo offer with five free cushions",
     was: "৳ 7,982",
     now: "৳ 6,785",
@@ -67,7 +67,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "HD Foam Combo Offer",
     href: "/foam/furniture#foam-offers",
-    image: `${COVER}/hd-cover.jpg`,
+    image: `${COVER}/hd-cover.webp`,
     alt: "Karmo HD foam combo offer with five free cushions",
     was: "৳ 8,552",
     now: "৳ 7,270",
@@ -84,7 +84,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "4G Foam Combo Offer",
     href: "/foam/combo-4g",
-    image: `${COVER}/4g-cover.jpg`,
+    image: `${COVER}/4g-cover.webp`,
     alt: "Karmo 4G foam combo offer with five free cushions",
     was: "৳ 9,040",
     now: "৳ 7,684",
@@ -101,7 +101,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "1965 Foam Combo Offer",
     href: "/foam/combo-1965",
-    image: `${COVER}/1965-cover.jpg`,
+    image: `${COVER}/1965-cover.webp`,
     alt: "Karmo 1965 foam combo offer with five free cushions",
     was: "৳ 10,749",
     now: "৳ 9,137",
@@ -118,7 +118,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "Signature Foam Combo Offer",
     href: "/foam/combo-signature",
-    image: `${COVER}/signature-cover.jpg`,
+    image: `${COVER}/signature-cover.webp`,
     alt: "Karmo Signature foam combo offer with five free cushions",
     was: "৳ 15,910",
     now: "৳ 13,524",
@@ -135,7 +135,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "Foam (Sit)",
     href: "/foam/furniture#foam-offers",
-    image: `${COVER}/sit-cover.jpg`,
+    image: `${COVER}/sit-cover.webp`,
     alt: "Karmo foam sit piece — 22 by 22 by 4 inches",
     was: "৳ 1,200",
     now: "৳ 1,000",
@@ -152,7 +152,7 @@ export const liveFurnitureFoamOffers = [
     category: "furniture",
     name: "Foam (Back)",
     href: "/foam/furniture#foam-offers",
-    image: `${COVER}/back-cover.jpg`,
+    image: `${COVER}/back-cover.webp`,
     alt: "Karmo foam back piece — 22 by 18 by 3 inches",
     was: "৳ 1,200",
     now: "৳ 1,000",
@@ -183,7 +183,7 @@ const foamFurniture = {
 
   banner: {
     hidden: true,
-    bg: `${IMG}/hero/hero-foam-user-hq.png`,
+    bg: `${IMG}/hero/hero-foam-user-hq.webp`,
     badge: { src: BADGE, width: 420, height: 330 },
     eyebrowEnd: "Foam Brand",
     headline: "All your upholstery needs",
@@ -240,25 +240,25 @@ const foamFurniture = {
     sofas: [
       {
         id: "cream",
-        src: `${IMG}/rooms/room-cream-sectional-hq.png`,
+        src: `${IMG}/rooms/room-cream-sectional-hq.webp`,
         alt: "Cream sectional sofa with Karmo set foam in a sunlit living room",
         label: "Sofa foam",
       },
       {
         id: "mustard",
-        src: `${IMG}/rooms/room-mustard-set-hq.png`,
+        src: `${IMG}/rooms/room-mustard-set-hq.webp`,
         alt: "Mustard wood-frame sofa set with Karmo set foam",
         label: "Set foam",
       },
       {
         id: "emerald",
-        src: `${IMG}/rooms/room-emerald-chair-hq.png`,
+        src: `${IMG}/rooms/room-emerald-chair-hq.webp`,
         alt: "Emerald armchair with Karmo set foam beside a palm",
         label: "Chair foam",
       },
       {
         id: "bed",
-        src: `${IMG}/rooms/room-upholstered-bed-hq.png`,
+        src: `${IMG}/rooms/room-upholstered-bed-hq.webp`,
         alt: "Upholstered bed with Karmo set foam headboard in a sunlit bedroom",
         label: "Bed foam",
       },
@@ -266,7 +266,7 @@ const foamFurniture = {
   },
 
   furnitureGrades: {
-    lineup: `${IMG}/hero/hero-crafted-hq.png`,
+    lineup: `${IMG}/hero/hero-crafted-hq.webp`,
     alt: "Cream armchair with a KARMO foam label under a magnifying glass",
     heading: "All your upholstery needs",
   },
@@ -276,19 +276,19 @@ const foamFurniture = {
     columns: [
       {
         id: "firm",
-        image: `${IMG}/why/why-firm-hq.jpg`,
+        image: `${IMG}/why/why-firm-hq.webp`,
         alt: "Upright seating on a firm sofa — cushions hold their shape",
         caption: "If you need firm support that holds its shape",
       },
       {
         id: "density",
-        image: `${IMG}/why/why-density-hq.jpg`,
+        image: `${IMG}/why/why-density-hq.webp`,
         alt: "Cream armchair with a KARMO foam label under a magnifying glass",
         caption: "If you want density that lasts for years",
       },
       {
         id: "airflow",
-        image: `${IMG}/why/why-airflow-hq.jpg`,
+        image: `${IMG}/why/why-airflow-hq.webp`,
         alt: "Relaxed seating by an open window — cool airflow comfort",
         caption: "If you prefer cool, open airflow comfort",
       },
@@ -306,7 +306,7 @@ const foamFurniture = {
         title: "No Filler",
         overview:
           "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: `${IMG}/products/hd-hover-hq.jpg`,
+        background: `${IMG}/products/hd-hover-hq.webp`,
       },
       {
         id: "long-durability",
@@ -315,7 +315,7 @@ const foamFurniture = {
         title: "Long Durability",
         overview:
           "Engineered to resist sagging and hold structure — support that stays true for years of seating.",
-        background: `${IMG}/why/why-density-hq.jpg`,
+        background: `${IMG}/why/why-density-hq.webp`,
       },
       {
         id: "more-resilient",
@@ -324,11 +324,11 @@ const foamFurniture = {
         title: "More Resilient",
         overview:
           "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
-        background: `${IMG}/why/why-firm-hq.jpg`,
+        background: `${IMG}/why/why-firm-hq.webp`,
       },
     ],
     spotlight: {
-      image: `${IMG}/mosaic/spotlight-emerald-left-hq.png`,
+      image: `${IMG}/mosaic/spotlight-emerald-left-hq.webp`,
       alt: "Emerald armchair and oak dresser on the left of a sunlit living room",
       headingLead: "Designed",
       headingAccent: "to",
@@ -372,7 +372,7 @@ const foamFurniture = {
         },
       ],
       photo: {
-        src: `${IMG}/inside/cushion-cutaway-hq.jpg`,
+        src: `${IMG}/inside/cushion-cutaway-hq.webp`,
         video: "/shared/videos/shorts/v1-tisa.mp4",
         videoStart: 1,
         alt: "Tanzin Tisha for Karmo Foam",
@@ -413,7 +413,7 @@ const foamFurniture = {
     layout: "overlay",
     headingLead: "The comfort you feel every day",
     image: {
-      src: `${IMG}/bands/lounge-mustard-user-hq.png`,
+      src: `${IMG}/bands/lounge-mustard-user-hq.webp`,
       alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
       width: 1920,
       height: 1080,
@@ -427,7 +427,7 @@ const foamFurniture = {
         titleCard: true,
         headingLead: "The comfort you feel every day",
         image: {
-          src: `${IMG}/bands/lounge-mustard-user-hq.png`,
+          src: `${IMG}/bands/lounge-mustard-user-hq.webp`,
           alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
           width: 1920,
           height: 1080,
@@ -453,7 +453,7 @@ const foamFurniture = {
       { label: "Contact us", href: "/contact" },
     ],
     image: {
-      src: `${IMG}/hero/hero-foam-user-hq.png`,
+      src: `${IMG}/hero/hero-foam-user-hq.webp`,
       alt: "Close-up of black egg-crate Karmo furniture foam",
       width: 2120,
       height: 742,
@@ -468,7 +468,7 @@ const foamFurniture = {
           "linear-gradient(to top, rgba(11,21,40,0.70) 0%, rgba(11,21,40,0.52) 45%, rgba(11,21,40,0.46) 100%)",
         headingLead: "All your upholstery needs",
         image: {
-          src: `${IMG}/hero/hero-foam-user-hq.png`,
+          src: `${IMG}/hero/hero-foam-user-hq.webp`,
           alt: "Close-up of black egg-crate Karmo furniture foam",
           width: 2120,
           height: 742,

@@ -119,7 +119,7 @@ function LeafRule() {
 const CROSSFADE = 0.7;
 /* Slightly below 1 — the clip reads too brisk at native speed behind the copy. */
 const PLAYBACK = 0.9;
-const STILL = "/shared/backgrounds/page-header-bg-image.jpg";
+const STILL = "/shared/backgrounds/page-header-bg-image.webp";
 
 /**
  * How the background behaves as the section passes. Four treatments were built

@@ -105,7 +105,7 @@ const nav = [
     href: "/mattress",
     icon: `${MENU}/nav-mattress.webp?v=2`,
     texture: "mattress",
-    textureSrc: "/shared/header/mattress-side-texture.jpg",
+    textureSrc: "/shared/header/mattress-side-texture.webp",
     /* One division page — sub-rows are products, not category pages. */
     panelWidth: "25rem",
     columns: [

@@ -9,8 +9,8 @@ import { liveFurnitureFoamOffers } from "./foamFurniture";
 
 const IMG = "/pages/foam";
 const BADGE = "/shared/hero/badge-number-one.webp";
-const CERT_ISO = "/shared/certified/01-iso-9001.jpg";
-const CERT_UKAS = "/shared/certified/02-ukas.jpg";
+const CERT_ISO = "/shared/certified/01-iso-9001.webp";
+const CERT_UKAS = "/shared/certified/02-ukas.webp";
 
 const foam = {
   slug: "foam",
@@ -19,7 +19,7 @@ const foam = {
 
   banner: {
     hidden: true,
-    bg: `${IMG}/bands/lounge-sofa-hq.jpg`,
+    bg: `${IMG}/bands/lounge-sofa-hq.webp`,
     badge: { src: BADGE, width: 420, height: 330 },
     eyebrowEnd: "Foam Brand",
     headline: "The Chemistry of Comfort",
@@ -78,19 +78,19 @@ const foam = {
     columns: [
       {
         id: "firm",
-        image: "/pages/foam/furniture/why/why-1.png",
+        image: "/pages/foam/furniture/why/why-1.webp",
         alt: "Upright seating on a firm high-density foam sofa",
         caption: "IF YOU NEED HIGH-IMPACT SUPPORT & ENERGY RETURN",
       },
       {
         id: "density",
-        image: "/pages/foam/furniture/why/why-4.png",
+        image: "/pages/foam/furniture/why/why-4.webp",
         alt: "Hand pressing into dense Karmo foam showing rebound",
         caption: "IF YOU WANT DENSITY THAT LASTS FOR YEARS",
       },
       {
         id: "airflow",
-        image: "/pages/foam/furniture/why/why-6.png",
+        image: "/pages/foam/furniture/why/why-6.webp",
         alt: "Bright living room with breathable foam seating",
         caption: "IF YOU PREFER COOL, OPEN AIRFLOW COMFORT",
       },
@@ -107,7 +107,7 @@ const foam = {
         title: "No Filler",
         overview:
           "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: "/pages/foam/furniture/bands/no-filler-footwear.png",
+        background: "/pages/foam/furniture/bands/no-filler-footwear.webp",
       },
       {
         id: "long-durability",
@@ -127,7 +127,7 @@ const foam = {
       },
     ],
     spotlight: {
-      image: "/pages/foam/furniture/mosaic/footwear-spotlight2.png",
+      image: "/pages/foam/furniture/mosaic/footwear-spotlight2.webp",
       alt: "A calm living room with deep foam sofa seating",
       overlay: "bg-[#0b1a33]/20",
       headingLead: "DESIGNED TO ENDURE",
@@ -139,13 +139,13 @@ const foam = {
 certifications: [
   {
     id: "flex-test",
-    image: "/pages/foam/furniture/badges/flex-test-badge.png", // ফ্রেম ছাড়া ক্লিন ট্রান্সপারেন্ট ব্যাজ
+    image: "/pages/foam/furniture/badges/flex-test-badge.webp", // ফ্রেম ছাড়া ক্লিন ট্রান্সপারেন্ট ব্যাজ
     title: "100,000+ FLEX CYCLES",
     body: "Zero sole breakdown after 100k automated lab flex tests — built for extreme athletic endurance.",
   },
   {
     id: "shock-absorb",
-    image: "/pages/foam/furniture/badges/shock-absorb-badge.png",
+    image: "/pages/foam/furniture/badges/shock-absorb-badge.webp",
     title: "DYNAMIC SHOCK ABSORPTION",
     body: "Dissipates up to 45% of heel-strike ground impact, reducing knee fatigue and joint pressure.",
   },
@@ -177,13 +177,13 @@ certifications: [
       },
     ],
     film: null,
-    still:  "/pages/foam/furniture/mosaic/footwear-sole-v4.png",
+    still:  "/pages/foam/furniture/mosaic/footwear-sole-v4.webp",
     filmAlt: "Karmo Footwear Foam Quality",
     filmOverlay: true,
   },
 
   zones: {
-    src: "/pages/foam/furniture/bands/footwear-layers-cutaway.png",
+    src: "/pages/foam/furniture/bands/footwear-layers-cutaway.webp",
     alt: "Layered foam cutaway showing soft top, dense core and base foam",
     width: 1536,
     height: 864,
@@ -206,7 +206,7 @@ certifications: [
     titleCard: true,
     cta: null,
     image: {
-      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.png",
+      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.webp",
       alt: "Comfortable footwear foam for everyday walking",
       position: "object-[center_40%]",
       width: 1920,
@@ -222,7 +222,7 @@ certifications: [
         // cta: ,
         veil: true,
         image: {
-      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.png",
+      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.webp",
       alt: "Comfortable footwear foam for everyday walking",
       position: "object-[center_40%]",
           width: 1920,
@@ -247,7 +247,7 @@ certifications: [
       { label: "Contact us", href: "/contact" },
     ],
     image: {
-      src: `${IMG}/hero/hero-slide-01-no-foam-v10-hq.jpg`,
+      src: `${IMG}/hero/hero-slide-01-no-foam-v10-hq.webp`,
       alt: "Mustard sofa in a modern living room",
       width: 1536,
       height: 1024,
@@ -260,7 +260,7 @@ certifications: [
   headingLead: "ALL YOUR FOOTWEAR NEEDS",
   veil: true,
   image: {
-    src: "/pages/foam/hero/footwear-hero1.jpeg",
+    src: "/pages/foam/hero/footwear-hero1.webp",
     alt: "Footwear foam",
     width: 1536,
     height: 1024,
@@ -279,7 +279,7 @@ certifications: [
       //   kicker: "Every grade cut, tested and ready for makers",
       //   cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
       //   image: {
-      //     src: `${IMG}/hero/craft-karmo-grades-v9-hq.jpg`,
+      //     src: `${IMG}/hero/craft-karmo-grades-v9-hq.webp`,
       //     alt: "Karmo 280, Signature and 1965 foam on the left of a living room; clear navy wall on the right for headline copy",
       //     width: 2560,
       //     height: 1096,
@@ -300,7 +300,7 @@ certifications: [
       //   kicker: "Rubber grade. Higher durability. Fine cell structure",
       //   cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
       //   image: {
-      //     src: "/pages/foam/hero/home-hero-slide-foam-grades-v2-hq.jpg",
+      //     src: "/pages/foam/hero/home-hero-slide-foam-grades-v2-hq.webp",
       //     alt: "Four Karmo foam grades in front of a white sofa living room",
       //     width: 2560,
       //     height: 1096,
@@ -316,14 +316,14 @@ certifications: [
         id: "furniture",
         name: "Furniture",
         line: "Sofas, cushions, seating",
-        image: "/products/foam/catalog/sofa-olive-hq.jpg",
+        image: "/products/foam/catalog/sofa-olive-hq.webp",
         alt: "Olive sofa built on Karmo foam",
       },
       {
         id: "specialty",
         name: "Specialty",
         line: "Grades for makers",
-        image: "/products/foam/catalog/blocks-coral-hq.jpg",
+        image: "/products/foam/catalog/blocks-coral-hq.webp",
         alt: "Colored foam blocks for specialty use",
       },
     ],
@@ -333,7 +333,7 @@ certifications: [
     hidden: true,
     heading: "Blending tradition with innovation",
     subline: "Lasting Comfort to your Doorstep",
-    still: `${IMG}/bands/lounge-sofa-hq.jpg`,
+    still: `${IMG}/bands/lounge-sofa-hq.webp`,
     film: null,
     showFilm: false,
     claims: [

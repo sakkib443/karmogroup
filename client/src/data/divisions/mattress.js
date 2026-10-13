@@ -163,7 +163,7 @@ const mattress = {
     columns: [
       {
         id: "pain",
-        image: "/pages/mattress/why/why-back-pain-hq.jpg",
+        image: "/pages/mattress/why/why-back-pain-hq.webp",
         alt: "Half-body rear view on a Karmo mattress with a soft wellness glow along the spine",
         caption: "If you have chronic neck & back pain",
       },
@@ -222,7 +222,7 @@ const mattress = {
       },
     ],
     spotlight: {
-      image: "/pages/mattress/mosaic/designed-to-destress.jpg",
+      image: "/pages/mattress/mosaic/designed-to-destress.webp",
       alt: "Peaceful sleep on a Karmo mattress",
       headingLead: "Designed",
       headingAccent: "to",
@@ -265,7 +265,7 @@ const mattress = {
         },
       ],
       photo: {
-        src: "/pages/mattress/brochure/inside/pocket-cutaway.jpg",
+        src: "/pages/mattress/brochure/inside/pocket-cutaway.webp",
         alt: "Karmo pocket-spring mattress with the pillow top peeled back to show foam wadding and coils",
         caption: "Foam wadding · pillow top · pocket springs",
       },
@@ -412,7 +412,7 @@ const mattress = {
         /* Official mattress tagline #13 — one line, original centre position. */
         headingLead: "Designed for Deeper Sleep",
         image: {
-          src: "/pages/mattress/hero/mattress-by-the-serene-shore-v1.jpg",
+          src: "/pages/mattress/hero/mattress-by-the-serene-shore-v1.webp",
           alt: "Karmo mattress on a serene shore",
           width: 1916,
           height: 821,

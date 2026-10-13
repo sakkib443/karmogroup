@@ -29,7 +29,7 @@ const DEFAULT_PANELS = [
   {
     id: "mattress",
     href: "/mattress",
-    src: "/shared/explore/mattress-panel-v2.jpg",
+    src: "/shared/explore/mattress-panel-v2.webp",
     alt: "A Karmo floral mattress styled in a calm grey bedroom",
     line1: "Mattress made",
     line2: "for deep rest",
