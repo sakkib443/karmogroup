@@ -249,7 +249,7 @@ export default function DivisionPage({ data }) {
           {Array.from({ length: 10 }).map((_, i) => (
             <Image
               key={`side-tex-${i}`}
-              src="/shared/header/mattress-side-texture.jpg"
+              src="/shared/header/mattress-side-texture.webp"
               alt=""
               width={1536}
               height={1024}

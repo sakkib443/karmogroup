@@ -97,7 +97,7 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
     },
   ],
   film: "/pages/foam/videos/shorts/v1-tisa-trim.mp4",
-  still: "/pages/foam/mosaic/tisha-film-still-hq.jpg",
+  still: "/pages/foam/mosaic/tisha-film-still-hq.webp",
   filmAlt: "Tanzin Tisha for Karmo Foam",
 };
 

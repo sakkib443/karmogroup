@@ -8,7 +8,7 @@ export const contactBanner = {
   eyebrow: "Contact us",
   title: "Talk to Karmo",
   line: "Orders, dealership, bulk supply or a simple product question — the same team answers the phone that builds the foam.",
-  src: "/shared/certified/bg-living-room.jpg",
+  src: "/shared/certified/bg-living-room.webp",
   alt: "A bright living room with Karmo comfort pieces",
 };
 

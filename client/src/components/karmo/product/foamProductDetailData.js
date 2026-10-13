@@ -23,12 +23,12 @@ const PDP = "/products/foam/detail";
 const PROD = "/products/foam/catalog";
 
 export const foamColorOptions = [
-  { id: "coral", label: "Coral 280", image: `${PDP}/swatches/coral.jpg` },
-  { id: "olive", label: "Olive 2001", image: `${PDP}/swatches/olive.jpg` },
-  { id: "lavender", label: "Lavender 4G", image: `${PDP}/swatches/lavender.jpg` },
-  { id: "gold", label: "Gold 1965", image: `${PDP}/swatches/gold.jpg` },
-  { id: "blue", label: "Signature Blue", image: `${PDP}/swatches/blue.jpg` },
-  { id: "rebonded", label: "Rebonded", image: `${PDP}/swatches/rebonded.jpg` },
+  { id: "coral", label: "Coral 280", image: `${PDP}/swatches/coral.webp` },
+  { id: "olive", label: "Olive 2001", image: `${PDP}/swatches/olive.webp` },
+  { id: "lavender", label: "Lavender 4G", image: `${PDP}/swatches/lavender.webp` },
+  { id: "gold", label: "Gold 1965", image: `${PDP}/swatches/gold.webp` },
+  { id: "blue", label: "Signature Blue", image: `${PDP}/swatches/blue.webp` },
+  { id: "rebonded", label: "Rebonded", image: `${PDP}/swatches/rebonded.webp` },
 ];
 
 export const foamProductFeatures = [
@@ -65,44 +65,44 @@ export const FOAM_BUYBOX_ICONS = [
 
 /** Shared letter strip — reuse Matrexx KARMO plates until foam letters ship. */
 export const FOAM_LETTER_GALLERY = [
-  "/products/foam/gallery/gallery-3.jpg",
-  "/products/foam/gallery/gallery-5.jpg",
-  "/products/foam/gallery/gallery-4.jpg",
-  "/products/foam/gallery/gallery-1.jpg",
-  "/products/foam/gallery/gallery-2.jpg",
+  "/products/foam/gallery/gallery-3.webp",
+  "/products/foam/gallery/gallery-5.webp",
+  "/products/foam/gallery/gallery-4.webp",
+  "/products/foam/gallery/gallery-1.webp",
+  "/products/foam/gallery/gallery-2.webp",
 ];
 
 const REAL_BY_ID = {
   "combo-280": [
-    `${PROD}/combo-280-room-hq.jpg`,
-    `${PROD}/combo-280-hover-hq.jpg`,
-    `${PROD}/combo-280-angle-hq.jpg`,
-    `${PROD}/combo-280-detail-hq.jpg`,
+    `${PROD}/combo-280-room-hq.webp`,
+    `${PROD}/combo-280-hover-hq.webp`,
+    `${PROD}/combo-280-angle-hq.webp`,
+    `${PROD}/combo-280-detail-hq.webp`,
   ],
   "combo-2001": [
-    `${PROD}/combo-2001-room-hq.jpg`,
-    `${PROD}/foam-grades-hover-hq.jpg`,
-    `${PROD}/combo-280-angle-hq.jpg`,
+    `${PROD}/combo-2001-room-hq.webp`,
+    `${PROD}/foam-grades-hover-hq.webp`,
+    `${PROD}/combo-280-angle-hq.webp`,
   ],
   "combo-4g": [
-    `${PROD}/combo-4g-room-hq.jpg`,
-    `${PROD}/foam-grades-hover-hq.jpg`,
-    `${PROD}/combo-280-detail-hq.jpg`,
+    `${PROD}/combo-4g-room-hq.webp`,
+    `${PROD}/foam-grades-hover-hq.webp`,
+    `${PROD}/combo-280-detail-hq.webp`,
   ],
   "combo-1965": [
-    `${PROD}/combo-1965-room-hq.jpg`,
-    `${PROD}/foam-grades-hover-hq.jpg`,
-    `${PROD}/combo-280-hover-hq.jpg`,
+    `${PROD}/combo-1965-room-hq.webp`,
+    `${PROD}/foam-grades-hover-hq.webp`,
+    `${PROD}/combo-280-hover-hq.webp`,
   ],
   "combo-signature": [
-    `${PROD}/combo-signature-room-hq.jpg`,
-    `${PROD}/foam-grades-hover-hq.jpg`,
-    `${PROD}/combo-280-angle-hq.jpg`,
+    `${PROD}/combo-signature-room-hq.webp`,
+    `${PROD}/foam-grades-hover-hq.webp`,
+    `${PROD}/combo-280-angle-hq.webp`,
   ],
   "rebonded-set": [
-    `${PROD}/rebonded-set-room-hq.jpg`,
-    `${PROD}/foam-grades-hover-hq.jpg`,
-    `${PROD}/combo-280-detail-hq.jpg`,
+    `${PROD}/rebonded-set-room-hq.webp`,
+    `${PROD}/foam-grades-hover-hq.webp`,
+    `${PROD}/combo-280-detail-hq.webp`,
   ],
 };
 
@@ -120,7 +120,7 @@ export function getFoamProductSlugs() {
 
 function buildRealGallery(item) {
   if (REAL_BY_ID[item.id]) return REAL_BY_ID[item.id];
-  const shots = [item.image, item.imageHover, `${PROD}/combo-280-hover-hq.jpg`].filter(
+  const shots = [item.image, item.imageHover, `${PROD}/combo-280-hover-hq.webp`].filter(
     Boolean
   );
   return [...new Set(shots)];
@@ -190,17 +190,17 @@ export function getFoamProductDetail(productId) {
 export const foamMorphSlides = [
   {
     id: "pose-01",
-    src: `${PDP}/morph-pose-01.jpg`,
+    src: `${PDP}/morph-pose-01.webp`,
     alt: "Relaxed seating on a sofa built with Karmo Foam",
   },
   {
     id: "pose-02",
-    src: `${PDP}/morph-pose-02.jpg`,
+    src: `${PDP}/morph-pose-02.webp`,
     alt: "Reading lounge on the same Karmo Foam sofa",
   },
   {
     id: "pose-03",
-    src: `${PDP}/morph-pose-03.jpg`,
+    src: `${PDP}/morph-pose-03.webp`,
     alt: "Deep rest on a sofa supported by Karmo Foam",
   },
 ];
@@ -208,7 +208,7 @@ export const foamMorphSlides = [
 export const foamBuildSlides = [
   {
     id: "build-01",
-    src: `${PDP}/build-01.jpg`,
+    src: `${PDP}/build-01.webp`,
     alt: "Sofa corner with coral Karmo Foam beside it",
     label: "Seating ready",
   },
@@ -227,15 +227,15 @@ export const foamBuildSlides = [
 ];
 
 export const foamBanner = {
-  bg: `${PDP}/banner-hq.jpg`,
+  bg: `${PDP}/banner-hq.webp`,
   eyebrow: "Karmo Foam",
   heading: "Density crafted to endure",
   bodyLead: "pure rubber grade",
   body:
     " — cut, tested and ready for furniture makers, footwear lines and specialty padding across Bangladesh.",
   layers: [
-    { src: `${PDP}/swatches/coral.jpg`, label: "Rubber grade" },
-    { src: `${PDP}/swatches/blue.jpg`, label: "Signature density" },
-    { src: `${PDP}/swatches/rebonded.jpg`, label: "Rebonded base" },
+    { src: `${PDP}/swatches/coral.webp`, label: "Rubber grade" },
+    { src: `${PDP}/swatches/blue.webp`, label: "Signature density" },
+    { src: `${PDP}/swatches/rebonded.webp`, label: "Rebonded base" },
   ],
 };

@@ -98,7 +98,7 @@ export const aboutDivisions = [
     name: "Karmo Foam",
     line: "We create the chemistry of comfort",
     href: "/foam",
-    image: "/shared/divisions/foam-karmo-sofa-blocks-studio.png",
+    image: "/shared/divisions/foam-karmo-sofa-blocks-studio.webp",
     alt: "A Karmo Foam sofa beside stacked foam blocks in a studio",
     points: [
       "Furniture and automotive grades",
@@ -122,7 +122,7 @@ export const aboutDivisions = [
     name: "Karmo HomeTex",
     line: "Where comfort meets elegance",
     href: "/hometex",
-    image: "/shared/divisions/hometex-karmo-bedding-room.png",
+    image: "/shared/divisions/hometex-karmo-bedding-room.webp",
     alt: "Karmo HomeTex bedding in a styled bedroom",
     points: [
       "Cotton twill, sateen and Egyptian cotton bedsheets",
@@ -134,7 +134,7 @@ export const aboutDivisions = [
     name: "Karmo Chemical & Adhesives",
     line: "Excelling in chemicals and polymers",
     href: "/chemicals",
-    image: "/shared/divisions/chemicals-karmo-adhesive-tins.png",
+    image: "/shared/divisions/chemicals-karmo-adhesive-tins.webp",
     alt: "Karmo Adhesive tins arranged in a showroom",
     points: [
       "Industrial-grade adhesives for footwear, board and furniture",

@@ -90,7 +90,7 @@ export default function Footer() {
   return (
     <footer className="relative overflow-hidden text-white">
       <Image
-        src="/shared/footer/footer-bg.jpg"
+        src="/shared/footer/footer-bg.webp"
         alt=""
         aria-hidden
         fill
