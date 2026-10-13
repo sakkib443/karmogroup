@@ -1,5 +1,55 @@
 import { baseApi } from "./baseApi";
 
+/** A payment the shop can record against an order. */
+export type OrderPaymentMethod = 'cod' | 'bkash' | 'nagad' | 'rocket' | 'bank';
+
+/** One line of an admin "New order". */
+export interface AdminOrderItemInput {
+    product: string;
+    quantity: number;
+    color?: string;
+    size?: string;
+    /** Price charged per unit for THIS order only — sent only when staff changed the price. */
+    unitPrice?: number;
+    /** The list / "was" price shown next to it — sent together with unitPrice. */
+    originalPrice?: number;
+}
+
+/** Body of POST /api/orders/admin. Anything left out is resolved by the server. */
+export interface AdminOrderInput {
+    items: AdminOrderItemInput[];
+    shippingAddress: {
+        fullName: string;
+        phone: string;
+        email?: string;
+        address: string;
+        area?: string;
+        city?: string;
+        postalCode?: string;
+    };
+    paymentMethod: OrderPaymentMethod;
+    paymentDetails?: { senderNumber?: string; transactionId?: string; paymentTime?: string };
+    paymentStatus?: 'pending' | 'paid';
+    status?: 'pending' | 'confirmed' | 'processing';
+    deliveryArea?: 'inside_dhaka' | 'outside_dhaka';
+    zoneId?: string;
+    /** auto = the normal delivery charge, free = none, custom = `amount`. */
+    shipping?: { mode: 'auto' | 'free' | 'custom'; amount?: number };
+    couponCode?: string;
+    note?: string;
+}
+
+/**
+ * Body of PATCH /api/orders/admin/:id — correcting an order that has not gone to the
+ * courier yet. Every part is optional: send only what changed, and the rest is left
+ * alone. `items`, when sent, replaces the order's lines in full.
+ *
+ * The order's status and payment status are not here — they keep their own controls.
+ */
+export type AdminOrderUpdate = Partial<Pick<AdminOrderInput,
+    'items' | 'shippingAddress' | 'paymentMethod' | 'paymentDetails' | 'deliveryArea' | 'zoneId' | 'shipping' | 'note'
+>>;
+
 export const orderApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // ===== Admin endpoints =====
@@ -37,6 +87,16 @@ export const orderApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Orders'],
         }),
+        // Admin: correct an order's details — Backend route: PATCH /api/orders/admin/:id.
+        // Editing the lines moves stock, so Products is invalidated too.
+        updateAdminOrder: builder.mutation<{ data?: unknown }, { id: string } & AdminOrderUpdate>({
+            query: ({ id, ...data }) => ({
+                url: `/orders/admin/${id}`,
+                method: 'PATCH',
+                body: data,
+            }),
+            invalidatesTags: ['Orders', 'Products', 'Users'],
+        }),
         // Admin: update payment status — Backend route: PATCH /api/orders/admin/:id/payment
         updatePaymentStatus: builder.mutation({
             query: ({ id, ...data }) => ({
@@ -54,6 +114,29 @@ export const orderApi = baseApi.injectEndpoints({
                 body: { note },
             }),
             invalidatesTags: ['Orders'],
+        }),
+
+        // Admin: "New order" for a phone / walk-in customer — Backend route: POST /api/orders/admin
+        createAdminOrder: builder.mutation<{ data?: { _id?: string; orderId?: string } }, AdminOrderInput>({
+            query: (data) => ({
+                url: '/orders/admin',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Orders', 'Products', 'Users'],
+        }),
+
+        // Admin: shipping-label / invoice data for up to 100 orders, in the order given —
+        // Backend route: POST /api/orders/admin/print { ids }. A read, so a query (POST only
+        // because the id list can be long); dropped as soon as the print window closes.
+        getOrdersPrintData: builder.query({
+            query: (ids: string[]) => ({
+                url: '/orders/admin/print',
+                method: 'POST',
+                body: { ids },
+            }),
+            providesTags: ['Orders'],
+            keepUnusedDataFor: 0,
         }),
 
         // ===== User endpoints =====
@@ -101,8 +184,8 @@ export const orderApi = baseApi.injectEndpoints({
             providesTags: (result, error, id) => [{ type: 'Orders', id }],
         }),
 
-        // ===== Public tracking endpoint (no auth) =====
-        // Public: track order by human orderId (e.g. ABM-0001) or Mongo _id — Backend route: GET /api/orders/track/:orderId
+// ===== Public tracking endpoint (no auth) =====
+        // Public: track order by human orderId (e.g. SK-0050, or KM-xxxx for older orders) or Mongo _id — Backend route: GET /api/orders/track/:orderId
         trackOrder: builder.query({
             query: (orderId) => ({
                 url: `/orders/track/${orderId}`,
@@ -121,6 +204,14 @@ export const orderApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Orders'],
         }),
+        // Admin: book the parcel with Pathao and mark the order shipped — POST /api/orders/admin/:id/pathao
+        sendWithPathao: builder.mutation<{ data?: { consignmentId?: string } }, string>({
+            query: (id) => ({
+                url: `/orders/admin/${id}/pathao`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Orders'],
+        }),
     }),
 });
 
@@ -130,16 +221,21 @@ export const {
     useGetOrderStatsQuery,
     useGetAdminOrderByIdQuery,
     useUpdateOrderStatusMutation,
+    useUpdateAdminOrderMutation,
     useUpdatePaymentStatusMutation,
     useAddAdminNoteMutation,
+    useCreateAdminOrderMutation,
+    useGetOrdersPrintDataQuery,
     // User hooks
     useCreateOrderMutation,
     useGuestCheckoutMutation,
     useGetMyOrdersQuery,
     useCancelOrderMutation,
     useGetOrderByIdQuery,
-    // Public tracking hook
+    // Public tracking hooks
+    useTrackOrderQuery,
     useLazyTrackOrderQuery,
     // Admin tracking hook
     useUpdateAdminOrderTrackingMutation,
+    useSendWithPathaoMutation,
 } = orderApi;

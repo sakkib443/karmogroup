@@ -1,25 +1,17 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { LuX, LuCloudUpload, LuFileText, LuCircleCheck, LuTriangleAlert, LuDownload } from 'react-icons/lu';
+import { FiX, FiUploadCloud, FiFileText, FiCheckCircle, FiAlertTriangle, FiDownload } from 'react-icons/fi';
 import { useBulkUploadProductsMutation } from '@/redux/api/productApi';
 import { toast } from 'react-hot-toast';
 
-// Columns parsed from the CSV.
-// `category`/`subCategory` accept the category NAME (e.g. "Electronics") or its id.
-// Pipe-separated columns (images/tags/colors/sizes) take multiple values: a|b|c.
+// Columns parsed from the CSV. `images` is pipe-separated (url1|url2|url3).
 const COLUMNS = [
-    // core
-    'name', 'price', 'originalPrice', 'costPrice', 'thumbnail', 'images',
-    'category', 'subCategory', 'description', 'stock', 'status',
-    // specs
-    'brand', 'model', 'weight', 'boxSize', 'insideTheBox',
-    // filters + image search
-    'tags', 'colors', 'sizes',
+    'name', 'price', 'thumbnail', 'category', 'description', 'stock',
+    'brand', 'model', 'weight', 'boxSize', 'insideTheBox', 'images',
 ];
 
-const NUMERIC = new Set(['price', 'stock', 'originalPrice', 'costPrice']);
-const PIPE_ARRAYS = new Set(['images', 'tags', 'colors', 'sizes']);
+const NUMERIC = new Set(['price', 'stock']);
 
 type ParsedRow = Record<string, any> & { __rowIndex: number; __errors: string[] };
 
@@ -58,34 +50,17 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
         headers.forEach((h, i) => {
             const key = h.trim();
             let val: any = (cells[i] ?? '').trim();
-            if (PIPE_ARRAYS.has(key)) {
+            if (key === 'images') {
                 val = val ? String(val).split('|').map((u: string) => u.trim()).filter(Boolean) : [];
             } else if (NUMERIC.has(key)) {
                 val = val === '' ? '' : Number(val);
             }
             row[key] = val;
         });
-        // Client-side per-row checks (mirror backend rules)
+        // Client-side per-row checks (mirror backend rules): name and price only.
+        // A row may leave the description, category and images out and be filled in later.
         if (!row.name) row.__errors.push('name is required');
         if (row.price === '' || isNaN(Number(row.price)) || Number(row.price) <= 0) row.__errors.push('price must be positive');
-        if (!row.thumbnail) row.__errors.push('thumbnail is required');
-        if (!row.category) row.__errors.push('category is required');
-        if (!row.description) row.__errors.push('description is required');
-        const imgCount = [row.thumbnail, ...(Array.isArray(row.images) ? row.images : [])].filter(Boolean).length;
-        if (imgCount < 3) row.__errors.push('at least 3 images required (thumbnail + 2 in images, pipe-separated)');
-        // Optional numbers: only validated when a value was actually given.
-        (['originalPrice', 'costPrice', 'stock'] as const).forEach((k) => {
-            if (row[k] !== '' && row[k] !== undefined && (isNaN(Number(row[k])) || Number(row[k]) < 0)) {
-                row.__errors.push(`${k} must be a number (0 or more)`);
-            }
-        });
-        if (row.originalPrice !== '' && row.originalPrice !== undefined
-            && Number(row.originalPrice) > 0 && Number(row.originalPrice) < Number(row.price)) {
-            row.__errors.push('originalPrice should be higher than price (it is the struck-through price)');
-        }
-        if (row.status && !['active', 'draft', 'out-of-stock'].includes(String(row.status))) {
-            row.__errors.push('status must be active, draft or out-of-stock');
-        }
         return row;
     };
 
@@ -127,28 +102,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
 
     const downloadTemplate = () => {
         const header = COLUMNS.join(',');
-        // One realistic, filled-in example row so the format is obvious at a glance.
-        const sample = [
-            'Sony WH-1000XM4 Wireless Headphone', // name
-            '28500',                              // price
-            '32000',                              // originalPrice (struck-through)
-            '24000',                              // costPrice (needed for net profit)
-            'https://res.cloudinary.com/demo/image/upload/xm4-1.jpg',                                      // thumbnail
-            'https://res.cloudinary.com/demo/image/upload/xm4-2.jpg|https://res.cloudinary.com/demo/image/upload/xm4-3.jpg', // images
-            'Electronics',                        // category (NAME or id)
-            '',                                   // subCategory (optional)
-            '"Industry-leading noise cancelling, 30-hour battery and touch controls."', // description
-            '25',                                 // stock
-            'active',                             // status
-            'Sony',                               // brand
-            'WH-1000XM4',                         // model
-            '254 g',                              // weight
-            '25x20x8 cm',                         // boxSize
-            '1x Headphone|1x Case|1x Cable',      // insideTheBox
-            'headphone|audio|wireless|noise-cancelling', // tags
-            'black|silver',                       // colors
-            '',                                   // sizes
-        ].join(',');
+        const sample = 'Sample Product,1200,https://img/thumb.jpg,<categoryId>,A great product,50,Acme,AC-100,500 g,30x20x15 cm,1x item|1x manual,https://img/2.jpg|https://img/3.jpg';
         const blob = new Blob([header + '\n' + sample + '\n'], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -164,17 +118,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
             toast.error('No valid rows to upload. Fix the highlighted errors first.');
             return;
         }
-        // Drop blank cells so optional fields are OMITTED rather than sent as ""
-        // (an empty string would fail the backend's number/enum validation).
-        const products = validRows.map(({ __rowIndex, __errors, ...rest }) => {
-            const clean: Record<string, any> = {};
-            Object.entries(rest).forEach(([k, v]) => {
-                if (v === '' || v === undefined || v === null) return;
-                if (Array.isArray(v) && v.length === 0) return;
-                clean[k] = v;
-            });
-            return clean;
-        });
+        const products = validRows.map(({ __rowIndex, __errors, ...rest }) => rest);
         try {
             const res: any = await bulkUpload({ products }).unwrap();
             const data = res?.data || res;
@@ -191,10 +135,10 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <div className="flex items-center gap-2">
-                        <LuCloudUpload className="text-[#4F46E5]" size={20} />
+                        <FiUploadCloud className="text-[#4F46E5]" size={20} />
                         <h2 className="text-lg font-bold text-gray-800">Bulk Upload Products (CSV)</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-md text-gray-500"><LuX size={18} /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-md text-gray-500"><FiX size={18} /></button>
                 </div>
 
                 <div className="p-6 overflow-y-auto space-y-4">
@@ -204,14 +148,10 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
                             <div className="bg-indigo-50 border border-indigo-100 rounded-md p-4 text-xs text-indigo-700 space-y-1">
                                 <p className="font-bold">Expected columns (header row):</p>
                                 <p className="font-mono break-all">{COLUMNS.join(', ')}</p>
-                                <p><strong>Required:</strong> name, price, thumbnail, category, description — everything else is optional (leave the cell blank to skip it).</p>
-                                <p><strong>category / subCategory</strong> = just the category <strong>name</strong> (e.g. <span className="font-mono">Electronics</span>) — the id also works.</p>
-                                <p><strong>images, tags, colors, sizes</strong> = pipe-separated (e.g. <span className="font-mono">url2|url3</span>). Thumbnail + images must total at least 3.</p>
-                                <p><strong>costPrice</strong> = what you paid — required for the net-profit report. <strong>originalPrice</strong> = the struck-through “was” price.</p>
-                                <p><strong>tags / colors</strong> power the filters and “search by image”, so fill them in when you can.</p>
-                                <p><strong>status</strong> = <span className="font-mono">active</span> (default), <span className="font-mono">draft</span> or <span className="font-mono">out-of-stock</span>.</p>
+                                <p><strong>images</strong> column = pipe-separated URLs (e.g. <span className="font-mono">url2|url3</span>). Thumbnail + images must total at least 3.</p>
+                                <p><strong>category</strong> = the category ObjectId.</p>
                                 <button onClick={downloadTemplate} className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-white border border-indigo-200 rounded-md font-bold text-indigo-600 hover:bg-indigo-100">
-                                    <LuDownload size={13} /> Download CSV template
+                                    <FiDownload size={13} /> Download CSV template
                                 </button>
                             </div>
 
@@ -220,7 +160,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
                                 onClick={() => fileRef.current?.click()}
                                 className="border-2 border-dashed border-gray-200 rounded-md p-8 text-center cursor-pointer hover:border-[#4F46E5] hover:bg-gray-50 transition-all"
                             >
-                                <LuFileText className="mx-auto text-gray-400 mb-2" size={28} />
+                                <FiFileText className="mx-auto text-gray-400 mb-2" size={28} />
                                 <p className="text-sm font-semibold text-gray-700">{fileName || 'Click to choose a .csv file'}</p>
                                 <p className="text-xs text-gray-400 mt-1">Comma-separated, UTF-8</p>
                                 <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={onInputChange} />
@@ -228,7 +168,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
 
                             {parseError && (
                                 <div className="bg-red-50 border border-red-200 rounded-md p-3 text-xs text-red-600 font-medium flex items-start gap-2">
-                                    <LuTriangleAlert className="mt-0.5 shrink-0" /> {parseError}
+                                    <FiAlertTriangle className="mt-0.5 shrink-0" /> {parseError}
                                 </div>
                             )}
 
@@ -282,7 +222,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
                     {result && (
                         <div className="space-y-4">
                             <div className="bg-green-50 border border-green-200 rounded-md p-4 flex items-center gap-3">
-                                <LuCircleCheck className="text-green-600" size={24} />
+                                <FiCheckCircle className="text-green-600" size={24} />
                                 <div>
                                     <p className="font-bold text-green-700">{result.created} product(s) created</p>
                                     {result.failed.length > 0 && <p className="text-xs text-red-500 font-medium">{result.failed.length} row(s) failed</p>}
@@ -324,7 +264,7 @@ export default function BulkUploadModal({ onClose }: { onClose: () => void }) {
                                 disabled={isLoading || validRows.length === 0}
                                 className="flex items-center gap-2 px-6 py-2.5 bg-[#4F46E5] text-white rounded-md font-bold hover:bg-[#4338CA] text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <LuCloudUpload size={16} />
+                                <FiUploadCloud size={16} />
                                 {isLoading ? 'Uploading...' : `Upload ${validRows.length} product(s)`}
                             </button>
                         </>

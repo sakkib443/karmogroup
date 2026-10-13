@@ -3,15 +3,22 @@ import { baseApi } from "./baseApi";
 export const paymentApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // ===== Customer / gateway endpoints =====
-        // What checkout may offer + how each method collects money —
-        // Backend route: GET /api/payments/methods
-        // data: { methods: [{ id, label, mode: 'gateway'|'manual'|'cod', live, number?, accountType? }], instructions }
+        // Checkout: which payment methods are enabled — Backend route: GET /api/payments/methods
         getPaymentMethods: builder.query({
             query: () => ({
                 url: '/payments/methods',
                 method: 'GET',
             }),
             providesTags: ['Payments'],
+        }),
+        // bKash callback: execute the payment — Backend route: POST /api/payments/bkash/execute
+        executeBkash: builder.mutation({
+            query: (data) => ({
+                url: '/payments/bkash/execute',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Payments', 'Orders'],
         }),
         // Init a payment for an order — Backend route: POST /api/payments/init
         // Body: { orderId, method }  →  data: { redirectUrl, transactionId }
@@ -50,17 +57,6 @@ export const paymentApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Payments'],
         }),
-        // bKash execute step — Backend route: POST /api/payments/bkash/execute
-        // Called by /payment/bkash/callback once bKash returns a paymentID.
-        // Body: { paymentID }  →  data: { transactionId, status }
-        executeBkash: builder.mutation({
-            query: (data) => ({
-                url: '/payments/bkash/execute',
-                method: 'POST',
-                body: data,
-            }),
-            invalidatesTags: ['Payments', 'Orders'],
-        }),
         // DEV-SIMULATION confirm — Backend route: POST /api/payments/simulate/confirm
         // Body: { transactionId, outcome: 'success' | 'fail' | 'cancel' }  →  data: { transactionId, status }
         confirmSimulatedPayment: builder.mutation({
@@ -76,16 +72,51 @@ export const paymentApi = baseApi.injectEndpoints({
             ],
         }),
 
+        // ===== Admin endpoints =====
+        getAdminPayments: builder.query({
+            query: (params) => ({
+                url: '/payments/admin/all',
+                method: 'GET',
+                params,
+            }),
+            providesTags: ['Payments'],
+        }),
+        getPaymentStats: builder.query({
+            query: () => ({
+                url: '/payments/admin/stats',
+                method: 'GET',
+            }),
+            providesTags: ['Payments'],
+        }),
+        markCODPaid: builder.mutation({
+            query: (id) => ({
+                url: `/payments/admin/${id}/cod-paid`,
+                method: 'PATCH',
+            }),
+            invalidatesTags: ['Payments', 'Orders'],
+        }),
+        refundPayment: builder.mutation({
+            query: (id) => ({
+                url: `/payments/admin/${id}/refund`,
+                method: 'POST',
+            }),
+            invalidatesTags: ['Payments', 'Orders'],
+        }),
     }),
 });
 
 export const {
     // Customer / gateway hooks
     useGetPaymentMethodsQuery,
+    useExecuteBkashMutation,
     useInitPaymentMutation,
     useVerifyPaymentQuery,
     useGetMyPaymentsQuery,
     useRetryPaymentMutation,
     useConfirmSimulatedPaymentMutation,
-    useExecuteBkashMutation,
+    // Admin hooks
+    useGetAdminPaymentsQuery,
+    useGetPaymentStatsQuery,
+    useMarkCODPaidMutation,
+    useRefundPaymentMutation,
 } = paymentApi;

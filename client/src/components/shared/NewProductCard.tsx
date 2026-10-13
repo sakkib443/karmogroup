@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 import {
     useGetProductReviewsQuery,
@@ -12,9 +13,8 @@ import {
 } from '@/redux/api/reviewApi';
 import { useToggleWishlistMutation, useGetWishlistQuery } from '@/redux/api/userApi';
 import { useAppDispatch, useAppSelector } from '@/redux';
-import { addToCart } from '@/redux/slices/cartSlice';
 import { toggleWishlist } from '@/redux/slices/wishlistSlice';
-import { LuStar, LuX, LuCopy, LuCheck, LuSend, LuThumbsUp, LuCornerDownRight, LuHeart } from 'react-icons/lu';
+import { FiStar, FiX, FiCopy, FiCheck, FiSend, FiThumbsUp, FiCornerDownRight, FiHeart } from 'react-icons/fi';
 import { getDisplayPrice } from '@/utils/offerPrice';
 
 interface Product {
@@ -48,6 +48,8 @@ interface NewProductCardProps {
     product: Product;
 }
 
+export const PRODUCT_IMAGE_FALLBACK = '/images/placeholder-product.webp';
+
 const formatCount = (n: number): string => {
     if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'K';
     return String(n);
@@ -61,8 +63,6 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
 
     // Auth + cart state
     const { isAuthenticated } = useAppSelector((state: any) => state.auth);
-    const cartItems = useAppSelector((state: any) => state.cart.items);
-    const isInCart = cartItems.some((item: any) => item.id === productId);
 
     // Wishlist state — server for logged-in users, Redux for guests
     const localWishlist = useAppSelector((state: any) => state.wishlist.items);
@@ -72,7 +72,12 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
         ? serverItems.some((item: any) => String(item._id || item.id) === productId)
         : localWishlist.some((item: any) => item.id === productId);
     const [wishlistAnim, setWishlistAnim] = useState(false);
-    const [showAlreadyAdded, setShowAlreadyAdded] = useState(false);
+
+    // Falls back to a local placeholder rather than via.placeholder.com: that
+    // service has been unreliable since 2024, and a card whose image 404s would
+    // otherwise hang on a cross-origin request that never answers.
+    const [imageFailed, setImageFailed] = useState(false);
+    const imageSrc = (!imageFailed && product.image) || PRODUCT_IMAGE_FALLBACK;
 
 
 
@@ -98,25 +103,6 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                 rating: product.rating || 0,
             }));
         }
-    };
-
-    const handleAddToCart = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (isInCart) {
-            setShowAlreadyAdded(true);
-            setTimeout(() => setShowAlreadyAdded(false), 1500);
-            return;
-        }
-        dispatch(addToCart({
-            id: productId,
-            productId: productId,
-            name: product.name,
-            price: product.price,
-            mrp: product.originalPrice || product.mrp || product.price,
-            image: product.image,
-            category: product.categoryName || 'General',
-        }));
     };
 
     // Respect the offer-validity window: while the offer is active the card shows
@@ -151,34 +137,27 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                                 -{discountPercent}%
                             </span>
                         )}
-                        {/* Cart Button — hidden, slides in on card hover */}
-                        <button
-                            onClick={handleAddToCart}
-                            className='absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md border border-slate-100 text-slate-700 transition-all duration-300 ease-out opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 hover:scale-110 active:scale-95 hover:shadow-lg bg-white hover:bg-[var(--color-primary)] hover:text-white hover:border-[var(--color-primary)]'
-                            title={isInCart ? 'Already in Cart' : 'Add to Cart'}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                            {isInCart && <span className='absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full ring-2 ring-white' />}
-                        </button>
                         {/* Wishlist Button — hidden, slides in on card hover (slight delay) */}
                         <button
                             onClick={handleWishlistToggle}
-                            className={`absolute top-12 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md border transition-all duration-300 ease-out delay-75 hover:scale-110 active:scale-95 hover:shadow-lg bg-white hover:bg-red-500 hover:border-red-500 hover:text-white ${isInWishlist ? 'text-red-500 opacity-100 translate-x-0 border-red-200' : 'text-slate-600 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 border-slate-100'} ${wishlistAnim ? 'scale-125' : ''}`}
+                            className={`absolute top-[46px] right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md border transition-all duration-200 delay-75 hover:scale-110 bg-white hover:bg-red-500 hover:border-red-500 ${isInWishlist ? 'opacity-100 translate-x-0 border-red-200' : 'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 border-slate-100'} ${wishlistAnim ? 'scale-125' : ''}`}
                             title={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
                         >
-                            <LuHeart
+                            <FiHeart
                                 size={13}
-                                className="transition-colors"
+                                className={`transition-colors ${isInWishlist ? 'text-red-500' : 'text-slate-600 hover:text-white'}`}
                                 style={{ fill: isInWishlist ? 'currentColor' : 'none' }}
                             />
                         </button>
-                        <img
-                            src={product.image || 'https://via.placeholder.com/400x400/F1F5F9/CBD5E1?text=Product'}
+                        <Image
+                            src={imageSrc}
                             alt={product.name}
-                            className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-500'
-                            onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x400/F1F5F9/CBD5E1?text=Product';
-                            }}
+                            fill
+                            // Four across on a phone-width grid, up to ~220px on desktop.
+                            // Next uses this to pick the smallest sensible file per device.
+                            sizes='(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 220px'
+                            className='object-cover group-hover:scale-105 transition-transform duration-500'
+                            onError={() => setImageFailed(true)}
                         />
                     </div>
 
@@ -205,7 +184,7 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
                             <div className='flex items-center gap-1.5 mt-1 text-[10px] text-slate-400'>
                                 {(product.rating || 0) > 0 && (
                                     <span className='flex items-center gap-0.5'>
-                                        <LuStar size={10} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                                        <FiStar size={10} style={{ color: '#f59e0b', fill: '#f59e0b' }} />
                                         <span className='text-slate-500 font-medium'>{Number(product.rating).toFixed(1)}</span>
                                     </span>
                                 )}
@@ -229,8 +208,8 @@ const NewProductCard: React.FC<NewProductCardProps> = ({ product }) => {
 /* ═══════════════════════════════════════════════ */
 
 // localStorage helpers — track which reviews/replies this device has liked
-const LIKED_REVIEWS_KEY = 'skawsarsunnahmart_liked_reviews';
-const LIKED_REPLIES_KEY = 'skawsarsunnahmart_liked_replies';
+const LIKED_REVIEWS_KEY = 'shohozkrishi_liked_reviews';
+const LIKED_REPLIES_KEY = 'shohozkrishi_liked_replies';
 
 const getLikedSet = (key: string): Set<string> => {
     if (typeof window === 'undefined') return new Set();
@@ -339,7 +318,7 @@ const CommentsPopup: React.FC<{
                         onClick={onClose}
                         className='w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 transition-colors shrink-0'
                     >
-                        <LuX size={18} />
+                        <FiX size={18} />
                     </button>
                 </div>
 
@@ -352,7 +331,7 @@ const CommentsPopup: React.FC<{
                             className='w-full object-contain'
                             style={{ maxHeight: '280px' }}
                             onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/620x200/f3f4f6/9ca3af?text=No+Image';
+                                (e.target as HTMLImageElement).src = PRODUCT_IMAGE_FALLBACK;
                             }}
                         />
                     </div>
@@ -389,7 +368,7 @@ const CommentsPopup: React.FC<{
                                             <div className='flex items-center gap-3 px-3 mt-0.5 text-[10px] text-gray-400'>
                                                 <span className='flex gap-0.5'>
                                                     {[1, 2, 3, 4, 5].map(star => (
-                                                        <LuStar key={star} size={9} style={{
+                                                        <FiStar key={star} size={9} style={{
                                                             color: '#f59e0b',
                                                             fill: star <= (review.rating || 0) ? '#f59e0b' : 'none'
                                                         }} />
@@ -400,7 +379,7 @@ const CommentsPopup: React.FC<{
                                                     className={`font-medium hover:underline flex items-center gap-1 ${isLiked ? 'text-[var(--color-secondary)]' : ''}`}
                                                     disabled={isLiked}
                                                 >
-                                                    <LuThumbsUp size={10} style={{ fill: isLiked ? 'var(--color-secondary)' : 'none' }} />
+                                                    <FiThumbsUp size={10} style={{ fill: isLiked ? 'var(--color-secondary)' : 'none' }} />
                                                     <span>Like{likeCount > 0 ? ` (${likeCount})` : ''}</span>
                                                 </button>
                                                 <button
@@ -419,7 +398,7 @@ const CommentsPopup: React.FC<{
                                                         const isReplyLiked = likedReplies.has(replyKey);
                                                         return (
                                                             <div key={reply._id} className='flex gap-2'>
-                                                                <LuCornerDownRight size={12} className='text-gray-300 mt-1.5 shrink-0' />
+                                                                <FiCornerDownRight size={12} className='text-gray-300 mt-1.5 shrink-0' />
                                                                 <div className='flex-1 min-w-0'>
                                                                     <div className='bg-gray-50 rounded-2xl px-3 py-1.5'>
                                                                         <p className='text-[11px] text-gray-800 leading-snug'>{reply.text}</p>
@@ -430,7 +409,7 @@ const CommentsPopup: React.FC<{
                                                                             className={`font-medium hover:underline flex items-center gap-1 ${isReplyLiked ? 'text-[var(--color-secondary)]' : ''}`}
                                                                             disabled={isReplyLiked}
                                                                         >
-                                                                            <LuThumbsUp size={9} style={{ fill: isReplyLiked ? 'var(--color-secondary)' : 'none' }} />
+                                                                            <FiThumbsUp size={9} style={{ fill: isReplyLiked ? 'var(--color-secondary)' : 'none' }} />
                                                                             <span>Like{reply.likes > 0 ? ` (${reply.likes})` : ''}</span>
                                                                         </button>
                                                                     </div>
@@ -444,7 +423,7 @@ const CommentsPopup: React.FC<{
                                             {/* ── Reply input ── */}
                                             {isReplyOpen && (
                                                 <div className='flex gap-2 mt-2 ml-1'>
-                                                    <LuCornerDownRight size={12} className='text-gray-300 mt-2 shrink-0' />
+                                                    <FiCornerDownRight size={12} className='text-gray-300 mt-2 shrink-0' />
                                                     <div className='flex-1 flex items-center bg-gray-100 rounded-full px-3 py-1'>
                                                         <input
                                                             type='text'
@@ -463,7 +442,7 @@ const CommentsPopup: React.FC<{
                                                             {isReplying ? (
                                                                 <div className='w-3 h-3 border-2 border-gray-300 border-t-[var(--color-primary)] rounded-full animate-spin' />
                                                             ) : (
-                                                                <LuSend size={11} />
+                                                                <FiSend size={11} />
                                                             )}
                                                         </button>
                                                     </div>
@@ -514,7 +493,7 @@ const CommentsPopup: React.FC<{
                                                 onMouseLeave={() => setHoverRating(0)}
                                                 className='p-px transition-transform hover:scale-125'
                                             >
-                                                <LuStar size={13} style={{
+                                                <FiStar size={13} style={{
                                                     color: '#f59e0b',
                                                     fill: star <= (hoverRating || newRating) ? '#f59e0b' : 'none',
                                                     transition: 'all 0.15s ease'
@@ -531,7 +510,7 @@ const CommentsPopup: React.FC<{
                                     {isSubmitting ? (
                                         <div className='w-4 h-4 border-2 border-gray-300 border-t-[var(--color-primary)] rounded-full animate-spin' />
                                     ) : (
-                                        <><LuSend size={13} /> Post</>
+                                        <><FiSend size={13} /> Post</>
                                     )}
                                 </button>
                             </div>

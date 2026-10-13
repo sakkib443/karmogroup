@@ -25,6 +25,7 @@ router.patch('/admin/:id/status', authMiddleware, authorizeRoles('admin'), valid
 router.patch('/admin/:id/payment', authMiddleware, authorizeRoles('admin'), OrderController.updatePaymentStatus);
 router.patch('/admin/:id/note', authMiddleware, authorizeRoles('admin'), OrderController.addNote);
 router.patch('/admin/:id/tracking', authMiddleware, authorizeRoles('admin'), OrderController.updateOrderTracking);
+router.post('/admin/:id/pathao', authMiddleware, authorizeRoles('admin'), OrderController.sendWithPathao);
 
 // ── Legacy/general ───────────────────────────────
 router.get('/:id', authMiddleware, OrderController.getById);

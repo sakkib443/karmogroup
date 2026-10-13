@@ -143,6 +143,13 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ theme = 'orange', s
         }
     };
 
+    const resolveLink = (link?: string) => {
+        if (!link) return '';
+        let target = link.trim();
+        if (target.startsWith('/admin/')) target = target.replace('/admin/', '/dashboard/admin/');
+        return target;
+    };
+
     const handleItemClick = async (n: NotificationItem) => {
         setOpen(false);
         if (!n.isRead) {
@@ -152,7 +159,8 @@ const NotificationBell: React.FC<NotificationBellProps> = ({ theme = 'orange', s
                 /* non-blocking */
             }
         }
-        if (n.link) router.push(n.link);
+        const targetUrl = resolveLink(n.link);
+        if (targetUrl) router.push(targetUrl);
     };
 
     const handleMarkAll = async () => {

@@ -12,6 +12,14 @@ export const reviewApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Reviews']
         }),
+        // User: check if eligible to review product
+        canReview: builder.query<{ data: { canReview: boolean; hasPurchased: boolean; alreadyReviewed: boolean } }, string>({
+            query: (productId) => ({
+                url: `/reviews/can-review/${productId}`,
+                method: 'GET',
+            }),
+            providesTags: ['Reviews'],
+        }),
         // User: create review (auth required) — Backend route: POST /api/reviews/
         createReview: builder.mutation({
             query: (data) => ({
@@ -19,14 +27,7 @@ export const reviewApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data
             }),
-            // Invalidate the PRODUCT-SCOPED review list (getProductReviews is keyed by
-            // { type:'Reviews', id: productId }) so the new review + its client-computed
-            // average show immediately, plus the product itself so the header rating refreshes.
-            invalidatesTags: (result: any, error: any, arg: any) => [
-                'Reviews',
-                { type: 'Reviews' as const, id: arg?.product },
-                { type: 'Products' as const, id: arg?.product },
-            ],
+            invalidatesTags: ['Reviews', 'Products']
         }),
         // Public: create comment (no login required) — Backend route: POST /api/reviews/public
         publicCreateReview: builder.mutation({
@@ -321,6 +322,7 @@ export const reviewApi = baseApi.injectEndpoints({
 
 export const {
     useGetAllReviewsQuery,
+    useCanReviewQuery,
     useCreateReviewMutation,
     usePublicCreateReviewMutation,
     useUpdateReviewMutation,

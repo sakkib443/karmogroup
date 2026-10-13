@@ -19,7 +19,7 @@ export {
   getPricingRule,
 } from "@/components/karmo/product/mattressPricing";
 
-const VID = "/karmo/video";
+const VID = "/products/videos";
 
 export const productFeatures = [
   {
@@ -36,12 +36,12 @@ export const productFeatures = [
 
 /** Cover / damask swatches — same fabric set as the buy box. */
 export const fabricOptions = [
-  { id: "fabric-1", label: "Damask 1", image: "/karmo/images/product/fabrics/fabric1.webp" },
-  { id: "fabric-2", label: "Damask 2", image: "/karmo/images/product/fabrics/fabric2.webp" },
-  { id: "fabric-3", label: "Damask 3", image: "/karmo/images/product/fabrics/fabric3.webp" },
-  { id: "fabric-4", label: "Damask 4", image: "/karmo/images/product/fabrics/fabric4.webp" },
-  { id: "fabric-5", label: "Damask 5", image: "/karmo/images/product/fabrics/fabric5.webp" },
-  { id: "fabric-6", label: "Damask 6", image: "/karmo/images/product/fabrics/fabric6.webp" },
+  { id: "fabric-1", label: "Damask 1", image: "/products/common/fabrics/fabric1.webp" },
+  { id: "fabric-2", label: "Damask 2", image: "/products/common/fabrics/fabric2.webp" },
+  { id: "fabric-3", label: "Damask 3", image: "/products/common/fabrics/fabric3.webp" },
+  { id: "fabric-4", label: "Damask 4", image: "/products/common/fabrics/fabric4.webp" },
+  { id: "fabric-5", label: "Damask 5", image: "/products/common/fabrics/fabric5.webp" },
+  { id: "fabric-6", label: "Damask 6", image: "/products/common/fabrics/fabric6.webp" },
 ];
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
@@ -78,7 +78,7 @@ const catalog = mattress.products?.items || [];
 
 function letterSet(folder) {
   return ["K", "A", "R", "M", "O"].map(
-    (letter) => `/karmo/images/mattress/products/${folder}/letter-${letter}.png`
+    (letter) => `/products/mattress/${folder}/letter-${letter}.png`
   );
 }
 
@@ -93,10 +93,10 @@ export const KARMO_LETTER_GALLERY = KING_LETTER_GALLERY;
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/karmo/images/mattress/products/king-cover-luxury-floral-v2.webp",
-  "/karmo/images/mattress/products/king-gallery/angle-front-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/angle-side-v4.webp",
-  "/karmo/images/mattress/products/king-gallery/angle-detail-v4.webp",
+  "/products/mattress/king-cover-luxury-floral-v2.webp",
+  "/products/mattress/king-gallery/angle-front-v4.webp",
+  "/products/mattress/king-gallery/angle-side-v4.webp",
+  "/products/mattress/king-gallery/angle-detail-v4.webp",
 ];
 
 const LETTER_BY_ID = {
@@ -124,7 +124,7 @@ function buildRealGallery(item) {
   const shots = [
     item.image,
     item.imageHover,
-    "/karmo/images/mattress/products/matrex-p1.webp",
+    "/products/mattress/matrex-p1.webp",
   ].filter(Boolean);
   return [...new Set(shots)];
 }

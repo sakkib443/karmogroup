@@ -274,6 +274,12 @@ const CheckoutPage = () => {
                 quantity: item.quantity,
                 color: item.color || undefined,
                 size: item.size || undefined,
+                // Karmo catalogue lines (mattress, foam, pillows…) are not in the products
+                // collection, so they travel with their name, configured price and division.
+                name: item.name,
+                price: item.price,
+                image: item.image,
+                division: item.category,
             })),
             shippingAddress: {
                 fullName: formData.fullName,
@@ -813,7 +819,7 @@ const CheckoutPage = () => {
                         </div>
 
                         {/* ══ RIGHT COLUMN: Sticky Order Summary ══ */}
-                        <div className="lg:col-span-5 lg:sticky lg:top-[200px] h-fit">
+                        <div className="lg:col-span-5 lg:sticky lg:top-[136px] h-fit">
                             <div className="border border-ink/10 bg-white">
                                 <div className="px-5 py-3.5 border-b border-ink/8">
                                     <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Order Summary</h2>

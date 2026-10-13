@@ -5,10 +5,12 @@
  * Artwork lives under `public/karmo/images/foam-2/`.
  */
 
-const IMG = "/karmo/images/foam-2";
-const BADGE = "/karmo/images/home-02/hero/badge-number-one.webp";
-const CERT_ISO = "/karmo/images/home-02/certified/01-iso-9001.jpg";
-const CERT_UKAS = "/karmo/images/home-02/certified/02-ukas.jpg";
+import { liveFurnitureFoamOffers } from "./foamFurniture";
+
+const IMG = "/pages/foam";
+const BADGE = "/shared/hero/badge-number-one.webp";
+const CERT_ISO = "/shared/certified/01-iso-9001.jpg";
+const CERT_UKAS = "/shared/certified/02-ukas.jpg";
 
 const foam = {
   slug: "foam",
@@ -34,37 +36,37 @@ const foam = {
   features: [
     {
       id: "legacy",
-      icon: "/karmo/images/trust/cartoon-v3/legacy-60-v2.webp",
+      icon: "/shared/trust/cartoon-v3/legacy-60-v2.webp",
       title: "A legacy of 60 years",
       note: "of lasting foam",
     },
     {
       id: "trusted",
-      icon: "/karmo/images/trust/cartoon-v3/trusted-v3.webp",
+      icon: "/shared/trust/cartoon-v3/trusted-v3.webp",
       title: "Trusted By Million",
       note: "homes & makers",
     },
     {
       id: "recognised",
-      icon: "/karmo/images/trust/cartoon-v3/superbrand-v3.webp",
+      icon: "/shared/trust/cartoon-v3/superbrand-v3.webp",
       title: "Recognised By",
       note: "Super Brand",
     },
     {
       id: "natural",
-      icon: "/karmo/images/trust/cartoon-v3/natural-v2.webp",
+      icon: "/shared/trust/cartoon-v3/natural-v2.webp",
       title: "Pure Rubber Grade",
       note: "no fillers",
     },
     {
       id: "delivery",
-      icon: "/karmo/images/trust/cartoon-v3/delivery-v2.webp",
+      icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
       title: "Free Delivery",
       note: "Available",
     },
     {
       id: "stores",
-      icon: "/karmo/images/trust/cartoon-v3/stores-v2.webp",
+      icon: "/shared/trust/cartoon-v3/stores-v2.webp",
       title: "5k+ Stores",
       note: "Pan Bangladesh",
     },
@@ -76,19 +78,19 @@ const foam = {
     columns: [
       {
         id: "firm",
-        image: "/karmo/images/foam/furniture/why/why-1.png",
+        image: "/pages/foam/furniture/why/why-1.png",
         alt: "Upright seating on a firm high-density foam sofa",
         caption: "IF YOU NEED HIGH-IMPACT SUPPORT & ENERGY RETURN",
       },
       {
         id: "density",
-        image: "/karmo/images/foam/furniture/why/why-4.png",
+        image: "/pages/foam/furniture/why/why-4.png",
         alt: "Hand pressing into dense Karmo foam showing rebound",
         caption: "IF YOU WANT DENSITY THAT LASTS FOR YEARS",
       },
       {
         id: "airflow",
-        image: "/karmo/images/foam/furniture/why/why-6.png",
+        image: "/pages/foam/furniture/why/why-6.png",
         alt: "Bright living room with breathable foam seating",
         caption: "IF YOU PREFER COOL, OPEN AIRFLOW COMFORT",
       },
@@ -96,7 +98,7 @@ const foam = {
   },
 
   shapeGrid: {
-    background: "/karmo/images/foam/furniture/mosaic/foam-texture-hq.webp",
+    background: "/pages/foam/furniture/mosaic/foam-texture-hq.webp",
     highlights: [
       {
         id: "no-filler",
@@ -105,7 +107,7 @@ const foam = {
         title: "No Filler",
         overview:
           "100% pure rubber-grade foam — maximum density, clean finish and strength that stands through daily use.",
-        background: "/karmo/images/foam/furniture/bands/no-filler-footwear.png",
+        background: "/pages/foam/furniture/bands/no-filler-footwear.png",
       },
       {
         id: "long-durability",
@@ -125,7 +127,7 @@ const foam = {
       },
     ],
     spotlight: {
-      image: "/karmo/images/foam/furniture/mosaic/footwear-spotlight2.png",
+      image: "/pages/foam/furniture/mosaic/footwear-spotlight2.png",
       alt: "A calm living room with deep foam sofa seating",
       overlay: "bg-[#0b1a33]/20",
       headingLead: "DESIGNED TO ENDURE",
@@ -137,13 +139,13 @@ const foam = {
 certifications: [
   {
     id: "flex-test",
-    image: "/karmo/images/foam/furniture/badges/flex-test-badge.png", // ফ্রেম ছাড়া ক্লিন ট্রান্সপারেন্ট ব্যাজ
+    image: "/pages/foam/furniture/badges/flex-test-badge.png", // ফ্রেম ছাড়া ক্লিন ট্রান্সপারেন্ট ব্যাজ
     title: "100,000+ FLEX CYCLES",
     body: "Zero sole breakdown after 100k automated lab flex tests — built for extreme athletic endurance.",
   },
   {
     id: "shock-absorb",
-    image: "/karmo/images/foam/furniture/badges/shock-absorb-badge.png",
+    image: "/pages/foam/furniture/badges/shock-absorb-badge.png",
     title: "DYNAMIC SHOCK ABSORPTION",
     body: "Dissipates up to 45% of heel-strike ground impact, reducing knee fatigue and joint pressure.",
   },
@@ -175,13 +177,13 @@ certifications: [
       },
     ],
     film: null,
-    still:  "/karmo/images/foam/furniture/mosaic/footwear-sole-v4.png",
+    still:  "/pages/foam/furniture/mosaic/footwear-sole-v4.png",
     filmAlt: "Karmo Footwear Foam Quality",
     filmOverlay: true,
   },
 
   zones: {
-    src: "/karmo/images/foam/furniture/bands/footwear-layers-cutaway.png",
+    src: "/pages/foam/furniture/bands/footwear-layers-cutaway.png",
     alt: "Layered foam cutaway showing soft top, dense core and base foam",
     width: 1536,
     height: 864,
@@ -204,7 +206,7 @@ certifications: [
     titleCard: true,
     cta: null,
     image: {
-      src: "/karmo/images/foam/furniture/bands/footwear-comfort-lounge2.png",
+      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.png",
       alt: "Comfortable footwear foam for everyday walking",
       position: "object-[center_40%]",
       width: 1920,
@@ -220,7 +222,7 @@ certifications: [
         // cta: ,
         veil: true,
         image: {
-      src: "/karmo/images/foam/furniture/bands/footwear-comfort-lounge2.png",
+      src: "/pages/foam/furniture/bands/footwear-comfort-lounge2.png",
       alt: "Comfortable footwear foam for everyday walking",
       position: "object-[center_40%]",
           width: 1920,
@@ -258,7 +260,7 @@ certifications: [
   headingLead: "ALL YOUR FOOTWEAR NEEDS",
   veil: true,
   image: {
-    src: "/karmo/images/foam/hero/footwear-hero1.jpeg",
+    src: "/pages/foam/hero/footwear-hero1.jpeg",
     alt: "Footwear foam",
     width: 1536,
     height: 1024,
@@ -298,7 +300,7 @@ certifications: [
       //   kicker: "Rubber grade. Higher durability. Fine cell structure",
       //   cta: [{ label: "Find your perfect foam", href: "#foam-offers", primary: true }],
       //   image: {
-      //     src: "/karmo/images/home-02/hero/home-hero-slide-foam-grades-v2-hq.jpg",
+      //     src: "/pages/foam/hero/home-hero-slide-foam-grades-v2-hq.jpg",
       //     alt: "Four Karmo foam grades in front of a white sofa living room",
       //     width: 2560,
       //     height: 1096,
@@ -314,14 +316,14 @@ certifications: [
         id: "furniture",
         name: "Furniture",
         line: "Sofas, cushions, seating",
-        image: `${IMG}/products/sofa-olive-hq.jpg`,
+        image: "/products/foam/catalog/sofa-olive-hq.jpg",
         alt: "Olive sofa built on Karmo foam",
       },
       {
         id: "specialty",
         name: "Specialty",
         line: "Grades for makers",
-        image: `${IMG}/products/blocks-coral-hq.jpg`,
+        image: "/products/foam/catalog/blocks-coral-hq.jpg",
         alt: "Colored foam blocks for specialty use",
       },
     ],
@@ -366,126 +368,11 @@ certifications: [
     eyebrow: "Best price",
     headingLead: "Hot offer",
     headingAccent: "for you",
-    body: "Combo sets and seating grades — pure rubber foam sized for Bangladesh homes and makers. Prices are placeholders; confirm before launch.",
+    body: "",
     textured: true,
-    variant: "catalogue",
+    variant: "foam",
     offersId: "foam-offers",
-    items: [
-      {
-        id: "combo-280",
-        category: "furniture",
-        name: "280 Foam Combo",
-        shortName: "280",
-        href: "/foam/combo-280",
-        image: `${IMG}/products/combo-280-room-hq.jpg`,
-        imageHover: `${IMG}/products/combo-280-hover-hq.jpg`,
-        alt: "Karmo 280 foam combo beside a sand sofa",
-        was: "৳ 9,890",
-        now: "৳ 8,405",
-        line: "High-density rubber-grade foam for firm, lasting support",
-        badge: "Best Seller",
-        thickness: "Custom cut",
-        rating: 4.8,
-        reviews: 164,
-        specs: ["Rubber grade", "Firm support", "No fillers"],
-        defaultSize: "Queen",
-      },
-      {
-        id: "combo-2001",
-        category: "furniture",
-        name: "2001 Foam Combo",
-        shortName: "2001",
-        href: "/foam/combo-2001",
-        image: `${IMG}/products/combo-2001-room-hq.jpg`,
-        imageHover: `${IMG}/products/foam-grades-hover-hq.jpg`,
-        alt: "Living room seating on Karmo 2001 foam",
-        was: "৳ 9,405",
-        now: "৳ 7,995",
-        line: "Balanced density for everyday sofas and cushions",
-        badge: "Value Pick",
-        thickness: "Custom cut",
-        rating: 4.7,
-        reviews: 128,
-        specs: ["Balanced feel", "Furniture ready", "Open airflow"],
-        defaultSize: "Queen",
-      },
-      {
-        id: "combo-4g",
-        category: "specialty",
-        name: "4G Foam Combo",
-        shortName: "4G",
-        href: "/foam/combo-4g",
-        image: `${IMG}/products/combo-4g-room-hq.jpg`,
-        imageHover: `${IMG}/products/foam-grades-hover-hq.jpg`,
-        alt: "Karmo 4G foam cushions and blocks",
-        was: "৳ 9,405",
-        now: "৳ 7,995",
-        line: "Responsive rebound for modern seating builds",
-        badge: "New Launch",
-        thickness: "Custom cut",
-        rating: 4.6,
-        reviews: 96,
-        specs: ["Fast rebound", "Maker grade", "Clean cut"],
-        defaultSize: "Queen",
-      },
-      {
-        id: "combo-1965",
-        category: "specialty",
-        name: "1965 Foam Combo",
-        shortName: "1965",
-        href: "/foam/combo-1965",
-        image: `${IMG}/products/combo-1965-room-hq.jpg`,
-        imageHover: `${IMG}/products/foam-grades-hover-hq.jpg`,
-        alt: "Cream armchair on Karmo 1965 foam",
-        was: "৳ 15,203",
-        now: "৳ 12,922",
-        line: "The house classic — pure rubber comfort since 1965",
-        badge: "Heritage",
-        thickness: "Custom cut",
-        rating: 4.9,
-        reviews: 210,
-        specs: ["Heritage grade", "Pure rubber", "Long life"],
-        defaultSize: "Queen",
-      },
-      {
-        id: "combo-signature",
-        category: "specialty",
-        name: "Signature Foam Combo",
-        shortName: "Signature",
-        href: "/foam/combo-signature",
-        image: `${IMG}/products/combo-signature-room-hq.jpg`,
-        imageHover: `${IMG}/products/foam-grades-hover-hq.jpg`,
-        alt: "Deep blue velvet sofa on Karmo Signature foam",
-        was: "৳ 18,732",
-        now: "৳ 15,922",
-        line: "Premium grade where signature comfort lives",
-        badge: "Premium",
-        thickness: "Custom cut",
-        rating: 4.9,
-        reviews: 142,
-        specs: ["Premium density", "Showroom feel", "No fillers"],
-        defaultSize: "Queen",
-      },
-      {
-        id: "rebonded-set",
-        category: "furniture",
-        name: "Rebonded Foam Pack",
-        shortName: "Rebonded",
-        href: "/foam/rebonded-set",
-        image: `${IMG}/products/rebonded-set-room-hq.jpg`,
-        imageHover: `${IMG}/products/foam-grades-hover-hq.jpg`,
-        alt: "Stacked rebonded and specialty foam blocks",
-        was: "৳ 11,500",
-        now: "৳ 9,775",
-        line: "Steam-bonded chips for firm bases that last",
-        badge: "Maker Fav.",
-        thickness: "Custom cut",
-        rating: 4.7,
-        reviews: 118,
-        specs: ["Rebonded core", "Heavy use", "Firm base"],
-        defaultSize: "Queen",
-      },
-    ],
+    items: liveFurnitureFoamOffers,
   },
 };
 

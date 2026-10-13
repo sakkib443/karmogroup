@@ -90,7 +90,7 @@ export default function Footer() {
   return (
     <footer className="relative overflow-hidden text-white">
       <Image
-        src="/karmo/images/footer/footer-bg.jpg"
+        src="/shared/footer/footer-bg.jpg"
         alt=""
         aria-hidden
         fill

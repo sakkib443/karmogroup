@@ -1,8 +1,16 @@
 import { z } from 'zod';
+import { ORDER_STATUSES } from './order.model';
 
 const orderItemValidation = z.object({
+    // A product _id, or the slug of a Karmo catalogue item (then name, price and division come with it).
     product: z.string().min(1, 'Product ID required'),
     quantity: z.number().min(1, 'Quantity must be at least 1'),
+    name: z.string().optional(),
+    price: z.number().optional(),
+    image: z.string().optional(),
+    division: z.string().optional(),
+    color: z.string().optional(),
+    size: z.string().optional(),
 });
 
 const shippingAddressValidation = z.object({
@@ -35,7 +43,7 @@ export const createOrderValidation = z.object({
 
 export const updateOrderStatusValidation = z.object({
     body: z.object({
-        status: z.enum(['pending', 'confirmed', 'processing', 'shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt', 'delivered', 'cancelled', 'returned', 'refunded']),
+        status: z.enum(ORDER_STATUSES),
         note: z.string().optional(),
     }),
 });

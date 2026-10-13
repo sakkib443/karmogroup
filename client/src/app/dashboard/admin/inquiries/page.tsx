@@ -1,10 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from 'react';
 import {
-    LuMail, LuTrash2, LuSearch, LuCircleCheck, LuClock,
-    LuEye, LuX, LuMessageSquare, LuPackage, LuPhone, LuUser
-} from 'react-icons/lu';
+    FiMail, FiTrash2, FiSearch, FiCheckCircle, FiClock,
+    FiX, FiMessageSquare, FiPackage, FiPhone
+} from 'react-icons/fi';
 import {
     useGetInquiriesQuery,
     useUpdateInquiryStatusMutation,
@@ -86,9 +88,9 @@ const InquiriesPage = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4">
                 {[
-                    { label: 'Total', value: meta.total || inquiries.length, color: 'blue', icon: LuMessageSquare },
-                    { label: 'Pending', value: inquiries.filter((i: any) => i.status === 'pending').length, color: 'yellow', icon: LuClock },
-                    { label: 'Resolved', value: inquiries.filter((i: any) => i.status === 'resolved').length, color: 'green', icon: LuCircleCheck },
+                    { label: 'Total', value: meta.total || inquiries.length, color: 'blue', icon: FiMessageSquare },
+                    { label: 'Pending', value: inquiries.filter((i: any) => i.status === 'pending').length, color: 'yellow', icon: FiClock },
+                    { label: 'Resolved', value: inquiries.filter((i: any) => i.status === 'resolved').length, color: 'green', icon: FiCheckCircle },
                 ].map((stat, i) => (
                     <div key={i} className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
@@ -105,7 +107,7 @@ const InquiriesPage = () => {
             {/* Filters */}
             <div className="flex flex-col md:flex-row gap-3 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
                 <div className="relative flex-1">
-                    <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                     <input
                         type="text"
                         placeholder="Search by name, product or message..."
@@ -136,7 +138,7 @@ const InquiriesPage = () => {
                         </div>
                     ) : inquiries.length === 0 ? (
                         <div className="p-20 text-center">
-                            <LuMail size={40} className="text-gray-200 mx-auto mb-4" />
+                            <FiMail size={40} className="text-gray-200 mx-auto mb-4" />
                             <h3 className="font-bold text-gray-700">No inquiries found</h3>
                             <p className="text-sm text-gray-400 mt-1">Customer inquiries will appear here</p>
                         </div>
@@ -161,7 +163,8 @@ const InquiriesPage = () => {
                                             </span>
                                         </div>
                                         <p className="text-xs text-[var(--color-primary)] font-medium truncate mt-0.5 flex items-center gap-1">
-                                            <LuPackage size={10} /> {inq.product?.name || inq.productName || 'General Inquiry'}
+                                            {inq.product ? <FiPackage size={11} /> : <FiMessageSquare size={11} />}
+                                            <span>{inq.product?.name || inq.subject || inq.productName || 'General Inquiry'}</span>
                                         </p>
                                         <p className="text-xs text-gray-400 mt-1 truncate">{inq.message}</p>
                                     </div>
@@ -192,7 +195,7 @@ const InquiriesPage = () => {
                         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                             <h3 className="font-bold text-gray-800">Inquiry Detail</h3>
                             <button onClick={() => setSelectedInquiry(null)} className="p-1.5 hover:bg-gray-100 rounded-md transition-all text-gray-400">
-                                <LuX size={18} />
+                                <FiX size={18} />
                             </button>
                         </div>
 
@@ -206,13 +209,24 @@ const InquiriesPage = () => {
                                     </div>
                                     <div>
                                         <p className="font-bold text-gray-800 text-sm">{selectedInquiry.name || selectedInquiry.customerName || 'Anonymous'}</p>
-                                        {selectedInquiry.email && <p className="text-xs text-gray-500 flex items-center gap-1"><LuMail size={10} /> {selectedInquiry.email}</p>}
-                                        {selectedInquiry.phone && <p className="text-xs text-gray-500 flex items-center gap-1"><LuPhone size={10} /> {selectedInquiry.phone}</p>}
+                                        {selectedInquiry.email && <p className="text-xs text-gray-500 flex items-center gap-1"><FiMail size={10} /> {selectedInquiry.email}</p>}
+                                        {selectedInquiry.phone && <p className="text-xs text-gray-500 flex items-center gap-1"><FiPhone size={10} /> {selectedInquiry.phone}</p>}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Product */}
+                            {/* Subject / Category */}
+                            {selectedInquiry.subject && (
+                                <div className="space-y-1">
+                                    <h4 className="text-xs font-bold text-gray-400 uppercase">Subject</h4>
+                                    <div className="p-3 bg-gray-50 rounded-md border border-gray-100 flex items-center gap-2">
+                                        <FiMessageSquare size={14} className="text-[var(--color-primary)] shrink-0" />
+                                        <span className="text-sm font-semibold text-gray-800">{selectedInquiry.subject}</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Product (if product-specific) */}
                             {(selectedInquiry.product || selectedInquiry.productName) && (
                                 <div className="space-y-2">
                                     <h4 className="text-xs font-bold text-gray-400 uppercase">Product</h4>
@@ -247,7 +261,7 @@ const InquiriesPage = () => {
                                             onClick={() => handleStatusUpdate(selectedInquiry._id, 'resolved')}
                                             className="flex items-center justify-center gap-2 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all"
                                         >
-                                            <LuCircleCheck size={15} /> Resolve
+                                            <FiCheckCircle size={15} /> Resolve
                                         </button>
                                     )}
                                     {selectedInquiry.status === 'resolved' && (
@@ -255,14 +269,14 @@ const InquiriesPage = () => {
                                             onClick={() => handleStatusUpdate(selectedInquiry._id, 'pending')}
                                             className="flex items-center justify-center gap-2 py-2.5 bg-yellow-500 text-white rounded-md text-sm font-bold hover:bg-yellow-600 transition-all"
                                         >
-                                            <LuClock size={15} /> Reopen
+                                            <FiClock size={15} /> Reopen
                                         </button>
                                     )}
                                     <button
                                         onClick={() => handleDelete(selectedInquiry._id)}
                                         className="flex items-center justify-center gap-2 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-md text-sm font-bold hover:bg-red-100 transition-all"
                                     >
-                                        <LuTrash2 size={15} /> Delete
+                                        <FiTrash2 size={15} /> Delete
                                     </button>
                                 </div>
                             </div>

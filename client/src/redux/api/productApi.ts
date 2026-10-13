@@ -34,9 +34,20 @@ export const productApi = baseApi.injectEndpoints({
             query: () => '/products/featured',
             providesTags: ['Products'],
         }),
+        // Staff: next free short SKU for a product name — Backend route: GET /api/products/sku/suggest?name=
+        // Returns { sku: 'NF01' }. Used lazily: the product form asks only while a new name is typed,
+        // so it is not tagged — an invalidation must not re-fetch a suggestion nobody is looking at.
+        suggestSku: builder.query({
+            query: (name: string) => ({
+                url: '/products/sku/suggest',
+                params: { name },
+            }),
+        }),
         // Public: get product by slug — Backend route: GET /api/products/slug/:slug
+        // The slug is passed as plain text — a product named in Bengali has Bengali letters
+        // in its slug, and those have to be percent-encoded to survive the URL.
         getProductBySlug: builder.query({
-            query: (slug) => `/products/slug/${slug}`,
+            query: (slug: string) => `/products/slug/${encodeURIComponent(slug)}`,
             providesTags: ['Products'],
         }),
         // Public: get related products — Backend route: GET /api/products/:id/related/:categoryId
@@ -158,7 +169,26 @@ export const productApi = baseApi.injectEndpoints({
                 }
             },
         }),
-        // Admin: bulk upload products (CSV) — Backend route: POST /api/products/admin/bulk-upload
+        // Admin QC: get pending/rejected products — Backend route: GET /api/products/admin/pending
+        getPendingProducts: builder.query({
+            query: (params) => ({ url: '/products/admin/pending', params }),
+            providesTags: ['Products'],
+        }),
+        // Admin QC: approve product — Backend route: PATCH /api/products/admin/:id/approve
+        approveProduct: builder.mutation({
+            query: (id: string) => ({ url: `/products/admin/${id}/approve`, method: 'PATCH' }),
+            invalidatesTags: (result, error, id) => ['Products', { type: 'Products', id }],
+        }),
+        // Admin QC: reject product — Backend route: PATCH /api/products/admin/:id/reject
+        rejectProduct: builder.mutation({
+            query: ({ id, reason }: { id: string; reason: string }) => ({
+                url: `/products/admin/${id}/reject`,
+                method: 'PATCH',
+                body: { reason },
+            }),
+            invalidatesTags: (result, error, { id }) => ['Products', { type: 'Products', id }],
+        }),
+// Admin: bulk upload products (CSV) — Backend route: POST /api/products/admin/bulk-upload
         bulkUploadProducts: builder.mutation({
             query: (data: { products: any[] }) => ({
                 url: '/products/admin/bulk-upload',
@@ -167,7 +197,7 @@ export const productApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Products'],
         }),
-        // Admin: low-stock products — Backend route: GET /api/products/admin/low-stock?threshold=5
+// Admin: low-stock products — Backend route: GET /api/products/admin/low-stock?threshold=5
         // NOTE: named getProductLowStock to avoid colliding with analyticsApi's getLowStock
         // (GET /api/analytics/low-stock), which share the same injected baseApi.
         getProductLowStock: builder.query({
@@ -185,6 +215,7 @@ export const {
     useGetProductByIdQuery,
     useSuggestProductsQuery,
     useGetBrandsQuery,
+    useLazySuggestSkuQuery,
     useGetFeaturedProductsQuery,
     useGetProductBySlugQuery,
     useGetRelatedProductsQuery,
@@ -196,6 +227,7 @@ export const {
     useBulkUpdateStatusMutation,
     useBulkDeleteMutation,
     useIncrementProductStatMutation,
-    useBulkUploadProductsMutation,
-    useGetProductLowStockQuery,
+    useGetPendingProductsQuery,
+    useApproveProductMutation,
+    useRejectProductMutation,    useBulkUploadProductsMutation,    useGetProductLowStockQuery,
 } = productApi;

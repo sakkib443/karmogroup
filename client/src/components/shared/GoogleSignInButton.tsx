@@ -6,6 +6,11 @@ import { useAppDispatch } from '@/redux/hooks';
 import { loginSuccess } from '@/redux/slices/authSlice';
 import { useGoogleLoginMutation } from '@/redux/api/authApi';
 import { toast } from 'react-hot-toast';
+import { canOpen, homeFor, isStaffRole } from '@/components/admin/access';
+
+// Hidden on the login and register pages until Google sign-in is set up.
+// Set to true to show it again; the button and the server side are unchanged.
+export const GOOGLE_SIGN_IN_ENABLED = false;
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
@@ -77,9 +82,8 @@ const GoogleSignInButton: React.FC<Props> = ({ redirectPath, label = 'Continue w
                     style: { borderRadius: '10px', background: 'var(--color-primary)', color: '#fff' },
                     icon: '✅',
                 });
-                const isStaff = user.role === 'admin' || user.role === 'superadmin';
-                if (isStaff) {
-                    router.push(redirectPath && redirectPath.startsWith('/dashboard/admin') ? redirectPath : '/dashboard/admin');
+                if (isStaffRole(user.role)) {
+                    router.push(redirectPath && redirectPath.startsWith('/dashboard/admin') && canOpen(user.role, redirectPath) ? redirectPath : homeFor(user.role));
                 } else {
                     router.push(redirectPath || '/');
                 }
@@ -131,10 +135,10 @@ const GoogleSignInButton: React.FC<Props> = ({ redirectPath, label = 'Continue w
             type="button"
             onClick={handleClick}
             disabled={busy}
-            className="flex w-full items-center justify-center gap-2.5 border border-ink/20 bg-white py-3 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:border-ink/40 hover:bg-cream/50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full py-3 rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 flex items-center justify-center gap-2.5 transition hover:bg-slate-50 hover:border-slate-300 disabled:opacity-60 disabled:cursor-not-allowed"
         >
             {busy ? (
-                <span className="h-[18px] w-[18px] animate-spin rounded-full border-2 border-ink/20 border-t-ink" />
+                <span className="w-[18px] h-[18px] border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
             ) : (
                 <GoogleIcon />
             )}

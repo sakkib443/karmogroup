@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { mattressTitleOverlay } from "@/components/karmo/chrome/mattressHeroVeil";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
@@ -84,6 +85,11 @@ export default function OverlayHeroSlider({
   /** Delay before leaving slide 0 the first time (home / mattress landings). */
   firstSlideMs = FIRST_SLIDE_MS,
   fadeDuration = FADE_S,
+  /**
+   * Mattress hero only. Bottom-stop percent of the navy wash (50 is the
+   * drawn look). Omitted on every other slider, including the homepage.
+   */
+  veilPercent,
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
@@ -225,10 +231,12 @@ export default function OverlayHeroSlider({
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      s.titleOverlay ||
-                      (right
-                        ? "linear-gradient(to left, rgba(11,21,40,0.48) 0%, rgba(11,21,40,0.22) 40%, rgba(11,21,40,0.10) 100%)"
-                        : "linear-gradient(to top, rgba(11,21,40,0.72) 0%, rgba(11,21,40,0.32) 45%, rgba(11,21,40,0.22) 100%)"),
+                      veilPercent != null
+                        ? mattressTitleOverlay(right ? "right" : "center", veilPercent)
+                        : s.titleOverlay ||
+                          (right
+                            ? "linear-gradient(to left, rgba(11,21,40,0.48) 0%, rgba(11,21,40,0.22) 40%, rgba(11,21,40,0.10) 100%)"
+                            : "linear-gradient(to top, rgba(11,21,40,0.72) 0%, rgba(11,21,40,0.32) 45%, rgba(11,21,40,0.22) 100%)"),
                   }}
                 />
               ) : !light ? (

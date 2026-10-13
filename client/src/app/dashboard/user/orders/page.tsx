@@ -4,13 +4,13 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
-    LuPackage,
-    LuSearch,
-    LuChevronRight,
-    LuShoppingBag,
-    LuMapPin,
-    LuCreditCard,
-} from 'react-icons/lu';
+    FiPackage,
+    FiSearch,
+    FiChevronRight,
+    FiShoppingBag,
+    FiMapPin,
+    FiCreditCard,
+} from 'react-icons/fi';
 import { useGetMyOrdersQuery } from '@/redux/api/orderApi';
 import { getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
 
@@ -30,6 +30,7 @@ function MyOrdersContent() {
     // "My Cancellations" links here with ?status=cancelled — honour any incoming filter.
     const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
     const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [page, setPage] = useState(1);
 
     // Keep the active tab in sync when the URL's ?status= changes (e.g. sidebar nav)
@@ -39,11 +40,17 @@ function MyOrdersContent() {
         setPage(1);
     }, [searchParams]);
 
+    // Debounce the order-number search so we don't hit the server on every keystroke.
+    useEffect(() => {
+        const t = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 400);
+        return () => clearTimeout(t);
+    }, [search]);
+
     const { data, isLoading } = useGetMyOrdersQuery({
         page,
         limit: 10,
         status: statusFilter !== 'all' ? statusFilter : undefined,
-        search: search || undefined,
+        searchTerm: debouncedSearch || undefined,   // QueryBuilder.search() reads `searchTerm`
     });
 
     const orders = data?.data || [];
@@ -52,10 +59,10 @@ function MyOrdersContent() {
     const statusTabs = [
         { id: 'all', label: 'All' },
         { id: 'pending', label: 'Pending' },
-        { id: 'processing', label: 'Processing' },
+        { id: 'confirmed', label: 'Confirmed' },
+        { id: 'factory', label: 'In Production' },
+        { id: 'courier_entry', label: 'Ready to Ship' },
         { id: 'shipped', label: 'Shipped' },
-        { id: 'on_the_way', label: 'On The Way' },
-        { id: 'out_for_delivery', label: 'Out For Delivery' },
         { id: 'delivered', label: 'Delivered' },
         { id: 'cancelled', label: 'Cancelled' },
         { id: 'returned', label: 'Returned' },
@@ -74,7 +81,7 @@ function MyOrdersContent() {
                         href="/"
                         className="px-5 py-2.5 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-all shadow-md shadow-[var(--color-primary)]/20 flex items-center gap-2"
                     >
-                        <LuShoppingBag size={16} />
+                        <FiShoppingBag size={16} />
                         Continue Shopping
                     </Link>
                 </div>
@@ -101,7 +108,7 @@ function MyOrdersContent() {
 
                 {/* Search */}
                 <div className="relative">
-                    <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                    <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                     <input
                         type="text"
                         placeholder="Search by order number..."
@@ -127,7 +134,7 @@ function MyOrdersContent() {
                     ))
                 ) : orders.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-gray-100 p-12 shadow-sm text-center">
-                        <LuPackage size={48} className="mx-auto text-gray-200 mb-4" />
+                        <FiPackage size={48} className="mx-auto text-gray-200 mb-4" />
                         <h3 className="text-lg font-bold text-gray-600 mb-1">No orders found</h3>
                         <p className="text-sm text-gray-400">
                             {statusFilter !== 'all' ? 'Try changing the filter' : 'Start shopping to see your orders here'}
@@ -165,7 +172,7 @@ function MyOrdersContent() {
                                                     <img src={item.thumbnail || item.image} alt={item.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                        <LuPackage size={14} />
+                                                        <FiPackage size={14} />
                                                     </div>
                                                 )}
                                             </div>
@@ -197,7 +204,7 @@ function MyOrdersContent() {
                                 {/* Delivery destination */}
                                 {order.shippingAddress && (
                                     <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-3">
-                                        <LuMapPin size={13} className="flex-shrink-0" />
+                                        <FiMapPin size={13} className="flex-shrink-0" />
                                         <span className="truncate">
                                             {order.shippingAddress.fullName}
                                             {order.shippingAddress.city ? ` · ${order.shippingAddress.city}` : ''}
@@ -209,7 +216,7 @@ function MyOrdersContent() {
                                 {/* Bottom Row */}
                                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 pt-3 border-t border-gray-50">
                                     <div className="flex items-center gap-2 text-xs">
-                                        <LuCreditCard size={13} className="text-gray-300 flex-shrink-0" />
+                                        <FiCreditCard size={13} className="text-gray-300 flex-shrink-0" />
                                         <span className="text-gray-500 font-bold tracking-wide">
                                             {paymentMethodLabel(order.paymentMethod)}
                                         </span>
@@ -223,7 +230,7 @@ function MyOrdersContent() {
                                             <span className="block text-[10px] text-gray-400 mb-0.5">Total</span>
                                             <span className="block text-lg font-bold text-[var(--color-primary)]">৳{order.total?.toLocaleString()}</span>
                                         </div>
-                                        <LuChevronRight size={16} className="text-gray-300 group-hover:text-[var(--color-primary)] group-hover:translate-x-1 transition-all" />
+                                        <FiChevronRight size={16} className="text-gray-300 group-hover:text-[var(--color-primary)] group-hover:translate-x-1 transition-all" />
                                     </div>
                                 </div>
                             </div>

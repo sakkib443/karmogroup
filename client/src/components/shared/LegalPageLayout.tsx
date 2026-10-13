@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LuChevronLeft, LuMail, LuCalendar } from 'react-icons/lu';
+import { FiChevronLeft, FiMail, FiCalendar } from 'react-icons/fi';
 import { useGetLegalPageQuery } from '@/redux/api/siteContentApi';
 
 interface LegalPageProps {
@@ -44,7 +44,7 @@ const LegalPageLayout = ({ slug, fallbackTitle, icon, accentColor, ctaTitle, cta
                         href="/"
                         style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: '#9ca3af', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '24px' }}
                     >
-                        <LuChevronLeft size={12} />
+                        <FiChevronLeft size={12} />
                         Back to Home
                     </Link>
 
@@ -61,7 +61,7 @@ const LegalPageLayout = ({ slug, fallbackTitle, icon, accentColor, ctaTitle, cta
                     {/* Last Updated */}
                     {lastUpdated && (
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#9ca3af', fontWeight: 500, background: '#f3f4f6', padding: '4px 12px', borderRadius: '20px', marginTop: '4px' }}>
-                            <LuCalendar size={11} />
+                            <FiCalendar size={11} />
                             Last updated: {lastUpdated}
                         </div>
                     )}
@@ -93,7 +93,7 @@ const LegalPageLayout = ({ slug, fallbackTitle, icon, accentColor, ctaTitle, cta
                             transition: 'all 0.2s',
                         }}
                     >
-                        <LuMail size={13} />
+                        <FiMail size={13} />
                         {ctaButtonText}
                     </Link>
                 </div>

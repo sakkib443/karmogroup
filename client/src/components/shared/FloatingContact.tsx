@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaWhatsapp, FaRobot } from 'react-icons/fa';
 import { LuX, LuSend, LuMessageCircle, LuArrowUp } from 'react-icons/lu';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import { useAppSelector } from '@/redux';
 import { API_CONFIGURED } from '@/config/api';
@@ -30,6 +30,7 @@ const FloatingContact: React.FC = () => {
     // the component already renders with them empty.
     const { data: res } = useGetSiteContentQuery({}, { skip: !API_CONFIGURED });
     const router = useRouter();
+    const pathname = usePathname();
     const { isAuthenticated } = useAppSelector((s) => s.auth);
 
     const f = res?.data?.floating;
@@ -196,6 +197,9 @@ const FloatingContact: React.FC = () => {
         }
         if (a.topic) handleTopic(a.topic, a.label);
     };
+
+    // No chat / WhatsApp bubbles inside the admin dashboard.
+    if (pathname?.startsWith('/dashboard')) return null;
 
     return (
         <>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { LuShoppingBag } from 'react-icons/lu';
+import { FiShoppingBag } from 'react-icons/fi';
 
 interface EmptyStateProps {
     title: string;
@@ -17,11 +17,11 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     description,
     buttonText = 'Continue Shopping',
     buttonLink = '/',
-    icon = <LuShoppingBag size={48} />
+    icon = <FiShoppingBag size={48} />
 }) => {
     return (
         <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="w-24 h-24 bg-[var(--color-primary-lightest)] rounded-[28px] flex items-center justify-center text-[var(--color-primary)] mb-6 ring-1 ring-[var(--color-primary-border)]">
+            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-6 border border-gray-100">
                 {icon}
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">{title}</h3>

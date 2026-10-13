@@ -1111,7 +1111,9 @@ svg.app-icon[fill="none"] {
   }
 
   .footwear-band {
-    height: var(--footwear-h, calc(100svh - 64px)) !important;
+    /* Grow with content instead of clipping on short / scaled screens.
+       min-height still fills the viewport when the copy fits. */
+    height: auto !important;
     min-height: var(--footwear-h, calc(100svh - 64px)) !important;
   }
 }

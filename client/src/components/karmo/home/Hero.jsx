@@ -17,8 +17,8 @@ const SLIDES = [
     headingLead: "The Journey Since 1965",
     holdMs: 6000,
     video: {
-      src: "/karmo/videos/home/hero-video-1.mp4",
-      poster: "/karmo/videos/home/hero-video-1-poster.webp",
+      src: "/pages/home/videos/hero-video-1.mp4",
+      poster: "/pages/home/videos/hero-video-1-poster.webp",
     },
   },
   // TRIAL (4 Oct): two stock interior clips (4K originals cut to 1080p web
@@ -30,9 +30,9 @@ const SLIDES = [
     headingLead: "Foam crafted for living",
     holdMs: 14800, // 18.5s clip at 1.25x
     video: {
-      src: "/karmo/videos/home/hero-video-a.mp4",
+      src: "/pages/home/videos/hero-video-a.mp4",
       rate: 1.25,
-      poster: "/karmo/videos/home/hero-video-a-poster.webp",
+      poster: "/pages/home/videos/hero-video-a-poster.webp",
       // Framed a little lower in the clip so the picture sits higher on screen.
       position: "object-[50%_68%]",
     },
@@ -44,9 +44,9 @@ const SLIDES = [
     headingLead: "Moments that make a house",
     holdMs: 10400, // 13s clip at 1.25x
     video: {
-      src: "/karmo/videos/home/hero-video-b.mp4",
+      src: "/pages/home/videos/hero-video-b.mp4",
       rate: 1.25,
-      poster: "/karmo/videos/home/hero-video-b-poster.webp",
+      poster: "/pages/home/videos/hero-video-b-poster.webp",
     },
   },
   {
@@ -56,9 +56,9 @@ const SLIDES = [
     headingLead: "The Journey Since 1965",
     holdMs: 12200, // 15.2s clip at 1.25x
     video: {
-      src: "/karmo/videos/home/hero-video-c.mp4",
+      src: "/pages/home/videos/hero-video-c.mp4",
       rate: 1.25,
-      poster: "/karmo/videos/home/hero-video-c-poster.webp",
+      poster: "/pages/home/videos/hero-video-c-poster.webp",
     },
   },
   // TRIAL (4 Oct): Gemini room-tour clip as the opening slide. Holds for the
@@ -69,7 +69,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "The Journey Since 1965",
     holdMs: 10000,
-    video: { src: "/karmo/videos/home/hero-room-tour-trial.mp4" },
+    video: { src: "/pages/home/videos/hero-room-tour-trial.mp4" },
   },
   {
     id: "home-journey-1965",
@@ -78,7 +78,7 @@ const SLIDES = [
     veil: true,
     headingLead: "The Journey Since 1965",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-01-mustard-room-hq.webp",
+      src: "/pages/home/hero/home-hero-slide-01-mustard-room-hq.webp",
       alt: "Mustard sofa in a blue-walled living room with plants and wood shelves",
       width: 1979,
       height: 795,
@@ -92,7 +92,7 @@ const SLIDES = [
     veil: true,
     headingLead: "The Journey Since 1965",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-living-scandi-v3-hq.webp",
+      src: "/pages/home/hero/home-hero-slide-living-scandi-v3-hq.webp",
       alt: "Warm living room with a cream sofa, wood shelves and round coffee table",
       width: 1978,
       height: 795,
@@ -105,7 +105,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Industrial chemistry built to last",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-chemicals-hero-hq.webp",
+      src: "/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp",
       alt: "Organized Karmo chemicals warehouse with blue drums in cinematic light",
       width: 1536,
       height: 1024,
@@ -118,7 +118,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Moments that make a house",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-hometex-quilts-v2-hq.webp",
+      src: "/pages/home/hero/home-hero-slide-hometex-quilts-v2-hq.webp",
       alt: "Stacked Karmo HomeTex floral quilts on a sunlit bed",
       width: 2560,
       height: 1019,
@@ -132,7 +132,7 @@ const SLIDES = [
     veil: true,
     headingLead: "Foam crafted for living",
     image: {
-      src: "/karmo/images/home-02/hero/home-hero-slide-foam-real-v23-hq.webp",
+      src: "/pages/home/hero/home-hero-slide-foam-real-v23-hq.webp",
       alt: "KARMO HD and KARMO 280 foam stacks in a sunlit mustard living room",
       width: 2560,
       height: 1017,
@@ -145,7 +145,7 @@ const SLIDES = [
     titleCard: true,
     headingLead: "Crafted for nights that last",
     image: {
-      src: "/karmo/images/mattress/hero/cooling-cat-karmo-handle-hq.webp",
+      src: "/shared/hero/cooling-cat-karmo-handle-hq.webp",
       alt: "Karmo mattress in a calm bedroom with a sleeping cat",
       unoptimized: true,
       width: 1983,

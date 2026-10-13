@@ -12,14 +12,13 @@ const LOGO_H = 53;
  *
  * `src` exists because the default artwork is reversed — "KARMO" in red but
  * "GROUP", "Since 1965" and the ® set in white — so it only reads on a dark
- * panel. On a light one, half the wordmark disappears. Home 02's header is
- * white and passes /karmo/logo-ink.png, the same artwork with the white ink
- * recoloured to slate. Both files must stay in step if the mark is ever
- * redrawn.
+ * panel. On a light one, half the wordmark disappears. Keep any light-panel
+ * variant in /brand/ next to logo.png so both stay in step if the mark is
+ * ever redrawn.
  *
  * `width`/`height` default to that wordmark's size but are overridable,
- * because not every Karmo mark shares its 7.25:1 ratio — `/karmo/logo-mark.png`,
- * the short "KARMO" with the black 1965 device and no "GROUP", is 400x120.
+ * because not every Karmo mark shares its 7.25:1 ratio — `/brand/logo-compact.png`,
+ * the short "KARMO" with no "GROUP", is 412x120.
  * Passing a file without its matching pair is the one way to misuse this: the
  * ratio would be wrong and `object-contain` would letterbox it inside a box
  * of the wrong shape rather than complain.
@@ -27,7 +26,7 @@ const LOGO_H = 53;
 export default function Logo({
   className = "h-9 w-auto",
   priority = false,
-  src = "/karmo/logo.png",
+  src = "/brand/logo.png",
   width = LOGO_W,
   height = LOGO_H,
   quality = 75,

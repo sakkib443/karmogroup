@@ -3,18 +3,23 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-    LuHeart,
-    LuShoppingCart,
-    LuTrash2,
-    LuStar,
-    LuEye,
-    LuShoppingBag,
-} from 'react-icons/lu';
+    FiHeart,
+    FiShoppingCart,
+    FiTrash2,
+    FiStar,
+    FiEye,
+} from 'react-icons/fi';
+import { toast } from 'react-hot-toast';
 import { useGetWishlistQuery, useToggleWishlistMutation } from '@/redux/api/userApi';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '@/redux/hooks';
+import { addToCart, clearCart } from '@/redux/slices/cartSlice';
 
 export default function WishlistPage() {
     const { data, isLoading } = useGetWishlistQuery({});
     const [toggleWishlist, { isLoading: toggling }] = useToggleWishlistMutation();
+    const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const wishlistItems = data?.data || [];
 
@@ -26,13 +31,30 @@ export default function WishlistPage() {
         }
     };
 
+    const handleAddToCart = (product: any) => {
+        if (product.stock <= 0) { toast.error('This product is out of stock'); return; }
+        // No cart step — buy this one product straight away.
+        dispatch(clearCart());
+        dispatch(addToCart({
+            id: product._id,
+            productId: product._id,
+            name: product.name,
+            price: product.discountPrice || product.price,
+            mrp: product.price,
+            image: product.images?.[0] || '',
+            category: 'General',
+        }));
+        try { localStorage.setItem('shohozkrishi_selected_cart', JSON.stringify([product._id])); } catch {}
+        router.push('/checkout');
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="min-w-0">
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Wishlist &amp; Followed Stores</h1>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">My Wishlist</h1>
                         <p className="text-sm text-gray-400 mt-1">
                             {wishlistItems.length} saved item{wishlistItems.length !== 1 ? 's' : ''}
                         </p>
@@ -59,7 +81,7 @@ export default function WishlistPage() {
                 </div>
             ) : wishlistItems.length === 0 ? (
                 <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center shadow-sm">
-                    <LuHeart size={48} className="mx-auto text-gray-200 mb-4" />
+                    <FiHeart size={48} className="mx-auto text-gray-200 mb-4" />
                     <h3 className="text-lg font-bold text-gray-600 mb-1">Your wishlist is empty</h3>
                     <p className="text-sm text-gray-400 mb-4">Save items you love to your wishlist</p>
                     <Link
@@ -75,15 +97,15 @@ export default function WishlistPage() {
                         <div key={product._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden">
                             {/* Image */}
                             <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
-                                {(product.thumbnail || product.images?.[0]) ? (
+                                {product.images?.[0] ? (
                                     <img
-                                        src={product.thumbnail || product.images[0]}
+                                        src={product.images[0]}
                                         alt={product.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-200">
-                                        <LuShoppingCart size={32} />
+                                        <FiShoppingCart size={32} />
                                     </div>
                                 )}
 
@@ -93,10 +115,15 @@ export default function WishlistPage() {
                                         href={`/product/${product.slug || product._id}`}
                                         className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[var(--color-primary)] hover:text-white transition-all"
                                     >
-                                        <LuEye size={16} />
+                                        <FiEye size={16} />
                                     </Link>
-                                    <button className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[var(--color-primary)] hover:text-white transition-all">
-                                        <LuShoppingCart size={16} />
+                                    <button
+                                        onClick={() => handleAddToCart(product)}
+                                        disabled={product.stock <= 0}
+                                        title={product.stock > 0 ? 'Buy now' : 'Out of stock'}
+                                        className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg hover:bg-[var(--color-primary)] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <FiShoppingCart size={16} />
                                     </button>
                                 </div>
 
@@ -106,13 +133,13 @@ export default function WishlistPage() {
                                     disabled={toggling}
                                     className="absolute top-3 right-3 w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                                 >
-                                    <LuTrash2 size={14} />
+                                    <FiTrash2 size={14} />
                                 </button>
 
                                 {/* Discount Badge */}
-                                {product.originalPrice > product.price && (
+                                {product.discountPrice && product.discountPrice < product.price && (
                                     <span className="absolute top-3 left-3 px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded-md shadow-md">
-                                        -{product.discount || Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+                                        -{Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
                                     </span>
                                 )}
                             </div>
@@ -126,14 +153,14 @@ export default function WishlistPage() {
                                 </Link>
 
                                 {/* Rating */}
-                                {product.rating > 0 && (
+                                {product.averageRating > 0 && (
                                     <div className="flex items-center gap-1 mt-2">
-                                        <LuStar size={12} className="text-amber-400 fill-amber-400" />
+                                        <FiStar size={12} className="text-amber-400 fill-amber-400" />
                                         <span className="text-xs font-semibold text-gray-600">
-                                            {product.rating?.toFixed(1)}
+                                            {product.averageRating?.toFixed(1)}
                                         </span>
                                         <span className="text-xs text-gray-300">
-                                            ({product.reviewCount || 0})
+                                            ({product.totalReviews || 0})
                                         </span>
                                     </div>
                                 )}
@@ -141,11 +168,11 @@ export default function WishlistPage() {
                                 {/* Price */}
                                 <div className="flex items-center gap-2 mt-3">
                                     <span className="text-lg font-bold text-[var(--color-primary)]">
-                                        ৳{product.price?.toLocaleString()}
+                                        ৳{(product.discountPrice || product.price)?.toLocaleString()}
                                     </span>
-                                    {product.originalPrice > product.price && (
+                                    {product.discountPrice && product.discountPrice < product.price && (
                                         <span className="text-xs text-gray-400 line-through">
-                                            ৳{product.originalPrice?.toLocaleString()}
+                                            ৳{product.price?.toLocaleString()}
                                         </span>
                                     )}
                                 </div>
@@ -159,29 +186,6 @@ export default function WishlistPage() {
                     ))}
                 </div>
             )}
-
-            {/* ── Followed Stores ── */}
-            <div>
-                <div className="flex items-center gap-2 mb-3">
-                    <LuShoppingBag size={18} className="text-[var(--color-primary)]" />
-                    <h2 className="text-lg font-bold text-gray-900">Followed Stores</h2>
-                </div>
-                <div className="bg-white rounded-2xl border border-gray-100 p-10 shadow-sm text-center">
-                    <div className="w-14 h-14 rounded-full bg-[var(--color-primary-lightest)] flex items-center justify-center mx-auto mb-4">
-                        <LuShoppingBag size={24} className="text-[var(--color-primary)]" />
-                    </div>
-                    <h3 className="text-base font-bold text-gray-700 mb-1">You&apos;re not following any stores yet</h3>
-                    <p className="text-sm text-gray-400 mb-5 max-w-md mx-auto">
-                        Follow your favourite stores to get their latest products and offers right here.
-                    </p>
-                    <Link
-                        href="/products"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:brightness-95 transition-all"
-                    >
-                        <LuShoppingBag size={15} /> Browse Stores
-                    </Link>
-                </div>
-            </div>
         </div>
     );
 }

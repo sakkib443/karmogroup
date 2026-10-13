@@ -48,29 +48,33 @@ function priceForSize(item, sizeLabel) {
 function sizedHref(href, sizeLabel) {
   const presetId = SIZE_TO_PRESET[sizeLabel];
   if (!href || !presetId) return href;
-  return `${href}${href.includes("?") ? "&" : "?"}size=${presetId}`;
+  const hashAt = href.indexOf("#");
+  const path = hashAt >= 0 ? href.slice(0, hashAt) : href;
+  const hash = hashAt >= 0 ? href.slice(hashAt) : "";
+  const next = `${path}${path.includes("?") ? "&" : "?"}size=${presetId}`;
+  return `${next}${hash}`;
 }
 
 const SIZE_OPTIONS = [
   {
     id: "Single",
     label: "Single",
-    icon: "/karmo/images/trust/cartoon-v3/size-single-v2.webp",
+    icon: "/shared/trust/cartoon-v3/size-single-v2.webp",
   },
   {
     id: "Double",
     label: "Double",
-    icon: "/karmo/images/trust/cartoon-v3/size-double-v2.webp",
+    icon: "/shared/trust/cartoon-v3/size-double-v2.webp",
   },
   {
     id: "Queen",
     label: "Queen",
-    icon: "/karmo/images/trust/cartoon-v3/size-queen-v2.webp",
+    icon: "/shared/trust/cartoon-v3/size-queen-v2.webp",
   },
   {
     id: "King",
     label: "King",
-    icon: "/karmo/images/trust/cartoon-v3/size-king-v2.webp",
+    icon: "/shared/trust/cartoon-v3/size-king-v2.webp",
   },
 ];
 
@@ -101,11 +105,15 @@ function Stars({ value = 4.8 }) {
   );
 }
 
-/** Simple tile — foam / chemicals / hometex. */
-function ProductTile({ item, detailHref }) {
+/** Simple tile — foam / chemicals / hometex.
+ *  `hoverOverlay` matches the live shop: second image fades in on top
+ *  (0.35s ease-in-out), front photo stays put. Foam tiles keep the
+ *  slower crossfade + scale. */
+function ProductTile({ item, detailHref, hoverOverlay = false }) {
   const onOffer = Boolean(item.was);
   const hoverSrc = item.imageHover;
   const href = item.href || detailHref || null;
+  const overlay = Boolean(hoverOverlay && hoverSrc);
 
   const media = (
     <div className="relative aspect-square overflow-hidden">
@@ -114,9 +122,13 @@ function ProductTile({ item, detailHref }) {
         alt={item.alt}
         fill
         sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-        className={`object-cover transition-[transform,opacity] duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] ${
-          hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
-        }`}
+        className={
+          overlay
+            ? "object-cover"
+            : `object-cover transition-[transform,opacity] duration-[1300ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] ${
+                hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
+              }`
+        }
       />
       {hoverSrc && (
         <Image
@@ -125,7 +137,11 @@ function ProductTile({ item, detailHref }) {
           fill
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           aria-hidden
-          className="object-cover opacity-0 transition-[transform,opacity] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] group-hover:opacity-100"
+          className={
+            overlay
+              ? "z-[1] object-cover opacity-0 transition-opacity duration-[350ms] ease-in-out group-hover:opacity-100"
+              : "z-[1] object-cover opacity-0 transition-[transform,opacity] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04] group-hover:opacity-100"
+          }
         />
       )}
       {onOffer && (
@@ -315,7 +331,7 @@ function MattressFloatCard({ item }) {
               className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
             >
               <Image
-                src="/karmo/images/trust/order-cartoon/cart-v2.webp"
+                src="/shared/trust/order-cartoon/cart-v2.webp"
                 alt=""
                 aria-hidden
                 width={22}
@@ -481,7 +497,7 @@ function MattressCatalogueCard({ item }) {
             className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
           >
             <Image
-              src="/karmo/images/trust/order-cartoon/cart-v2.webp"
+              src="/shared/trust/order-cartoon/cart-v2.webp"
               alt=""
               aria-hidden
               width={22}
@@ -512,6 +528,87 @@ function MattressCatalogueCard({ item }) {
   );
 }
 
+/** Foam shop card — square cover (no crop), set price, no mattress sizes. */
+function FoamCatalogueCard({ item }) {
+  const href = item.href || "/contact";
+  const pct = discountPct(item.was, item.now);
+  const spec = (item.specs || []).filter(Boolean).join(" · ") || item.line;
+
+  return (
+    <motion.article
+      variants={fade}
+      className="group flex h-full flex-col overflow-hidden bg-white shadow-[0_1px_8px_rgba(11,26,51,0.08)] ring-1 ring-ink/[0.05]"
+    >
+      <Link
+        href={href}
+        className="relative block aspect-square shrink-0 overflow-hidden bg-white focus-visible:outline-none"
+      >
+        <Image
+          src={item.image}
+          alt={item.alt || item.name}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-contain object-center transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.015]"
+        />
+      </Link>
+
+      <div className="flex min-h-0 flex-1 flex-col px-4 pb-4 pt-3.5 sm:px-5">
+        <h3 className="text-[15px] font-bold leading-snug text-ink sm:text-[16px]">
+          <Link href={href} className="transition-colors hover:text-brand">
+            {item.name}
+          </Link>
+        </h3>
+
+        {spec ? (
+          <p className="mt-1.5 text-[12px] font-medium leading-snug text-ink/50">
+            {spec}
+          </p>
+        ) : null}
+
+        <div className="mt-3 flex items-end justify-between gap-3">
+          <p className="flex flex-wrap items-center gap-2">
+            <span className="text-[20px] font-bold tabular-nums leading-none text-brand">
+              {item.now}
+            </span>
+            {item.was ? (
+              <s className="text-[13px] tabular-nums text-ink/35">{item.was}</s>
+            ) : null}
+            {pct != null ? (
+              <span
+                className="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-white"
+                style={{ backgroundColor: ORANGE }}
+              >
+                {pct}% off
+              </span>
+            ) : null}
+          </p>
+          <p className="mb-0.5 flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink/45">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#2F9E44]" />
+            In stock
+          </p>
+        </div>
+
+        <div className="mt-auto pt-4">
+          <Link
+            href={href}
+            className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
+          >
+            <Image
+              src="/shared/trust/order-cartoon/cart-v2.webp"
+              alt=""
+              aria-hidden
+              width={22}
+              height={22}
+              className="h-[22px] w-[22px] object-contain transition-transform duration-300 group-hover/cta:scale-110"
+            />
+            <span>Order Now</span>
+          </Link>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
 export default function DivisionProducts({
   eyebrow = "Best price",
   headingLead = "Hot offer",
@@ -522,13 +619,17 @@ export default function DivisionProducts({
   categoryId = "all",
   detailHref,
   textured = false,
-  textureSrc = "/karmo/images/mattress/mosaic/karmo-pattern-texture.webp",
-  /** `catalogue` = mattress-style offer cards. */
+  textureSrc = "/products/mattress/mosaic/karmo-pattern-texture.webp",
+  /** `catalogue` = mattress cards. `foam` = square foam shop cards. */
   variant = "default",
+  /** Live-shop style: hover image fades in over the front photo. */
+  hoverOverlay = false,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const catalogue = variant === "catalogue";
+  const foamGrid = variant === "foam";
+  const threeCol = catalogue || foamGrid;
 
   const list =
     categoryId === "all"
@@ -542,7 +643,7 @@ export default function DivisionProducts({
     <section
       id={offersId}
       className={`relative scroll-mt-[7.5rem] bg-white pb-16 pt-4 lg:pb-24 lg:pt-6 ${
-        catalogue ? "overflow-x-clip overflow-y-visible" : "overflow-hidden"
+        threeCol ? "overflow-x-clip overflow-y-visible" : "overflow-hidden"
       }`}
     >
       {textured && !hasFloatCard ? (
@@ -615,20 +716,27 @@ export default function DivisionProducts({
           {...reveal}
           viewport={VIEWPORT}
           className={
-            catalogue
+            threeCol
               ? "relative z-[1] mx-auto grid w-full max-w-[1680px] grid-cols-1 items-stretch gap-5 px-5 pt-6 sm:grid-cols-2 sm:gap-6 sm:pt-8 md:px-8 lg:grid-cols-3 lg:gap-7 lg:px-10 lg:pt-10"
               : "relative z-[1] mx-auto grid w-full max-w-[1760px] grid-cols-1 gap-5 px-6 sm:grid-cols-2 sm:gap-6 md:px-10 lg:grid-cols-4 lg:gap-8 lg:px-12"
           }
         >
           {list.map((item) =>
-            catalogue ? (
+            foamGrid ? (
+              <FoamCatalogueCard key={item.id} item={item} />
+            ) : catalogue ? (
               item.cardStyle === "float3d" ? (
                 <MattressFloatCard key={item.id} item={item} />
               ) : (
                 <MattressCatalogueCard key={item.id} item={item} />
               )
             ) : (
-              <ProductTile key={item.id} item={item} detailHref={detailHref} />
+              <ProductTile
+                key={item.id}
+                item={item}
+                detailHref={detailHref}
+                hoverOverlay={hoverOverlay}
+              />
             ),
           )}
         </motion.div>

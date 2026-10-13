@@ -2,16 +2,16 @@
 
 import React, { useState } from 'react';
 import {
-    LuMapPin,
-    LuPlus,
-    LuSquarePen,
-    LuTrash2,
-    LuX,
-    LuUser,
-    LuPhone,
-    LuHouse,
-    LuCheck,
-} from 'react-icons/lu';
+    FiMapPin,
+    FiPlus,
+    FiEdit2,
+    FiTrash2,
+    FiX,
+    FiUser,
+    FiPhone,
+    FiHome,
+    FiCheck,
+} from 'react-icons/fi';
 import { useGetMyAddressesQuery, useAddAddressMutation, useUpdateAddressMutation, useDeleteAddressMutation } from '@/redux/api/userApi';
 
 interface Address {
@@ -21,13 +21,14 @@ interface Address {
     address: string;
     city: string;
     area: string;
-    postalCode: string;
+    zipCode?: string;
+    postalCode?: string;   // backend stores the zip as `postalCode`
     isDefault?: boolean;
     label?: string;
 }
 
 const emptyAddress = {
-    fullName: '', phone: '', address: '', city: '', area: '', postalCode: '', label: 'Home', isDefault: false,
+    fullName: '', phone: '', address: '', city: '', area: '', zipCode: '', label: 'Home',
 };
 
 export default function AddressesPage() {
@@ -56,9 +57,8 @@ export default function AddressesPage() {
             address: addr.address,
             city: addr.city,
             area: addr.area,
-            postalCode: addr.postalCode,
+            zipCode: addr.postalCode || addr.zipCode || '',
             label: addr.label || 'Home',
-            isDefault: !!addr.isDefault,
         });
         setShowModal(true);
     };
@@ -88,6 +88,14 @@ export default function AddressesPage() {
         }
     };
 
+    const handleSetDefault = async (id: string) => {
+        try {
+            await updateAddress({ id, isDefault: true }).unwrap();
+        } catch (err) {
+            console.error('Failed to set default address', err);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -101,7 +109,7 @@ export default function AddressesPage() {
                         onClick={openAdd}
                         className="w-full sm:w-auto px-5 py-2.5 bg-[var(--color-primary)] text-white rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] transition-all shadow-md shadow-[var(--color-primary)]/20 flex items-center justify-center gap-2 flex-shrink-0"
                     >
-                        <LuPlus size={16} />
+                        <FiPlus size={16} />
                         Add New
                     </button>
                 </div>
@@ -120,7 +128,7 @@ export default function AddressesPage() {
                 </div>
             ) : addresses.length === 0 ? (
                 <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center shadow-sm">
-                    <LuMapPin size={48} className="mx-auto text-gray-200 mb-4" />
+                    <FiMapPin size={48} className="mx-auto text-gray-200 mb-4" />
                     <h3 className="text-lg font-bold text-gray-600 mb-1">No addresses yet</h3>
                     <p className="text-sm text-gray-400 mb-4">Add your first shipping address</p>
                     <button
@@ -144,7 +152,7 @@ export default function AddressesPage() {
                                     </span>
                                     {addr.isDefault && (
                                         <span className="px-2.5 py-0.5 bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-xs font-bold rounded-md flex items-center gap-1">
-                                            <LuCheck size={10} /> Default
+                                            <FiCheck size={10} /> Default
                                         </span>
                                     )}
                                 </div>
@@ -153,13 +161,13 @@ export default function AddressesPage() {
                                         onClick={() => openEdit(addr)}
                                         className="p-2 hover:bg-blue-50 rounded-lg text-gray-400 hover:text-blue-600 transition-all"
                                     >
-                                        <LuSquarePen size={14} />
+                                        <FiEdit2 size={14} />
                                     </button>
                                     <button
                                         onClick={() => handleDelete(addr._id)}
                                         className="p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-600 transition-all"
                                     >
-                                        <LuTrash2 size={14} />
+                                        <FiTrash2 size={14} />
                                     </button>
                                 </div>
                             </div>
@@ -167,10 +175,21 @@ export default function AddressesPage() {
                             <p className="text-sm font-bold text-gray-800 mb-1">{addr.fullName}</p>
                             <p className="text-sm text-gray-500">{addr.address}</p>
                             <p className="text-sm text-gray-500">{addr.city}, {addr.area}</p>
-                            <p className="text-sm text-gray-500">Zip: {addr.postalCode}</p>
-                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-50 text-xs text-gray-400">
-                                <LuPhone size={12} />
-                                <span>{addr.phone}</span>
+                            <p className="text-sm text-gray-500">Zip: {addr.postalCode || addr.zipCode || '—'}</p>
+                            <div className="flex items-center justify-between gap-2 mt-3 pt-3 border-t border-gray-50">
+                                <div className="flex items-center gap-2 text-xs text-gray-400">
+                                    <FiPhone size={12} />
+                                    <span>{addr.phone}</span>
+                                </div>
+                                {!addr.isDefault && (
+                                    <button
+                                        onClick={() => handleSetDefault(addr._id)}
+                                        disabled={updating}
+                                        className="text-xs font-semibold text-[var(--color-primary)] hover:underline disabled:opacity-50 flex items-center gap-1"
+                                    >
+                                        <FiCheck size={12} /> Set as Default
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -186,7 +205,7 @@ export default function AddressesPage() {
                                 {editingId ? 'Edit Address' : 'Add New Address'}
                             </h2>
                             <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
-                                <LuX size={20} />
+                                <FiX size={20} />
                             </button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-5 space-y-4">
@@ -241,22 +260,10 @@ export default function AddressesPage() {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-500 mb-2">Zip Code</label>
-                                    <input type="text" required value={form.postalCode} onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
+                                    <input type="text" required value={form.zipCode} onChange={(e) => setForm({ ...form, zipCode: e.target.value })}
                                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[var(--color-primary)] outline-none text-sm transition-all" placeholder="1200" />
                                 </div>
                             </div>
-
-                            {/* Set as default */}
-                            <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                                <input
-                                    type="checkbox"
-                                    checked={form.isDefault}
-                                    onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
-                                    className="w-4 h-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30 accent-[var(--color-primary)]"
-                                />
-                                <span className="text-sm font-medium text-gray-600">Set as default shipping address</span>
-                            </label>
-
                             <div className="flex justify-end gap-3 pt-3">
                                 <button type="button" onClick={() => setShowModal(false)}
                                     className="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-all">

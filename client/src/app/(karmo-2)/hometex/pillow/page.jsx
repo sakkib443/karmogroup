@@ -27,15 +27,15 @@ const pillowPage = {
 function WhyChoosePillows() {
   const items = [
     {
-      img: "/new%20icon/why-choose-1.png",
+      img: "/pages/hometex/pillow/why-choose/why-choose-1.png",
       title: "Unmatched Energy Recovery",
     },
     {
-      img: "/new%20icon/why-choose-2.png",
+      img: "/pages/hometex/pillow/why-choose/why-choose-2.png",
       title: "Premium Plush Microfiber",
     },
     {
-      img: "/new%20icon/why-choose-3.png",
+      img: "/pages/hometex/pillow/why-choose/why-choose-3.png",
       title: "Pure Comfort For Everyone",
     }
   ];
@@ -73,7 +73,7 @@ const customShapeGrid = {
       badge: "red",
       title: "Feather-Touch Microfibre",
       overview: "Premium down-like softness crafted for ultimate relaxation and breathability, bringing a luxurious hotel-feel to your everyday sleep.",
-      background: "/karmo/images/pillow/card-01.png",
+      background: "/pages/hometex/pillow/card-01.png",
     },
     {
       id: "soft-luxurious",
@@ -91,7 +91,7 @@ const customShapeGrid = {
     }
   ],
   spotlight: {
-    image: "/karmo/images/pillow/banner-02.png",
+    image: "/pages/hometex/pillow/banner-02.png",
     alt: "Karmo Pillow Banner",
     overlay: true, // we'll add support for this
     headingLead: "",
@@ -101,9 +101,168 @@ const customShapeGrid = {
     brand: "",
   },
   film: null,
-  still: "/karmo/images/pillow/card-02.png",
+  still: "/pages/hometex/pillow/card-02.png",
   filmOverlay: true,
 };
+
+const PILLOW_IMG = "/products/hometex/pillow";
+
+/* Same 19 SKUs as karmogroup.com/pillow — front photo + the live shop's
+   second (hover) image. Size variants that share a photo there share it here. */
+const pillowCatalogue = [
+  {
+    id: "2-relaxtime-cushion-offer",
+    name: "2 RelaxTime Cushion Offer",
+    image: `${PILLOW_IMG}/2-cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/2-cushion-hover.jpg`,
+    alt: "Two white Karmo Relax Time cushions",
+    now: "৳ 470",
+  },
+  {
+    id: "4-relaxtime-cushion-offer",
+    name: "4 RelaxTime Cushion Offer",
+    image: `${PILLOW_IMG}/4-cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/4-cushion-hover.jpg`,
+    alt: "Four white Karmo Relax Time cushions",
+    now: "৳ 850",
+  },
+  {
+    id: "6-relaxtime-cushion-offer",
+    name: "6 RelaxTime Cushion Offer",
+    image: `${PILLOW_IMG}/6-cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/6-cushion-hover.jpg`,
+    alt: "Six white Karmo Relax Time cushions",
+    now: "৳ 1,240",
+  },
+  {
+    id: "plush-pillow-combo-offer",
+    name: "Plush Pillow Combo Offer",
+    image: `${PILLOW_IMG}/plush-combo.jpg`,
+    imageHover: `${PILLOW_IMG}/plush-combo-hover.jpg`,
+    alt: "Karmo Plush pillow combo tied with a red ribbon",
+    now: "৳ 2,599",
+  },
+  {
+    id: "relaxtime-pillow-combo-offer",
+    name: "RelaxTime Pillow Combo Offer",
+    image: `${PILLOW_IMG}/relax-combo.jpg`,
+    imageHover: `${PILLOW_IMG}/relax-combo-hover.jpg`,
+    alt: "Karmo Relax Time pillow combo",
+    now: "৳ 1,599",
+  },
+  {
+    id: "relaxtime-pillow-combo-offer-999",
+    name: "RelaxTime Pillow Combo Offer",
+    image: `${PILLOW_IMG}/relax-combo-999.jpg`,
+    imageHover: `${PILLOW_IMG}/relax-combo-999-hover.jpg`,
+    alt: "Karmo Relax Time pillow combo offer",
+    now: "৳ 999",
+  },
+  {
+    id: "plush-pillow-combo-offer-2060",
+    name: "Plush Pillow Combo Offer",
+    image: `${PILLOW_IMG}/plush-combo-2060.jpg`,
+    imageHover: `${PILLOW_IMG}/plush-head-hover.jpg`,
+    alt: "Karmo Plush pillow combo offer",
+    now: "৳ 2,060",
+  },
+  {
+    id: "plush-head-18x24",
+    name: "Plush Head Pillow (18″ x 24″)",
+    image: `${PILLOW_IMG}/plush-head.jpg`,
+    imageHover: `${PILLOW_IMG}/plush-head-hover.jpg`,
+    alt: "Two stacked white Karmo Plush head pillows",
+    now: "৳ 1,030",
+  },
+  {
+    id: "plush-head-18x26",
+    name: "Plush Head Pillow (18″ x 26″)",
+    image: `${PILLOW_IMG}/plush-head.jpg`,
+    imageHover: `${PILLOW_IMG}/plush-head-hover.jpg`,
+    alt: "Two stacked white Karmo Plush head pillows",
+    now: "৳ 1,050",
+  },
+  {
+    id: "plush-head-18x28",
+    name: "Plush Head Pillow (18″ x 28″)",
+    image: `${PILLOW_IMG}/plush-head.jpg`,
+    imageHover: `${PILLOW_IMG}/plush-head-hover.jpg`,
+    alt: "Two stacked white Karmo Plush head pillows",
+    now: "৳ 1,080",
+  },
+  {
+    id: "relaxtime-head-18x24",
+    name: "RelaxTime Head Pillow (18″ x 24″)",
+    image: `${PILLOW_IMG}/relaxtime-head.jpg`,
+    imageHover: `${PILLOW_IMG}/relax-combo-999-hover.jpg`,
+    alt: "Three stacked white Karmo Relax Time head pillows",
+    now: "৳ 500",
+  },
+  {
+    id: "relaxtime-head-18x26",
+    name: "RelaxTime Head Pillow (18″ x 26″)",
+    image: `${PILLOW_IMG}/relaxtime-head-26.jpg`,
+    imageHover: `${PILLOW_IMG}/relax-combo-999-hover.jpg`,
+    alt: "White Karmo Relax Time head pillows",
+    now: "৳ 550",
+  },
+  {
+    id: "relaxtime-head-18x28",
+    name: "RelaxTime Head Pillow (18″ x 28″)",
+    image: `${PILLOW_IMG}/relaxtime-head.jpg`,
+    imageHover: `${PILLOW_IMG}/relaxtime-head-28-hover.jpg`,
+    alt: "Three stacked white Karmo Relax Time head pillows",
+    now: "৳ 570",
+  },
+  {
+    id: "side-pillow-32x27",
+    name: "Side Pillow (32″ x 27″)",
+    image: `${PILLOW_IMG}/side-pillow.jpg`,
+    imageHover: `${PILLOW_IMG}/side-pillow-hover.png`,
+    alt: "Two white Karmo Relax Time side pillows",
+    now: "৳ 630",
+  },
+  {
+    id: "side-pillow-38x32",
+    name: "Side Pillow (38″ x 32″)",
+    image: `${PILLOW_IMG}/side-pillow.jpg`,
+    imageHover: `${PILLOW_IMG}/side-pillow-hover.png`,
+    alt: "Two white Karmo Relax Time side pillows",
+    now: "৳ 730",
+  },
+  {
+    id: "cushion-14x14",
+    name: "Cushion (14″ x 14″)",
+    image: `${PILLOW_IMG}/cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/cushion-hover.jpg`,
+    alt: "Two stacked white Karmo Relax Time cushions",
+    now: "৳ 220",
+  },
+  {
+    id: "cushion-16x16",
+    name: "Cushion (16″ x 16″)",
+    image: `${PILLOW_IMG}/cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/cushion-hover.jpg`,
+    alt: "Two stacked white Karmo Relax Time cushions",
+    now: "৳ 260",
+  },
+  {
+    id: "cushion-18x18",
+    name: "Cushion (18″ x 18″)",
+    image: `${PILLOW_IMG}/cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/cushion-hover.jpg`,
+    alt: "Two stacked white Karmo Relax Time cushions",
+    now: "৳ 280",
+  },
+  {
+    id: "cushion-20x20",
+    name: "Cushion (20″ x 20″)",
+    image: `${PILLOW_IMG}/cushion.jpg`,
+    imageHover: `${PILLOW_IMG}/cushion-hover.jpg`,
+    alt: "Two stacked white Karmo Relax Time cushions",
+    now: "৳ 310",
+  },
+];
 
 const customLounge = {
   ...foam.lounge,
@@ -123,7 +282,7 @@ const customLounge = {
       kicker: "",
       cta: [],
       image: {
-        src: "/karmo/images/hometex/pillow/karmo-plush-travel-suitcase-hero-v2.png",
+        src: "/pages/hometex/pillow/karmo-plush-travel-suitcase-hero-v2.png",
         alt: "A Karmo Plush pillow packed in an open suitcase beside headphones, a wallet, an orange knit and a travel list, on a warm cream backdrop",
         position: "object-[63%_center] lg:object-right",
       },
@@ -140,7 +299,16 @@ export default function PillowRoute() {
       <WhyChoosePillows />
       <HometexShapeGrid {...customShapeGrid} />
       <DivisionAbout {...customLounge} />
-      <DivisionProducts {...pillowPage.products} categoryId="all" />
+      <DivisionProducts
+        eyebrow="Best price"
+        headingLead="Hot offer"
+        headingAccent="for you"
+        offersId="pillow-offers"
+        body=""
+        items={pillowCatalogue}
+        categoryId="all"
+        hoverOverlay
+      />
       <OrderAndContact />
     </>
   );

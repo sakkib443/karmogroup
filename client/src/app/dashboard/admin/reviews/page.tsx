@@ -1,25 +1,26 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import {
-    LuStar,
-    LuMessageSquare,
-    LuCircleCheck,
-    LuCircleX,
-    LuTrash2,
-    LuRefreshCw,
-    LuFilter,
-    LuSearch,
-    LuCornerDownRight,
-    LuSend,
-    LuEye,
-    LuCircleAlert,
-    LuUser,
-    LuPackage,
-    LuX,
-    LuClock,
-} from 'react-icons/lu';
+    FiStar,
+    FiMessageSquare,
+    FiCheckCircle,
+    FiXCircle,
+    FiTrash2,
+    FiRefreshCw,
+    FiFilter,
+    FiSearch,
+    FiCornerDownRight,
+    FiSend,
+    FiEye,
+    FiAlertCircle,
+    FiUser,
+    FiPackage,
+    FiX,
+    FiClock,
+} from 'react-icons/fi';
 import {
     useGetAllReviewsQuery,
     useUpdateReviewMutation,
@@ -48,7 +49,7 @@ const ReplyModal = ({
             <div className="bg-white rounded-md w-full max-w-md shadow-xl overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                     <h3 className="font-bold text-gray-800 text-lg">Reply to Review</h3>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><LuX size={20} /></button>
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><FiX size={20} /></button>
                 </div>
                 <div className="p-6 space-y-4">
                     <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
@@ -71,7 +72,7 @@ const ReplyModal = ({
                         onClick={() => onSubmit(reply)}
                         className="px-6 py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold shadow-md hover:bg-[var(--color-primary-dark)] flex items-center gap-2 transition-all"
                     >
-                        <LuSend size={16} />
+                        <FiSend size={16} />
                         Send Reply
                     </button>
                 </div>
@@ -80,9 +81,22 @@ const ReplyModal = ({
     );
 };
 
+const REVIEW_STATUSES = ['pending', 'approved', 'rejected'];
+
+// useSearchParams needs a Suspense boundary (Next.js falls back to client rendering up to it).
 export default function ReviewsPage() {
+    return (
+        <Suspense fallback={null}>
+            <ReviewsPageInner />
+        </Suspense>
+    );
+}
+
+function ReviewsPageInner() {
+    // ?status=pending (the Dashboard's "Reviews awaiting moderation" link) pre-selects the filter.
+    const statusParam = useSearchParams().get('status');
     const [page, setPage] = useState(1);
-    const [statusFilter, setStatusFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState(statusParam && REVIEW_STATUSES.includes(statusParam) ? statusParam : '');
     const [isReplyModalOpen, setIsReplyModalOpen] = useState(false);
     const [selectedReview, setSelectedReview] = useState<any>(null);
 
@@ -135,7 +149,7 @@ export default function ReviewsPage() {
                     onClick={() => refetch()}
                     className="px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 flex items-center gap-2 transition-all shadow-sm"
                 >
-                    <LuRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
+                    <FiRefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
                     Refresh
                 </button>
             </div>
@@ -144,7 +158,7 @@ export default function ReviewsPage() {
             <div className="bg-blue-50 border border-blue-100 rounded-md p-5 shadow-sm">
                 <div className="flex items-center gap-4">
                     <div className="p-3 rounded-md bg-white shadow-sm text-blue-600">
-                        <LuMessageSquare size={22} />
+                        <FiMessageSquare size={22} />
                     </div>
                     <div>
                         <p className="text-2xl font-bold text-blue-600 leading-none">{meta.total}</p>
@@ -225,13 +239,13 @@ export default function ReviewsPage() {
                                                     <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
                                                         {review.user?.avatar ? (
                                                             <Image src={review.user.avatar} alt="User" width={24} height={24} className="rounded-full" />
-                                                        ) : <LuUser size={12} className="text-gray-400" />}
+                                                        ) : <FiUser size={12} className="text-gray-400" />}
                                                     </div>
                                                     <span className="text-xs font-bold text-gray-700">{review.user?.firstName} {review.user?.lastName}</span>
                                                 </div>
                                                 <div className="flex gap-0.5">
                                                     {[...Array(5)].map((_, i) => (
-                                                        <LuStar
+                                                        <FiStar
                                                             key={i}
                                                             size={12}
                                                             className={i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}
@@ -255,7 +269,7 @@ export default function ReviewsPage() {
                                                 )}
                                                 {review.adminReply && (
                                                     <div className="bg-gray-50 p-2 rounded border border-gray-200 flex gap-2">
-                                                        <LuCornerDownRight className="text-gray-400 flex-shrink-0" size={14} />
+                                                        <FiCornerDownRight className="text-gray-400 flex-shrink-0" size={14} />
                                                         <div>
                                                             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none mb-1">Response</p>
                                                             <p className="text-xs text-gray-700 font-medium">{review.adminReply}</p>
@@ -273,43 +287,43 @@ export default function ReviewsPage() {
                                             </span>
                                             {review.isVerifiedPurchase && (
                                                 <div className="mt-2 text-[9px] font-bold text-indigo-500 uppercase flex items-center gap-1">
-                                                    <LuCircleCheck size={10} /> Verified Purchase
+                                                    <FiCheckCircle size={10} /> Verified Purchase
                                                 </div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                {review.status === 'pending' && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleUpdateStatus(review._id, 'approved')}
-                                                            title="Approve"
-                                                            className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-md border border-gray-100 transition-all"
-                                                        >
-                                                            <LuCircleCheck size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleUpdateStatus(review._id, 'rejected')}
-                                                            title="Reject"
-                                                            className="p-2 text-red-500 hover:bg-red-50 rounded-md border border-gray-100 transition-all"
-                                                        >
-                                                            <LuCircleX size={16} />
-                                                        </button>
-                                                    </>
+                                                {review.status !== 'approved' && (
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(review._id, 'approved')}
+                                                        title="Approve"
+                                                        className="p-2 text-emerald-500 hover:bg-emerald-50 rounded-md border border-gray-100 transition-all"
+                                                    >
+                                                        <FiCheckCircle size={16} />
+                                                    </button>
+                                                )}
+                                                {review.status !== 'rejected' && (
+                                                    <button
+                                                        onClick={() => handleUpdateStatus(review._id, 'rejected')}
+                                                        title="Reject"
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-md border border-gray-100 transition-all"
+                                                    >
+                                                        <FiXCircle size={16} />
+                                                    </button>
                                                 )}
                                                 <button
                                                     onClick={() => { setSelectedReview(review); setIsReplyModalOpen(true); }}
                                                     title="Reply"
                                                     className="p-2 text-blue-500 hover:bg-blue-50 rounded-md border border-gray-100 transition-all"
                                                 >
-                                                    <LuMessageSquare size={16} />
+                                                    <FiMessageSquare size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(review._id)}
                                                     title="Delete"
                                                     className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md border border-gray-100 transition-all"
                                                 >
-                                                    <LuTrash2 size={16} />
+                                                    <FiTrash2 size={16} />
                                                 </button>
                                             </div>
                                         </td>
@@ -320,21 +334,32 @@ export default function ReviewsPage() {
                     </table>
                 </div>
 
-                {/* Pagination */}
+                {/* Pagination — windowed so it stays compact as reviews grow */}
                 {meta.totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-gray-100 flex justify-center gap-2">
-                        {[...Array(meta.totalPages)].map((_, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setPage(i + 1)}
-                                className={`w-8 h-8 rounded-md text-sm font-bold transition-all ${page === i + 1
-                                    ? 'bg-[var(--color-primary)] text-white shadow-md'
-                                    : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
-                                    }`}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
+                    <div className="px-6 py-4 border-t border-gray-100 flex justify-center items-center gap-2">
+                        {(() => {
+                            const items: (number | string)[] = [];
+                            for (let i = 1; i <= meta.totalPages; i++) {
+                                if (i === 1 || i === meta.totalPages || (i >= page - 1 && i <= page + 1)) items.push(i);
+                                else if (items[items.length - 1] !== '…') items.push('…');
+                            }
+                            return items.map((it, idx) =>
+                                it === '…' ? (
+                                    <span key={`gap-${idx}`} className="w-8 h-8 flex items-center justify-center text-gray-400 text-sm select-none">…</span>
+                                ) : (
+                                    <button
+                                        key={it}
+                                        onClick={() => setPage(it as number)}
+                                        className={`w-8 h-8 rounded-md text-sm font-bold transition-all ${page === it
+                                            ? 'bg-[var(--color-primary)] text-white shadow-md'
+                                            : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {it}
+                                    </button>
+                                )
+                            );
+                        })()}
                     </div>
                 )}
             </div>

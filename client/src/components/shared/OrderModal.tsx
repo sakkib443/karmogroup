@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { LuX } from 'react-icons/lu';
+import { FiX } from 'react-icons/fi';
 import { useGuestCheckoutMutation, useCreateOrderMutation } from '@/redux/api/orderApi';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { clearCart } from '@/redux/slices/cartSlice';
@@ -227,7 +227,7 @@ const OrderModal: React.FC<OrderModalProps> = ({
             >
                 {/* Close */}
                 <button onClick={onClose} style={{ position: 'absolute', top: '12px', right: '12px', width: '32px', height: '32px', borderRadius: '50%', background: '#f3f4f6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#666' }}>
-                    <LuX size={16} />
+                    <FiX size={16} />
                 </button>
 
                 <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#1a1a1a', margin: '0 0 4px' }}>Confirm Your Order</h2>

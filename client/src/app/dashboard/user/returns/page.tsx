@@ -3,13 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-    LuRefreshCw,
-    LuChevronDown,
-    LuChevronUp,
-    LuPackage,
-    LuExternalLink,
-    LuCircleAlert,
-} from 'react-icons/lu';
+    FiRefreshCw,
+    FiChevronDown,
+    FiChevronUp,
+    FiPackage,
+    FiExternalLink,
+    FiAlertCircle,
+} from 'react-icons/fi';
 import { useGetMyReturnsQuery, RETURN_REASONS, returnStatusBadge } from '@/redux/api/returnApi';
 
 export default function MyReturnsPage() {
@@ -41,7 +41,7 @@ export default function MyReturnsPage() {
         <div className="space-y-5">
             {/* Header */}
             <div className="flex items-center gap-2">
-                <LuRefreshCw size={20} className="text-[var(--color-primary)]" />
+                <FiRefreshCw size={20} className="text-[var(--color-primary)]" />
                 <h1 className="text-xl font-bold text-gray-900">My Returns</h1>
                 {returns.length > 0 && (
                     <span className="ml-1 text-xs font-bold text-gray-400">({returns.length})</span>
@@ -51,7 +51,7 @@ export default function MyReturnsPage() {
             {/* Empty state */}
             {returns.length === 0 ? (
                 <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-                    <LuRefreshCw size={48} className="mx-auto text-gray-200 mb-4" />
+                    <FiRefreshCw size={48} className="mx-auto text-gray-200 mb-4" />
                     <h3 className="text-lg font-bold text-gray-600 mb-1">No returns yet</h3>
                     <p className="text-sm text-gray-400 mb-4">
                         When you request a return on a delivered order, it&apos;ll show up here.
@@ -113,7 +113,7 @@ export default function MyReturnsPage() {
                                                 ৳{(ret.refundAmount || 0).toLocaleString()}
                                             </span>
                                             <span className="text-gray-300">
-                                                {isOpen ? <LuChevronUp size={16} /> : <LuChevronDown size={16} />}
+                                                {isOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                                             </span>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@ export default function MyReturnsPage() {
                                                                 />
                                                             ) : (
                                                                 <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                                                    <LuPackage size={16} />
+                                                                    <FiPackage size={16} />
                                                                 </div>
                                                             )}
                                                         </div>
@@ -196,7 +196,7 @@ export default function MyReturnsPage() {
                                         {/* Rejection reason */}
                                         {ret.status === 'rejected' && ret.rejectionReason && (
                                             <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-100">
-                                                <LuCircleAlert size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                                                <FiAlertCircle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
                                                 <div>
                                                     <p className="text-xs font-bold text-red-700">Reason for rejection</p>
                                                     <p className="text-sm text-red-600 mt-0.5">{ret.rejectionReason}</p>
@@ -240,7 +240,7 @@ export default function MyReturnsPage() {
                                             className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-primary)] hover:underline"
                                         >
                                             View order
-                                            <LuExternalLink size={13} />
+                                            <FiExternalLink size={13} />
                                         </Link>
                                     </div>
                                 )}

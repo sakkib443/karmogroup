@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
@@ -8,18 +11,24 @@ const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false, loadin
 import 'react-quill-new/dist/quill.snow.css';
 import Link from 'next/link';
 import { SingleImageUploader, MultipleImageUploader } from '@/components/ui/ImageUploader';
+import AttributeValuePicker from '@/components/dashboard/AttributeValuePicker';
 import {
-    LuArrowLeft, LuSave, LuImage, LuInfo,
-    LuSettings, LuDollarSign, LuTag, LuShield,
-    LuGlobe, LuTrash2, LuDroplet, LuPercent
-} from 'react-icons/lu';
+    FiArrowLeft, FiSave, FiImage, FiX, FiPlus, FiInfo,
+    FiSettings, FiDollarSign, FiTag, FiShield, FiTruck,
+    FiList, FiGlobe, FiTrash2, FiBox, FiCheckCircle,
+    FiDroplet, FiFileText, FiPercent
+} from 'react-icons/fi';
 import {
     useCreateProductMutation,
     useUpdateProductMutation,
-    useGetProductByIdQuery
+    useGetProductByIdQuery,
+    useLazySuggestSkuQuery
 } from '@/redux/api/productApi';
 import { useGetCategoriesQuery } from '@/redux/api/categoryApi';
+import { useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
+import UnitSelect from '@/components/dashboard/UnitSelect';
 import { toast } from 'react-hot-toast';
+
 
 // ── Toggle Switch Component ──────────────────────────────────
 const Toggle = ({ label, name, checked, onChange, color = 'bg-emerald-500' }: any) => (
@@ -59,13 +68,27 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
     const [createProduct, { isLoading: isCreating }] = useCreateProductMutation();
     const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
-    const { data: productToEdit, isLoading: isFetching } = useGetProductByIdQuery(productId, { skip: !isEditing });
+    const { data: productToEdit, isLoading, isFetching } = useGetProductByIdQuery(productId, {
+        skip: !isEditing,
+        refetchOnMountOrArgChange: true,
+    });
     const { data: categoriesData } = useGetCategoriesQuery({});
+    // The site-wide flat delivery charge — what a product with no charge of its own costs.
+    const { data: shipSettings } = useGetShippingSettingsQuery();
+    const defaultInsideRate = shipSettings?.defaultInsideDhakaRate ?? 60;
+
+    const [isDataLoaded, setIsDataLoaded] = useState(!isEditing);
+
+    useEffect(() => {
+        if (isEditing) {
+            setIsDataLoaded(false);
+        }
+    }, [productId, isEditing]);
 
     const [formData, setFormData] = useState<any>({
         // Basic
         name: '', slug: '', sku: '', brand: '', model: '',
-        description: '', tagline: '',
+        description: '', shortDescription: '', tagline: '',
         productType: 'simple',
         // Pricing — numeric fields start EMPTY ('') so inputs aren't stuck at 0
         price: '', originalPrice: '', discount: 0,
@@ -74,15 +97,16 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         // Media
         thumbnail: '', images: [],
         // Organization
-        category: '', subCategory: '',
+        category: '', subCategory: '', childCategory: '',
         // Specs (new)
         insideTheBox: '',
-        compatibility: '',
         // Stock
         stock: '', lowStockThreshold: '', unit: 'piece',
+        // Shown on the product page ("N Sold", views) — starting numbers set by the admin
+        totalSold: '', viewCount: '',
         // Status
         status: 'active', visibility: 'visible',
-        isFeatured: false, isNewProduct: true, isOnSale: false, isBestSelling: false,
+        isFeatured: false, isNewProduct: true, isOnSale: false,
         // Visual variants
         colors: [], colorHex: [], sizes: [], material: [],
         variants: [],
@@ -94,14 +118,19 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         // Physical
         weight: '',
         dimensions: { length: '', width: '', height: '' },
-        // Shipping & Warranty
-        shippingConfig: { freeShipping: false, shippingCost: 0, estimatedDays: 3 },
+        // Shipping & Warranty — delivery charges left blank fall back to Settings → Business
+        shippingConfig: { freeShipping: false, insideDhakaCost: '', outsideDhakaCost: '', estimatedDays: 3 },
         warranty: { hasWarranty: false, duration: 0, durationUnit: 'months', type: 'manufacturer' },
-        // Payment / courier hook
-        codAvailable: true,
         // SEO
         metaTitle: '', metaDescription: '', metaKeywords: [],
     });
+
+    // Stock as loaded. Inventory and orders change stock while this form is open, so a save
+    // sends stock only when it was changed here (see handleSubmit).
+    const loadedStock = useRef<{ stock: number; variants: Map<string, number> } | null>(null);
+    // Sold / views as loaded: sales and page visits raise them while the form is open,
+    // so a save sends them only when the admin changed them here.
+    const loadedCounters = useRef<{ totalSold: number; viewCount: number } | null>(null);
 
     // ── Validation Errors State ──
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -117,17 +146,27 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
     useEffect(() => {
         if (isEditing && productToEdit?.data) {
             const prod = productToEdit.data;
+            loadedStock.current = {
+                stock: Number(prod.stock ?? 0),
+                variants: new Map((prod.variants || [])
+                    .filter((v: any) => v?._id)
+                    .map((v: any) => [String(v._id), Number(v.stock ?? 0)])),
+            };
+            loadedCounters.current = { totalSold: Number(prod.totalSold ?? 0), viewCount: Number(prod.viewCount ?? 0) };
             // Format an ISO/Date value to yyyy-mm-dd for <input type="date">
             const toDateInput = (d: any) => {
                 if (!d) return '';
                 const dt = new Date(d);
                 return isNaN(dt.getTime()) ? '' : dt.toISOString().slice(0, 10);
             };
-            setFormData({
-                ...formData,
+            setFormData((prev: any) => ({
+                ...prev,
                 ...prod,
+                description: prod.description || '',
+                shortDescription: prod.shortDescription || '',
                 category: prod.category?._id || prod.category || '',
                 subCategory: prod.subCategory?._id || prod.subCategory || '',
+                childCategory: prod.childCategory?._id || prod.childCategory || '',
                 brand: prod.brand || '',
                 model: prod.model || '',
                 weight: prod.weight ?? '',
@@ -135,20 +174,27 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                 originalPrice: prod.originalPrice ?? '',
                 stock: prod.stock ?? '',
                 lowStockThreshold: prod.lowStockThreshold ?? '',
+                totalSold: prod.totalSold ?? 0,
+                viewCount: prod.viewCount ?? 0,
                 offerStartDate: toDateInput(prod.offerStartDate),
                 offerEndDate: toDateInput(prod.offerEndDate),
                 insideTheBox: prod.insideTheBox || '',
-                compatibility: prod.compatibility || '',
-                codAvailable: prod.codAvailable !== false,
-                warranty: prod.warranty || formData.warranty,
-                shippingConfig: prod.shippingConfig || formData.shippingConfig,
+                warranty: prod.warranty || prev.warranty,
+                // A charge of 0 means "not set", so the box shows empty and the
+                // Settings rate applies.
+                shippingConfig: {
+                    freeShipping: Boolean(prod.shippingConfig?.freeShipping),
+                    insideDhakaCost: prod.shippingConfig?.insideDhakaCost || '',
+                    outsideDhakaCost: prod.shippingConfig?.outsideDhakaCost || '',
+                    estimatedDays: prod.shippingConfig?.estimatedDays ?? 3,
+                },
                 dimensions: prod.dimensions
                     ? {
                         length: prod.dimensions.length ?? '',
                         width: prod.dimensions.width ?? '',
                         height: prod.dimensions.height ?? '',
                     }
-                    : formData.dimensions,
+                    : prev.dimensions,
                 specifications: prod.specifications || [],
                 highlights: prod.highlights || [],
                 tags: prod.tags || [],
@@ -161,9 +207,9 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                 productType: prod.productType || 'simple',
                 metaKeywords: prod.metaKeywords || [],
                 images: prod.images || [],
-            });
+            }));
+            setIsDataLoaded(true);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEditing, productToEdit]);
 
     // Auto-calculate discount (price fields are kept as raw strings → parse them)
@@ -184,8 +230,32 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
             const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
             setFormData((prev: any) => ({ ...prev, slug }));
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData.name, isEditing]);
+
+    // ── Suggested SKU ──
+    const [fetchSkuSuggestion] = useLazySuggestSkuQuery();
+    // Set once the admin types in the SKU box: their SKU wins for the rest of the session.
+    const skuEditedByHand = useRef(false);
+
+    // New product only: ask the server for the SKU this name would get, once typing pauses.
+    // Never on the edit form — an existing SKU is part of the product's link.
+    useEffect(() => {
+        if (isEditing || skuEditedByHand.current) return;
+        const name = String(formData.name || '').trim();
+        if (!name) return;
+        const timer = setTimeout(async () => {
+            try {
+                const res = await fetchSkuSuggestion(name).unwrap();
+                const sku = res?.data?.sku;
+                // The admin may have typed one while the request was in flight.
+                if (sku && !skuEditedByHand.current) setFormData((prev: any) => ({ ...prev, sku }));
+            } catch {
+                // No suggestion (offline, or the session expired) — leaving the SKU empty
+                // is fine, the server generates one on save.
+            }
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [formData.name, isEditing, fetchSkuSuggestion]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -215,25 +285,48 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         setFormData((prev: any) => ({ ...prev, [name]: arr }));
     };
 
+    // Images (newline-separated)
+    const handleImagesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const urls = e.target.value.split('\n').map(u => u.trim()).filter(u => u !== '');
+        setFormData((prev: any) => ({ ...prev, images: urls }));
+    };
+
+    // Specifications
+    const handleSpecChange = (idx: number, field: string, value: string) => {
+        const specs = [...formData.specifications];
+        specs[idx] = { ...specs[idx], [field]: value };
+        setFormData((prev: any) => ({ ...prev, specifications: specs }));
+    };
+    const addSpec = () => setFormData((prev: any) => ({ ...prev, specifications: [...prev.specifications, { key: '', value: '' }] }));
+    const removeSpec = (idx: number) => {
+        const specs = [...formData.specifications]; specs.splice(idx, 1);
+        setFormData((prev: any) => ({ ...prev, specifications: specs }));
+    };
+
+    // Highlights
+    const handleHighlightChange = (idx: number, value: string) => {
+        const hl = [...formData.highlights]; hl[idx] = value;
+        setFormData((prev: any) => ({ ...prev, highlights: hl }));
+    };
+    const addHighlight = () => setFormData((prev: any) => ({ ...prev, highlights: [...prev.highlights, ''] }));
+    const removeHighlight = (idx: number) => {
+        const hl = [...formData.highlights]; hl.splice(idx, 1);
+        setFormData((prev: any) => ({ ...prev, highlights: hl }));
+    };
+
     // ── Validation ──
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        // Required fields
+        // Only the name and the price are required — a product can be added now and
+        // finished later. Everything below only complains about values that are
+        // actually wrong, never about values that are simply missing.
         if (!formData.name || formData.name.trim().length === 0) {
             newErrors.name = 'Product name is required';
         } else if (formData.name.trim().length < 3) {
             newErrors.name = 'Product name must be at least 3 characters';
         } else if (formData.name.length > 200) {
             newErrors.name = 'Product name cannot exceed 200 characters';
-        }
-
-        if (!formData.description || formData.description.replace(/<[^>]*>/g, '').trim().length === 0) {
-            newErrors.description = 'Product description is required';
-        }
-
-        if (!formData.category) {
-            newErrors.category = 'Please select a category';
         }
 
         const priceNum = parseFloat(formData.price);
@@ -247,17 +340,8 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
             newErrors.originalPrice = 'Original price should be higher than offer price';
         }
 
-        if (!formData.thumbnail || formData.thumbnail.trim().length === 0) {
-            newErrors.thumbnail = 'Product thumbnail image is required';
-        }
-
-        // Min 3 images: thumbnail counts as 1, gallery must supply at least 2 more
-        const allImages = [formData.thumbnail, ...(formData.images || [])]
-            .map((u: string) => (u || '').trim())
-            .filter((u: string) => u !== '');
-        if (allImages.length < 3) {
-            newErrors.images = 'At least 3 images are required (thumbnail + 2 more)';
-        }
+        // Photos are optional. A product with none shows the placeholder on the
+        // storefront until a real one is uploaded.
 
         if (formData.tagline && formData.tagline.length > 200) {
             newErrors.tagline = 'Tagline cannot exceed 200 characters';
@@ -309,6 +393,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         try {
             const payload = { ...formData };
             if (!payload.subCategory) delete payload.subCategory;
+            if (!payload.childCategory) delete payload.childCategory;
 
             // ── Convert raw string numeric fields → Number (no NaN leaks into payload) ──
             // Required number (price): empty → 0 (validation already guards > 0).
@@ -326,12 +411,51 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
             payload.price = toRequiredNum(formData.price);
             payload.originalPrice = toOptionalNum(formData.originalPrice);
             payload.stock = toOptionalNum(formData.stock) ?? 0;
+            if (isEditing && loadedStock.current) {
+                // Send stock only when it was changed here, with the count it was changed
+                // from — the server refuses the save if the stock has moved since (a sale or
+                // an Inventory stock-in). Unchanged variant stock is left out, so the server
+                // keeps each variant's current count.
+                const loaded = loadedStock.current;
+                if (payload.stock === loaded.stock) delete payload.stock;
+                else payload.expectedStock = loaded.stock;
+                payload.variants = (payload.variants || []).map((v: any) => {
+                    const id = v?._id ? String(v._id) : '';
+                    if (!id || !loaded.variants.has(id) || Number(v.stock ?? 0) !== loaded.variants.get(id)) return v;
+                    const { stock: _unchangedStock, ...rest } = v;
+                    return rest;
+                });
+            }
             payload.lowStockThreshold = toOptionalNum(formData.lowStockThreshold) ?? 5;
+            // Sold / views: whole numbers ≥ 0; on edit only when changed here (see loadedCounters).
+            for (const key of ['totalSold', 'viewCount'] as const) {
+                const n = toOptionalNum(formData[key]);
+                const value = n === undefined ? undefined : Math.max(0, Math.round(n));
+                const unchanged = isEditing && loadedCounters.current && value === loadedCounters.current[key];
+                if (value === undefined || unchanged) delete payload[key];
+                else payload[key] = value;
+            }
             payload.dimensions = {
                 length: toOptionalNum(formData.dimensions?.length) ?? 0,
                 width: toOptionalNum(formData.dimensions?.width) ?? 0,
                 height: toOptionalNum(formData.dimensions?.height) ?? 0,
             };
+
+            payload.shippingConfig = {
+                freeShipping: Boolean(formData.shippingConfig?.freeShipping),
+                // 0 = no charge of its own → the Settings → Business rate applies.
+                insideDhakaCost: toOptionalNum(formData.shippingConfig?.insideDhakaCost) ?? 0,
+                outsideDhakaCost: toOptionalNum(formData.shippingConfig?.outsideDhakaCost) ?? 0,
+                estimatedDays: toOptionalNum(formData.shippingConfig?.estimatedDays) ?? 3,
+            };
+
+            if (formData.warranty) {
+                payload.warranty = {
+                    ...formData.warranty,
+                    hasWarranty: Boolean(formData.warranty.hasWarranty),
+                    duration: toOptionalNum(formData.warranty.duration) ?? 0,
+                };
+            }
 
             // The form no longer captures cost price — never send it.
             delete payload.costPrice;
@@ -344,6 +468,12 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
             payload.weight = formData.weight === '' || formData.weight === undefined || formData.weight === null
                 ? ''
                 : String(formData.weight);
+
+            // Explicit boolean casting for visibility & promotion flags
+            payload.isNewProduct = Boolean(formData.isNewProduct);
+            payload.isFeatured = Boolean(formData.isFeatured);
+            payload.isOnSale = Boolean(formData.isOnSale);
+
 
             if (isEditing) {
                 await updateProduct({ id: productId, data: payload }).unwrap();
@@ -382,13 +512,36 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
         const pid = c.parent?._id || c.parent;
         return !pid;
     });
-    // Sub-categories of the currently selected category
+    // Sub-categories of the currently selected category (Level 1)
     const subCategories = formData.category
         ? allCategories.filter((c: any) => {
             const pid = c.parent?._id || c.parent;
             return pid && String(pid) === String(formData.category);
         })
         : [];
+    // Child categories of the currently selected subCategory (Level 2)
+    const childCategories = formData.subCategory
+        ? allCategories.filter((c: any) => {
+            const pid = c.parent?._id || c.parent;
+            return pid && String(pid) === String(formData.subCategory);
+        })
+        : [];
+
+    const selectedCategoryObj = categories.find((c: any) => String(c._id) === String(formData.category));
+    const selectedSubCategoryObj = subCategories.find((c: any) => String(c._id) === String(formData.subCategory));
+    const selectedChildCategoryObj = childCategories.find((c: any) => String(c._id) === String(formData.childCategory));
+
+    const selectedCategoryName = selectedCategoryObj?.name;
+    const selectedSubCategoryName = selectedSubCategoryObj?.name;
+    const selectedChildCategoryName = selectedChildCategoryObj?.name;
+
+    // Target the specific category selected (Child -> Sub -> Category)
+    const selectedTargetCategory =
+        formData.childCategory ? { obj: selectedChildCategoryObj, source: 'Child Category' }
+        : formData.subCategory ? { obj: selectedSubCategoryObj, source: 'Sub-Category' }
+        : formData.category ? { obj: selectedCategoryObj, source: 'Category' }
+        : null;
+
 
     return (
         <div className="max-w-7xl mx-auto space-y-6 pb-32">
@@ -396,7 +549,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-md border border-gray-200 shadow-sm sticky top-0 z-40">
                 <div className="flex items-center gap-4">
                     <Link href={listHref} className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 text-gray-400 transition-all hover:text-gray-600">
-                        <LuArrowLeft size={20} />
+                        <FiArrowLeft size={20} />
                     </Link>
                     <div>
                         <h1 className="text-xl font-bold text-gray-800">{isEditing ? 'Edit Product' : 'Create New Product'}</h1>
@@ -412,7 +565,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                         Cancel
                     </button>
                     <button onClick={handleSubmit} disabled={isCreating || isUpdating} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-2.5 bg-[var(--color-primary)] text-white rounded-md font-semibold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 text-sm">
-                        <LuSave size={18} />
+                        <FiSave size={18} />
                         {isCreating || isUpdating ? 'Saving...' : (isEditing ? 'Update Product' : 'Publish Product')}
                     </button>
                 </div>
@@ -436,55 +589,100 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
                     {/* ── 1. Basic Information ──────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-5">
-                        <SectionHeader icon={<LuInfo size={20} />} title="Basic Information" color="bg-blue-50 text-blue-600" />
+                        <SectionHeader icon={<FiInfo size={20} />} title="Basic Information" color="bg-blue-50 text-blue-600" />
 
-                        <Input label="Product Name" name="name" required type="text" placeholder="e.g. Motul 10W-40 Engine Oil 1L / Yamaha FZ Air Filter" value={formData.name} onChange={handleChange} error={errors.name} />
+                        <Input label="Product Name" name="name" required type="text" placeholder="e.g. 250L Piston Type Industrial Air Compressor" value={formData.name} onChange={handleChange} error={errors.name} />
 
-                        {/* ── Category + Sub-Category (cascade) ── */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5" data-field="category">
-                                <label className="text-sm font-semibold text-gray-700">Category <span className="text-red-400">*</span></label>
-                                <select name="category" required className={`w-full px-4 py-2.5 bg-white border rounded-md text-sm font-semibold outline-none cursor-pointer ${errors.category ? 'border-red-400 bg-red-50/30' : 'border-gray-200 focus:border-[var(--color-primary)]'}`}
-                                    value={formData.category}
-                                    onChange={(e) => { clearError('category'); setFormData((prev: any) => ({ ...prev, category: e.target.value, subCategory: '' })); }}>
-                                    <option value="">Select Category</option>
-                                    {categories.map((cat: any) => (<option key={cat._id} value={cat._id}>{cat.name}</option>))}
-                                </select>
-                                {errors.category && <p className="text-xs text-red-500 font-medium">⚠ {errors.category}</p>}
+                        {/* ── 3-Tier Category Cascade (Category -> Sub-Category -> Child Category) ── */}
+                        <div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="space-y-1.5" data-field="category">
+                                    <label className="text-sm font-semibold text-gray-700">Category</label>
+                                    <select name="category" className={`w-full px-3.5 py-2.5 bg-white border rounded-md text-sm font-semibold outline-none cursor-pointer ${errors.category ? 'border-red-400 bg-red-50/30' : 'border-gray-200 focus:border-[var(--color-primary)]'}`}
+                                        value={formData.category}
+                                        onChange={(e) => { clearError('category'); setFormData((prev: any) => ({ ...prev, category: e.target.value, subCategory: '', childCategory: '' })); }}>
+                                        <option value="">Select Category</option>
+                                        {categories.map((cat: any) => (<option key={cat._id} value={cat._id}>{cat.name}</option>))}
+                                    </select>
+                                    {errors.category && <p className="text-xs text-red-500 font-medium">⚠ {errors.category}</p>}
+                                </div>
+
+                                <div className="space-y-1.5" data-field="subCategory">
+                                    <label className="text-sm font-semibold text-gray-700">Sub-Category <span className="text-xs text-gray-400">(optional)</span></label>
+                                    <select name="subCategory" disabled={!formData.category || subCategories.length === 0} className={`w-full px-3.5 py-2.5 bg-white border rounded-md text-sm font-semibold outline-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed ${errors.subCategory ? 'border-red-400 bg-red-50/30' : 'border-gray-200 focus:border-[var(--color-primary)]'}`}
+                                        value={formData.subCategory}
+                                        onChange={(e) => { clearError('subCategory'); setFormData((prev: any) => ({ ...prev, subCategory: e.target.value, childCategory: '' })); }}>
+                                        <option value="">
+                                            {!formData.category
+                                                ? 'Select category first'
+                                                : subCategories.length === 0
+                                                    ? 'No sub-categories'
+                                                    : 'Select Sub-Category'}
+                                        </option>
+                                        {subCategories.map((sub: any) => (<option key={sub._id} value={sub._id}>{sub.name}</option>))}
+                                    </select>
+                                    {errors.subCategory && <p className="text-xs text-red-500 font-medium">⚠ {errors.subCategory}</p>}
+                                </div>
+
+                                <div className="space-y-1.5" data-field="childCategory">
+                                    <label className="text-sm font-semibold text-gray-700">Child Category <span className="text-xs text-gray-400">(optional)</span></label>
+                                    <select name="childCategory" disabled={!formData.subCategory || childCategories.length === 0} className={`w-full px-3.5 py-2.5 bg-white border rounded-md text-sm font-semibold outline-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed ${errors.childCategory ? 'border-red-400 bg-red-50/30' : 'border-gray-200 focus:border-[var(--color-primary)]'}`}
+                                        value={formData.childCategory}
+                                        onChange={(e) => { clearError('childCategory'); setFormData((prev: any) => ({ ...prev, childCategory: e.target.value })); }}>
+                                        <option value="">
+                                            {!formData.subCategory
+                                                ? 'Select sub-category first'
+                                                : childCategories.length === 0
+                                                    ? 'No child categories'
+                                                    : 'Select Child Category'}
+                                        </option>
+                                        {childCategories.map((child: any) => (<option key={child._id} value={child._id}>{child.name}</option>))}
+                                    </select>
+                                    {errors.childCategory && <p className="text-xs text-red-500 font-medium">⚠ {errors.childCategory}</p>}
+                                </div>
                             </div>
-                            {/* Sub-Category — always shown (optional). Disabled until a category
-                                with sub-categories is selected, so the field is visible but only
-                                interactive when there's something to pick. */}
-                            <div className="space-y-1.5" data-field="subCategory">
-                                <label className="text-sm font-semibold text-gray-700">Sub-Category <span className="text-xs text-gray-400">(optional)</span></label>
-                                <select name="subCategory" disabled={!formData.category || subCategories.length === 0} className={`w-full px-4 py-2.5 bg-white border rounded-md text-sm font-semibold outline-none cursor-pointer disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed ${errors.subCategory ? 'border-red-400 bg-red-50/30' : 'border-gray-200 focus:border-[var(--color-primary)]'}`} value={formData.subCategory} onChange={handleChange}>
-                                    <option value="">
-                                        {!formData.category
-                                            ? 'Select a category first'
-                                            : subCategories.length === 0
-                                                ? 'No sub-categories'
-                                                : 'Select Sub-Category'}
-                                    </option>
-                                    {subCategories.map((sub: any) => (<option key={sub._id} value={sub._id}>{sub.name}</option>))}
-                                </select>
-                                {errors.subCategory && <p className="text-xs text-red-500 font-medium">⚠ {errors.subCategory}</p>}
-                            </div>
+
+                            {/* Active Category Path Badge */}
+                            {formData.category && selectedCategoryName && (
+                                <div className="mt-3 px-3.5 py-2.5 bg-green-50/70 border border-green-200/70 rounded-md text-xs text-gray-700 flex items-center justify-between flex-wrap gap-2 shadow-sm">
+                                    <div className="flex items-center flex-wrap gap-1.5">
+                                        <span className="font-semibold text-gray-500">Selected Path:</span>
+                                        <span className="font-bold text-[var(--color-primary)]">{selectedCategoryName}</span>
+                                        {selectedSubCategoryName && (
+                                            <>
+                                                <span className="text-gray-400">›</span>
+                                                <span className="font-bold text-[var(--color-primary)]">{selectedSubCategoryName}</span>
+                                            </>
+                                        )}
+                                        {selectedChildCategoryName && (
+                                            <>
+                                                <span className="text-gray-400">›</span>
+                                                <span className="font-bold text-[var(--color-primary)]">{selectedChildCategoryName}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Input label="Slug (auto)" name="slug" type="text" placeholder="auto-generated" value={formData.slug} onChange={handleChange} />
-                            <Input label="SKU / Model No. (optional)" name="sku" type="text" placeholder="e.g. SKU-1001 / MODEL-4589" value={formData.sku} onChange={handleChange} />
-                            <Input label="Brand (recommended)" name="brand" type="text" placeholder="e.g. Motul, Bosch, Yamaha, Bajaj" value={formData.brand} onChange={handleChange} error={errors.brand} />
+                            <Input label="Slug" name="slug" type="text" placeholder="auto-generated" value={formData.slug} onChange={handleChange} />
+                            <div className="space-y-1.5">
+                                <Input label="SKU" name="sku" type="text" placeholder="Auto — e.g. NF01" value={formData.sku}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => { skuEditedByHand.current = true; handleChange(e); }} />
+                                <p className="text-xs text-gray-400">Appears in the product link</p>
+                            </div>
+                            <Input label="Brand" name="brand" type="text" placeholder="e.g. Lishan Group" value={formData.brand} onChange={handleChange} error={errors.brand} />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input label="Model / Variant (optional)" name="model" type="text" placeholder="e.g. FZ-S V3 / LS-250X" value={formData.model} onChange={handleChange} error={errors.model} />
-                            <Input label="Weight (optional — used for courier)" name="weight" type="text" placeholder="e.g. 500 g / 1 L" value={formData.weight} onChange={handleChange} error={errors.weight} />
+                            <Input label="Model" name="model" type="text" placeholder="e.g. LS-250X" value={formData.model} onChange={handleChange} error={errors.model} />
+                            <Input label="Weight" name="weight" type="text" placeholder="e.g. 500 g / 2.5 kg" value={formData.weight} onChange={handleChange} error={errors.weight} />
                         </div>
 
                         {/* ── Box Size (L × W × H) ── */}
                         <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-gray-700">Box Size (L × W × H, cm) <span className="text-xs text-gray-400">(optional — used for courier)</span></label>
+                            <label className="text-sm font-semibold text-gray-700">Box Size (L × W × H, cm)</label>
                             <div className="grid grid-cols-3 gap-3">
                                 <Input label="Length" name="dimensions.length" type="number" placeholder="0" value={formData.dimensions.length} onChange={handleChange} />
                                 <Input label="Width" name="dimensions.width" type="number" placeholder="0" value={formData.dimensions.width} onChange={handleChange} />
@@ -493,18 +691,9 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                         </div>
 
                         <div className="space-y-1.5" data-field="insideTheBox">
-                            <label className="text-sm font-semibold text-gray-700">Inside The Box <span className="text-xs text-gray-400">(optional)</span></label>
-                            <textarea name="insideTheBox" rows={3} placeholder="e.g. 1x Air Filter, 1x Mounting Gasket, 1x Manual" className={`w-full px-4 py-3 bg-white border rounded-md outline-none transition-all text-sm ${errors.insideTheBox ? 'border-red-400 bg-red-50/30 focus:border-red-500' : 'border-gray-200 focus:border-[var(--color-primary)]'}`} value={formData.insideTheBox} onChange={handleChange}></textarea>
+                            <label className="text-sm font-semibold text-gray-700">Inside The Box</label>
+                            <textarea name="insideTheBox" rows={3} placeholder="e.g. 1x Air Compressor, 1x Hose, 1x User Manual" className={`w-full px-4 py-3 bg-white border rounded-md outline-none transition-all text-sm ${errors.insideTheBox ? 'border-red-400 bg-red-50/30 focus:border-red-500' : 'border-gray-200 focus:border-[var(--color-primary)]'}`} value={formData.insideTheBox} onChange={handleChange}></textarea>
                             {errors.insideTheBox && <p className="text-xs text-red-500 font-medium">⚠ {errors.insideTheBox}</p>}
-                        </div>
-
-                        {/* ── Compatibility / Fits which models (key trust field for parts) ── */}
-                        <div className="space-y-1.5">
-                            <label className="text-sm font-semibold text-gray-700">
-                                Compatibility <span className="text-gray-500">— works with which models / devices</span>
-                                <span className="text-xs text-gray-400 font-normal"> (recommended, builds buyer trust)</span>
-                            </label>
-                            <textarea name="compatibility" rows={2} placeholder="e.g. Compatible with specific models, sizes, or devices. Helps buyers pick the right item." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md outline-none focus:border-[var(--color-primary)] transition-all text-sm" value={formData.compatibility} onChange={handleChange}></textarea>
                         </div>
 
                         <div className="space-y-2">
@@ -512,31 +701,53 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                             <input type="text" name="tagline" placeholder="Lower price than others but quality higher" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md outline-none focus:border-[var(--color-primary)] transition-all text-sm" value={formData.tagline} onChange={handleChange} />
                         </div>
 
+                        {/* Plain text under the product name on the storefront — the rich text below
+                            is the long copy in the Product details section. */}
+                        <div className="space-y-1.5" data-field="shortDescription">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-semibold text-gray-700">Short description</label>
+                                <span className="text-xs text-gray-400">{(formData.shortDescription || '').length}/300</span>
+                            </div>
+                            <textarea name="shortDescription" rows={2} maxLength={300} placeholder="One or two lines shown under the product name"
+                                className={`w-full px-4 py-3 bg-white border rounded-md outline-none transition-all text-sm ${errors.shortDescription ? 'border-red-400 bg-red-50/30 focus:border-red-500' : 'border-gray-200 focus:border-[var(--color-primary)]'}`}
+                                value={formData.shortDescription}
+                                onChange={(e) => { clearError('shortDescription'); setFormData((prev: any) => ({ ...prev, shortDescription: e.target.value.slice(0, 300) })); }}></textarea>
+                            {errors.shortDescription && <p className="text-xs text-red-500 font-medium">⚠ {errors.shortDescription}</p>}
+                        </div>
+
                         <div className="space-y-1.5" data-field="description">
-                            <label className="text-sm font-semibold text-gray-700">Product Description <span className="text-red-400">*</span></label>
+                            <label className="text-sm font-semibold text-gray-700">Full description</label>
                             <div className={`product-editor-wrapper ${errors.description ? 'ring-1 ring-red-400 rounded-md' : ''}`}>
-                                <ReactQuill
-                                    theme="snow"
-                                    value={formData.description}
-                                    onChange={(value: string) => { setFormData((prev: any) => ({ ...prev, description: value })); clearError('description'); }}
-                                    placeholder="Write detailed product description..."
-                                    modules={{
-                                        toolbar: [
-                                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                                            [{ 'font': [] }],
-                                            [{ 'size': ['small', false, 'large', 'huge'] }],
-                                            ['bold', 'italic', 'underline', 'strike'],
-                                            [{ 'color': [] }, { 'background': [] }],
-                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                            [{ 'indent': '-1' }, { 'indent': '+1' }],
-                                            [{ 'align': [] }],
-                                            ['link', 'image', 'video'],
-                                            ['blockquote', 'code-block'],
-                                            ['clean'],
-                                        ],
-                                    }}
-                                    style={{ minHeight: '300px' }}
-                                />
+                                {isEditing && !isDataLoaded ? (
+                                    <div className="h-[300px] bg-gray-50 border border-gray-200 rounded-md animate-pulse flex flex-col items-center justify-center text-gray-400 text-sm gap-2">
+                                        <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Loading description...</span>
+                                    </div>
+                                ) : (
+                                    <ReactQuill
+                                        key={`editor-${productToEdit?.data?._id || 'new'}`}
+                                        theme="snow"
+                                        value={formData.description || ''}
+                                        onChange={(value: string) => { setFormData((prev: any) => ({ ...prev, description: value })); clearError('description'); }}
+                                        placeholder="Write detailed product description..."
+                                        modules={{
+                                            toolbar: [
+                                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                                                [{ 'font': [] }],
+                                                [{ 'size': ['small', false, 'large', 'huge'] }],
+                                                ['bold', 'italic', 'underline', 'strike'],
+                                                [{ 'color': [] }, { 'background': [] }],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                                                [{ 'align': [] }],
+                                                ['link', 'image', 'video'],
+                                                ['blockquote', 'code-block'],
+                                                ['clean'],
+                                            ],
+                                        }}
+                                        style={{ minHeight: '300px' }}
+                                    />
+                                )}
                             </div>
                             {errors.description && <p className="text-xs text-red-500 font-medium">⚠ {errors.description}</p>}
                         </div>
@@ -544,7 +755,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
                     {/* ── 2. Pricing & Inventory ────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-5">
-                        <SectionHeader icon={<LuDollarSign size={20} />} title="Pricing & Inventory" color="bg-green-50 text-green-600" />
+                        <SectionHeader icon={<FiDollarSign size={20} />} title="Pricing & Inventory" color="bg-green-50 text-green-600" />
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1.5" data-field="price">
@@ -564,8 +775,8 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                 {errors.originalPrice && <p className="text-xs text-red-500 font-medium">⚠ {errors.originalPrice}</p>}
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-700 flex items-center gap-1"><LuPercent size={14} /> Discount</label>
-                                <input type="number" name="discount" placeholder="Auto" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md outline-none text-base font-bold text-[var(--color-primary)]" value={formData.discount} readOnly />
+                                <label className="text-sm font-semibold text-gray-700 flex items-center gap-1"><FiPercent size={14} /> Discount</label>
+                                <input type="number" name="discount" placeholder="Auto" className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md outline-none text-base font-bold text-green-700" value={formData.discount} readOnly />
                             </div>
                         </div>
 
@@ -580,44 +791,21 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                             <Input label="Low Stock Alert" name="lowStockThreshold" type="number" placeholder="5" value={formData.lowStockThreshold} onChange={handleChange} />
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700">Unit</label>
-                                <select name="unit" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] cursor-pointer" value={formData.unit} onChange={handleChange}>
-                                    <optgroup label="Count">
-                                        <option value="piece">Piece</option>
-                                        <option value="pair">Pair</option>
-                                        <option value="set">Set</option>
-                                        <option value="pack">Pack</option>
-                                        <option value="box">Box</option>
-                                        <option value="dozen">Dozen</option>
-                                    </optgroup>
-                                    <optgroup label="Liquid / Volume">
-                                        <option value="liter">Litre (L)</option>
-                                        <option value="ml">Millilitre (ml)</option>
-                                        <option value="bottle">Bottle</option>
-                                        <option value="can">Can</option>
-                                    </optgroup>
-                                    <optgroup label="Weight">
-                                        <option value="kg">Kilogram (kg)</option>
-                                        <option value="gram">Gram (g)</option>
-                                    </optgroup>
-                                    <optgroup label="Length">
-                                        <option value="meter">Metre (m)</option>
-                                        <option value="cm">Centimetre (cm)</option>
-                                        <option value="foot">Foot (ft)</option>
-                                        <option value="inch">Inch (in)</option>
-                                    </optgroup>
-                                    <optgroup label="Other">
-                                        <option value="roll">Roll</option>
-                                        <option value="tube">Tube</option>
-                                        <option value="kit">Kit</option>
-                                    </optgroup>
-                                </select>
+                                {/* Active units from Catalog → Units (the product's own unit always stays listed);
+                                    "+ Add new unit…" creates one there without leaving the form. */}
+                                <UnitSelect
+                                    value={formData.unit}
+                                    onChange={(unit) => setFormData((prev: any) => ({ ...prev, unit }))}
+                                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] cursor-pointer"
+                                    inputClassName="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
+                                />
                             </div>
                         </div>
                     </div>
 
                     {/* ── 3. Product Type & Variations ─ */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-5">
-                        <SectionHeader icon={<LuDroplet size={20} />} title="Product Type & Variations" color="bg-pink-50 text-pink-600" />
+                        <SectionHeader icon={<FiDroplet size={20} />} title="Product Type & Variations" color="bg-pink-50 text-pink-600" />
 
                         {/* ── Product Type Selector ── */}
                         <div className="grid grid-cols-3 gap-3">
@@ -630,7 +818,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                     onClick={() => setFormData((prev: any) => ({ ...prev, productType: t.value }))}
                                     className={`p-4 rounded-lg border-2 text-left transition-all ${
                                         formData.productType === t.value
-                                            ? 'border-[var(--color-primary)] bg-green-50 shadow-md'
+                                            ? 'border-[var(--color-primary)] bg-[var(--color-primary-lightest)] shadow-md'
                                             : 'border-gray-200 bg-white hover:border-gray-300'
                                     }`}
                                 >
@@ -671,38 +859,17 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                     </span>
                                 ))}
                             </div>
-                            <div className="flex gap-2 items-center">
-                                <input type="color" id="varColorHex" defaultValue="#000000" className="w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5 shrink-0" />
-                                <input type="text" id="varColorName" placeholder="Color নাম (e.g. Sky Blue)" className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const nameEl = document.getElementById('varColorName') as HTMLInputElement;
-                                            const hexEl = document.getElementById('varColorHex') as HTMLInputElement;
-                                            const name = nameEl.value.trim();
-                                            if (!name) return;
-                                            setFormData((prev: any) => ({
-                                                ...prev,
-                                                colors: [...prev.colors, name],
-                                                colorHex: [...prev.colorHex, hexEl.value],
-                                            }));
-                                            nameEl.value = '';
-                                        }
-                                    }}
-                                />
-                                <button type="button" onClick={() => {
-                                    const nameEl = document.getElementById('varColorName') as HTMLInputElement;
-                                    const hexEl = document.getElementById('varColorHex') as HTMLInputElement;
-                                    const name = nameEl.value.trim();
-                                    if (!name) return;
-                                    setFormData((prev: any) => ({
-                                        ...prev,
-                                        colors: [...prev.colors, name],
-                                        colorHex: [...prev.colorHex, hexEl.value],
-                                    }));
-                                    nameEl.value = '';
-                                }} className="px-4 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] shrink-0">+ Add</button>
-                            </div>
+                            {/* Dropdown fed by Attributes → Color; a new colour typed here is saved there too. */}
+                            <AttributeValuePicker
+                                kind="color"
+                                selected={formData.colors}
+                                placeholder="Search or type a colour (e.g. Sky Blue)"
+                                onAdd={(name, hex) => setFormData((prev: any) => ({
+                                    ...prev,
+                                    colors: [...prev.colors, name],
+                                    colorHex: [...prev.colorHex, hex || '#000000'],
+                                }))}
+                            />
                         </div>
                         )}
 
@@ -720,29 +887,15 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                     </span>
                                 ))}
                             </div>
-                            <div className="flex gap-2">
-                                <input type="text" id="varSizeName" placeholder="S, M, L, XL, XXL, Free Size..." className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const el = document.getElementById('varSizeName') as HTMLInputElement;
-                                            const val = el.value.trim();
-                                            if (val && !formData.sizes.includes(val)) {
-                                                setFormData((prev: any) => ({ ...prev, sizes: [...prev.sizes, val] }));
-                                            }
-                                            el.value = '';
-                                        }
-                                    }}
-                                />
-                                <button type="button" onClick={() => {
-                                    const el = document.getElementById('varSizeName') as HTMLInputElement;
-                                    const val = el.value.trim();
-                                    if (val && !formData.sizes.includes(val)) {
-                                        setFormData((prev: any) => ({ ...prev, sizes: [...prev.sizes, val] }));
-                                    }
-                                    el.value = '';
-                                }} className="px-4 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] shrink-0">+ Add</button>
-                            </div>
+                            {/* Dropdown fed by Attributes → Size; a new size typed here is saved there too. */}
+                            <AttributeValuePicker
+                                kind="size"
+                                selected={formData.sizes}
+                                placeholder="Search or type a size (e.g. S, M, XL, 24 cm, 1.5 L)"
+                                onAdd={(val) => setFormData((prev: any) => (
+                                    prev.sizes.includes(val) ? prev : { ...prev, sizes: [...prev.sizes, val] }
+                                ))}
+                            />
                         </div>
                         )}
 
@@ -825,6 +978,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                             </div>
                                             <MultipleImageUploader
                                                 label={`${colorName} Images`}
+                                                hint="Recommended: 1000×1000px (1:1)"
                                                 values={currentImages}
                                                 onChange={(urls: string[]) => {
                                                     // Apply images to ALL variants of this color
@@ -854,7 +1008,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                     <span className="flex-1 text-sm font-semibold text-gray-800">{[v.color, v.size].filter(Boolean).join(' / ') || `Variant #${i + 1}`}</span>
                                     <span className="text-xs text-gray-400">৳{v.price || 0} • Stock: {v.stock || 0}{(v.images?.length || 0) > 0 ? ` • 📷${v.images.length}` : ''}</span>
                                     <button type="button" onClick={(e) => { e.preventDefault(); setFormData((prev: any) => ({ ...prev, variants: prev.variants.filter((_: any, j: number) => j !== i) })); }} className="px-2 py-1 bg-red-50 border border-red-200 text-red-500 rounded text-[10px] font-bold hover:bg-red-100">
-                                        <LuTrash2 size={12} />
+                                        <FiTrash2 size={12} />
                                     </button>
                                 </summary>
                                 <div className="p-4 border-t border-gray-200 space-y-3">
@@ -892,28 +1046,33 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                             </button>
                                         </div>
                                         <div className="product-editor-wrapper">
-                                            <ReactQuill
-                                                theme="snow"
-                                                value={v.description || ''}
-                                                onChange={(val: string) => { const vars = [...formData.variants]; vars[i] = { ...vars[i], description: val }; setFormData((prev: any) => ({ ...prev, variants: vars })); }}
-                                                placeholder="Variant-specific description..."
-                                                modules={{
-                                                    toolbar: [
-                                                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                                                        [{ 'font': [] }],
-                                                        [{ 'size': ['small', false, 'large', 'huge'] }],
-                                                        ['bold', 'italic', 'underline', 'strike'],
-                                                        [{ 'color': [] }, { 'background': [] }],
-                                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                        [{ 'indent': '-1' }, { 'indent': '+1' }],
-                                                        [{ 'align': [] }],
-                                                        ['link', 'image', 'video'],
-                                                        ['blockquote', 'code-block'],
-                                                        ['clean'],
-                                                    ],
-                                                }}
-                                                style={{ minHeight: '200px' }}
-                                            />
+                                            {isEditing && !isDataLoaded ? (
+                                                <div className="h-[150px] bg-gray-50 border border-gray-200 rounded-md animate-pulse" />
+                                            ) : (
+                                                <ReactQuill
+                                                    key={`variant-quill-${productToEdit?.data?._id || 'new'}-${i}`}
+                                                    theme="snow"
+                                                    value={v.description || ''}
+                                                    onChange={(val: string) => { const vars = [...formData.variants]; vars[i] = { ...vars[i], description: val }; setFormData((prev: any) => ({ ...prev, variants: vars })); }}
+                                                    placeholder="Variant-specific description..."
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                                                            [{ 'font': [] }],
+                                                            [{ 'size': ['small', false, 'large', 'huge'] }],
+                                                            ['bold', 'italic', 'underline', 'strike'],
+                                                            [{ 'color': [] }, { 'background': [] }],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            [{ 'indent': '-1' }, { 'indent': '+1' }],
+                                                            [{ 'align': [] }],
+                                                            ['link', 'image', 'video'],
+                                                            ['blockquote', 'code-block'],
+                                                            ['clean'],
+                                                        ],
+                                                    }}
+                                                    style={{ minHeight: '200px' }}
+                                                />
+                                            )}
                                         </div>
                                         {v.description && v.description !== formData.description && (
                                             <p className="text-[10px] text-amber-600 font-medium">⚠ Custom description (different from main)</p>
@@ -923,83 +1082,51 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                             </details>
                         ))}
 
-                        {/* Material — what the product is made of */}
-                        <div className="pt-4 border-t border-gray-100">
+                        {/* Material, Pattern, Gender — kept below */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-700">Material <span className="text-xs text-gray-400">(optional, comma-separated)</span></label>
-                                <input type="text" placeholder="e.g. aluminium, steel, rubber, ABS plastic" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]" value={formData.material.join(', ')} onChange={(e) => handleArrayChange('material', e.target.value)} />
+                                <label className="text-sm font-semibold text-gray-700">Material <span className="text-xs text-gray-400">(comma-separated)</span></label>
+                                <input type="text" placeholder="e.g. cotton, polyester" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]" value={formData.material.join(', ')} onChange={(e) => handleArrayChange('material', e.target.value)} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Pattern</label>
+                                    <select name="pattern" className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] cursor-pointer" value={formData.pattern} onChange={handleChange}>
+                                        <option value="">None</option>
+                                        <option value="solid">Solid</option>
+                                        <option value="striped">Striped</option>
+                                        <option value="floral">Floral</option>
+                                        <option value="graphic print">Graphic</option>
+                                        <option value="embroidered">Embroidered</option>
+                                        <option value="camo">Camo</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-gray-700">Gender</label>
+                                    <select name="gender" className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] cursor-pointer" value={formData.gender} onChange={handleChange}>
+                                        <option value="">Any</option>
+                                        <option value="Men">Men</option>
+                                        <option value="Women">Women</option>
+                                        <option value="Unisex">Unisex</option>
+                                        <option value="Kids">Kids</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
 
 
-                    {/* ── 6. Specifications & Highlights ─────────────── */}
-                    <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-5">
-                        <SectionHeader icon={<LuInfo size={20} />} title="Specifications & Highlights" color="bg-indigo-50 text-indigo-600" />
-
-                        {/* Highlights — bullet key selling points */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Highlights <span className="text-xs text-gray-400">(key selling points, shown as bullets on the product page)</span></label>
-                            {formData.highlights.map((h: string, i: number) => (
-                                <div key={i} className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={h}
-                                        placeholder={`Highlight ${i + 1} — e.g. "100% cotton, breathable"`}
-                                        className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
-                                        onChange={(e) => setFormData((prev: any) => { const hl = [...prev.highlights]; hl[i] = e.target.value; return { ...prev, highlights: hl }; })}
-                                    />
-                                    <button type="button" title="Remove" onClick={() => setFormData((prev: any) => ({ ...prev, highlights: prev.highlights.filter((_: any, idx: number) => idx !== i) }))}
-                                        className="px-3 rounded-md border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors">
-                                        <LuTrash2 size={15} />
-                                    </button>
-                                </div>
-                            ))}
-                            <button type="button" onClick={() => setFormData((prev: any) => ({ ...prev, highlights: [...prev.highlights, ''] }))}
-                                className="text-sm font-semibold text-[var(--color-primary)] hover:underline">+ Add highlight</button>
-                        </div>
-
-                        {/* Specifications — key/value table */}
-                        <div className="space-y-2 pt-4 border-t border-gray-100">
-                            <label className="text-sm font-semibold text-gray-700">Specifications <span className="text-xs text-gray-400">(key–value table, e.g. Material → Cotton)</span></label>
-                            {formData.specifications.map((sp: any, i: number) => (
-                                <div key={i} className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={sp.key}
-                                        placeholder="Label (e.g. Material)"
-                                        className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
-                                        onChange={(e) => setFormData((prev: any) => { const specs = [...prev.specifications]; specs[i] = { ...specs[i], key: e.target.value }; return { ...prev, specifications: specs }; })}
-                                    />
-                                    <input
-                                        type="text"
-                                        value={sp.value}
-                                        placeholder="Value (e.g. Cotton)"
-                                        className="flex-1 px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)]"
-                                        onChange={(e) => setFormData((prev: any) => { const specs = [...prev.specifications]; specs[i] = { ...specs[i], value: e.target.value }; return { ...prev, specifications: specs }; })}
-                                    />
-                                    <button type="button" title="Remove" onClick={() => setFormData((prev: any) => ({ ...prev, specifications: prev.specifications.filter((_: any, idx: number) => idx !== i) }))}
-                                        className="px-3 rounded-md border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-300 transition-colors">
-                                        <LuTrash2 size={15} />
-                                    </button>
-                                </div>
-                            ))}
-                            <button type="button" onClick={() => setFormData((prev: any) => ({ ...prev, specifications: [...prev.specifications, { key: '', value: '' }] }))}
-                                className="text-sm font-semibold text-[var(--color-primary)] hover:underline">+ Add specification</button>
-                        </div>
-                    </div>
-
                     {/* ── 7. SEO ─────────────────────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-5">
-                        <SectionHeader icon={<LuGlobe size={20} />} title="SEO Optimization" color="bg-[var(--color-primary-lightest)] text-[var(--color-primary)]" />
+                        <SectionHeader icon={<FiGlobe size={20} />} title="SEO Optimization" color="bg-green-50 text-green-700" />
                         <Input label="Meta Title" name="metaTitle" type="text" placeholder="SEO title for search engines" value={formData.metaTitle} onChange={handleChange} />
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-700">Meta Description</label>
-                            <textarea name="metaDescription" rows={3} placeholder="SEO description for better search ranking..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md outline-none focus:border-[var(--color-primary-border)] transition-all text-sm" value={formData.metaDescription} onChange={handleChange}></textarea>
+                            <textarea name="metaDescription" rows={3} placeholder="SEO description for better search ranking..." className="w-full px-4 py-3 bg-white border border-gray-200 rounded-md outline-none focus:border-green-400 transition-all text-sm" value={formData.metaDescription} onChange={handleChange}></textarea>
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-700">Meta Keywords <span className="text-xs text-gray-400">(comma-separated)</span></label>
-                            <input type="text" placeholder="e.g. air compressor, industrial" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary-border)]" value={formData.metaKeywords.join(', ')} onChange={(e) => handleArrayChange('metaKeywords', e.target.value)} />
+                            <input type="text" placeholder="e.g. air compressor, industrial" className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-green-400" value={formData.metaKeywords.join(', ')} onChange={(e) => handleArrayChange('metaKeywords', e.target.value)} />
                         </div>
                     </div>
                 </div>
@@ -1009,18 +1136,19 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
                     {/* ── Media Assets ──────────────────────────────── */}
                     <div className={`bg-white p-6 rounded-md border shadow-sm space-y-4 ${(errors.thumbnail || errors.images) ? 'border-red-300 ring-1 ring-red-200' : 'border-gray-200'}`} data-field="thumbnail">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><LuImage className="text-blue-500" /> Media Assets</h3>
-                        <p className="text-[11px] text-gray-400 -mt-2">At least 3 images required (1 thumbnail + 2 gallery)</p>
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><FiImage className="text-blue-500" /> Media Assets</h3>
+                        <p className="text-[11px] text-gray-400 -mt-2">Optional — a product with no photo shows a placeholder until you add one</p>
                         <SingleImageUploader
                             label="Product Thumbnail"
+                            hint="Recommended: 1000×1000px (1:1 square)"
                             value={formData.thumbnail}
                             onChange={(url: string) => { setFormData((prev: any) => ({ ...prev, thumbnail: url })); clearError('thumbnail'); clearError('images'); }}
-                            required
                         />
                         {errors.thumbnail && <p className="text-xs text-red-500 font-medium">⚠ {errors.thumbnail}</p>}
                         <div data-field="images">
                             <MultipleImageUploader
                                 label="Gallery Images"
+                                hint="Recommended: 1000×1000px (1:1 square)"
                                 values={formData.images}
                                 onChange={(urls: string[]) => { setFormData((prev: any) => ({ ...prev, images: urls })); clearError('images'); }}
                                 max={10}
@@ -1031,7 +1159,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
                     {/* ── Category & Tags ───────────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-4">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><LuTag className="text-indigo-500" /> Organization</h3>
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><FiTag className="text-indigo-500" /> Organization</h3>
                         {/* Category & Sub-Category moved to the Basic Information card (under Product Name). */}
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-gray-400 uppercase">Tags <span className="text-gray-300">(comma-separated)</span></label>
@@ -1051,14 +1179,25 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                         </div>
                     </div>
 
+                    {/* ── Sold & views shown on the product page ───── */}
+                    <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-4">
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><FiCheckCircle className="text-[var(--color-primary)]" /> Sold &amp; Views</h3>
+                        <p className="text-[11px] text-gray-400 -mt-2">
+                            Shown on the product page as “N Sold” and the eye count. Set a starting number here — every real order adds its quantity to Sold, and every visit to the product page adds one view.
+                        </p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input label="Sold" name="totalSold" type="number" placeholder="0" value={formData.totalSold} onChange={handleChange} />
+                            <Input label="Views" name="viewCount" type="number" placeholder="0" value={formData.viewCount} onChange={handleChange} />
+                        </div>
+                    </div>
+
                     {/* ── Visibility & Promotion ────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-4">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><LuSettings className="text-[var(--color-primary)]" /> Visibility & Status</h3>
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><FiSettings className="text-green-600" /> Visibility & Status</h3>
                         <div className="space-y-2">
                             <Toggle label="Featured Product" name="isFeatured" checked={formData.isFeatured} onChange={handleChange} color="bg-yellow-500" />
                             <Toggle label="On Sale" name="isOnSale" checked={formData.isOnSale} onChange={handleChange} color="bg-rose-500" />
                             <Toggle label="New Arrival" name="isNewProduct" checked={formData.isNewProduct} onChange={handleChange} color="bg-emerald-500" />
-                            <Toggle label="Top Selling (হোম পেজে দেখাবে)" name="isBestSelling" checked={formData.isBestSelling} onChange={handleChange} color="bg-orange-500" />
                         </div>
                         <div className="pt-2">
                             <label className="text-xs font-bold text-gray-400 uppercase block mb-2">Status</label>
@@ -1075,10 +1214,7 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
 
                     {/* ── Shipping & Warranty ───────────────────────── */}
                     <div className="bg-white p-6 rounded-md border border-gray-200 shadow-sm space-y-4">
-                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><LuShield className="text-emerald-500" /> Shipping, Payment & Warranty</h3>
-
-                        {/* Cash on Delivery — used by courier + payment flow */}
-                        <Toggle label="Cash on Delivery (COD) available" name="codAvailable" checked={formData.codAvailable} onChange={handleChange} color="bg-emerald-500" />
+                        <h3 className="font-bold text-gray-800 flex items-center gap-2"><FiShield className="text-emerald-500" /> Shipping & Warranty</h3>
 
                         <div className="space-y-3 p-4 bg-gray-50 rounded-md border border-gray-100">
                             <label className="flex items-center gap-3 cursor-pointer">
@@ -1086,16 +1222,22 @@ const ProductFormInner = ({ productId: propProductId }: { productId?: string }) 
                                 <span className="text-sm font-bold text-gray-700">Free Shipping</span>
                             </label>
                             {!formData.shippingConfig.freeShipping && (
-                                <div className="grid grid-cols-2 gap-3 pt-1">
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-400">Shipping Cost (৳)</label>
-                                        <input type="number" name="shippingConfig.shippingCost" placeholder="0" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.shippingCost} onChange={handleChange} />
+                                <>
+                                    <div className="grid grid-cols-2 gap-3 pt-1">
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold text-gray-400">Delivery Charge (৳)</label>
+                                            <input type="number" name="shippingConfig.insideDhakaCost" placeholder={String(defaultInsideRate)} className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.insideDhakaCost} onChange={handleChange} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-[10px] font-bold text-gray-400">Est. Days</label>
+                                            <input type="number" name="shippingConfig.estimatedDays" placeholder="3" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.estimatedDays} onChange={handleChange} />
+                                        </div>
                                     </div>
-                                    <div className="space-y-1">
-                                        <label className="text-[10px] font-bold text-gray-400">Est. Days</label>
-                                        <input type="number" name="shippingConfig.estimatedDays" placeholder="3" className="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-sm outline-none focus:border-emerald-300" value={formData.shippingConfig.estimatedDays} onChange={handleChange} />
-                                    </div>
-                                </div>
+                                    <p className="text-[11px] text-gray-500">
+                                        Leave the charge empty to use the flat delivery charge (৳{defaultInsideRate}) from Settings → Business.
+                                        In a mixed cart the dearest product&apos;s charge applies to the whole order.
+                                    </p>
+                                </>
                             )}
                         </div>
 

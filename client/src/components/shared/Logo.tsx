@@ -33,8 +33,8 @@ interface LogoProps {
     imgClassName?: string;
 }
 
-const LOGO_FULL = '/logo.png';
-const LOGO_MARK = '/logo-mark.png';
+const LOGO_FULL = '/brand/logo.png';
+const LOGO_MARK = '/brand/logo-icon.png';
 
 const Logo: React.FC<LogoProps> = ({
     size = 40,

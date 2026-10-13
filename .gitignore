@@ -12,12 +12,15 @@ build/
 # spreadsheet. Kept out of the repo because the two TVC videos inside are
 # 202 MB and 160 MB, well past GitHub's 100 MB per-file limit. The folder on
 # disk was named "recource"; the old "korbo group" line never matched it.
-# Consolidated on 28 Aug 2026 into client/public/karmo-library/ (below) —
+# Consolidated on 28 Aug 2026 into karmo-library/ (below) —
 # these two stay so any stray old copy is still ignored.
 recource/
 korbo group/
 
-# ── client/public/karmo-library/ — the reference library ──────────────────
+# Local scratch: experimental image exports, never part of the site.
+client/tmp/
+
+# ── karmo-library/ — the reference library ──────────────────
 #
 # Every source/reference asset now lives under one tree (see its README).
 # Most of it is far too heavy for the repo — ~1.9 GB of Illustrator masters,
@@ -27,10 +30,12 @@ korbo group/
 # `01-taglines/` is deliberately NOT ignored: three small client-approved
 # PDFs that are the source of truth for site copy, and worth having in the
 # history. Everything else under the library is local-only.
-client/public/karmo-library/02-catalogues/
-client/public/karmo-library/03-image-candidates/
-client/public/karmo-library/04-website-reference/
-client/public/karmo-library/05-originals-masters/
+karmo-library/02-catalogues/
+karmo-library/03-image-candidates/
+karmo-library/04-website-reference/
+karmo-library/05-originals-masters/
+# Team-only reference info (spec sheets, price lists) — never shipped with the site.
+karmo-library/06-info/
 
 # Money receipts that were dropped into public/images by mistake. They carry
 # personal and financial details and would be served by the site if committed.

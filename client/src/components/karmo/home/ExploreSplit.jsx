@@ -29,7 +29,7 @@ const DEFAULT_PANELS = [
   {
     id: "mattress",
     href: "/mattress",
-    src: "/karmo/images/home-02/explore/mattress-panel-v2.jpg",
+    src: "/shared/explore/mattress-panel-v2.jpg",
     alt: "A Karmo floral mattress styled in a calm grey bedroom",
     line1: "Mattress made",
     line2: "for deep rest",
@@ -40,7 +40,7 @@ const DEFAULT_PANELS = [
   {
     id: "hometex",
     href: "/hometex",
-    src: "/karmo/images/home-02/explore/hometex-panel-v2.webp",
+    src: "/shared/explore/hometex-panel-v2.webp",
     alt: "A cream sofa in a mustard yellow HomeTex living room",
     line1: "HomeTex for",
     line2: "every room",
@@ -55,7 +55,7 @@ const DEFAULT_PANELS = [
 const FLAGSHIP_SHOTS = [
   {
     id: "banner",
-    src: "/karmo/images/home-02/banners/magnific-3zzTfKCREY.webp",
+    src: "/shared/banners/magnific-3zztfkcrey.webp",
     alt: "A Karmo Magnific lifestyle scene",
     position: "object-center",
     tone: "bg-[#d8d8d8]",
@@ -63,7 +63,7 @@ const FLAGSHIP_SHOTS = [
   },
   {
     id: "sunlit",
-    src: "/karmo/images/foam/furniture/hero/foam-sunlit-sofa-v2.webp",
+    src: "/pages/foam/furniture/hero/foam-sunlit-sofa-v2.webp",
     alt: "Cream armchair and Karmo foam slabs in a sunlit living room",
     position: "object-[20%_bottom]",
     tone: "bg-white",

@@ -619,7 +619,7 @@ const CartPage = () => {
                     </div>
 
                     {/* ═══ RIGHT: ORDER SUMMARY ═══ */}
-                    <div className="lg:col-span-4 lg:sticky lg:top-[200px] h-fit">
+                    <div className="lg:col-span-4 lg:sticky lg:top-[136px] h-fit">
                         <div className="border border-ink/10 bg-white">
 
                             <div className="px-5 py-3.5 border-b border-ink/8">

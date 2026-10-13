@@ -89,6 +89,12 @@ export const userApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Users'],
         }),
+        // The one customer on file for an exact mobile number, or null — for "New order".
+        // Admins and editors; editors never get the customer list itself.
+        lookupCustomer: builder.query<{ data: any | null }, string>({
+            query: (phone) => ({ url: '/users/admin/lookup', method: 'GET', params: { phone } }),
+            providesTags: ['Users'],
+        }),
         getAdminUserById: builder.query({
             query: (id) => ({
                 url: `/users/admin/${id}`,
@@ -107,6 +113,15 @@ export const userApi = baseApi.injectEndpoints({
             query: ({ id, ...data }) => ({
                 url: `/users/admin/${id}`,
                 method: 'PATCH',
+                body: data,
+            }),
+            invalidatesTags: ['Users'],
+        }),
+        // Admin adds a buyer by hand (phone orders, walk-ins)
+        createCustomer: builder.mutation({
+            query: (data) => ({
+                url: '/users/admin/customers',
+                method: 'POST',
                 body: data,
             }),
             invalidatesTags: ['Users'],
@@ -135,9 +150,11 @@ export const {
     useGetSharedWishlistQuery,
     // Admin hooks
     useGetAdminUsersQuery,
+    useLookupCustomerQuery,
     useGetAdminUserByIdQuery,
     useGetAdminUserStatsQuery,
     useUpdateUserMutation,
+    useCreateCustomerMutation,
     useDeleteUserMutation,
 } = userApi;
 

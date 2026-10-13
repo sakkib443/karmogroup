@@ -36,6 +36,11 @@ export interface InvoiceData {
     couponCode?: string;
 }
 
+interface InvoiceResponse {
+    success: boolean;
+    data: InvoiceData;
+}
+
 interface EmailInvoiceResponse {
     success: boolean;
     message: string;
@@ -43,6 +48,13 @@ interface EmailInvoiceResponse {
 
 export const invoiceApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        getInvoice: builder.query<InvoiceResponse, string>({
+            query: (orderId) => ({
+                url: '/invoices/' + orderId,
+                method: 'GET',
+            }),
+            providesTags: ['Invoices'],
+        }),
         emailInvoice: builder.mutation<EmailInvoiceResponse, { orderId: string }>({
             query: ({ orderId }) => ({
                 url: '/invoices/' + orderId + '/email',
@@ -53,4 +65,4 @@ export const invoiceApi = baseApi.injectEndpoints({
     overrideExisting: false,
 });
 
-export const { useEmailInvoiceMutation } = invoiceApi;
+export const { useGetInvoiceQuery, useEmailInvoiceMutation } = invoiceApi;

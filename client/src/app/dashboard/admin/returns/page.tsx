@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
     useGetAdminReturnsQuery,
     useApproveReturnMutation,
@@ -64,8 +65,21 @@ function StatusBadge({ status }: { status: string }) {
     );
 }
 
+// useSearchParams needs a Suspense boundary (Next.js falls back to client rendering up to it).
 export default function AdminReturnsPage() {
-    const [activeTab, setActiveTab] = useState<ReturnStatus | 'all'>('all');
+    return (
+        <Suspense fallback={null}>
+            <AdminReturnsPageInner />
+        </Suspense>
+    );
+}
+
+function AdminReturnsPageInner() {
+    // ?status=pending (the Dashboard's "Return requests to review" link) pre-selects the tab.
+    const statusParam = useSearchParams().get('status');
+    const [activeTab, setActiveTab] = useState<ReturnStatus | 'all'>(
+        STATUS_TABS.find((t) => t.value === statusParam)?.value || 'all',
+    );
     const [selected, setSelected] = useState<any | null>(null);
     const [lightbox, setLightbox] = useState<string | null>(null);
     const [rejectMode, setRejectMode] = useState(false);
@@ -251,7 +265,7 @@ export default function AdminReturnsPage() {
                                             <span className="text-sm text-gray-600">{r.orderId || '—'}</span>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <span className="text-sm text-gray-600">{'S Kawsar Sunnah Mart'}</span>
+                                            <span className="text-sm text-gray-600">{r.shopName || 'Shohoz Krishi'}</span>
                                         </td>
                                         <td className="px-5 py-4">
                                             <OrderItemsPreview items={r.items} totalCount={r.items?.length} size={34} />
@@ -318,7 +332,7 @@ export default function AdminReturnsPage() {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Shop</p>
-                                    <p className="text-sm font-medium text-gray-800">{'S Kawsar Sunnah Mart'}</p>
+                                    <p className="text-sm font-medium text-gray-800">{selected.shopName || 'Shohoz Krishi'}</p>
                                 </div>
                             </div>
 

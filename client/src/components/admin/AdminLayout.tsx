@@ -1,354 +1,330 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import type { IconType } from 'react-icons';
 import {
-    LuHouse, LuShoppingBag, LuUsers,
-    LuLayoutGrid, LuLogOut, LuMenu, LuX, LuChevronDown,
-    LuShoppingCart, LuUser, LuChevronLeft,
-    LuLayoutDashboard, LuChartColumn, LuTruck, LuTag, LuStar, LuMapPin,
-    LuSettings, LuBell, LuSearch, LuCreditCard, LuZap, LuShield, LuRefreshCw, LuMail, LuBriefcase,
+    LuLayoutDashboard, LuPackage, LuPackageCheck, LuLayoutGrid,
+    LuUsers, LuUserCheck, LuShoppingCart, LuChartColumn, LuStar, LuTicketPercent, LuUndo2, LuShieldAlert,
+    LuStore, LuTruck, LuWallet, LuSettings, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog, LuShield,
+    LuMessageSquare, LuMail, LuBriefcase, LuFileText, LuBell, LuMapPin,
+    LuPanelLeft, LuChevronRight, LuLogOut, LuX,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
-import Logo from '@/components/shared/Logo';
-import { useSelector } from 'react-redux';
+import { SiteMark } from '@/components/shared/SiteLogo';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { logout } from '@/redux/slices/authSlice';
+import { useLogoutMutation } from '@/redux/api/authApi';
+import { baseApi } from '@/redux/api/baseApi';
+import { ADMIN_ROOT, ROLE_LABEL, canOpen, homeFor } from './access';
 
 interface AdminLayoutProps { children: React.ReactNode; }
 
-const SIDEBAR_W = 240;
+// Who sees an item follows the page rules in ./access (canOpen), so the menu and the
+// pages never disagree. Sections with nothing visible to the role are dropped.
+type MenuItem = { name: string; href: string; icon: IconType };
 
-const menuSections = [
-    // Overview — what an admin opens first
+// Ordered by how often Karmo actually needs them: the day's work first
+// (orders, catalogue), then people, hiring, reports, money, and settings last.
+//
+// Taken out of the menu on purpose (pages still exist, just not listed):
+// categories (the divisions are fixed), attributes and units (set while
+// uploading a product), offers & flash sales (hidden until redesigned), stock,
+// warehouses, transfers, suppliers, purchases, expenses, investors, the whole
+// digital-marketing group, system health and the API scanner.
+const menuSections: { label: string; items: MenuItem[] }[] = [
     {
-        label: 'Main',
+        label: '',
         items: [
-            { name: 'Dashboard', href: '/dashboard/admin', icon: LuHouse, submenu: null },
-            { name: 'Report & Analysis', href: '/dashboard/admin/analytics', icon: LuChartColumn, submenu: null },
+            { name: 'Dashboard', href: '/dashboard/admin', icon: LuLayoutDashboard },
         ],
     },
-    // Daily operations — follows the order lifecycle: placed → shipped → returned
     {
-        label: 'Orders & Fulfillment',
+        label: 'Orders',
         items: [
-            { name: 'Orders', href: '/dashboard/admin/orders', icon: LuShoppingCart, submenu: null },
-            { name: 'Courier / Shipments', href: '/dashboard/admin/courier', icon: LuTruck, submenu: null },
-            { name: 'Shipping & Zones', href: '/dashboard/admin/shipping', icon: LuMapPin, submenu: null },
-            { name: 'Returns', href: '/dashboard/admin/returns', icon: LuRefreshCw, submenu: null },
+            { name: 'Orders', href: '/dashboard/admin/orders', icon: LuShoppingCart },
+            { name: 'Returns', href: '/dashboard/admin/returns', icon: LuUndo2 },
+            { name: 'Fraud check', href: '/dashboard/admin/fraud-check', icon: LuShieldAlert },
+            // Steadfast parcel booking and sync.
+            { name: 'Courier parcels', href: '/dashboard/admin/courier', icon: LuTruck },
         ],
     },
-    // What you sell
     {
         label: 'Catalog',
         items: [
-            {
-                name: 'Products', href: '/dashboard/admin/products', icon: LuShoppingBag, submenu: [
-                    { name: 'All Products', href: '/dashboard/admin/products' },
-                    { name: 'Add Product', href: '/dashboard/admin/products/new' },
-                ]
-            },
-            { name: 'Categories', href: '/dashboard/admin/categories', icon: LuLayoutGrid, submenu: null },
+            { name: 'Products', href: '/dashboard/admin/products', icon: LuPackage },
+            { name: 'Product approval', href: '/dashboard/admin/products/moderation', icon: LuPackageCheck },
+            { name: 'Reviews', href: '/dashboard/admin/reviews', icon: LuStar },
+            { name: 'Coupons', href: '/dashboard/admin/coupons', icon: LuTicketPercent },
         ],
     },
-    // Promotions & engagement
     {
-        label: 'Marketing',
+        label: 'Customers',
         items: [
-            { name: 'Coupons', href: '/dashboard/admin/coupons', icon: LuTag, submenu: null },
-            { name: 'Offers & Flash Sales', href: '/dashboard/admin/offers', icon: LuZap, submenu: null },
-            { name: 'Reviews', href: '/dashboard/admin/reviews', icon: LuStar, submenu: null },
-            { name: 'Newsletter', href: '/dashboard/admin/newsletter', icon: LuMail, submenu: null },
+            { name: 'Customers', href: '/dashboard/admin/customers', icon: LuUsers },
+            { name: 'Inquiries', href: '/dashboard/admin/inquiries', icon: LuMessageSquare },
+            { name: 'Newsletter', href: '/dashboard/admin/newsletter', icon: LuMail },
         ],
     },
-    // Money flow — payments collected from customers
+    {
+        label: 'Career',
+        items: [
+            { name: 'Job posts', href: '/dashboard/admin/jobs', icon: LuBriefcase },
+            { name: 'Applications', href: '/dashboard/admin/jobs/applications', icon: LuFileText },
+        ],
+    },
+    {
+        label: 'Reports',
+        items: [
+            { name: 'Sales reports', href: '/dashboard/admin/analytics', icon: LuChartColumn },
+            { name: 'Staff activity', href: '/dashboard/admin/staff-activity', icon: LuUserCheck },
+        ],
+    },
     {
         label: 'Finance',
         items: [
-            { name: 'Payments', href: '/dashboard/admin/payments', icon: LuCreditCard, submenu: null },
+            { name: 'Accounts overview', href: '/dashboard/admin/accounts', icon: LuLayoutGrid },
+            { name: 'Payments', href: '/dashboard/admin/payments', icon: LuCreditCard },
+            { name: 'Courier payouts', href: '/dashboard/admin/courier-payouts', icon: LuWallet },
         ],
     },
-    // Recruitment — postings on /career and the CVs they pull in
     {
-        label: 'Careers',
+        label: 'Settings',
         items: [
-            {
-                name: 'Jobs', href: '/dashboard/admin/jobs', icon: LuBriefcase, submenu: [
-                    { name: 'All Jobs', href: '/dashboard/admin/jobs' },
-                    { name: 'Post a Job', href: '/dashboard/admin/jobs/new' },
-                    { name: 'Applications', href: '/dashboard/admin/jobs/applications' },
-                ]
-            },
-        ],
-    },
-    // People & access control
-    {
-        label: 'Users & Access',
-        items: [
-            { name: 'Users & Admins', href: '/dashboard/admin/customers', icon: LuUsers, submenu: null },
-            { name: 'Roles & Permissions', href: '/dashboard/admin/roles', icon: LuShield, submenu: null, superadminOnly: true },
-        ],
-    },
-    // Configuration
-    {
-        label: 'Support & System',
-        items: [
-            { name: 'Site Content', href: '/dashboard/admin/site-content', icon: LuLayoutDashboard, submenu: null },
-            { name: 'Settings', href: '/dashboard/admin/settings', icon: LuSettings, submenu: null },
-            { name: 'Profile', href: '/dashboard/admin/profile', icon: LuUser, submenu: null },
+            { name: 'Store settings', href: '/dashboard/admin/settings', icon: LuSettings },
+            { name: 'Shipping', href: '/dashboard/admin/shipping', icon: LuMapPin },
+            { name: 'Site content', href: '/dashboard/admin/site-content', icon: LuLayoutTemplate },
+            { name: 'Notifications', href: '/dashboard/admin/notifications', icon: LuBell },
+            // Super admin only (access.ts): add admins and editors, change roles.
+            { name: 'Staff', href: '/dashboard/admin/staff', icon: LuUserCog },
+            { name: 'Roles & permissions', href: '/dashboard/admin/roles', icon: LuShield },
+            { name: 'My profile', href: '/dashboard/admin/profile', icon: LuUser },
         ],
     },
 ];
 
-// Flatten for compatibility
-const allMenuItems = menuSections.flatMap(s => s.items);
+const allMenuItems = menuSections.flatMap((s) => s.items);
+const ROOT = ADMIN_ROOT;
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
-    const pathname = usePathname();
-    const router = useRouter();
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+/** A menu item shows when the role may open the page behind it. */
+const showItem = (role: string | undefined, item: MenuItem) => canOpen(role, item.href);
 
-    useEffect(() => { setMobileOpen(false); }, [pathname]);
+/** The menu item a path belongs to — the longest href that prefixes it. */
+function matchItem(pathname: string): MenuItem | undefined {
+    return allMenuItems
+        .filter((i) => i.href !== ROOT && (pathname === i.href || pathname.startsWith(i.href + '/')))
+        .sort((a, b) => b.href.length - a.href.length)[0];
+}
 
-    useEffect(() => {
-        allMenuItems.forEach((item) => {
-            if (item.submenu?.some(s => pathname.startsWith(s.href))) {
-                setExpandedMenu(item.name);
-            }
-        });
-    }, [pathname]);
+const titleCase = (s: string) => s.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-    const handleLogout = () => { localStorage.removeItem('token'); router.push('/'); };
+/** Dashboard › Orders › New — derived from the path and the menu above. */
+function buildCrumbs(pathname: string): { label: string; href?: string }[] {
+    const crumbs: { label: string; href?: string }[] = [{ label: 'Dashboard', href: ROOT }];
+    if (pathname === ROOT) return [{ label: 'Dashboard' }];
 
-    const isActive = (href: string) => pathname === href;
-    const isParentActive = (item: typeof allMenuItems[0]) =>
-        item.submenu ? item.submenu.some(s => pathname.startsWith(s.href)) : pathname === item.href;
+    const item = matchItem(pathname);
+    let rest: string[];
+    if (item) {
+        crumbs.push({ label: item.name, href: item.href });
+        rest = pathname.slice(item.href.length).split('/').filter(Boolean);
+    } else {
+        rest = pathname.slice(ROOT.length).split('/').filter(Boolean);
+    }
+    rest.forEach((seg, i) => {
+        const label = /^[a-f0-9]{24}$/i.test(seg) ? 'Details' : seg === 'new' ? 'New' : titleCase(seg);
+        const href = (item ? item.href : ROOT) + '/' + rest.slice(0, i + 1).join('/');
+        crumbs.push({ label, href });
+    });
+    // The current page is never a link.
+    delete crumbs[crumbs.length - 1].href;
+    return crumbs;
+}
 
-    const Sidebar = () => (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            {/* Logo */}
-            <div style={{
-                height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '0 16px', borderBottom: '1px solid #334155', flexShrink: 0,
-            }}>
-                <Link href="/dashboard/admin" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                    <Logo light imgClassName="h-[30px] md:h-[34px]" />
+function Sidebar({ pathname, role, onClose, onLogout }: {
+    pathname: string; role?: string; onClose?: () => void; onLogout: () => void;
+}) {
+    const active = matchItem(pathname);
+    const isActive = (item: MenuItem) => (item.href === ROOT ? pathname === ROOT : active?.href === item.href);
+
+    return (
+        <div className="flex h-full flex-col">
+            {/* Brand */}
+            <div className="flex h-16 shrink-0 items-center justify-between px-4">
+                <Link href={homeFor(role)} className="flex items-center gap-2.5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/brand/logo.png" alt="Karmo Group" className="block h-7 w-auto max-w-[200px]" />
                 </Link>
-                <button
-                    className="lg:hidden"
-                    onClick={() => setMobileOpen(false)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#cbd5e1', padding: '4px' }}
-                >
-                    <LuX size={18} />
-                </button>
+                {onClose && (
+                    <button type="button" aria-label="Close menu" onClick={onClose} className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 lg:hidden">
+                        <LuX size={18} />
+                    </button>
+                )}
             </div>
 
             {/* Nav */}
-            <nav className="scrollbar-hide" style={{ flex: 1, overflowY: 'auto', padding: '12px 10px' }}>
-                {menuSections.map((section) => (
-                    <div key={section.label} style={{ marginBottom: '16px' }}>
-                        <p style={{
-                            fontSize: '9px', fontWeight: 700, color: '#94A3B8',
-                            textTransform: 'uppercase', letterSpacing: '1.2px',
-                            padding: '0 10px 6px', margin: 0,
-                        }}>
-                            {section.label}
-                        </p>
-                        {section.items.filter((item: any) => !item.superadminOnly || role === 'superadmin').map((item) => {
-                            const hasSubmenu = !!(item.submenu && item.submenu.length > 0);
-                            const isExpanded = expandedMenu === item.name;
-                            const parentActive = isParentActive(item);
-                            const exactActive = !hasSubmenu && isActive(item.href);
-                            const highlighted = exactActive || (hasSubmenu && parentActive);
-
+            <nav className="scrollbar-hide flex-1 overflow-y-auto px-3 pb-3">
+                {menuSections.map((section) => ({ section, items: section.items.filter((i) => showItem(role, i)) }))
+                    .filter(({ items }) => items.length > 0)
+                    .map(({ section, items }) => (
+                    <div key={section.label || 'main'} className="mb-1">
+                        {section.label && <p className="px-3 pb-1 pt-4 text-xs font-medium text-gray-500">{section.label}</p>}
+                        {items.map((item) => {
+                            const on = isActive(item);
+                            const Icon = item.icon;
+                            const cls = 'group flex h-9 items-center gap-3 rounded-lg px-3 text-sm transition-colors';
                             return (
-                                <div key={item.name} style={{ marginBottom: '1px' }}>
-                                    <Link
-                                        href={hasSubmenu ? '#' : item.href}
-                                        onClick={(e) => {
-                                            if (hasSubmenu) { e.preventDefault(); setExpandedMenu(isExpanded ? null : item.name); }
-                                        }}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                            padding: '8px 12px', borderRadius: '8px', textDecoration: 'none',
-                                            background: highlighted ? 'var(--color-primary)' : 'transparent',
-                                            color: highlighted ? '#fff' : '#cbd5e1',
-                                            fontSize: '13px', fontWeight: highlighted ? 600 : 500,
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                        onMouseEnter={e => { if (!highlighted) { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; } }}
-                                        onMouseLeave={e => { if (!highlighted) { (e.currentTarget as HTMLElement).style.background = 'transparent'; } }}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <item.icon size={16} />
-                                            <span>{item.name}</span>
-                                        </div>
-                                        {hasSubmenu && (
-                                            <LuChevronDown size={13} style={{
-                                                transform: isExpanded ? 'rotate(180deg)' : 'none',
-                                                transition: 'transform 0.2s',
-                                                opacity: 0.5,
-                                            }} />
-                                        )}
-                                    </Link>
-
-                                    {hasSubmenu && isExpanded && (
-                                        <div style={{
-                                            marginLeft: '16px', paddingLeft: '12px',
-                                            borderLeft: '2px solid #334155', marginTop: '2px', marginBottom: '4px',
-                                        }}>
-                                            {item.submenu!.map((sub) => (
-                                                <Link key={sub.name} href={sub.href}
-                                                    style={{
-                                                        display: 'block', padding: '6px 10px', borderRadius: '6px',
-                                                        fontSize: '12px', textDecoration: 'none', marginBottom: '1px',
-                                                        background: isActive(sub.href) ? 'rgba(var(--color-primary-rgb),0.15)' : 'transparent',
-                                                        color: isActive(sub.href) ? 'var(--color-primary)' : '#94A3B8',
-                                                        fontWeight: isActive(sub.href) ? 600 : 400,
-                                                        borderLeft: isActive(sub.href) ? '2px solid var(--color-primary)' : '2px solid transparent',
-                                                    }}
-                                                >
-                                                    {sub.name}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                                <Link
+                                    key={item.name}
+                                    href={item.href}
+                                    className={`${cls} ${on ? 'bg-gray-200/60 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
+                                >
+                                    <Icon size={17} className={on ? 'text-[var(--color-primary)]' : 'text-gray-500 group-hover:text-gray-700'} />
+                                    <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                                </Link>
                             );
                         })}
                     </div>
                 ))}
             </nav>
 
-            {/* Footer */}
-            <div style={{ padding: '8px 10px', borderTop: '1px solid #334155', flexShrink: 0 }}>
-                <button onClick={handleLogout}
-                    style={{
-                        width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
-                        padding: '9px 12px', borderRadius: '8px', background: 'none',
-                        border: 'none', cursor: 'pointer', color: '#94A3B8', fontSize: '13px', fontWeight: 500,
-                    }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#fff0f0'; (e.currentTarget as HTMLElement).style.color = '#dc2626'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
+            <div className="shrink-0 border-t border-gray-200 p-3">
+                <button
+                    type="button"
+                    onClick={onLogout}
+                    className="flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm text-gray-600 transition-colors hover:bg-red-50 hover:text-red-600"
                 >
-                    <LuLogOut size={16} /> Logout
+                    <LuLogOut size={17} /> Logout
                 </button>
             </div>
         </div>
     );
+}
+
+const COLLAPSE_KEY = 'sk-admin-sidebar-collapsed';
+
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [collapsed, setCollapsed] = useState(false);
+    const pathname = usePathname();
+    const router = useRouter();
+    const user = useSelector((s: RootState) => s.auth.user);
+    // TEMPORARY: login is disabled, so everyone is treated as super admin.
+    const role = user?.role ?? 'superadmin';
+
+    useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+    // A page this role may not open (typed URL, old link) → the role's own start page.
+    const allowed = canOpen(role, pathname);
+    useEffect(() => {
+        if (role && !allowed) router.replace(homeFor(role));
+    }, [role, allowed, router]);
+
+    // Desktop collapse is a per-browser preference only.
+    useEffect(() => {
+        try { setCollapsed(localStorage.getItem(COLLAPSE_KEY) === '1'); } catch { /* storage unavailable */ }
+    }, []);
+
+    const toggleSidebar = () => {
+        if (typeof window !== 'undefined' && window.innerWidth < 1024) { setMobileOpen(true); return; }
+        setCollapsed((c) => {
+            try { localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1'); } catch { /* storage unavailable */ }
+            return !c;
+        });
+    };
+
+    // A real sign-out: clear the signed-in user from the app (removing the saved
+    // token alone left Redux still holding them, so nothing looked signed out),
+    // drop cached admin data, and have the server clear its refresh cookie.
+    const dispatch = useDispatch();
+    const [serverLogout] = useLogoutMutation();
+    const handleLogout = () => {
+        serverLogout(undefined).unwrap().catch(() => {});
+        dispatch(logout());
+        dispatch(baseApi.util.resetApiState());
+        router.replace('/');
+    };
+
+    const crumbs = buildCrumbs(pathname);
+    const name = user?.name?.trim() || 'Admin';
+    const initials = name.split(/\s+/).map((p: string) => p[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8f9fb' }}>
-
+        <div className="min-h-screen bg-white">
             {/* Mobile overlay */}
             {mobileOpen && (
-                <div
-                    onClick={() => setMobileOpen(false)}
-                    style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 99, backdropFilter: 'blur(4px)' }}
-                />
+                <div className="fixed inset-0 z-[99] bg-black/30 backdrop-blur-[2px] lg:hidden" onClick={() => setMobileOpen(false)} />
             )}
 
-            {/* Desktop Sidebar */}
-            <div
-                className="hidden lg:block"
-                style={{
-                    position: 'fixed', top: 0, left: 0, width: `${SIDEBAR_W}px`, height: '100vh',
-                    background: '#1E293B', borderRight: '1px solid #334155', zIndex: 50, overflowY: 'hidden',
-                }}
+            {/* Desktop sidebar */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 hidden w-[248px] border-r border-gray-200 bg-gray-50 transition-transform duration-200 lg:block ${collapsed ? '-translate-x-full' : 'translate-x-0'}`}
             >
-                <Sidebar />
-            </div>
+                <Sidebar pathname={pathname} role={role} onLogout={handleLogout} />
+            </aside>
 
-            {/* Mobile Sidebar */}
-            <div
-                className="lg:hidden"
-                style={{
-                    position: 'fixed', top: 0, left: 0, width: '260px', height: '100vh',
-                    background: '#1E293B', borderRight: '1px solid #334155', zIndex: 100,
-                    transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
-                    transition: 'transform 0.25s ease',
-                    boxShadow: mobileOpen ? '4px 0 20px rgba(0,0,0,0.1)' : 'none',
-                }}
+            {/* Mobile sidebar */}
+            <aside
+                className={`fixed inset-y-0 left-0 z-[100] w-[272px] border-r border-gray-200 bg-gray-50 shadow-xl transition-transform duration-200 lg:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
-                <Sidebar />
-            </div>
+                <Sidebar pathname={pathname} role={role} onClose={() => setMobileOpen(false)} onLogout={handleLogout} />
+            </aside>
 
-            {/* Main Content */}
-            <div
-                className="lg:ml-[240px]"
-                style={{ minHeight: '100vh' }}
-            >
-                {/* Top Header */}
-                <header style={{
-                    height: '56px', background: '#fff', borderBottom: '1px solid #f0f0f0',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '0 clamp(12px, 4vw, 24px)', position: 'sticky', top: 0, zIndex: 40,
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Main */}
+            <div className={`min-h-screen transition-[margin] duration-200 ${collapsed ? 'lg:ml-0' : 'lg:ml-[248px]'}`}>
+                <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-gray-200 bg-white/90 px-4 backdrop-blur sm:px-6">
+                    <div className="flex min-w-0 items-center gap-2">
                         <button
-                            className="lg:hidden"
-                            onClick={() => setMobileOpen(true)}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '4px' }}
+                            type="button"
+                            onClick={toggleSidebar}
+                            aria-label="Toggle sidebar"
+                            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100"
                         >
-                            <LuMenu size={20} />
+                            <LuPanelLeft size={17} />
                         </button>
-
-                        {/* Search Bar (hidden on mobile — inline display must not override the `hidden` class) */}
-                        <div style={{
-                            position: 'relative', alignItems: 'center',
-                        }} className="hidden md:flex">
-                            <LuSearch size={14} style={{
-                                position: 'absolute', left: '12px', color: '#bbb',
-                            }} />
-                            <input
-                                type="text"
-                                placeholder="Search orders, products, customers..."
-                                style={{
-                                    width: '320px', padding: '7px 12px 7px 34px',
-                                    background: '#f5f5f5', border: '1px solid transparent',
-                                    borderRadius: '8px', fontSize: '12.5px', color: '#555',
-                                    outline: 'none', transition: 'all 0.2s',
-                                }}
-                                onFocus={e => { e.target.style.background = '#fff'; e.target.style.borderColor = '#e5e7eb'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; }}
-                                onBlur={e => { e.target.style.background = '#f5f5f5'; e.target.style.borderColor = 'transparent'; e.target.style.boxShadow = 'none'; }}
-                            />
-                        </div>
+                        <span className="h-5 w-px shrink-0 bg-gray-200" />
+                        <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
+                            {crumbs.map((c, i) => (
+                                <React.Fragment key={i}>
+                                    {i > 0 && <LuChevronRight size={14} className="shrink-0 text-gray-400" />}
+                                    {c.href ? (
+                                        <Link href={c.href} className={`truncate text-gray-500 hover:text-gray-900 ${i < crumbs.length - 2 ? 'hidden sm:inline' : ''}`}>{c.label}</Link>
+                                    ) : (
+                                        <span className="truncate font-medium text-gray-900">{c.label}</span>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </nav>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        {/* Notifications */}
+                    <div className="flex shrink-0 items-center gap-1.5">
                         <NotificationBell theme="indigo" seeAllHref="/dashboard/admin/notifications" />
-
-                        <div style={{ width: '1px', height: '20px', background: '#efefef' }} />
-
-                        <Link href="/" style={{
-                            display: 'flex', alignItems: 'center', gap: '4px',
-                            fontSize: '12px', fontWeight: 600, color: '#777',
-                            textDecoration: 'none', padding: '5px 10px', borderRadius: '6px',
-                        }}
-                            onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f5f5f5'}
-                            onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                        <Link
+                            href="/"
+                            className="hidden h-8 items-center gap-1.5 rounded-full px-3 text-sm text-gray-600 hover:bg-gray-100 sm:inline-flex"
                         >
-                            <LuChevronLeft size={13} /> Store
+                            <LuStore size={15} /> Store
                         </Link>
-
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <div style={{
-                                width: '30px', height: '30px', borderRadius: '50%',
-                                background: 'linear-gradient(135deg, var(--color-primary), #4338CA)',
-                                display: 'flex', alignItems: 'center',
-                                justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#fff',
-                            }}>A</div>
-                            <span style={{ fontSize: '12px', fontWeight: 600, color: '#555' }} className="hidden sm:inline">Admin</span>
-                        </div>
+                        {role && (
+                            <span className="hidden rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 md:inline">
+                                {ROLE_LABEL[role] || role}
+                            </span>
+                        )}
+                        <span
+                            title={`${name}${role ? ` · ${ROLE_LABEL[role] || role}` : ''}`}
+                            className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-700"
+                        >
+                            {initials}
+                        </span>
                     </div>
                 </header>
 
-                {/* Page content */}
-                <main style={{ padding: 'clamp(14px, 3.5vw, 24px)', minHeight: 'calc(100vh - 56px)' }}>
-                    {children}
+                <main className="px-4 py-6 sm:px-6 lg:px-8">
+                    {/* Nothing of a page this role may not open, even for a moment before the redirect. */}
+                    {allowed ? children : null}
                 </main>
             </div>
         </div>

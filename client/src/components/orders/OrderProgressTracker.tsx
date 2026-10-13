@@ -7,8 +7,6 @@ import {
     LuBadgeCheck,
     LuPackage,
     LuTruck,
-    LuNavigation,
-    LuBike,
     LuPackageCheck,
     LuCheck,
     LuCircleX,
@@ -42,33 +40,35 @@ interface Milestone {
     icon: ElementType;
 }
 
-// ── The 7 happy-path milestones (maps the 11-state backend lifecycle) ──
+// ── The 6 happy-path milestones (maps the order desk statuses for the customer) ──
 const MILESTONES: Milestone[] = [
     { key: 'pending', label: 'Order Placed', sub: 'We received your order', icon: LuReceipt },
     { key: 'confirmed', label: 'Confirmed', sub: 'Your order is confirmed', icon: LuBadgeCheck },
-    { key: 'processing', label: 'Packed', sub: 'Packed & ready to ship', icon: LuPackage },
-    { key: 'shipped', label: 'Shipped', sub: 'Handed to the courier', icon: LuTruck },
-    { key: 'on_the_way', label: 'On the Way', sub: 'In transit to your area', icon: LuNavigation },
-    { key: 'out_for_delivery', label: 'Out for Delivery', sub: 'Arriving soon', icon: LuBike },
-    { key: 'delivered', label: 'Delivered', sub: 'Delivered successfully', icon: LuPackageCheck },
+    { key: 'factory', label: 'In Production', sub: 'Being made at the Karmo factory', icon: LuPackage },
+    { key: 'courier_entry', label: 'Ready to Ship', sub: 'Packed and booked with the courier', icon: LuPackageCheck },
+    { key: 'shipped', label: 'Shipped', sub: 'On its way to you', icon: LuTruck },
+    { key: 'delivered', label: 'Delivered', sub: 'Delivered successfully', icon: LuMapPin },
 ];
 
-// order status → index within MILESTONES (delivery_attempt rides the out-for-delivery node)
+// order status → index within MILESTONES (the older courier steps ride the nearest node)
 const STATUS_INDEX: Record<string, number> = {
     pending: 0,
     confirmed: 1,
+    factory: 2,
+    challan_ready: 2,
     processing: 2,
-    shipped: 3,
+    courier_entry: 3,
+    shipped: 4,
     on_the_way: 4,
-    delivery_attempt: 5,
-    out_for_delivery: 5,
-    delivered: 6,
+    out_for_delivery: 4,
+    delivery_attempt: 4,
+    delivered: 5,
 };
 
 // Milestone key → the timeline statuses that fulfil it (for per-step timestamps)
 const KEY_ALIASES: Record<string, string[]> = {
-    on_the_way: ['on_the_way'],
-    out_for_delivery: ['out_for_delivery', 'delivery_attempt'],
+    factory: ['factory', 'challan_ready', 'processing'],
+    shipped: ['shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt'],
 };
 
 const TERMINAL: Record<

@@ -21,7 +21,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  * company is known for, Pocket Spring the narrowest.
  *
  * Macro close-ups of the four brochure materials live under
- * `/karmo/images/home-02/materials/` (prompts in
+ * `/pages/home/materials/` (prompts in
  * `karmo-library/02-catalogues/mattress-brochure/MATERIAL-IMAGE-PROMPTS.md`).
  */
 
@@ -31,8 +31,8 @@ const materials = [
     name: "Rebonded Foam",
     line: "Support that lasts",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/rebonded-foam-v14.webp",
-    alt: "Close-up of Karmo rebonded foam — finely bonded pastel chips",
+    src: "/pages/home/materials/rebonded-foam-v15.webp",
+    alt: "Speckled terrazzo rebonded foam slab",
     /* The chip colour is the point of this photo — only a soft wash behind the type. */
     wash: "bg-gradient-to-r from-black/35 via-black/10 to-transparent",
     /* Tall left. `row-span-2` is what makes the row asymmetric at all. */
@@ -45,7 +45,7 @@ const materials = [
     name: "Polyethylene Foam",
     line: "Hi-density core",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/pe-foam-v2.webp",
+    src: "/pages/home/materials/pe-foam-v2.webp",
     alt: "Close-up of charcoal egg-crate contour foam",
     span: "lg:col-start-2 lg:row-start-1",
     ratio: "aspect-[16/9]",
@@ -56,7 +56,7 @@ const materials = [
     name: "Natural Coir",
     line: "Cool and breathable",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/natural-coir.webp",
+    src: "/pages/home/materials/natural-coir.webp",
     alt: "Close-up of a Karmo natural coir sheet — pressed coconut-husk fibre",
     span: "lg:col-start-2 lg:row-start-2",
     ratio: "aspect-[16/9]",
@@ -67,7 +67,7 @@ const materials = [
     name: "Pocket Spring",
     line: "Independent coils",
     href: "/mattress",
-    src: "/karmo/images/home-02/materials/pocket-spring.webp",
+    src: "/pages/home/materials/pocket-spring.webp",
     alt: "Close-up of a Karmo pocket-spring unit — fabric-bagged steel coils",
     span: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     ratio: "aspect-[4/5]",
