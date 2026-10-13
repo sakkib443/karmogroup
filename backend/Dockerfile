@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════
-#   S Kawsar Sunnah Mart — BACKEND (Express + TypeScript + Socket.IO)
+#   Karmo Group — BACKEND (Express + TypeScript + Socket.IO)
 #   Multi-stage build for Coolify / any Docker host.
 # ═══════════════════════════════════════════════════════════════════
 

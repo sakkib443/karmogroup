@@ -61,7 +61,7 @@ const server = app.listen(config.port, () => {
     console.log('');
     console.log('╔══════════════════════════════════════════════════╗');
     console.log('║                                                  ║');
-    console.log('║   🛒 S Kawsar Sunnah Mart API Server Started!             ║');
+    console.log('║   🛒 Karmo Group API Server Started!             ║');
     console.log('║                                                  ║');
     console.log(`║   🌐 URL: http://localhost:${config.port}                  ║`);
     console.log(`║   🔧 Env:  ${String(config.env).padEnd(37)}║`);

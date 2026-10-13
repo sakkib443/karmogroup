@@ -10,10 +10,10 @@ const DARK    = '#111827';
 // of the way for the rest of the visit. `PRELOADER_SEEN_KEY` is also read by the
 // inline script in app/layout.tsx, which hides the markup before first paint —
 // keep the two in step.
-export const PRELOADER_SEEN_KEY = 'shohozkrishi:preloaded';
+export const PRELOADER_SEEN_KEY = 'karmo:preloaded';
 
 // Once the page itself has loaded, how long to keep waiting for the homepage's
-// `shohozkrishi:dataReady` cue before leaving anyway.
+// `karmo:dataReady` cue before leaving anyway.
 const DATA_GRACE_MS = 1200;
 // Hard ceiling, in case neither signal ever arrives.
 const SAFETY_MS = 4000;
@@ -123,7 +123,7 @@ const Preloader: React.FC = () => {
         else window.addEventListener('load', markPage);
 
         const markData = () => { dataReadyRef.current = true; };
-        window.addEventListener('shohozkrishi:dataReady', markData);
+        window.addEventListener('karmo:dataReady', markData);
 
         const finish = () => {
             if (finishedRef.current) return;
@@ -135,7 +135,7 @@ const Preloader: React.FC = () => {
             }, 600);
         };
 
-        // `shohozkrishi:dataReady` is dispatched by the homepage once its products
+        // `karmo:dataReady` is dispatched by the homepage once its products
         // and categories have arrived. It is the ideal cue, but only the homepage
         // sends it — so once the page itself has loaded we give it a short grace
         // period and then leave regardless, instead of waiting out the safety net.
@@ -166,7 +166,7 @@ const Preloader: React.FC = () => {
             clearTimeout(safety);
             if (grace !== undefined) clearTimeout(grace);
             window.removeEventListener('load', markPage);
-            window.removeEventListener('shohozkrishi:dataReady', markData);
+            window.removeEventListener('karmo:dataReady', markData);
         };
     }, []);
 
@@ -183,7 +183,7 @@ const Preloader: React.FC = () => {
 
     return (
         <div
-            id="shohoz-preloader"
+            id="karmo-preloader"
             className={`fixed inset-0 z-[99999] flex items-center justify-center transition-all duration-700 ease-out ${fadeOut ? 'opacity-0 scale-[1.015]' : 'opacity-100 scale-100'}`}
             style={{
                 background: 'linear-gradient(160deg, var(--color-primary-surface) 0%, #ffffff 45%, #ffffff 100%)',
@@ -215,7 +215,7 @@ const Preloader: React.FC = () => {
                 <div
                     className="flex items-center gap-3 select-none"
                     style={{ animation: 'preloaderFadeUp 0.55s ease-out both' }}
-                    aria-label="Shohoz Krishi"
+                    aria-label="Karmo"
                 >
                     <Logo size={120} />
                 </div>

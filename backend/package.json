@@ -1,7 +1,7 @@
 {
-    "name": "s-kawsar-sunnah-mart-server",
+    "name": "karmo-group-server",
     "version": "1.0.0",
-    "description": "S Kawsar Sunnah Mart - multi-category e-commerce marketplace backend API",
+    "description": "Karmo Group - multi-category e-commerce marketplace backend API",
     "main": "index.js",
     "scripts": {
         "start": "node index.js",
@@ -19,11 +19,11 @@
         "ecommerce",
         "backend",
         "api",
-        "s-kawsar-sunnah-mart",
+        "karmo-group",
         "marketplace",
         "variety-store"
     ],
-    "author": "S Kawsar Sunnah Mart",
+    "author": "Karmo Group",
     "license": "ISC",
     "dependencies": {
         "@types/bcryptjs": "^2.4.6",

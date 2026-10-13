@@ -71,7 +71,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
-        message: '🛒 S Kawsar Sunnah Mart API Server is running!',
+        message: '🛒 Karmo Group API Server is running!',
         version: '1.0.0',
         environment: config.env,
         timestamp: new Date().toISOString(),

@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════
-#   S Kawsar Sunnah Mart — FRONTEND (Next.js 16, standalone output)
+#   Karmo Group — FRONTEND (Next.js 16, standalone output)
 #   Multi-stage build for Coolify / any Docker host.
 #
 #   ⚠️  NEXT_PUBLIC_* values are inlined into the JS bundle at BUILD time.

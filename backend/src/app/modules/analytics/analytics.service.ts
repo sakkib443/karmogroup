@@ -137,7 +137,7 @@ const drawHeader = (
     contentWidth: number
 ) => {
     doc.rect(0, 0, doc.page.width, 90).fill(color);
-    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('S Kawsar Sunnah Mart', left, 24);
+    doc.fillColor('#FFFFFF').fontSize(26).font('Helvetica-Bold').text('Karmo Group', left, 24);
     doc.fontSize(13).font('Helvetica').text(title, left, 56);
     doc.fontSize(9)
         .font('Helvetica')
@@ -241,7 +241,7 @@ const generateAdminReportPdf = async (): Promise<Buffer> => {
             }
 
             doc.font('Helvetica-Oblique').fontSize(9).fillColor('#888888').text(
-                'S Kawsar Sunnah Mart Admin · Internal analytics report',
+                'Karmo Group Admin · Internal analytics report',
                 left,
                 doc.page.height - 50,
                 { width: contentWidth, align: 'center' }

@@ -62,7 +62,7 @@ const CheckoutPage = () => {
     // Honor the cart's selection: only the ticked items are checked out (falls back to all).
     const items = React.useMemo(() => {
         try {
-            const sel = JSON.parse(localStorage.getItem('skawsarsunnahmart_selected_cart') || 'null');
+            const sel = JSON.parse(localStorage.getItem('karmogroup_selected_cart') || 'null');
             if (Array.isArray(sel) && sel.length > 0) {
                 const filtered = allCartItems.filter((i: any) => sel.includes(i.id));
                 if (filtered.length > 0) return filtered;
@@ -331,7 +331,7 @@ const CheckoutPage = () => {
             if (isAuthenticated) {
                 const result = await createOrder(orderPayload).unwrap();
                 items.forEach((i: any) => dispatch(removeFromCart(i.id)));
-                try { localStorage.removeItem('skawsarsunnahmart_selected_cart'); } catch {}
+                try { localStorage.removeItem('karmogroup_selected_cart'); } catch {}
                 clearAppliedCoupons();
                 await persistAddressIfNeeded();
 
@@ -348,7 +348,7 @@ const CheckoutPage = () => {
             } else {
                 const result = await guestCheckout(orderPayload).unwrap();
                 items.forEach((i: any) => dispatch(removeFromCart(i.id)));
-                try { localStorage.removeItem('skawsarsunnahmart_selected_cart'); } catch {}
+                try { localStorage.removeItem('karmogroup_selected_cart'); } catch {}
                 clearAppliedCoupons();
 
                 if (result.data?.accessToken && result.data?.user) {

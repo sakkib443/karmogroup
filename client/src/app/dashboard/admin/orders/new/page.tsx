@@ -62,7 +62,7 @@ export default function NewOrderPage() {
         setCust((c) => ({
             ...c,
             fullName: c.fullName || `${existing.firstName || ''} ${existing.lastName || ''}`.trim(),
-            email: c.email || (existing.email?.endsWith('@guest.shohozkrishi.com') ? '' : existing.email || ''),
+            email: c.email || (existing.email?.endsWith('@guest.karmo.com') ? '' : existing.email || ''),
             address: c.address || addr?.address || '',
             area: c.area || addr?.area || '',
             city: c.city || addr?.city || '',

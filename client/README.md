@@ -1,6 +1,6 @@
-# S Kawsar Sunnah Mart (Client)
+# Karmo Group (Client)
 
-Frontend for **S Kawsar Sunnah Mart** — a variety-products online marketplace in Bangladesh.
+Frontend for **Karmo Group** — a variety-products online marketplace in Bangladesh.
 
 Built with **Next.js 16**, **React 19**, **Tailwind CSS v4**, and **Redux Toolkit / RTK Query**.
 

@@ -8,7 +8,7 @@ import { useVerifyPaymentQuery } from '@/redux/api/paymentApi';
 import { useAppDispatch } from '@/redux';
 import { clearCart } from '@/redux/slices/cartSlice';
 
-const COUPON_STORAGE_KEY = 'skawsarsunnahmart_applied_coupon';
+const COUPON_STORAGE_KEY = 'karmogroup_applied_coupon';
 
 const PaymentSuccessInner = () => {
     const params = useSearchParams();

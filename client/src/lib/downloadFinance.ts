@@ -33,7 +33,7 @@ async function downloadFinance(format: 'pdf' | 'excel', range: Range = {}): Prom
     const stamp = new Date().toISOString().slice(0, 10);
     const anchor = document.createElement('a');
     anchor.href = objectUrl;
-    anchor.download = `S-Kawsar-Sunnah-Mart-Finance-${stamp}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+    anchor.download = `Karmo-Group-Finance-${stamp}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);

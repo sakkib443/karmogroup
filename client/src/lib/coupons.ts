@@ -11,8 +11,8 @@ export interface AppliedCoupon {
     message?: string;
 }
 
-const KEY = 'skawsarsunnahmart_applied_coupons';
-const LEGACY_KEY = 'skawsarsunnahmart_applied_coupon';
+const KEY = 'karmogroup_applied_coupons';
+const LEGACY_KEY = 'karmogroup_applied_coupon';
 
 export function loadAppliedCoupons(): AppliedCoupon[] {
     if (typeof window === 'undefined') return [];

@@ -44,7 +44,7 @@ export default function WishlistPage() {
             image: product.images?.[0] || '',
             category: 'General',
         }));
-        try { localStorage.setItem('shohozkrishi_selected_cart', JSON.stringify([product._id])); } catch {}
+        try { localStorage.setItem('karmo_selected_cart', JSON.stringify([product._id])); } catch {}
         router.push('/checkout');
     };
 

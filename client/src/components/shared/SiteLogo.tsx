@@ -25,7 +25,7 @@ export function SiteLogo({ size = 40, className }: { size?: number; className?: 
     return (
         <img
             src={logo}
-            alt="Shohoz Krishi"
+            alt="Karmo"
             style={{ height: size, width: 'auto', maxWidth: size * 4 }}
             className={['block object-contain', className].filter(Boolean).join(' ')}
         />
@@ -44,7 +44,7 @@ export function SiteMark({ size = 36, className }: { size?: number; className?: 
     return (
         <img
             src={src}
-            alt="Shohoz Krishi"
+            alt="Karmo"
             width={size}
             height={size}
             style={{ width: size, height: size }}
