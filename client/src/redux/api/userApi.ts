@@ -109,13 +109,23 @@ export const userApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Users'],
         }),
+        // Admin: change an account — details, status, role, divisions, a new password
         updateUser: builder.mutation({
             query: ({ id, ...data }) => ({
                 url: `/users/admin/${id}`,
                 method: 'PATCH',
                 body: data,
             }),
-            invalidatesTags: ['Users'],
+            invalidatesTags: ['Users', 'Roles'],
+        }),
+        // Admin / super admin: add any account (customer or staff) — POST /api/users/admin
+        createUser: builder.mutation({
+            query: (data) => ({
+                url: '/users/admin',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Users', 'Roles'],
         }),
         // Admin adds a buyer by hand (phone orders, walk-ins)
         createCustomer: builder.mutation({
@@ -131,7 +141,7 @@ export const userApi = baseApi.injectEndpoints({
                 url: `/users/admin/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: ['Users'],
+            invalidatesTags: ['Users', 'Roles'],
         }),
     }),
 });
@@ -154,6 +164,7 @@ export const {
     useGetAdminUserByIdQuery,
     useGetAdminUserStatsQuery,
     useUpdateUserMutation,
+    useCreateUserMutation,
     useCreateCustomerMutation,
     useDeleteUserMutation,
 } = userApi;

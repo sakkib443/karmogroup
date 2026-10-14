@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 
-type Role = 'superadmin' | 'admin' | 'editor' | 'user';
+type Role = 'superadmin' | 'admin' | 'manager' | 'online_sales' | 'agency' | 'factory' | 'user';
 
 interface AuthGuardProps {
     children: ReactNode;

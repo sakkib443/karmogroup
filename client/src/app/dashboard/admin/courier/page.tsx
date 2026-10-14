@@ -84,8 +84,9 @@ export default function CourierPage() {
     const setup = countsData?.data?.setup;
     const connected = setup?.configured ?? true;   // assume yes until we know, so nothing flashes
 
-    // The Steadfast balance is shop money: admins only (editors work this board too).
-    const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
+    // The Steadfast balance is shop money: admins only (managers and online sales work this board too).
+    const staffRole = useSelector((s: RootState) => s.auth.user?.role);
+    const isEditor = staffRole !== 'superadmin' && staffRole !== 'admin';
     const { data: balanceData } = useGetCourierBalanceQuery(undefined, { skip: !setup?.configured || isEditor });
     const balance = balanceData?.data?.current_balance;
 

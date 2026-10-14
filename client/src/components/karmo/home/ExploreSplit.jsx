@@ -7,6 +7,9 @@ import { FiChevronRight } from "react-icons/fi";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import { useSection, CmsText } from "@/cms/CmsProvider";
+import { imageStyle, overlayStyle } from "@/cms/core";
+import { explore } from "@/cms/pages/home";
 
 /**
  * Home Two — three-image explore gallery.
@@ -128,6 +131,13 @@ function CareIcon({ id, className = "" }) {
   );
 }
 
+/* Design washes for the wide foam banner, by photo (Site content adds "extra darkness"
+   on top). The first two match the original sunlit-sofa and banner stills. */
+const CMS_FLAGSHIP_LOOK = [
+  { tone: "bg-white", wash: "bg-gradient-to-l from-shade-deep/28 via-shade-deep/10 to-transparent" },
+  { tone: "bg-[#d8d8d8]", wash: "bg-gradient-to-r from-shade-deep/25 via-shade-deep/20 to-shade-deep/45" },
+];
+
 function CarePanel({ panel }) {
   return (
     <div className="relative h-full min-h-0 overflow-hidden">
@@ -211,17 +221,23 @@ function Panel({ panel, compact = false }) {
       href={panel.href}
       className="group relative block h-full min-h-0 overflow-hidden"
     >
-      <Image
-        src={panel.src}
-        alt={panel.alt}
-        fill
-        sizes="(min-width: 768px) 50vw, 100vw"
-        className={`object-cover ${panel.position || "object-center"} transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]`}
-      />
+      {panel.src ? (
+        <span className="absolute inset-0 transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]">
+          <Image
+            src={panel.src}
+            alt={panel.alt || ""}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className={`object-cover ${panel.position || "object-center"}`}
+            style={panel.style}
+          />
+        </span>
+      ) : null}
       {/* Even wash — same strength everywhere (no directional gradient). */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-shade-deep/35"
+        className={`pointer-events-none absolute inset-0 ${panel.overlay ? "" : "bg-shade-deep/35"}`}
+        style={panel.overlay ? overlayStyle(panel.overlay) : undefined}
       />
       <div
         className={`relative z-[1] flex h-full flex-col justify-start p-7 sm:p-9 lg:p-11 xl:p-12 ${
@@ -244,11 +260,11 @@ function Panel({ panel, compact = false }) {
             letterSpacing: "-0.015em",
           }}
         >
-          <span className="block sm:whitespace-nowrap">{panel.line1}</span>
-          <span className="block sm:whitespace-nowrap">{panel.line2}</span>
+          <CmsText as="span" className="block sm:whitespace-nowrap" value={panel.line1} size={panel.line1Size} />
+          <CmsText as="span" className="block sm:whitespace-nowrap" value={panel.line2} size={panel.line1Size} />
         </h2>
         <span className="mt-3 inline-block text-[13px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 group-hover:decoration-white sm:mt-4 sm:text-[14px]">
-          Explore Now
+          {panel.cta || "Explore Now"}
         </span>
       </div>
     </Link>
@@ -256,15 +272,53 @@ function Panel({ panel, compact = false }) {
 }
 
 export default function ExploreSplit({
-  panels = DEFAULT_PANELS,
+  /* Site content key (the homepage passes "explore"). Without it the props below
+     are used as they always were — the division pages pass their own panels. */
+  cmsKey,
+  panels: panelsProp = DEFAULT_PANELS,
   flagship = true,
   half = false,
   className = "mt-1 md:mt-1.5",
 }) {
+  const cms = useSection(cmsKey || "__explore", explore.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const bandH = half ? VIEW_H_HALF : VIEW_H;
-  const [flagshipShot, setFlagshipShot] = useState(1);
+  const [flagshipShot, setFlagshipShot] = useState(cmsKey ? 0 : 1);
+
+  const panels = cmsKey
+    ? (cms.panels || []).map((p, i) => ({
+        id: `cms-${i}`,
+        href: p.href || "#",
+        src: p.image?.src,
+        alt: p.image?.alt,
+        style: imageStyle(p.image),
+        overlay: p.overlay,
+        line1: p.line1,
+        line1Size: p.line1Size,
+        line2: p.line2,
+        cta: p.cta,
+        align: p.align,
+      }))
+    : panelsProp;
+  const shots = cmsKey
+    ? (cms.flagship?.shots || [])
+        .filter((sh) => sh?.image?.src)
+        .map((sh, i) => ({
+          id: `cms-shot-${i}`,
+          src: sh.image.src,
+          alt: sh.image.alt || "",
+          position: "",
+          style: imageStyle(sh.image),
+          overlay: sh.overlay,
+          ...(CMS_FLAGSHIP_LOOK[i] || { tone: "bg-white", wash: "" }),
+        }))
+    : FLAGSHIP_SHOTS;
+  const flag = cmsKey
+    ? { line1: cms.flagship?.line1, line1Size: cms.flagship?.line1Size, line2: cms.flagship?.line2, link: cms.flagship?.link }
+    : { line1: "Foam crafted", line2: "for comfort", link: { label: "Explore Now", href: "/foam" } };
+  const current = shots[flagshipShot] || shots[0];
+  if (cmsKey && cms.hidden) return null;
 
   return (
     <section data-home-two-snap className={`bg-white ${className}`}>
@@ -286,14 +340,14 @@ export default function ExploreSplit({
           ))}
         </div>
 
-        {flagship && (
+        {flagship && current && (
           <motion.div
             variants={fade}
             {...reveal}
             viewport={VIEWPORT}
-            className={`explore-band relative overflow-hidden ${FLAGSHIP_SHOTS[flagshipShot].tone} ${bandH}`}
+            className={`explore-band relative overflow-hidden ${current.tone} ${bandH}`}
           >
-            {FLAGSHIP_SHOTS.map((shot, i) => (
+            {shots.map((shot, i) => (
               <span key={shot.id} aria-hidden={i !== flagshipShot}>
                 <Image
                   src={shot.src}
@@ -304,6 +358,7 @@ export default function ExploreSplit({
                   className={`object-cover ${shot.position} transition-opacity duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
                     i === flagshipShot ? "opacity-100" : "opacity-0"
                   }`}
+                  style={shot.style}
                 />
                 <span
                   aria-hidden
@@ -311,6 +366,13 @@ export default function ExploreSplit({
                     i === flagshipShot ? "opacity-100" : "opacity-0"
                   }`}
                 />
+                {shot.overlay && Number(shot.overlay.opacity) > 0 ? (
+                  <span
+                    aria-hidden
+                    className={`pointer-events-none absolute inset-0 transition-opacity duration-[900ms] ${i === flagshipShot ? "opacity-100" : "opacity-0"}`}
+                    style={overlayStyle(shot.overlay)}
+                  />
+                ) : null}
               </span>
             ))}
 
@@ -326,28 +388,32 @@ export default function ExploreSplit({
                     letterSpacing: "-0.015em",
                   }}
                 >
-                  <span className="block sm:whitespace-nowrap">Foam crafted</span>
-                  <span className="block sm:whitespace-nowrap">for comfort</span>
+                  <CmsText as="span" className="block sm:whitespace-nowrap" value={flag.line1} size={flag.line1Size} />
+                  <CmsText as="span" className="block sm:whitespace-nowrap" value={flag.line2} size={flag.line1Size} />
                 </h2>
-                <Link
-                  href="/foam"
-                  className="mt-5 inline-block text-[13px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 hover:decoration-white sm:mt-6 sm:text-[14px]"
-                >
-                  Explore Now
-                </Link>
+                {flag.link?.label ? (
+                  <Link
+                    href={flag.link.href || "#"}
+                    className="mt-5 inline-block text-[13px] font-semibold uppercase tracking-[0.14em] text-white underline decoration-white/55 underline-offset-[6px] transition-colors duration-300 hover:decoration-white sm:mt-6 sm:text-[14px]"
+                  >
+                    {flag.link.label}
+                  </Link>
+                ) : null}
               </div>
             </div>
 
+            {shots.length > 1 ? (
             <button
               type="button"
               onClick={() =>
-                setFlagshipShot((i) => (i + 1) % FLAGSHIP_SHOTS.length)
+                setFlagshipShot((i) => (i + 1) % shots.length)
               }
               aria-label="Show next foam layout"
               className="absolute top-1/2 right-2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-ink/15 bg-white text-ink shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition hover:border-ink/30 hover:text-brand sm:right-3 sm:h-11 sm:w-11 lg:right-4"
             >
               <FiChevronRight className="text-[20px]" aria-hidden />
             </button>
+            ) : null}
           </motion.div>
         )}
       </motion.div>

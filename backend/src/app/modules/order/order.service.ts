@@ -10,6 +10,7 @@ import QueryBuilder from '../../utils/QueryBuilder';
 import { notifyOrderToWhatsApp } from '../../utils/whatsappNotify';
 import { emitFinanceUpdate } from '../../utils/socket';
 import { computeShippingCost } from '../shipping/shipping.service';
+import { type Viewer, actorOf, scopeFor, present, assertVisible, assertTransition, ensureJobs, dhakaDayStart } from './order.desk';
 
 /**
  * Tell the customer their payment status changed. Shared by the admin's manual
@@ -103,7 +104,7 @@ function catalogueLine(item: any) {
 }
 
 const OrderService = {
-    async getAllOrders(query: Record<string, unknown>) {
+    async getAllOrders(query: Record<string, unknown>, viewer: Viewer) {
         // The order desk's own filters are pulled out here; everything else (status,
         // paymentStatus, paymentMethod, items.product…) goes to QueryBuilder.filter() as is.
         const { search, searchTerm, dateFrom, dateTo, minTotal, maxTotal, courier, division, places, zonePlaces, ...rest } = query;
@@ -140,6 +141,9 @@ const OrderService = {
                 { 'shippingAddress.address': rx },
             ] });
         }
+        // What this viewer may see at all (agency: pending; factory: its divisions…).
+        const scope = scopeFor(viewer);
+        if (Object.keys(scope).length) and.push(scope);
         if (and.length) where.$and = and;
 
         // Placed between two moments — the browser sends the start / end of its local days.
@@ -172,9 +176,20 @@ const OrderService = {
             .sort()
             .paginate();
 
-        const orders = await orderQuery.modelQuery;
+        const orders = (await orderQuery.modelQuery).map((o: any) => present(o, viewer));
         const meta = await orderQuery.countTotal();
         return { orders, meta };
+    },
+
+    /** One order for the admin panel, as this staff member may see it. */
+    async getOrderForStaff(id: string, viewer: Viewer) {
+        await assertVisible(id, viewer);
+        const order: any = await Order.findById(id)
+            .populate('user', 'firstName lastName email phone')
+            .populate('items.product', 'name thumbnail slug price');
+        if (!order) throw new AppError(404, 'Order not found');
+        if (!order.jobs?.length && !['pending', 'cancelled'].includes(order.status) && await ensureJobs(order)) await order.save();
+        return present(order, viewer);
     },
 
     async getMyOrders(userId: string, query: Record<string, unknown>) {
@@ -408,8 +423,9 @@ const OrderService = {
                     meta: { orderId: orderIdStr, total },
                 });
 
-                // 2) Every admin / superadmin
-                await NotificationService.notifyAdmins({
+                // 2) Everyone who handles new orders: admins, managers and the agency
+                //    that confirms them by phone.
+                await NotificationService.notifyRoles(['superadmin', 'admin', 'manager', 'agency'], {
                     type: 'new_order',
                     title: 'New order placed',
                     message: `A new order ${order.orderId || orderIdStr} was placed (৳${total}).`,
@@ -435,11 +451,18 @@ const OrderService = {
             throw new AppError(400, 'Full name and phone number are required for checkout');
         }
 
-        // Auto-generate guest email from phone if not provided
-        const guestEmail = email || `${phone.replace(/\s+/g, '')}@guest.karmogroup.com`;
+        const cleanPhone = String(phone).replace(/[\s-]/g, '');
+        const placeholderEmail = `${cleanPhone}@guest.karmogroup.com`;
+        const typedEmail = String(email || '').trim().toLowerCase();
 
-        // Check if user already exists
-        let user = await User.findOne({ $or: [{ email: guestEmail.toLowerCase() }, { phone }] });
+        // SECURITY: a guest is only ever matched to a shopper account, and only a NEW
+        // account is signed in here. Typing someone else's phone or email (a customer's,
+        // or a staff member's) must never hand out a login for that account — the order
+        // is still saved to the customer, who signs in with their own password to see it.
+        let user = await User.findOne({
+            role: 'user',
+            $or: [{ phone: cleanPhone }, ...(typedEmail ? [{ email: typedEmail }] : [])],
+        });
         let isNewUser = false;
 
         if (!user) {
@@ -447,24 +470,30 @@ const OrderService = {
             const nameParts = fullName.trim().split(' ');
             const firstName = nameParts[0] || 'Customer';
             const lastName = nameParts.slice(1).join(' ') || '.';
+            // An email that already belongs to another account (e.g. staff) is not reused.
+            const emailFree = typedEmail && !(await User.exists({ email: typedEmail }));
 
             user = await User.create({
-                email: guestEmail.toLowerCase(),
-                password: password || phone,   // matches the "your phone number is your password" message
+                email: emailFree ? typedEmail : placeholderEmail,
+                password: password || cleanPhone,   // matches the "your phone number is your password" message
                 firstName,
                 lastName,
-                phone,
+                phone: cleanPhone,
                 role: 'user',
                 status: 'active',
                 isEmailVerified: false,
             });
             isNewUser = true;
+        } else if (user.status === 'blocked') {
+            throw new AppError(403, 'We could not place this order. Please call us to order.');
         }
 
         // Now create order using the existing createOrder method
         const order = await this.createOrder(user._id!.toString(), payload);
 
-        // Generate token for auto-login
+        // Only the account just created is signed in (see the SECURITY note above).
+        if (!isNewUser) return { order, isNewUser };
+
         const jwt = require('jsonwebtoken');
         const appConfig = require('../../config').default;
         const accessToken = jwt.sign(
@@ -488,12 +517,186 @@ const OrderService = {
         };
     },
 
-    async updateOrderStatus(id: string, status: string, note?: string) {
-        const order = await Order.findById(id);
+    /**
+     * An order taken by hand at the desk — by phone or for a walk-in customer. Staff set
+     * the price agreed with the customer on each line. The customer is found by phone, or
+     * added (their phone number is their password, as at guest checkout). Created as
+     * Pending, or straight away Confirmed when the call already confirmed it.
+     */
+    async createStaffOrder(viewer: Viewer, payload: any) {
+        const { items, shippingAddress, paymentMethod, paymentDetails, note, adminNote } = payload;
+        const by = actorOf(viewer);
+        const now = new Date();
+        const isTop = viewer.role === 'superadmin' || viewer.role === 'admin';
+
+        // ── The customer ──
+        const phone = String(shippingAddress.phone || '').replace(/[\s-]/g, '');
+        if (!/^01\d{9}$/.test(phone)) throw new AppError(400, 'Enter an 11-digit mobile number starting with 01');
+        const fullName = String(shippingAddress.fullName || '').trim();
+        let customer: any = await User.findOne({ phone, role: 'user' });
+        if (!customer) {
+            const email = String(shippingAddress.email || '').trim().toLowerCase();
+            const emailFree = email && !(await User.exists({ email }));
+            const parts = fullName.split(/\s+/);
+            customer = await User.create({
+                email: emailFree ? email : `${phone}@guest.karmogroup.com`,
+                password: phone,
+                firstName: parts[0] || 'Customer',
+                lastName: parts.slice(1).join(' ') || '.',
+                phone,
+                role: 'user',
+                status: 'active',
+                isEmailVerified: false,
+            });
+        } else if (customer.status === 'blocked') {
+            throw new AppError(400, 'This customer is blocked — unblock them in Users first');
+        }
+
+        // ── The lines ──
+        let subtotal = 0;
+        const orderItems: any[] = [];
+        const fromStock: { id: any; qty: number }[] = [];
+        for (const item of items) {
+            const quantity = Math.floor(Number(item.quantity));
+            const price = Math.round(Number(item.price));
+            const original = Math.round(Number(item.originalPrice) || 0);
+            let line: any = {
+                slug: isProductId(item.product) ? '' : String(item.product || ''),
+                division: divisionKey(item.division),
+                name: String(item.name).trim(),
+                thumbnail: item.image || '',
+                price,
+                originalPrice: original > price ? original : 0,
+                cost: 0,
+                quantity,
+                total: price * quantity,
+                color: item.color || '',
+                size: item.size || '',
+            };
+            if (isProductId(item.product)) {
+                const product: any = await Product.findOne({ _id: item.product, isDeleted: false });
+                if (!product) throw new AppError(404, `Product not found: ${item.name}`);
+                if (product.stock < quantity) throw new AppError(400, `Only ${product.stock} of ${product.name} in stock`);
+                line = { ...line, product: product._id, name: line.name || product.name, thumbnail: line.thumbnail || product.thumbnail, cost: product.costPrice || 0 };
+                fromStock.push({ id: product._id, qty: quantity });
+            }
+            subtotal += line.total;
+            orderItems.push(line);
+        }
+
+        // ── Delivery and discount ──
+        const mode = payload.shipping?.mode || 'auto';
+        let shippingCost = 0;
+        let freeReason = '';
+        if (mode === 'custom') {
+            shippingCost = Math.round(Number(payload.shipping?.amount) || 0);
+        } else if (mode === 'auto') {
+            const area = payload.deliveryArea;
+            const city = area === 'inside_dhaka' ? 'dhaka'
+                : area === 'outside_dhaka' ? (/dhaka/i.test(shippingAddress.city || '') ? '' : shippingAddress.city || '')
+                    : shippingAddress.city || '';
+            const quote = await computeShippingCost({
+                city,
+                subtotal,
+                items: orderItems.map(() => ({ freeShipping: false })),
+                totalQuantity: orderItems.reduce((n, oi) => n + oi.quantity, 0),
+            });
+            shippingCost = quote.shippingCost;
+            freeReason = quote.freeReason || '';
+        } else {
+            freeReason = 'staff';
+        }
+        const discount = Math.min(Math.round(Number(payload.discount) || 0), subtotal);
+        const total = subtotal - discount + shippingCost;
+
+        // ── The order ──
+        const confirmed = payload.status === 'confirmed';
+        const paid = isTop && payload.paymentStatus === 'paid';
+        const order: any = new Order({
+            user: customer._id,
+            items: orderItems,
+            shippingAddress: {
+                fullName: fullName || `${customer.firstName} ${customer.lastName}`.replace(/\s\.$/, ''),
+                phone,
+                email: shippingAddress.email || '',
+                address: shippingAddress.address,
+                area: shippingAddress.area || '',
+                city: shippingAddress.city || '',
+                postalCode: shippingAddress.postalCode || '',
+            },
+            subtotal,
+            shippingCost,
+            shippingFreeReason: freeReason,
+            discount,
+            total,
+            paymentMethod: paymentMethod || 'cod',
+            paymentStatus: paid ? 'paid' : 'pending',
+            paymentDetails: paymentDetails || {},
+            transactionId: paymentDetails?.transactionId || '',
+            note: note || '',
+            adminNote: adminNote || '',
+            source: 'manual',
+            createdBy: by,
+            status: confirmed ? 'confirmed' : 'pending',
+            timeline: [
+                { status: 'pending', note: `Order taken by ${viewer.name || 'staff'} (phone / walk-in)`, by, createdAt: now },
+                ...(confirmed ? [{ status: 'confirmed', note: 'Confirmed with the customer when the order was taken', by, createdAt: now }] : []),
+            ],
+            ...(confirmed ? { confirmedAt: now, confirmedBy: by } : {}),
+        });
+        if (confirmed) await ensureJobs(order);   // reserve the challans (M1000…) for the factory
+        await order.save();
+
+        for (const s of fromStock) {
+            await Product.findByIdAndUpdate(s.id, { $inc: { stock: -s.qty, totalSold: s.qty } });
+        }
+        await User.findByIdAndUpdate(customer._id, { $inc: { totalOrders: 1, totalSpent: total } });
+        emitFinanceUpdate('order_placed');
+
+        try {
+            const { NotificationService } = require('../notification/notification.service');
+            const ref = order.orderId || order._id.toString();
+            NotificationService.notifyRoles(confirmed ? ['superadmin', 'admin', 'manager'] : ['superadmin', 'admin', 'manager', 'agency'], {
+                type: 'new_order',
+                title: confirmed ? 'New confirmed order' : 'New order taken by phone',
+                message: `${viewer.name || 'Staff'} added order ${ref} (৳${total}).`,
+                link: '/dashboard/admin/orders/' + order._id.toString(),
+                meta: { orderId: order._id.toString(), total },
+            }).catch(() => {});
+        } catch {
+            // never block the order on a notification
+        }
+
+        return present(order, viewer);
+    },
+
+    async updateOrderStatus(id: string, status: string, note: string | undefined, viewer: Viewer) {
+        await assertVisible(id, viewer);
+        const order: any = await Order.findById(id);
         if (!order) throw new AppError(404, 'Order not found');
+        assertTransition(viewer, order, status);
+
+        const by = actorOf(viewer);
+        const now = new Date();
+        if (status === 'cancelled') {
+            const reason = String(note || '').trim();
+            if (reason.length < 3) throw new AppError(400, 'Say why the order is cancelled');
+            order.cancelReason = reason;
+            order.cancelledAt = now;
+            order.cancelledBy = by;
+            // Products from the catalogue collection go back on the shelf.
+            for (const item of order.items) {
+                if (item.product) await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity, totalSold: -item.quantity } });
+            }
+        }
+        if (status === 'confirmed' && order.status === 'pending') {
+            order.confirmedAt = now;
+            order.confirmedBy = by;
+            await ensureJobs(order);   // reserve the challans (M1000…) for the factory
+        }
 
         order.status = status as any;
-        order.timeline.push({ status, note: note || '', createdAt: new Date() } as any);
+        order.timeline.push({ status, note: note || '', by, createdAt: now } as any);
 
         // Update payment status when delivered (COD collected on delivery)
         if (status === 'delivered' && order.paymentMethod === 'cod') {
@@ -509,14 +712,14 @@ const OrderService = {
         emitFinanceUpdate('order_status:' + status);
         notifyOrderStatus(order, status);
 
-        return order;
+        return present(order, viewer);
     },
 
     /**
      * Book the parcel with Pathao and mark the order shipped. Only from Courier Entry,
      * and only once — a second booking would be a second parcel.
      */
-    async sendWithPathao(id: string) {
+    async sendWithPathao(id: string, viewer: Viewer) {
         const order: any = await Order.findById(id);
         if (!order) throw new AppError(404, 'Order not found');
         if (order.status !== 'courier_entry') {
@@ -546,23 +749,27 @@ const OrderService = {
         order.courierFee = booked.deliveryFee;
         order.courierBookedAt = new Date();
         order.status = 'shipped';
-        order.timeline.push({ status: 'shipped', note: `Sent with Pathao · consignment ${booked.consignmentId}`, createdAt: new Date() });
+        order.timeline.push({ status: 'shipped', note: `Sent with Pathao · consignment ${booked.consignmentId}`, by: actorOf(viewer), createdAt: new Date() });
         await order.save();
 
         emitFinanceUpdate('order_status:shipped');
         notifyOrderStatus(order, 'shipped');
-        return order;
+        return present(order, viewer);
     },
 
     async cancelOrder(id: string, userId: string) {
-        const order = await Order.findOne({ _id: id, user: userId });
+        const order: any = await Order.findOne({ _id: id, user: userId });
         if (!order) throw new AppError(404, 'Order not found');
-        if (!['pending', 'confirmed'].includes(order.status)) {
-            throw new AppError(400, 'Order cannot be cancelled at this stage');
+        // Once the desk has confirmed it by phone, the factory may already be making it —
+        // the customer calls instead.
+        if (order.status !== 'pending') {
+            throw new AppError(400, 'This order is already confirmed. Please call us to cancel it.');
         }
 
         order.status = 'cancelled';
-        order.timeline.push({ status: 'cancelled', note: 'Cancelled by user', createdAt: new Date() } as any);
+        order.cancelReason = 'Cancelled by the customer';
+        order.cancelledAt = new Date();
+        order.timeline.push({ status: 'cancelled', note: 'Cancelled by the customer', createdAt: new Date() } as any);
 
         await order.save();
 
@@ -592,7 +799,7 @@ const OrderService = {
         return order;
     },
 
-    async updatePaymentStatus(id: string, paymentStatus: string) {
+    async updatePaymentStatus(id: string, paymentStatus: string, viewer?: Viewer) {
         const order = await Order.findById(id);
         if (!order) throw new AppError(404, 'Order not found');
 
@@ -600,7 +807,7 @@ const OrderService = {
         if (paymentStatus === 'paid') {
             order.transactionId = order.transactionId || `PAY-${Date.now()}`;
         }
-        order.timeline.push({ status: `payment_${paymentStatus}`, note: `Payment marked as ${paymentStatus}`, createdAt: new Date() } as any);
+        order.timeline.push({ status: `payment_${paymentStatus}`, note: `Payment marked as ${paymentStatus}`, by: actorOf(viewer), createdAt: new Date() } as any);
         await order.save();
         emitFinanceUpdate('payment_status:' + paymentStatus);
 
@@ -609,35 +816,48 @@ const OrderService = {
         return order;
     },
 
-    async addAdminNote(id: string, note: string) {
+    async addAdminNote(id: string, note: string, viewer: Viewer) {
+        await assertVisible(id, viewer);
         const order = await Order.findById(id);
         if (!order) throw new AppError(404, 'Order not found');
 
         // Persist the current note so the admin detail page can read it back
         // (order.adminNote), and keep a timeline trail of every note added.
         order.adminNote = note;
-        order.timeline.push({ status: 'admin_note', note, createdAt: new Date() } as any);
+        order.timeline.push({ status: 'admin_note', note, by: actorOf(viewer), createdAt: new Date() } as any);
         await order.save();
-        return order;
+        return present(order, viewer);
     },
 
-    async getOrderStats() {
-        const [counts, revenueData] = await Promise.all([
-            Order.aggregate([{ $group: { _id: '$status', n: { $sum: 1 } } }]),
-            Order.aggregate([
-                { $match: { status: 'delivered' } },
-                { $group: { _id: null, totalRevenue: { $sum: '$total' } } },
-            ]),
+    /** Counts per status within what the viewer may see, plus their own work today. */
+    async getOrderStats(viewer: Viewer) {
+        const scope = scopeFor(viewer);
+        const today = dhakaDayStart();
+        const seesMoney = ['superadmin', 'admin', 'manager'].includes(viewer.role);
+        const [counts, revenueData, confirmedToday, cancelledToday] = await Promise.all([
+            Order.aggregate([{ $match: scope }, { $group: { _id: '$status', n: { $sum: 1 } } }]),
+            seesMoney
+                ? Order.aggregate([
+                    { $match: { status: 'delivered' } },
+                    { $group: { _id: null, totalRevenue: { $sum: '$total' } } },
+                ])
+                : Promise.resolve([]),
+            Order.countDocuments({ 'confirmedBy.id': viewer.userId, confirmedAt: { $gte: today } }),
+            Order.countDocuments({ 'cancelledBy.id': viewer.userId, cancelledAt: { $gte: today } }),
         ]);
 
         // One count per status (zero when none), plus the total.
         const stats: Record<string, number> = { total: 0 };
         for (const s of ORDER_STATUSES) stats[s] = 0;
-        for (const c of counts) {
+        for (const c of counts as any[]) {
             stats[c._id] = c.n;
             stats.total += c.n;
         }
-        return { ...stats, totalRevenue: revenueData[0]?.totalRevenue || 0 };
+        return {
+            ...stats,
+            ...(seesMoney ? { totalRevenue: (revenueData as any[])[0]?.totalRevenue || 0 } : {}),
+            mine: { confirmedToday, cancelledToday },
+        };
     },
 
     // ════════════════════════════════════════════════════════════
@@ -676,7 +896,7 @@ const OrderService = {
     // ════════════════════════════════════════════════════════════
 
     // Admin sets the order tracking number + carrier
-    async updateOrderTracking(id: string, trackingNumber: string, carrier: string) {
+    async updateOrderTracking(id: string, trackingNumber: string, carrier: string, viewer?: Viewer) {
         const order = await Order.findById(id);
         if (!order) throw new AppError(404, 'Order not found');
 
@@ -685,6 +905,7 @@ const OrderService = {
         order.timeline.push({
             status: 'tracking_updated',
             note: `Tracking: ${trackingNumber} via ${carrier}`,
+            by: actorOf(viewer),
             createdAt: new Date(),
         } as any);
 

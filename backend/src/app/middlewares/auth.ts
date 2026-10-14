@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import AppError from '../utils/AppError';
 import { User } from '../modules/user/user.model';
+import type { Role } from '../constants/roles';
 
 declare global {
     namespace Express {
@@ -10,7 +11,11 @@ declare global {
             user?: JwtPayload & {
                 userId: string;
                 email: string;
-                role: 'superadmin' | 'admin' | 'user';
+                role: Role;
+                /** Display name, for "done by" on order timelines. */
+                name?: string;
+                /** Factory divisions this user may see; empty = all. */
+                divisions?: string[];
             };
         }
     }
@@ -33,7 +38,7 @@ export const authMiddleware = async (
         const decoded = jwt.verify(token, config.jwt.access_secret) as JwtPayload & {
             userId: string;
             email: string;
-            role: 'superadmin' | 'admin' | 'user';
+            role: Role;
         };
 
         const user = await User.findById(decoded.userId);
@@ -41,17 +46,24 @@ export const authMiddleware = async (
         if (user.isDeleted) throw new AppError(401, 'This user account has been deleted.');
         if (user.status === 'blocked') throw new AppError(403, 'Your account has been blocked. Contact support.');
 
-        req.user = decoded;
+        // The role comes from the account, not the token, so a role change (or a
+        // demotion) takes effect on the very next request instead of when the token expires.
+        req.user = {
+            ...decoded,
+            role: user.role as Role,
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email,
+            divisions: (user as any).divisions || [],
+        };
         next();
     } catch (error) {
         next(error);
     }
 };
 
-export const authorizeRoles = (...allowedRoles: ('superadmin' | 'admin' | 'user')[]) => {
+export const authorizeRoles = (...allowedRoles: Role[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {
-        // Superadmin is a superset of admin — it is always allowed on admin-scoped
-        // routes (so the super admin panel's API calls don't 403).
+        // The super admin passes every role check. Which roles open which route is
+        // grouped in constants/roles.ts (R.ops, R.orderDesk…).
         const allowed = !!req.user && (req.user.role === 'superadmin' || allowedRoles.includes(req.user.role));
         if (!allowed) {
             throw new AppError(403, 'You do not have permission to perform this action.');
@@ -103,7 +115,7 @@ export const optionalAuth = async (
                     const decoded = jwt.verify(token, config.jwt.access_secret) as JwtPayload & {
                         userId: string;
                         email: string;
-                        role: 'superadmin' | 'admin' | 'user';
+                        role: Role;
                     };
                     req.user = decoded;
                 } catch {

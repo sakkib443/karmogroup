@@ -1,13 +1,14 @@
 import express from 'express';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import AnalyticsController from './analytics.controller';
+import { R } from '../../constants/roles';
 
 const router = express.Router();
 
 // ════════════════════════════════════════════════════════════
 //  ADMIN ANALYTICS — everything below requires admin auth.
 // ════════════════════════════════════════════════════════════
-router.use(authMiddleware, authorizeRoles('admin'));
+router.use(authMiddleware, authorizeRoles(...R.ops));
 
 router.get('/dashboard', AnalyticsController.getDashboardSummary);
 router.get('/monthly-revenue', AnalyticsController.getMonthlyRevenue);

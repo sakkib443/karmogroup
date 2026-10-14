@@ -6,57 +6,37 @@ import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
+import { useSection, CmsText } from "@/cms/CmsProvider";
+import { imageStyle } from "@/cms/core";
+import { divisions as section } from "@/cms/pages/home";
 
 /**
  * Our Divisions — four square catalogue tiles in one row.
  * No caption under the image. On hover: soft wash + inset white frame +
  * centred division name (furniture-catalogue pattern).
+ * Content: Admin → Site content → Home → Our divisions.
  */
 
-// Previous tiles kept on disk (hidden): foam-catalog-v6, mattress-catalog-v6,
-// hometex-catalog-v5, chemicals-catalog-v6.
-const divisions = [
-  {
-    name: "Foam",
-    href: "/foam",
-    image: "/pages/home/divisions/foam-catalog-match-v1.webp",
-    alt: "Blue Karmo letter-cushion sofa in a cream catalog studio",
-  },
-  {
-    name: "Mattress",
-    href: "/mattress",
-    image: "/pages/home/divisions/mattress-catalog-v9.webp",
-    alt: "Hand pressing a red floral quilted Karmo mattress",
-    position: "object-[center_58%]",
-  },
-  {
-    name: "HomeTex",
-    href: "/hometex",
-    image: "/pages/home/divisions/hometex-catalog-match-v1.webp",
-    alt: "Stacked floral Karmo HomeTex quilts in a cream catalog studio",
-  },
-  {
-    name: "Chemicals",
-    href: "/chemicals",
-    image: "/pages/home/divisions/chemicals-catalog-v6.webp",
-    alt: "Karmo Chemicals adhesive tins in a professional studio",
-  },
-];
-
 function DivisionCard({ division }) {
+  const image = division.image || {};
   return (
     <motion.div variants={fade} className="min-w-0">
       <Link
-        href={division.href}
+        href={division.href || "#"}
         className="group relative block aspect-square overflow-hidden bg-[#e8e8e8]"
       >
-        <Image
-          src={division.image}
-          alt={division.alt}
-          fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className={`object-cover ${division.position || "object-center"} transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]`}
-        />
+        {image.src ? (
+          <span className="absolute inset-0 transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]">
+            <Image
+              src={image.src}
+              alt={image.alt || ""}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+              style={imageStyle(image)}
+            />
+          </span>
+        ) : null}
 
         {/* Hover: dim wash + inset white frame + centred name */}
         <span
@@ -78,8 +58,11 @@ function DivisionCard({ division }) {
 }
 
 export default function DivisionsStrip() {
+  const c = useSection("divisions", section.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  if (c.hidden) return null;
+  const tiles = c.tiles || [];
 
   return (
     <section className="relative overflow-hidden bg-white py-8 md:py-10">
@@ -93,7 +76,7 @@ export default function DivisionsStrip() {
       >
         <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
-            Our Divisions
+            {c.eyebrow}
           </span>
           <h2
             className="display title-card-line mt-1 uppercase text-ink"
@@ -105,7 +88,8 @@ export default function DivisionsStrip() {
               letterSpacing: "-0.015em",
             }}
           >
-            One group, <span className="text-brand">four crafts</span>
+            <CmsText value={c.title} size={c.titleSize} />{" "}
+            <CmsText className="text-brand" value={c.titleAccent} size={c.titleSize} />
           </h2>
         </motion.div>
       </motion.div>
@@ -114,10 +98,12 @@ export default function DivisionsStrip() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="relative z-[1] mt-3 grid grid-cols-2 gap-[2px] px-0 md:mt-3.5 md:grid-cols-4 md:gap-1"
+        className={`relative z-[1] mt-3 grid grid-cols-2 gap-[2px] px-0 md:mt-3.5 md:gap-1 ${
+          tiles.length === 3 ? "md:grid-cols-3" : tiles.length >= 5 ? "md:grid-cols-4 lg:grid-cols-5" : "md:grid-cols-4"
+        }`}
       >
-        {divisions.map((division) => (
-          <DivisionCard key={division.name} division={division} />
+        {tiles.map((division, i) => (
+          <DivisionCard key={`${i}-${division.name}`} division={division} />
         ))}
       </motion.div>
     </section>
