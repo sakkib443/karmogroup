@@ -48,6 +48,8 @@ import FraudOrderBanner from '../../fraud-check/FraudOrderBanner';
 import PrintOrdersModal, { type PrintKind } from '@/components/admin/print/PrintOrdersModal';
 import EditOrderModal from '@/components/admin/orders/EditOrderModal';
 import OrderPipeline from '@/components/admin/orders/OrderPipeline';
+import { CancelOrderModal } from '@/components/admin/orders/OrderActions';
+import { can, nextStatuses, ROLE_LABEL } from '@/components/admin/access';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 
@@ -83,6 +85,8 @@ interface TimelineStep {
     status: string;
     note?: string;
     createdAt?: string;
+    /** Who made the change (staff name and role), when the server recorded it. */
+    by?: { name?: string; role?: string };
 }
 
 /** One shipment of the order (orders normally have exactly one). */
@@ -281,8 +285,10 @@ export default function OrderDetailsPage() {
     // The package waiting in the "Send to Steadfast" confirmation, and why the last send failed.
     const [sendPkgId, setSendPkgId] = useState<string | null>(null);
     const [sendError, setSendError] = useState('');
-    // Editors confirm orders, add notes and print; payment, tracking and courier booking are for admins.
-    const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
+    // What this person may do comes from their role (components/admin/access.ts); the server checks again.
+    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const seeMoney = can(role, 'seeMoney');
+    const [cancelOpen, setCancelOpen] = useState(false);
 
     const openSendToSteadfast = (packageId: string) => {
         setSendError('');
@@ -352,6 +358,8 @@ export default function OrderDetailsPage() {
 
     const handleUpdateStatus = async () => {
         if (!selectedStatus) return;
+        // Cancelling needs a reason — the modal asks for it.
+        if (selectedStatus === 'cancelled') { setCancelOpen(true); setSelectedStatus(''); return; }
         try {
             await updateStatus({ id, status: selectedStatus }).unwrap();
             toast.success('Order status updated');
@@ -400,6 +408,8 @@ export default function OrderDetailsPage() {
     // Order-level tracking typed in by hand before the Steadfast integration. Shown read-only
     // so older data is never hidden; tracking now comes from the Steadfast booking per package.
     const editBlocked = editBlockedReason(order);
+    // Only the moves this role may make from here.
+    const statusChoices = nextStatuses(role, order.status || 'pending', Object.keys(ORDER_STATUS_CONFIG));
     const legacyTracking = [order.carrier, order.trackingNumber]
         .map((v: unknown) => (typeof v === 'string' ? v.trim() : ''))
         .filter(Boolean)
@@ -425,7 +435,7 @@ export default function OrderDetailsPage() {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-3 w-full md:w-auto">
-                    <button
+                    {can(role, 'editOrder') && <button
                         onClick={() => setIsEditing(true)}
                         disabled={!!editBlocked}
                         title={editBlocked || undefined}
@@ -433,34 +443,34 @@ export default function OrderDetailsPage() {
                     >
                         <FiEdit3 size={16} />
                         Edit order
-                    </button>
-                    <button
+                    </button>}
+                    {seeMoney && <button
                         onClick={handleDownloadInvoice}
                         disabled={isDownloadingInvoice}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm disabled:opacity-50"
                     >
                         <FiPrinter size={16} />
                         {isDownloadingInvoice ? 'Preparing...' : 'Invoice'}
-                    </button>
-                    <button
+                    </button>}
+                    {can(role, 'courier') && <button
                         onClick={() => setPrintKind('labels')}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
                     >
                         <FiTag size={16} />
                         Print label
-                    </button>
-                    <button
+                    </button>}
+                    {seeMoney && <button
                         onClick={() => setPrintKind('invoices')}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
                     >
                         <FiFileText size={16} />
                         Print invoice
-                    </button>
+                    </button>}
                 </div>
             </div>
 
             {/* Fraud check: shows only when this order was flagged */}
-            <FraudOrderBanner orderId={order._id} />
+            {can(role, 'courier') && <FraudOrderBanner orderId={order._id} />}
 
             {/* Pending → Confirmed → Factory → Challan Ready → Courier Entry → Shipped */}
             <OrderPipeline order={order} />
@@ -480,9 +490,9 @@ export default function OrderDetailsPage() {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                                        {seeMoney && <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>}
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Qty</th>
-                                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                                        {seeMoney && <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -527,7 +537,7 @@ export default function OrderDetailsPage() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            {soldBelowList || item.priceOverridden ? (
+                                            {!seeMoney ? null : soldBelowList || item.priceOverridden ? (
                                                 <td className="px-6 py-4 text-sm text-gray-600">
                                                     {soldBelowList && (
                                                         <span className="block text-xs text-gray-400 line-through">৳{original.toLocaleString()}</span>
@@ -550,7 +560,7 @@ export default function OrderDetailsPage() {
                                                 <td className="px-6 py-4 text-sm text-gray-600">৳{price.toLocaleString()}</td>
                                             )}
                                             <td className="px-6 py-4 text-sm text-gray-600">x{item.quantity}</td>
-                                            <td className="px-6 py-4 text-right text-sm font-bold text-gray-800">৳{lineTotal.toLocaleString()}</td>
+                                            {seeMoney && <td className="px-6 py-4 text-right text-sm font-bold text-gray-800">৳{lineTotal.toLocaleString()}</td>}
                                         </tr>
                                         );
                                     })}
@@ -558,7 +568,7 @@ export default function OrderDetailsPage() {
                             </table>
                         </div>
                         {/* Summary */}
-                        <div className="bg-gray-50/50 p-6 border-t border-gray-100">
+                        {seeMoney && <div className="bg-gray-50/50 p-6 border-t border-gray-100">
                             <div className="flex flex-col gap-2 ml-auto max-w-xs">
                                 <div className="flex justify-between text-sm text-gray-500">
                                     <span>Subtotal:</span>
@@ -588,7 +598,7 @@ export default function OrderDetailsPage() {
                                     <span className="text-[var(--color-primary)]">৳{(order.total || 0).toLocaleString()}</span>
                                 </div>
                             </div>
-                        </div>
+                        </div>}
                     </div>
 
                     {/* Order journey — animated responsive progress stepper */}
@@ -618,6 +628,11 @@ export default function OrderDetailsPage() {
                                             </span>
                                         </div>
                                         <p className="text-sm text-gray-500 mt-1">{step.note}</p>
+                                        {step.by?.name && (
+                                            <p className="text-xs text-gray-400 mt-0.5">
+                                                by {step.by.name}{step.by.role ? ` · ${ROLE_LABEL[step.by.role] || step.by.role}` : ''}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )) || <p className="text-gray-400 text-center italic py-4">No timeline available</p>}
@@ -674,8 +689,8 @@ export default function OrderDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Payment Information */}
-                    <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
+                    {/* Payment Information — not for the factory, which sees no money */}
+                    {seeMoney && <div className="bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
                         <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-100 text-gray-800">
                             <FiDollarSign className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Payment Information</h2>
@@ -737,8 +752,8 @@ export default function OrderDetailsPage() {
                                 </div>
                             )}
 
-                            {/* Change Payment Status (not for editors) */}
-                            {!isEditor && <div className="flex justify-between items-center text-sm pt-1">
+                            {/* Change Payment Status (admins only) */}
+                            {can(role, 'payment') && <div className="flex justify-between items-center text-sm pt-1">
                                 <span className="text-gray-500">Change Status:</span>
                                 <div className="flex items-center gap-2">
                                     <select
@@ -759,40 +774,44 @@ export default function OrderDetailsPage() {
                                 </div>
                             </div>}
                         </div>
-                    </div>
+                    </div>}
 
                     {/* Change Status */}
-                    <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
+                    {(statusChoices.length > 0 || can(role, 'note')) && <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                         <div className="flex items-center gap-2 mb-4 text-gray-800">
                             <FiEdit3 className="text-[var(--color-primary)]" size={20} />
                             <h2 className="font-bold">Order Actions</h2>
                         </div>
                         <div className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-xs font-bold text-gray-400 uppercase">Change Status</label>
-                                <div className="flex gap-2">
-                                    <select
-                                        value={selectedStatus || order.status}
-                                        onChange={(e) => setSelectedStatus(e.target.value)}
-                                        className="flex-1 border border-gray-200 rounded-md p-2 text-sm outline-none bg-gray-50/50"
-                                    >
-                                        {Object.entries(ORDER_STATUS_CONFIG).map(([key, cfg]) => (
-                                            <option key={key} value={key}>{cfg.label}</option>
-                                        ))}
-                                    </select>
-                                    <button
-                                        onClick={handleUpdateStatus}
-                                        disabled={!selectedStatus || isUpdatingStatus}
-                                        className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50"
-                                    >
-                                        <FiSave size={16} />
-                                    </button>
+                            {statusChoices.length > 0 && <>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-400 uppercase">Change Status</label>
+                                    <div className="flex gap-2">
+                                        <select
+                                            value={selectedStatus || order.status}
+                                            onChange={(e) => setSelectedStatus(e.target.value)}
+                                            className="flex-1 border border-gray-200 rounded-md p-2 text-sm outline-none bg-gray-50/50"
+                                        >
+                                            {Object.entries(ORDER_STATUS_CONFIG)
+                                                .filter(([key]) => key === order.status || statusChoices.includes(key))
+                                                .map(([key, cfg]) => (
+                                                    <option key={key} value={key}>{cfg.label}</option>
+                                                ))}
+                                        </select>
+                                        <button
+                                            onClick={handleUpdateStatus}
+                                            disabled={!selectedStatus || selectedStatus === order.status || isUpdatingStatus}
+                                            className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50"
+                                        >
+                                            <FiSave size={16} />
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="h-px bg-gray-50"></div>
+                                <div className="h-px bg-gray-50"></div>
+                            </>}
 
-                            <div className="space-y-1">
+                            {can(role, 'note') && <div className="space-y-1">
                                 <label className="text-xs font-bold text-gray-400 uppercase">Admin Note</label>
                                 <textarea
                                     className="w-full border border-gray-200 rounded-md p-3 text-sm outline-none bg-gray-50/50 focus:bg-white transition-all h-24 italic"
@@ -807,12 +826,12 @@ export default function OrderDetailsPage() {
                                 >
                                     {isAddingNote ? 'Saving...' : 'Update Note'}
                                 </button>
-                            </div>
+                            </div>}
                         </div>
-                    </div>
+                    </div>}
 
                     {/* Courier — Steadfast, one block per shipment */}
-                    {(packages.length > 0 || legacyTracking) && (
+                    {can(role, 'courier') && (packages.length > 0 || legacyTracking) && (
                         <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                             <div className="flex items-center gap-2 mb-1 text-gray-800">
                                 <FiTruck className="text-[var(--color-primary)]" size={20} />
@@ -920,6 +939,8 @@ export default function OrderDetailsPage() {
                 job={printKind ? { kind: printKind, ids: [order._id] } : null}
                 onClose={() => setPrintKind(null)}
             />
+
+            {cancelOpen && <CancelOrderModal order={order} open onClose={() => setCancelOpen(false)} />}
 
             {isEditing && !editBlocked && (
                 <EditOrderModal order={order} onClose={() => setIsEditing(false)} />

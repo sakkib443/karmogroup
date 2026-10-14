@@ -6,6 +6,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { TbDropletOff, TbShieldCheck, TbArrowBigDownLines, TbAward } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import { useSection, CmsText } from "@/cms/CmsProvider";
+import { overlayStyle } from "@/cms/core";
+import { promise } from "@/cms/pages/home";
 
 /**
  * "Blending tradition with innovation" — the three-claim band, rebuilt to the
@@ -199,6 +202,9 @@ export default function FoamPromise({
      whole background. */
   film = null,
   scrim = "bg-shade-deep/72",
+  /* Site content: the darkness as a style ({ backgroundColor }) instead of `scrim`. */
+  scrimStyle,
+  headingSize,
 }) {
   /* One switch for every branch below, so a caller that asks for a film
      without giving one gets the still rather than an empty `<video>`. */
@@ -503,7 +509,7 @@ export default function FoamPromise({
           rather than a gradient: the cards sit across the full height, so there
           is no band of the picture that can be left bright. Absolute, above
           both the still and the film. */}
-      <span aria-hidden className={`absolute inset-0 z-[2] ${scrim}`} />
+      <span aria-hidden className={`absolute inset-0 z-[2] ${scrimStyle ? "" : scrim}`} style={scrimStyle} />
 
       <motion.div
         variants={group}
@@ -513,7 +519,7 @@ export default function FoamPromise({
       >
         <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="text-center">
           <h2 className="display section-heading title-card-line uppercase text-white">
-            {heading}
+            <CmsText value={heading} size={headingSize} />
           </h2>
           <p className="body-copy mt-3 text-[15px] text-white/90">
             {subline}
@@ -580,5 +586,32 @@ export default function FoamPromise({
         </div>
       </motion.div>
     </section>
+  );
+}
+
+/**
+ * The homepage's promise band — FoamPromise fed from Admin → Site content → Home →
+ * Our promise. The card icons and badge colours stay with the design (by position).
+ */
+export function HomePromise() {
+  const c = useSection("promise", promise.defaults);
+  if (c.hidden) return null;
+  const claims = (c.claims || []).map((cl, i) => ({
+    ...DEFAULT_CLAIMS[i % DEFAULT_CLAIMS.length],
+    id: `cms-claim-${i}`,
+    title: cl.title,
+    body: cl.body,
+  }));
+  return (
+    <FoamPromise
+      filmMode="parallax"
+      film={c.film?.src || null}
+      still={c.still?.src || STILL}
+      scrimStyle={overlayStyle(c.overlay)}
+      heading={c.heading}
+      headingSize={c.headingSize}
+      subline={c.subline}
+      claims={claims}
+    />
   );
 }

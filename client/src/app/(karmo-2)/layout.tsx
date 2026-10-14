@@ -33,6 +33,8 @@ import SmoothScroll from "@/components/karmo/SmoothScroll";
 import Header from "@/components/karmo/header/Header";
 import ThemeControl from "@/components/karmo/chrome/ThemeControl";
 import HomeTwoSectionSnap from "@/components/karmo/chrome/HomeTwoSectionSnap";
+import { CmsScope } from "@/cms/CmsProvider";
+import { getPageContent } from "@/cms/server";
 
 /**
  * Live homepage chrome — the Home Two header and offset, promoted to `/`.
@@ -202,9 +204,11 @@ const FACES = [
   barlow,
 ];
 
-export default function KarmoTwoLayout({
+export default async function KarmoTwoLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Site-wide content (logos, contact, shared bands) — Admin → Site content → Brand & contact.
+  const site = await getPageContent("global");
   return (
     <ThemeControl
       classNames={FACES.map((f) => f.className).join(" ")}
@@ -237,6 +241,7 @@ export default function KarmoTwoLayout({
         barlow: barlow.style.fontFamily,
       }}
     >
+      <CmsScope page="global" content={site}>
       <SmoothScroll />
       <HomeTwoSectionSnap />
       <Header />
@@ -247,6 +252,7 @@ export default function KarmoTwoLayout({
       {/* Always glued above the footer on every karmo-2 page */}
       <CertifiedBy />
       <Footer />
+      </CmsScope>
     </ThemeControl>
   );
 }

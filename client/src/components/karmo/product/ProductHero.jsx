@@ -14,7 +14,7 @@ import {
 import { toast } from "react-hot-toast";
 
 import { useAppDispatch } from "@/redux";
-import { addToCart } from "@/redux/slices/cartSlice";
+import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
 import {
   getPricingRule,
@@ -105,6 +105,9 @@ export default function ProductHero({ product }) {
   const pricingRule = isFoam
     ? getFoamPricingRule(product.slug)
     : getPricingRule(product.slug);
+  /* No sales-calculator rule (e.g. Foam Sit / Back): sold by the piece at the
+     catalogue price, so there is no size to choose. */
+  const fixedPrice = !pricingRule;
   const heightLocked = pricingRule?.heightFixed != null;
   const heightChoices = pricingRule?.heightOptions || null;
   const buyboxIcons = isFoam
@@ -223,7 +226,9 @@ export default function ProductHero({ product }) {
   const mrpUnit = quote.base || unitPrice;
   const lineTotal = unitPrice * qty;
   const lineMrp = mrpUnit * qty;
-  const sizeLabel = `${width} × ${length} × ${height} inch`;
+  const sizeLabel = fixedPrice
+    ? product.pack || "Standard"
+    : `${width} × ${length} × ${height} inch`;
   const savePct = quote.ok ? discountPct : 0;
 
   const fade = reduce
@@ -243,20 +248,25 @@ export default function ProductHero({ product }) {
         transition: { duration: 0.5, ease: EASE },
       };
 
+  /* One cart line per product + option + size: adding the same thing again only
+     raises its quantity (the quantity used to be part of this key, which split
+     one product into several lines). */
+  const cartId = `${product.slug}_${fabric || "std"}_${fixedPrice ? "std" : `${width}x${length}x${height}`}`;
+
+  const cartItem = () => ({
+    id: cartId,
+    productId: product.slug,
+    name: product.name,
+    price: unitPrice,
+    mrp: mrpUnit || unitPrice,
+    image: selectedFabric?.image || mainSrc || cover,
+    category: product.division,
+    quantity: qty,
+    size: [selectedFabric?.label, sizeLabel].filter(Boolean).join(" · "),
+  });
+
   const onAdd = () => {
-    dispatch(
-      addToCart({
-        id: `${product.slug}_${fabric}_${sizeId}_${width}x${length}x${height}_${qty}`,
-        productId: product.slug,
-        name: product.name,
-        price: unitPrice,
-        mrp: mrpUnit || unitPrice,
-        image: selectedFabric?.image || mainSrc || cover,
-        category: product.division,
-        quantity: qty,
-        size: [selectedFabric?.label, sizeLabel].filter(Boolean).join(" · "),
-      })
-    );
+    dispatch(addToCart(cartItem()));
     toast.success("Added to cart", {
       style: {
         borderRadius: "0",
@@ -266,9 +276,17 @@ export default function ProductHero({ product }) {
     });
   };
 
+  /* Order now: straight to checkout with just this product, in exactly the
+     quantity shown (an earlier cart line for it is replaced, not added to). */
   const onOrder = () => {
-    onAdd();
-    router.push("/cart");
+    dispatch(removeFromCart(cartId));
+    dispatch(addToCart(cartItem()));
+    try {
+      localStorage.setItem("karmogroup_selected_cart", JSON.stringify([cartId]));
+    } catch {
+      /* checkout then takes the whole cart */
+    }
+    router.push("/checkout");
   };
 
   return (
@@ -488,11 +506,11 @@ export default function ProductHero({ product }) {
               <div className="mb-3 flex items-center gap-1.5">
                 <FiChevronDown className="shrink-0 text-[#555]" size={15} />
                 <span className="text-[16px] font-semibold text-[#444]">
-                  Size (inch)
+                  {fixedPrice ? "Price" : "Size (inch)"}
                 </span>
               </div>
 
-              {sizes.length ? (
+              {!fixedPrice && sizes.length ? (
                 <div className="mb-3 grid grid-cols-5 gap-1.5">
                   {sizes.map((s) => {
                     const on = sizeId === s.id;
@@ -535,6 +553,7 @@ export default function ProductHero({ product }) {
                 </div>
               ) : null}
 
+              {fixedPrice ? null : (
               <div className="grid grid-cols-3 gap-2.5">
                 <label className="block min-w-0">
                   <span className="mb-1.5 block text-[14px] font-medium text-[#555]">
@@ -604,8 +623,9 @@ export default function ProductHero({ product }) {
                   )}
                 </label>
               </div>
+              )}
 
-              <div className="mt-4">
+              <div className={fixedPrice ? "" : "mt-4"}>
                 {savePct > 0 && lineMrp > lineTotal ? (
                   <s className="block text-[16px] tabular-nums text-[#9ca3af]">
                     {formatTaka(lineMrp)}
@@ -630,7 +650,7 @@ export default function ProductHero({ product }) {
                 </div>
                 {quote.ok ? (
                   <p className="mt-1 text-[13px] text-[#555]">
-                    {formatTaka(unitPrice)} each · {sizeLabel}
+                    {formatTaka(unitPrice)} {fixedPrice ? "per piece" : "each"} · {sizeLabel}
                     {pricingRule?.mode
                       ? ` · ${String(pricingRule.mode).toUpperCase()}`
                       : ""}
@@ -668,7 +688,7 @@ export default function ProductHero({ product }) {
                   <button
                     type="button"
                     aria-label="Increase quantity"
-                    onClick={() => setQty((q) => q + 1)}
+                    onClick={() => setQty((q) => Math.min(99, q + 1))}
                     className="flex h-11 w-10 items-center justify-center bg-[#f3f4f6] text-[#555] transition-colors hover:bg-[#e5e7eb]"
                   >
                     <FiPlus size={14} />

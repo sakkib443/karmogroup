@@ -1,4 +1,5 @@
 import { Document, Model } from 'mongoose';
+import type { Role } from '../../constants/roles';
 
 export interface IShippingAddress {
     label: string;
@@ -18,8 +19,10 @@ export interface IUser extends Document {
     lastName: string;
     phone: string;
     avatar: string;
-    role: 'superadmin' | 'admin' | 'user';
+    role: Role;
     permissions: string[];
+    /** Factory divisions this staff member works on (empty = all). */
+    divisions?: string[];
     status: 'active' | 'blocked' | 'pending';
     isEmailVerified: boolean;
     isDeleted: boolean;
@@ -30,6 +33,8 @@ export interface IUser extends Document {
     // Stats
     totalOrders: number;
     totalSpent: number;
+    loyaltyPoints?: number;
+    defaultDiscount?: number;
 
     // Wishlist
     wishlist: string[];

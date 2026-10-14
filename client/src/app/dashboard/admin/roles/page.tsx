@@ -17,19 +17,25 @@ import {
 } from '@/redux/api/roleApi';
 import toast from 'react-hot-toast';
 import AuthGuard from '@/components/shared/AuthGuard';
-import { ROLE_ACCESS, ROLE_HINT, type StaffRole } from '@/components/admin/access';
+import { ROLE_ACCESS, ROLE_HINT, STAFF_ROLES, type StaffRole } from '@/components/admin/access';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const ROLE_META: Record<string, { label: string; color: string }> = {
-    superadmin: { label: 'Super Admin', color: 'text-purple-700 bg-purple-50' },
-    admin: { label: 'Admin', color: 'text-[var(--color-primary)] bg-[var(--color-primary-lightest)]' },
-    editor: { label: 'Editor', color: 'text-sky-700 bg-sky-50' },
-    user: { label: 'User', color: 'text-gray-600 bg-gray-100' },
+    superadmin: { label: 'Super Admin', color: 'text-rose-700 bg-rose-50' },
+    admin: { label: 'Admin', color: 'text-purple-700 bg-purple-50' },
+    manager: { label: 'Manager', color: 'text-indigo-700 bg-indigo-50' },
+    online_sales: { label: 'Online Sales', color: 'text-blue-700 bg-blue-50' },
+    agency: { label: 'Agency', color: 'text-orange-700 bg-orange-50' },
+    factory: { label: 'Factory', color: 'text-teal-700 bg-teal-50' },
+    user: { label: 'Customer', color: 'text-gray-600 bg-gray-100' },
 };
 
 const ROLE_OPTIONS = [
-    { id: 'editor', label: 'Editor', icon: FiShield, hint: 'Orders and products' },
+    { id: 'agency', label: 'Agency', icon: FiUser, hint: 'Confirms pending orders' },
+    { id: 'factory', label: 'Factory', icon: FiUser, hint: 'Scans and issues challans' },
+    { id: 'online_sales', label: 'Online Sales', icon: FiShield, hint: 'Challans, courier, returns' },
+    { id: 'manager', label: 'Manager', icon: FiShield, hint: 'Operations lead' },
     { id: 'admin', label: 'Admin', icon: FiShield, hint: 'Runs the shop, no money' },
     { id: 'superadmin', label: 'Super Admin', icon: FiLock, hint: 'Full unrestricted access' },
 ] as const;
@@ -37,7 +43,7 @@ const ROLE_OPTIONS = [
 const fullName = (u: any) =>
     [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.email;
 
-const asStaffRole = (r?: string): StaffRole => (r === 'superadmin' || r === 'editor' ? r : 'admin');
+const asStaffRole = (r?: string): StaffRole => (STAFF_ROLES.includes(r as StaffRole) ? (r as StaffRole) : 'admin');
 
 // Access follows the role (components/admin/access.ts on the client, authorizeRoles on
 // the server); there are no per-person permission switches.

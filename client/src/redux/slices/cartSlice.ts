@@ -62,6 +62,9 @@ const initialState: CartState = {
     totalPrice: 0,
 };
 
+/** The most of one line an order takes (the server refuses more on a single line). */
+const MAX_QTY = 99;
+
 const calculateTotals = (items: CartItem[]) => {
     const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -77,9 +80,9 @@ const cartSlice = createSlice({
             const qty = action.payload.quantity ?? 1;
 
             if (existingItem) {
-                existingItem.quantity += qty;
+                existingItem.quantity = Math.min(MAX_QTY, existingItem.quantity + qty);
             } else {
-                state.items.push({ ...action.payload, quantity: qty });
+                state.items.push({ ...action.payload, quantity: Math.min(MAX_QTY, qty) });
             }
 
             const totals = calculateTotals(state.items);
@@ -99,7 +102,7 @@ const cartSlice = createSlice({
 
         increaseQuantity: (state, action: PayloadAction<string>) => {
             const item = state.items.find(item => item.id === action.payload);
-            if (item) {
+            if (item && item.quantity < MAX_QTY) {
                 item.quantity += 1;
             }
 

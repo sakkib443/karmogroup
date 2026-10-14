@@ -7,6 +7,9 @@ import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
+import { useSection, CmsText } from "@/cms/CmsProvider";
+import { imageStyle } from "@/cms/core";
+import { editorials } from "@/cms/pages/home";
 
 /**
  * Home Two — third section. Screen-tall band: left tagline (shell-aligned) +
@@ -16,92 +19,38 @@ import TextureSlides from "@/components/karmo/home/TextureSlides";
 const GAP = "gap-1 md:gap-1.5";
 const DESKTOP_H = "calc(100svh - 32px)";
 
-const columns = [
-  [
-    {
-      id: "foam-studio",
-      href: "/mattress",
-      label: "Mattress",
-      src: "/pages/home/divisions/editorial-v2/mattress-press-pro-fill-hq.webp",
-      alt: "Hand pressing a quilted Karmo mattress on a bright bed",
-      ratio: "aspect-[3/4]",
-      grow: "md:flex-[16]",
-      position: "object-[center_62%]",
-      zoom: true,
-    },
-    {
-      id: "foam-lavender",
-      href: "/foam",
-      label: "Foam",
-      src: "/pages/home/divisions/editorial-v2/foam-olive-sofa-hq.webp",
-      alt: "Olive three-seat sofa with Karmo foam in a sunlit living room",
-      ratio: "aspect-[4/5]",
-      grow: "md:flex-[15]",
-    },
-  ],
-  [
-    {
-      id: "mattress-bedroom",
-      href: "/hometex",
-      label: "HomeTex",
-      src: "/pages/home/divisions/editorial-v2/hometex-pillows-sideboard-hq.webp",
-      alt: "White pillows and down feathers styled on a cane sideboard",
-      ratio: "aspect-[12/11]",
-      grow: "md:flex-[14]",
-      position: "object-[72%_center]",
-    },
-    {
-      id: "mattress-grey",
-      href: "/hometex",
-      label: "HomeTex",
-      src: "/pages/home/divisions/editorial-v2/hometex-quilt-stack-hq.webp",
-      alt: "Stacked floral Karmo HomeTex quilts with floating feathers on a white bed",
-      ratio: "aspect-[3/5]",
-      grow: "md:flex-[17]",
-    },
-  ],
-  [
-    {
-      id: "foam-campaign",
-      href: "/foam",
-      label: "Foam",
-      src: "/pages/home/divisions/editorial-v2/foam-luxury-arch-sofa-hq.webp",
-      alt: "Mustard wood-frame sofa set with Karmo foam in a sunlit living room",
-      ratio: "aspect-[3/4]",
-      grow: "md:flex-[16]",
-      position: "object-[center_42%]",
-    },
-    {
-      id: "mattress-floral",
-      href: "/chemicals",
-      label: "Chemicals",
-      src: "/pages/home/divisions/editorial-v2/chemicals-tins-hq.webp",
-      alt: "Karmo adhesive tins from the chemicals division",
-      ratio: "aspect-[4/5]",
-      grow: "md:flex-[15]",
-    },
-  ],
+/* Layout of the six photos (3 columns × 2) — design, not content. The photos,
+   names and links come from Site content → Home → Our craft. */
+const SLOTS = [
+  { ratio: "aspect-[3/4]", grow: "md:flex-[16]" },
+  { ratio: "aspect-[4/5]", grow: "md:flex-[15]" },
+  { ratio: "aspect-[12/11]", grow: "md:flex-[14]" },
+  { ratio: "aspect-[3/5]", grow: "md:flex-[17]" },
+  { ratio: "aspect-[3/4]", grow: "md:flex-[16]" },
+  { ratio: "aspect-[4/5]", grow: "md:flex-[15]" },
 ];
 
-function Shot({ shot }) {
+function Shot({ shot, slot }) {
+  const image = shot.image || {};
   return (
     <Link
-      href={shot.href}
-      className={`group relative block w-full min-h-0 overflow-hidden ${shot.ratio} md:aspect-auto md:flex-1 ${shot.grow}`}
+      href={shot.href || "#"}
+      className={`group relative block w-full min-h-0 overflow-hidden ${slot.ratio} md:aspect-auto md:flex-1 ${slot.grow}`}
     >
-      <Image
-        src={shot.src}
-        alt={shot.alt}
-        fill
-        quality={85}
-        unoptimized
-        sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
-        className={`object-cover ${shot.position || "object-center"} origin-center transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          shot.zoom
-            ? "scale-[1.28] group-hover:scale-[1.32]"
-            : "group-hover:scale-[1.04]"
-        }`}
-      />
+      {image.src ? (
+        <span className="absolute inset-0 origin-center transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]">
+          <Image
+            src={image.src}
+            alt={image.alt || ""}
+            fill
+            quality={85}
+            unoptimized
+            sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, 42vw"
+            className="object-cover"
+            style={imageStyle(image)}
+          />
+        </span>
+      ) : null}
 
       <span
         aria-hidden
@@ -121,8 +70,12 @@ function Shot({ shot }) {
 }
 
 export default function DivisionEditorials() {
+  const c = useSection("editorials", editorials.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  if (c.hidden) return null;
+  const shots = c.shots || [];
+  const columns = [shots.slice(0, 2), shots.slice(2, 4), shots.slice(4, 6)].filter((col) => col.length);
 
   return (
     <section
@@ -149,24 +102,22 @@ export default function DivisionEditorials() {
         >
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
-              Our craft
+              {c.eyebrow}
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
-              Karmo since 1965
+              {c.eyebrowNote}
             </span>
           </p>
 
           <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
-            <span className="block sm:whitespace-nowrap">We create the</span>
-            <span className="block text-brand sm:whitespace-nowrap">
-              Chemistry of comfort
-            </span>
+            <CmsText as="span" className="block sm:whitespace-nowrap" value={c.titleLine1} size={c.titleLine1Size} />
+            <CmsText as="span" className="block text-brand sm:whitespace-nowrap" value={c.titleLine2} size={c.titleLine2Size} />
           </h2>
 
           <span className="mt-4 flex items-center gap-3">
             <span className="h-px w-10 bg-brand" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
-              Made under one roof
+              {c.tagline}
             </span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0" aria-hidden>
               <path
@@ -178,18 +129,19 @@ export default function DivisionEditorials() {
           </span>
 
           <p className="body-copy mt-5 text-[16px] leading-[1.7] text-ink/55 lg:text-[17px]">
-            From foam and mattresses to HomeTex and chemicals, Karmo makes every
-            layer of comfort under one roof.
+            <CmsText value={c.body} size={c.bodySize} />
           </p>
 
-          <Link href="/mattress" className="group mt-8 inline-flex items-center gap-3">
+          {c.link?.label ? (
+          <Link href={c.link.href || "#"} className="group mt-8 inline-flex items-center gap-3">
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
-              Explore our range
+              {c.link.label}
             </span>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
               <FiArrowUpRight />
             </span>
           </Link>
+          ) : null}
         </motion.div>
 
         <div
@@ -204,8 +156,8 @@ export default function DivisionEditorials() {
                   : `flex min-h-0 flex-col lg:h-full ${GAP}`
               }
             >
-              {col.map((shot) => (
-                <Shot key={shot.id} shot={shot} />
+              {col.map((shot, j) => (
+                <Shot key={`${i}-${j}`} shot={shot} slot={SLOTS[i * 2 + j] || SLOTS[0]} />
               ))}
             </div>
           ))}

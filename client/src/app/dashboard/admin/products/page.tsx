@@ -50,8 +50,9 @@ export default function ProductsPage() {
     });
     const { data: statsData } = useGetProductStatsQuery(undefined);
     const [deleteProduct] = useDeleteProductMutation();
-    // Editors add and update products; deleting and bulk upload are for admins.
-    const isEditor = useSelector((s: RootState) => s.auth.user?.role) === 'editor';
+    // Managers add and update products; deleting and bulk upload are for admins.
+    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const isEditor = role !== 'superadmin' && role !== 'admin';
     const { data: units } = useGetUnitsQuery({ scope: 'all' });
     // Products store their unit as a word (e.g. "piece"); show the unit's short name.
     const unitShort = (u?: string) => findUnit(units, u || 'piece')?.shortName || (u || 'piece').toUpperCase();

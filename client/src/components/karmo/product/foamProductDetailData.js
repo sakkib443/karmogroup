@@ -7,6 +7,7 @@ import foam from "@/data/divisions/foam";
 import {
   defaultFoamHeightFor,
   foamSizePresetsFor,
+  getFoamPricingRule,
   quoteFoamListPrice,
   quoteFoamPrice,
 } from "@/components/karmo/product/foamPricing";
@@ -164,8 +165,14 @@ function toDetail(item) {
     fabricTitle: "Foam colour",
     densities: null,
     colors: foamColorOptions,
-    sizes: foamSizePresetsFor(item.id),
-    showCustomSize: true,
+    /* Only SKUs with a pricing rule are sized; the rest (Sit, Back) are sold by the piece. */
+    sizes: getFoamPricingRule(item.id) ? foamSizePresetsFor(item.id) : [],
+    showCustomSize: Boolean(getFoamPricingRule(item.id)),
+    pack: item.thickness || "",
+    specs: item.specs || [],
+    badge: item.badge || "",
+    rating: item.rating || 0,
+    reviews: item.reviews || 0,
     price,
     mrp,
     priceLabel: item.now,

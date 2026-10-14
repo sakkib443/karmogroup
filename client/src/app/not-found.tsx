@@ -15,6 +15,7 @@ import {
     FiLayout,
 } from 'react-icons/fi';
 import Logo from '@/components/shared/Logo';
+import { isStaffRole } from '@/components/admin/access';
 
 export default function NotFound() {
     const router = useRouter();
@@ -22,14 +23,13 @@ export default function NotFound() {
 
     const getDashboardHref = () => {
         if (!user) return '/';
-        if (user.role === 'admin' || user.role === 'superadmin') return '/dashboard/admin';
-        if (user.role === 'editor') return '/dashboard/admin/orders';
+        if (isStaffRole(user.role)) return '/dashboard/admin';
         return '/dashboard/user';
     };
 
     const getDashboardLabel = () => {
         if (!user) return 'Back to Home';
-        if (user.role === 'admin' || user.role === 'superadmin' || user.role === 'editor') return 'Admin Dashboard';
+        if (isStaffRole(user.role)) return 'Admin Dashboard';
         return 'My Account';
     };
 

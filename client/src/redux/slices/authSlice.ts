@@ -6,7 +6,7 @@ export interface User {
     email: string;
     phone?: string;
     avatar?: string;
-    role: 'user' | 'editor' | 'admin' | 'superadmin';
+    role: 'user' | 'superadmin' | 'admin' | 'manager' | 'online_sales' | 'agency' | 'factory';
     address?: {
         street: string;
         city: string;

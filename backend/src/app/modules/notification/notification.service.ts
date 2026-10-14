@@ -48,17 +48,23 @@ const NotificationService = {
     // design: a notification failure must never break the action that triggered
     // it (an order, a review, a contact message), so this never throws.
     async notifyAdmins(input: Omit<NotifyInput, 'user'>) {
+        return this.notifyRoles(['admin', 'superadmin'], input);
+    },
+
+    // The same, for any set of staff roles (e.g. a new order also reaches the agency).
+    async notifyRoles(roles: string[], input: Omit<NotifyInput, 'user'>) {
         try {
             // Required lazily to avoid a circular import at module load time.
             const { User } = require('../user/user.model');
-            const admins = await User.find({
-                role: { $in: ['admin', 'superadmin'] },
+            const staff = await User.find({
+                role: { $in: roles },
                 isDeleted: { $ne: true },
+                status: { $ne: 'blocked' },
             }).select('_id');
-            for (const admin of admins) {
-                await this.notify({ ...input, user: admin._id });
+            for (const s of staff) {
+                await this.notify({ ...input, user: s._id });
             }
-            return admins.length;
+            return staff.length;
         } catch {
             return 0;
         }

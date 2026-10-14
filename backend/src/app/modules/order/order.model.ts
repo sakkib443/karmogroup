@@ -31,6 +31,8 @@ const orderItemSchema = new Schema({
     name: { type: String, required: true },
     thumbnail: { type: String, default: '' },
     price: { type: Number, required: true },
+    // The list ("was") price, when the line sold below it — shown struck through.
+    originalPrice: { type: Number, default: 0 },
     // Unit cost (buying price) snapshotted at purchase time — powers COGS / net-profit.
     // Kept internal; never surfaced to the customer.
     cost: { type: Number, default: 0 },
@@ -40,11 +42,60 @@ const orderItemSchema = new Schema({
     size: { type: String, default: '' },
 }, { _id: true });
 
+/** Who did something — kept as a snapshot so the log still reads right if the account changes. */
+const actorSchema = new Schema({
+    id: { type: Schema.Types.ObjectId, ref: 'User' },
+    name: { type: String, default: '' },
+    role: { type: String, default: '' },
+}, { _id: false });
+
 const timelineSchema = new Schema({
     status: { type: String },
     note: { type: String, default: '' },
+    by: { type: actorSchema, default: undefined },
     createdAt: { type: Date, default: Date.now },
 }, { _id: false });
+
+/** One SMS sent to the customer from the order desk. */
+const smsSchema = new Schema({
+    kind: { type: String, default: 'confirmed' },          // confirmed | cancelled
+    to: { type: String, default: '' },
+    message: { type: String, default: '' },
+    status: { type: String, enum: ['sent', 'failed', 'not_configured'], default: 'sent' },
+    providerRef: { type: String, default: '' },
+    error: { type: String, default: '' },
+    by: { type: actorSchema },
+    at: { type: Date, default: Date.now },
+});
+
+/** One product leaving the factory: each piece is scanned out exactly once. */
+const unitSchema = new Schema({
+    code: { type: String, required: true },               // M1000-1
+    itemIndex: { type: Number, required: true },           // index into order.items
+    scannedAt: { type: Date },
+    scannedBy: { type: actorSchema },
+    method: { type: String, enum: ['scan', 'manual'] },
+}, { _id: false });
+
+/** A duplicate printed after the original — who allowed it and why. */
+const reprintSchema = new Schema({
+    at: { type: Date, default: Date.now },
+    by: { type: actorSchema },
+    reason: { type: String, default: '' },
+}, { _id: false });
+
+/**
+ * One challan: the products of a single division on this order. Its number is reserved
+ * when the order is confirmed; the original is issued once, after every piece is scanned.
+ */
+const jobSchema = new Schema({
+    division: { type: String, required: true },
+    challanNo: { type: String, required: true },          // M1000
+    units: { type: [unitSchema], default: [] },
+    issuedAt: { type: Date },
+    issuedBy: { type: actorSchema },
+    reprints: { type: [reprintSchema], default: [] },
+});
 
 const shippingAddressSchema = new Schema({
     fullName: { type: String, required: true },
@@ -79,6 +130,10 @@ const orderSchema = new Schema(
             default: 'pending',
         },
         cancelReason: { type: String, default: '' },
+        confirmedAt: { type: Date },
+        confirmedBy: { type: actorSchema },
+        cancelledAt: { type: Date },
+        cancelledBy: { type: actorSchema },
         paymentMethod: {
             type: String,
             enum: ['cod', 'bkash', 'rocket', 'nagad', 'sslcommerz'],
@@ -104,7 +159,19 @@ const orderSchema = new Schema(
 
         note: { type: String, default: '' },
         adminNote: { type: String, default: '' }, // internal note shown/editable on the admin order detail
+        // Where the order came from: the website, or taken by hand at the desk (phone / walk-in).
+        source: { type: String, enum: ['website', 'manual'], default: 'website' },
+        createdBy: { type: actorSchema },
         timeline: { type: [timelineSchema], default: [] },
+
+        // ── Order desk paperwork ──
+        sms: { type: [smsSchema], default: [] },
+        jobs: { type: [jobSchema], default: [] },          // one challan per division
+        memo: {
+            issuedAt: { type: Date },
+            issuedBy: { type: actorSchema },
+            reprints: { type: [reprintSchema], default: [] },
+        },
     },
     { timestamps: true, toJSON: { virtuals: true } }
 );
@@ -120,5 +187,17 @@ orderSchema.pre('save', async function (next) {
 
 orderSchema.index({ user: 1, status: 1 });
 orderSchema.index({ status: 1, createdAt: -1 });
+orderSchema.index({ 'jobs.challanNo': 1 });
+orderSchema.index({ 'jobs.units.code': 1 });
 
 export const Order = model('Order', orderSchema);
+
+/** Running numbers (challan series per division). */
+const counterSchema = new Schema({ _id: { type: String, required: true }, seq: { type: Number, default: 0 } }, { versionKey: false });
+export const Counter = model('Counter', counterSchema);
+
+/** The next number in a series that starts at `start` (M1000, M1001…). Atomic. */
+export async function nextInSeries(key: string, start: number): Promise<number> {
+    const c: any = await Counter.findOneAndUpdate({ _id: key }, { $inc: { seq: 1 } }, { upsert: true, new: true });
+    return start - 1 + c.seq;
+}

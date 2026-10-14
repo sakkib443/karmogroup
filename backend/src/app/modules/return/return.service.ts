@@ -2,6 +2,7 @@ import { ReturnRequest } from './return.model';
 import { Order } from '../order/order.model';
 import OrderService from '../order/order.service';
 import AppError from '../../utils/AppError';
+import { R } from '../../constants/roles';
 
 interface Requester {
     userId: string;
@@ -91,7 +92,7 @@ const ReturnService = {
         const isOwner = (doc.user as any)?._id
             ? (doc.user as any)._id.toString() === requester.userId
             : doc.user.toString() === requester.userId;
-        const isAdmin = requester.role === 'admin' || requester.role === 'superadmin';
+        const isAdmin = requester.role === 'superadmin' || R.orderDesk.includes(requester.role as any);
 
         if (!isOwner && !isAdmin) {
             throw new AppError(403, 'You do not have permission to view this return request');
