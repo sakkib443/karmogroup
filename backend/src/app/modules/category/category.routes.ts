@@ -3,11 +3,12 @@ import CategoryController from './category.controller';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { createCategoryValidation, updateCategoryValidation } from './category.validation';
+import { R } from '../../constants/roles';
 
 const router = express.Router();
 
 router.get('/', CategoryController.getAll);
-router.get('/admin/all', authMiddleware, authorizeRoles('admin'), CategoryController.getAllAdmin);
+router.get('/admin/all', authMiddleware, authorizeRoles(...R.ops), CategoryController.getAllAdmin);
 router.get('/:id/subcategories', CategoryController.getSubCategories);
 router.get('/:id', CategoryController.getById);
 router.post('/', authMiddleware, authorizeRoles('admin'), validateRequest(createCategoryValidation), CategoryController.create);

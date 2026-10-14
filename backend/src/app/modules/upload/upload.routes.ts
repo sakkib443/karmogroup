@@ -2,6 +2,7 @@ import express from 'express';
 import { upload, uploadDocument } from '../../utils/cloudinary';
 import { uploadController } from './upload.controller';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
+import { R } from '../../constants/roles';
 
 const router = express.Router();
 
@@ -49,7 +50,7 @@ router.post('/documents', rateLimitUploads, uploadDocument.array('files', 5), up
 router.post(
     '/image',
     authMiddleware,
-    authorizeRoles('admin'),
+    authorizeRoles(...R.ops),
     upload.single('image'),
     uploadController.uploadSingle,
 );
@@ -58,7 +59,7 @@ router.post(
 router.post(
     '/images',
     authMiddleware,
-    authorizeRoles('admin'),
+    authorizeRoles(...R.ops),
     upload.array('images', 10),
     uploadController.uploadMultiple,
 );

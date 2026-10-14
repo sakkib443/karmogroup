@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import ReviewService from './review.service';
+import { R } from '../../constants/roles';
 
 const ReviewController = {
     getProductReviews: catchAsync(async (req: Request, res: Response) => {
@@ -29,7 +30,7 @@ const ReviewController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Review updated', data: review });
     }),
     delete: catchAsync(async (req: Request, res: Response) => {
-        await ReviewService.deleteReview(req.params.id, req.user!.userId, req.user!.role === 'admin');
+        await ReviewService.deleteReview(req.params.id, req.user!.userId, req.user!.role === 'superadmin' || R.ops.includes(req.user!.role));
         sendResponse(res, { statusCode: 200, success: true, message: 'Review deleted' });
     }),
     likeReview: catchAsync(async (req: Request, res: Response) => {

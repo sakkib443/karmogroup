@@ -39,6 +39,35 @@ export interface AdminOrderInput {
     note?: string;
 }
 
+/** One line of an "Add order": the price agreed with the customer, per unit. */
+export interface ManualOrderLine {
+    /** A Karmo catalogue slug, a product _id, or nothing for a free line. */
+    product?: string;
+    name: string;
+    quantity: number;
+    price: number;
+    originalPrice?: number;
+    division?: string;
+    size?: string;
+    color?: string;
+    image?: string;
+}
+
+/** Body of POST /api/orders/admin — an order taken by phone or for a walk-in customer. */
+export interface ManualOrderInput {
+    items: ManualOrderLine[];
+    shippingAddress: { fullName: string; phone: string; email?: string; address: string; area?: string; city?: string };
+    paymentMethod: 'cod' | 'bkash' | 'nagad' | 'rocket';
+    paymentDetails?: { senderNumber?: string; transactionId?: string };
+    paymentStatus?: 'pending' | 'paid';
+    status: 'pending' | 'confirmed';
+    deliveryArea?: 'inside_dhaka' | 'outside_dhaka';
+    shipping: { mode: 'auto' | 'free' | 'custom'; amount?: number };
+    discount?: number;
+    note?: string;
+    adminNote?: string;
+}
+
 /**
  * Body of PATCH /api/orders/admin/:id — correcting an order that has not gone to the
  * courier yet. Every part is optional: send only what changed, and the rest is left
@@ -116,8 +145,9 @@ export const orderApi = baseApi.injectEndpoints({
             invalidatesTags: ['Orders'],
         }),
 
-        // Admin: "New order" for a phone / walk-in customer — Backend route: POST /api/orders/admin
-        createAdminOrder: builder.mutation<{ data?: { _id?: string; orderId?: string } }, AdminOrderInput>({
+        // "Add order" for a phone / walk-in customer — Backend route: POST /api/orders/admin
+        // (super admin, admin, manager, online sales)
+        createAdminOrder: builder.mutation<{ data?: { _id?: string; orderId?: string } }, ManualOrderInput>({
             query: (data) => ({
                 url: '/orders/admin',
                 method: 'POST',
@@ -212,6 +242,48 @@ export const orderApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Orders'],
         }),
+
+        // ===== Order desk: SMS, factory, once-only paperwork =====
+        // One-click SMS to the customer — POST /api/orders/admin/:id/sms
+        sendOrderSms: builder.mutation<{ message?: string; data?: { sms?: { status: string; error?: string } } }, { id: string; kind?: 'confirmed' | 'cancelled' }>({
+            query: ({ id, kind }) => ({ url: `/orders/admin/${id}/sms`, method: 'POST', body: kind ? { kind } : {} }),
+            invalidatesTags: ['Orders'],
+        }),
+        // Every SMS the desk sent (agency: their own) — GET /api/orders/admin/sms-log
+        getSmsLog: builder.query({
+            query: (params) => ({ url: '/orders/admin/sms-log', method: 'GET', params }),
+            providesTags: ['Orders'],
+        }),
+        // Challans waiting at the factory — GET /api/orders/factory/queue
+        getFactoryQueue: builder.query({
+            query: () => ({ url: '/orders/factory/queue', method: 'GET' }),
+            providesTags: ['Orders'],
+        }),
+        // Scan one piece out — POST /api/orders/factory/scan
+        factoryScan: builder.mutation<{ message?: string; data?: { code: string; itemName: string; orderId: string; remaining: number } }, { code: string; method?: 'scan' | 'manual' }>({
+            query: (body) => ({ url: '/orders/factory/scan', method: 'POST', body }),
+            invalidatesTags: ['Orders'],
+        }),
+        // Issue a challan's original, once — POST /api/orders/admin/:id/jobs/:jobId/issue
+        issueChallan: builder.mutation<{ message?: string; data?: unknown }, { id: string; jobId: string }>({
+            query: ({ id, jobId }) => ({ url: `/orders/admin/${id}/jobs/${jobId}/issue`, method: 'POST' }),
+            invalidatesTags: ['Orders'],
+        }),
+        // Admin: allow a duplicate challan, with a reason
+        reprintChallan: builder.mutation<{ data?: unknown }, { id: string; jobId: string; reason: string }>({
+            query: ({ id, jobId, reason }) => ({ url: `/orders/admin/${id}/jobs/${jobId}/reprint`, method: 'POST', body: { reason } }),
+            invalidatesTags: ['Orders'],
+        }),
+        // Issue the customer's memo, once
+        issueMemo: builder.mutation<{ data?: unknown }, string>({
+            query: (id) => ({ url: `/orders/admin/${id}/memo/issue`, method: 'POST' }),
+            invalidatesTags: ['Orders'],
+        }),
+        // Admin: allow a duplicate memo, with a reason
+        reprintMemo: builder.mutation<{ data?: unknown }, { id: string; reason: string }>({
+            query: ({ id, reason }) => ({ url: `/orders/admin/${id}/memo/reprint`, method: 'POST', body: { reason } }),
+            invalidatesTags: ['Orders'],
+        }),
     }),
 });
 
@@ -238,4 +310,13 @@ export const {
     // Admin tracking hook
     useUpdateAdminOrderTrackingMutation,
     useSendWithPathaoMutation,
+    // Order desk
+    useSendOrderSmsMutation,
+    useGetSmsLogQuery,
+    useGetFactoryQueueQuery,
+    useFactoryScanMutation,
+    useIssueChallanMutation,
+    useReprintChallanMutation,
+    useIssueMemoMutation,
+    useReprintMemoMutation,
 } = orderApi;

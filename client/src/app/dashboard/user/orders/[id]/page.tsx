@@ -55,7 +55,8 @@ export default function OrderDetailPage() {
     const [returnDescription, setReturnDescription] = React.useState('');
     const [returnImages, setReturnImages] = React.useState<string[]>([]);
 
-    const canCancel = order?.status === 'pending' || order?.status === 'confirmed';
+    // Only before our call centre confirms it — after that the factory may already be making it.
+    const canCancel = order?.status === 'pending';
     const canReturn = order?.status === 'delivered';
 
     const resetReturnForm = () => {

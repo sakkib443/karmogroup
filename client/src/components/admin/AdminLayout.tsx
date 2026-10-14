@@ -10,6 +10,7 @@ import {
     LuUsers, LuUserCheck, LuShoppingCart, LuChartColumn, LuStar, LuTicketPercent, LuUndo2, LuShieldAlert,
     LuStore, LuTruck, LuWallet, LuSettings, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog, LuShield,
     LuMessageSquare, LuMail, LuBriefcase, LuFileText, LuBell, LuMapPin,
+    LuScanBarcode, LuMessageSquareText, LuHouse, LuPalette, LuFiles, LuSlidersHorizontal,
     LuPanelLeft, LuChevronRight, LuLogOut, LuX,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
@@ -46,6 +47,9 @@ const menuSections: { label: string; items: MenuItem[] }[] = [
         label: 'Orders',
         items: [
             { name: 'Orders', href: '/dashboard/admin/orders', icon: LuShoppingCart },
+            // Factory members scan products out here and issue each challan once.
+            { name: 'Factory scan', href: '/dashboard/admin/factory', icon: LuScanBarcode },
+            { name: 'SMS log', href: '/dashboard/admin/sms', icon: LuMessageSquareText },
             { name: 'Returns', href: '/dashboard/admin/returns', icon: LuUndo2 },
             { name: 'Fraud check', href: '/dashboard/admin/fraud-check', icon: LuShieldAlert },
             // Steadfast parcel booking and sync.
@@ -96,12 +100,23 @@ const menuSections: { label: string; items: MenuItem[] }[] = [
         items: [
             { name: 'Store settings', href: '/dashboard/admin/settings', icon: LuSettings },
             { name: 'Shipping', href: '/dashboard/admin/shipping', icon: LuMapPin },
-            { name: 'Site content', href: '/dashboard/admin/site-content', icon: LuLayoutTemplate },
             { name: 'Notifications', href: '/dashboard/admin/notifications', icon: LuBell },
-            // Super admin only (access.ts): add admins and editors, change roles.
-            { name: 'Staff', href: '/dashboard/admin/staff', icon: LuUserCog },
+            // Every account, customers and staff. Admins manage customers and the staff below
+            // them; the super admin everyone (access.ts → assignableRoles).
+            { name: 'Users', href: '/dashboard/admin/users', icon: LuUserCog },
             { name: 'Roles & permissions', href: '/dashboard/admin/roles', icon: LuShield },
             { name: 'My profile', href: '/dashboard/admin/profile', icon: LuUser },
+        ],
+    },
+    {
+        // The website's own pages — text, pictures, overlays — with a live preview
+        // (super admin and admins; see app/dashboard/admin/site-content).
+        label: 'Site content',
+        items: [
+            { name: 'All pages', href: '/dashboard/admin/site-content', icon: LuFiles },
+            { name: 'Home page', href: '/dashboard/admin/site-content/home', icon: LuHouse },
+            { name: 'Brand & contact', href: '/dashboard/admin/site-content/global', icon: LuPalette },
+            { name: 'More settings', href: '/dashboard/admin/site-content/settings', icon: LuSlidersHorizontal },
         ],
     },
 ];
@@ -212,8 +227,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const pathname = usePathname();
     const router = useRouter();
     const user = useSelector((s: RootState) => s.auth.user);
-    // TEMPORARY: login is disabled, so everyone is treated as super admin.
-    const role = user?.role ?? 'superadmin';
+    const role = user?.role;
 
     useEffect(() => { setMobileOpen(false); }, [pathname]);
 

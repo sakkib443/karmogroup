@@ -20,6 +20,24 @@ function quoteCft(length, width, height, rate) {
 
 /** @type {Record<string, { mode: "cft", heightMin: number, heightMax: number, cftRate: number, minBill: boolean, notes: string[] }>} */
 export const FOAM_PRICING_RULES = {
+  /* Poly and HD scale with size like the other combos; the list price at the
+     sofa-set size stays the catalogue's (quoteFoamListPrice anchors to it). */
+  poly: {
+    mode: "cft",
+    heightMin: 2,
+    heightMax: 8,
+    cftRate: 600,
+    minBill: true,
+    notes: ["Standard grade, 25 kg/m³. Height 2–8 inch. The price follows the size you enter."],
+  },
+  hd: {
+    mode: "cft",
+    heightMin: 2,
+    heightMax: 8,
+    cftRate: 760,
+    minBill: true,
+    notes: ["High density. Height 2–8 inch. The price follows the size you enter."],
+  },
   "combo-280": {
     mode: "cft",
     heightMin: 2,

@@ -7,8 +7,9 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 import VideoModal from "@/components/karmo/VideoModal";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import { homeReels } from "@/data/films";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
+import { useSection, CmsText } from "@/cms/CmsProvider";
+import { reels } from "@/cms/pages/home";
 
 /**
  * Home films / shorts band — same shell split as DivisionEditorials
@@ -19,9 +20,8 @@ import TextureSlides from "@/components/karmo/home/TextureSlides";
 const ORANGE = "#FF9A1F";
 const DESKTOP_H = "calc(100svh - 32px)";
 const GAP_PX = 6;
-/* Desktop: ~2.55 tiles in view (wider than strict 3). Mobile: ~1.05. */
-
-const activeFilms = homeReels;
+/* Desktop: ~2.55 tiles in view (wider than strict 3). Mobile: ~1.05.
+   Films and copy: Admin → Site content → Home → Films. */
 
 function ReelTile({ film, still, onOpen, active }) {
   const tileRef = useRef(null);
@@ -52,6 +52,7 @@ function ReelTile({ film, still, onOpen, active }) {
       <video
         ref={videoRef}
         src={film.src}
+        poster={film.poster}
         loop
         muted
         playsInline
@@ -77,6 +78,14 @@ function ReelTile({ film, still, onOpen, active }) {
 }
 
 export default function Reels() {
+  const c = useSection("reels", reels.defaults);
+  const activeFilms = useMemo(
+    () =>
+      (c.films || [])
+        .filter((f) => f?.video?.src)
+        .map((f, i) => ({ id: `film-${i}`, src: f.video.src, poster: f.video.poster || undefined, title: f.title || "", tag: f.tag || "" })),
+    [c.films],
+  );
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const sectionRef = useRef(null);
@@ -101,11 +110,13 @@ export default function Reels() {
       ...activeFilms.map((f) => ({ ...f, key: `${f.id}-a` })),
       ...activeFilms.map((f) => ({ ...f, key: `${f.id}-b` })),
     ],
-    [],
+    [activeFilms],
   );
 
   /* Static fallback when reduced motion. */
   const staticFilms = activeFilms.slice(0, 3);
+
+  if (c.hidden) return null;
 
   return (
     <section
@@ -131,24 +142,22 @@ export default function Reels() {
         >
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
-              On film
+              {c.eyebrow}
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
-              Karmo films
+              {c.eyebrowNote}
             </span>
           </p>
 
           <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
-            <span className="block sm:whitespace-nowrap">See comfort.</span>
-            <span className="block text-brand sm:whitespace-nowrap">
-              On screen.
-            </span>
+            <CmsText as="span" className="block sm:whitespace-nowrap" value={c.titleLine1} size={c.titleLine1Size} />
+            <CmsText as="span" className="block text-brand sm:whitespace-nowrap" value={c.titleLine2} size={c.titleLine2Size} />
           </h2>
 
           <span className="mt-4 flex items-center gap-3">
             <span className="h-px w-10 bg-brand" />
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
-              Watch the craft
+              {c.tagline}
             </span>
             <svg
               width="16"
@@ -172,21 +181,22 @@ export default function Reels() {
           </span>
 
           <p className="body-copy mt-5 text-[16px] leading-[1.7] text-ink/55 lg:text-[17px]">
-            From commercials to product close-ups — the films that show how
-            Karmo foam, mattresses and HomeTex are made, tested and lived with.
+            <CmsText value={c.body} size={c.bodySize} />
           </p>
 
+          {c.link?.label ? (
           <Link
-            href="/media/ads"
+            href={c.link.href || "#"}
             className="group mt-8 inline-flex items-center gap-3"
           >
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
-              Explore to view more films
+              {c.link.label}
             </span>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
               <FiArrowUpRight />
             </span>
           </Link>
+          ) : null}
         </motion.div>
 
         {/* Right — continuous marquee; wider tiles (~2.55 in view on desktop) */}

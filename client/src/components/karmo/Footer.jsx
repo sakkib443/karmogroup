@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -14,6 +16,9 @@ import {
   FiMail,
 } from "react-icons/fi";
 import Logo from "@/components/karmo/Logo";
+import { useGlobal } from "@/cms/CmsProvider";
+import { imageStyle, overlayStyle } from "@/cms/core";
+import { brand, contact as contactSection, footer as footerSection, telHref } from "@/cms/pages/global";
 
 /**
  * Footer — three clear bands:
@@ -56,12 +61,13 @@ const moreInfo = [
   { name: "Chemicals", href: "/chemicals" },
 ];
 
-const socials = [
-  { Icon: FaFacebookF, label: "Facebook", href: "#" },
-  { Icon: FaInstagram, label: "Instagram", href: "#" },
-  { Icon: FaYoutube, label: "YouTube", href: "#" },
-  { Icon: FaTiktok, label: "TikTok", href: "#" },
-  { Icon: FaLinkedinIn, label: "LinkedIn", href: "#" },
+/* Links: Admin → Site content → Brand & contact → Contact information. */
+const SOCIALS = [
+  { key: "facebook", Icon: FaFacebookF, label: "Facebook" },
+  { key: "instagram", Icon: FaInstagram, label: "Instagram" },
+  { key: "youtube", Icon: FaYoutube, label: "YouTube" },
+  { key: "tiktok", Icon: FaTiktok, label: "TikTok" },
+  { key: "linkedin", Icon: FaLinkedinIn, label: "LinkedIn" },
 ];
 
 function Col({ title, links }) {
@@ -87,21 +93,32 @@ function Col({ title, links }) {
 }
 
 export default function Footer() {
+  const logos = useGlobal("brand", brand.defaults);
+  const info = useGlobal("contact", contactSection.defaults);
+  const f = useGlobal("footer", footerSection.defaults);
+  const socials = SOCIALS.filter((s) => info.socials?.[s.key]).map((s) => ({ ...s, href: info.socials[s.key] }));
+  const logo = logos.footerLogo || {};
+  const addressLines = String(info.address || "").split("\n");
+
   return (
     <footer className="relative overflow-hidden text-white">
-      <Image
-        src="/shared/footer/footer-bg.webp"
-        alt=""
-        aria-hidden
-        fill
-        sizes="100vw"
-        className="object-cover object-center"
-        priority={false}
-      />
+      {f.background?.src ? (
+        <Image
+          src={f.background.src}
+          alt=""
+          aria-hidden
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          style={imageStyle(f.background)}
+          priority={false}
+        />
+      ) : null}
       <div
         aria-hidden
         className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-black/72 to-black/88"
       />
+      <div aria-hidden className="absolute inset-0" style={overlayStyle(f.overlay)} />
 
       <div className="relative z-[1]">
         {/* Part 1 — left logo + divisions, full-width rule below */}
@@ -111,7 +128,14 @@ export default function Footer() {
             aria-label="Karmo Group home"
             className="inline-block"
           >
-            <Logo className="h-8 w-auto sm:h-9 lg:h-10" />
+            {logo.src ? (
+              <Logo
+                src={logo.src}
+                width={logo.width || 384}
+                height={logo.height || 53}
+                className="h-8 w-auto sm:h-9 lg:h-10"
+              />
+            ) : null}
           </Link>
 
           <nav
@@ -145,38 +169,35 @@ export default function Footer() {
               <li className="flex gap-3">
                 <FiMapPin className="mt-0.5 shrink-0 text-[15px] text-white" />
                 <span>
-                  Ibrahim Chamber, 4th Floor
-                  <br />
-                  95 Motijheel, Dhaka-1000, Bangladesh
+                  {addressLines.map((line, i) => (
+                    <span key={i} className="block">{line}</span>
+                  ))}
                 </span>
               </li>
-              <li className="flex items-center gap-3">
-                <FiPhone className="shrink-0 text-[15px] text-white" />
-                <a
-                  href="tel:+8801713483284"
-                  className="transition-colors hover:text-white"
-                >
-                  +88 01713483284
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <FiSmartphone className="shrink-0 text-[15px] text-white" />
-                <a
-                  href="tel:+8801713483285"
-                  className="transition-colors hover:text-white"
-                >
-                  +88 01713483285
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <FiMail className="shrink-0 text-[15px] text-white" />
-                <a
-                  href="mailto:info@karmogroup.com"
-                  className="transition-colors hover:text-white"
-                >
-                  info@karmogroup.com
-                </a>
-              </li>
+              {info.hotline ? (
+                <li className="flex items-center gap-3">
+                  <FiPhone className="shrink-0 text-[15px] text-white" />
+                  <a href={telHref(info.hotline)} className="transition-colors hover:text-white">
+                    +88 {info.hotline}
+                  </a>
+                </li>
+              ) : null}
+              {info.phone2 ? (
+                <li className="flex items-center gap-3">
+                  <FiSmartphone className="shrink-0 text-[15px] text-white" />
+                  <a href={telHref(info.phone2)} className="transition-colors hover:text-white">
+                    +88 {info.phone2}
+                  </a>
+                </li>
+              ) : null}
+              {info.email ? (
+                <li className="flex items-center gap-3">
+                  <FiMail className="shrink-0 text-[15px] text-white" />
+                  <a href={`mailto:${info.email}`} className="transition-colors hover:text-white">
+                    {info.email}
+                  </a>
+                </li>
+              ) : null}
             </ul>
           </div>
 
@@ -201,7 +222,7 @@ export default function Footer() {
               ))}
             </div>
             <p className="text-center text-[11px] uppercase tracking-[0.12em] text-white/55 sm:text-right">
-              © {new Date().getFullYear()} Karmo Group. All rights reserved.
+              {String(f.copyright || "").replace("{year}", String(new Date().getFullYear()))}
             </p>
           </div>
         </div>

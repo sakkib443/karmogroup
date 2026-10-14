@@ -2,6 +2,10 @@ import PDFDocument from 'pdfkit';
 import { Order } from '../order/order.model';
 import AppError from '../../utils/AppError';
 import { sendEmail } from '../../utils/email';
+import { R } from '../../constants/roles';
+
+// Staff who may open any customer's invoice (the order desk); everyone else only their own.
+const INVOICE_STAFF: string[] = ['superadmin', ...R.orderDesk];
 
 // ── Invoice data shapes (the contract the frontend consumes) ────────
 export interface IInvoiceItem {
@@ -283,7 +287,7 @@ const getInvoiceData = async (
     requester: { userId: string; role: string }
 ): Promise<IInvoiceData> => {
     const order = await fetchOrder(orderId);
-    if (requester.role !== 'admin' && order.user?._id?.toString() !== requester.userId) {
+    if (!INVOICE_STAFF.includes(requester.role) && order.user?._id?.toString() !== requester.userId) {
         throw new AppError(403, 'You do not have permission to view this invoice');
     }
     return buildCustomerInvoice(order);
@@ -294,7 +298,7 @@ const getInvoicePdf = async (
     requester: { userId: string; role: string }
 ): Promise<Buffer> => {
     const order = await fetchOrder(orderId);
-    if (requester.role !== 'admin' && order.user?._id?.toString() !== requester.userId) {
+    if (!INVOICE_STAFF.includes(requester.role) && order.user?._id?.toString() !== requester.userId) {
         throw new AppError(403, 'You do not have permission to view this invoice');
     }
     return generateInvoicePdf(buildCustomerInvoice(order));

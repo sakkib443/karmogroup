@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "@/components/karmo/Logo";
+import { useGlobal } from "@/cms/CmsProvider";
+import { brand } from "@/cms/pages/global";
 import { useAppSelector } from "@/redux";
 import {
   FiMapPin,
@@ -671,6 +673,8 @@ function HeaderCtaButton({ compact = false }) {
 }
 
 export default function Navbar({ scrolled = false }) {
+  // Logos: Admin → Site content → Brand & contact → Logos.
+  const logos = useGlobal("brand", brand.defaults);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(false);
   const [panel, setPanel] = useState(null);
@@ -770,9 +774,9 @@ export default function Navbar({ scrolled = false }) {
           {/* Resting: the wide "Karmo Group" wordmark. Scrolled: the compact
               short "KARMO" mark. Cross-faded, same as the pair they replaced. */}
           <Logo
-            src="/brand/logo-group.png"
-            width={1272}
-            height={320}
+            src={logos.headerLogo?.src || "/brand/logo-group.png"}
+            width={logos.headerLogo?.width || 1272}
+            height={logos.headerLogo?.height || 320}
             quality={100}
             className={`absolute left-0 top-1/2 origin-left -translate-y-[60%] h-[52px] w-auto sm:h-[80px] lg:h-[108px] xl:h-[92px] min-[1700px]:h-[108px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
@@ -782,9 +786,9 @@ export default function Navbar({ scrolled = false }) {
             priority
           />
           <Logo
-            src="/brand/logo-compact.png"
-            width={412}
-            height={120}
+            src={logos.headerLogoCompact?.src || "/brand/logo-compact.png"}
+            width={logos.headerLogoCompact?.width || 412}
+            height={logos.headerLogoCompact?.height || 120}
             quality={100}
             className={`absolute left-0 top-1/2 origin-left -translate-y-1/2 h-[50px] w-auto sm:h-[66px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
