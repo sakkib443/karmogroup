@@ -77,7 +77,7 @@ export function Dropdown({ button, buttonClassName, buttonStyle, ariaLabel, titl
                     ref={menuRef}
                     role="menu"
                     style={{ position: 'fixed', top: pos?.top ?? -9999, left: pos?.left ?? -9999, width }}
-                    className="z-[200] max-h-[70vh] overflow-y-auto rounded-xl border border-gray-200 bg-white p-1 shadow-xl"
+                    className="z-[200] max-h-[70vh] overflow-y-auto rounded-md border border-gray-200 bg-white p-1 shadow-lg"
                 >
                     {children(() => setOpen(false))}
                 </div>
@@ -86,8 +86,8 @@ export function Dropdown({ button, buttonClassName, buttonStyle, ariaLabel, titl
     );
 }
 
-export function MenuItem({ onClick, icon, children, active, danger, color }: {
-    onClick: () => void; icon?: React.ReactNode; children: React.ReactNode; active?: boolean; danger?: boolean; color?: string;
+export function MenuItem({ onClick, icon, children, hint, active, danger, color }: {
+    onClick: () => void; icon?: React.ReactNode; children: React.ReactNode; hint?: string; active?: boolean; danger?: boolean; color?: string;
 }) {
     return (
         <button
@@ -95,14 +95,17 @@ export function MenuItem({ onClick, icon, children, active, danger, color }: {
             role="menuitem"
             onClick={onClick}
             className={cx(
-                'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition',
+                'flex w-full items-center gap-2.5 rounded px-2.5 py-2 text-left text-sm transition',
                 danger ? 'text-red-600 hover:bg-red-50' : 'text-gray-700 hover:bg-gray-50',
                 active && 'bg-gray-50 font-medium text-gray-900',
             )}
         >
             {color && <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: color }} />}
             {icon && <span className="shrink-0 text-gray-400">{icon}</span>}
-            <span className="min-w-0 flex-1 truncate">{children}</span>
+            <span className="min-w-0 flex-1 truncate">
+                {children}
+                {hint && <span className="block truncate text-xs font-normal text-gray-400">{hint}</span>}
+            </span>
             {active && <LuCheck size={14} className="shrink-0 text-gray-500" />}
         </button>
     );
@@ -117,14 +120,13 @@ export const MenuDivider = () => <div className="my-1 h-px bg-gray-100" />;
 export type PillOption = { value: string; label: string; color: string; group?: string };
 
 /**
- * A status shown as a coloured pill that opens a menu to change it.
- * `solid` = filled with the colour (order status), `soft` = tinted (payment).
+ * A status shown as a quiet pill — white, grey outline, a small coloured dot — that
+ * opens a menu to change it.
  */
-export function PillSelect({ value, options, onChange, variant = 'solid', ariaLabel, disabled, fallbackLabel }: {
+export function PillSelect({ value, options, onChange, ariaLabel, disabled, fallbackLabel }: {
     value: string;
     options: PillOption[];
     onChange: (v: string) => void;
-    variant?: 'solid' | 'soft';
     ariaLabel?: string;
     disabled?: boolean;
     fallbackLabel?: string;
@@ -132,35 +134,25 @@ export function PillSelect({ value, options, onChange, variant = 'solid', ariaLa
     const current = options.find((o) => o.value === value);
     const color = current?.color || '#9CA3AF';
     const label = current?.label || fallbackLabel || value;
-    const style: React.CSSProperties = variant === 'solid'
-        ? { background: color, color: '#fff' }
-        : { background: `${color}14`, color, boxShadow: `inset 0 0 0 1px ${color}33` };
 
     const pill = cx(
-        'inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-xs font-semibold transition',
-        !disabled && 'hover:brightness-95',
-        disabled && 'cursor-default',
+        'inline-flex h-7 items-center gap-1.5 whitespace-nowrap rounded-md border border-gray-200 bg-white pl-2.5 pr-2 text-xs font-medium text-gray-700 transition',
+        !disabled && 'hover:border-gray-300 hover:bg-gray-50',
+        disabled && 'cursor-default pr-2.5',
     );
+    const dot = <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} />;
 
-    if (disabled) {
-        return (
-            <span className={pill} style={style}>
-                {variant === 'soft' && <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />}
-                {label}
-            </span>
-        );
-    }
+    if (disabled) return <span className={pill}>{dot}{label}</span>;
 
     return (
         <Dropdown
             ariaLabel={ariaLabel}
             buttonClassName={pill}
-            buttonStyle={style}
             width={200}
             button={<>
-                {variant === 'soft' && <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />}
+                {dot}
                 {label}
-                <LuChevronDown size={13} className="-mr-0.5 opacity-80" />
+                <LuChevronDown size={13} className="text-gray-400" />
             </>}
         >
             {(close) => options.map((o, i) => {

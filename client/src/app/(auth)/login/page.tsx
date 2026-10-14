@@ -19,6 +19,7 @@ import {
 } from "react-icons/lu";
 import GoogleSignInButton from "@/components/shared/GoogleSignInButton";
 import { API_URL } from "@/config/api";
+import { isStaffRole } from "@/components/admin/access";
 
 const inputCls =
   "w-full pl-11 pr-4 py-3 rounded-none border border-ink/20 bg-white text-sm text-ink placeholder:text-ink/40 outline-none transition-colors focus:border-brand";
@@ -87,8 +88,8 @@ const LoginPageInner = () => {
         console.error("Guest wishlist merge failed:", mergeErr);
       }
 
-      const isStaff = user.role === "admin" || user.role === "superadmin";
-      if (isStaff) {
+      // Every staff role (admin, manager, online sales, agency, factory…) works in the admin panel.
+      if (isStaffRole(user.role)) {
         router.push(
           redirectPath && redirectPath.startsWith("/dashboard/admin")
             ? redirectPath

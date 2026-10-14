@@ -10,7 +10,7 @@ import { RootState } from '@/redux/store';
 import { useGetMeQuery, useUpdateProfileMutation } from '@/redux/api/userApi';
 import { useUpdatePasswordMutation } from '@/redux/api/authApi';
 import { useUploadMyImagesMutation } from '@/redux/api/uploadApi';
-import { ROLE_LABEL, ROLE_HINT, ROLE_ACCESS, type StaffRole } from '@/components/admin/access';
+import { ROLE_LABEL, ROLE_HINT, ROLE_ACCESS, STAFF_ROLES, type StaffRole } from '@/components/admin/access';
 import { toast } from 'react-hot-toast';
 
 const inputCls = 'w-full h-10 px-3.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed';
@@ -80,9 +80,8 @@ export default function AdminProfilePage() {
         if (user) setProfile({ firstName: user.firstName || '', lastName: user.lastName || '', phone: user.phone || '' });
     }, [user]);
 
-    // Same fallback as AdminLayout while the panel runs without login (TEMPORARY there too).
-    const role: string = user?.role ?? authUser?.role ?? 'superadmin';
-    const staffRole = (['superadmin', 'admin', 'editor'] as const).includes(role as StaffRole) ? (role as StaffRole) : null;
+    const role: string = user?.role ?? authUser?.role ?? '';
+    const staffRole = STAFF_ROLES.includes(role as StaffRole) ? (role as StaffRole) : null;
     const fullName = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || ROLE_LABEL[role] || 'Admin';
     const initials = fullName.split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2).toUpperCase() || 'A';
     const status: string = user?.status || 'active';
@@ -254,9 +253,7 @@ export default function AdminProfilePage() {
                                         <p className="text-xs text-gray-500">Email and password sign-in</p>
                                     </div>
                                 </div>
-                                {role === 'editor' ? (
-                                    <span className="text-xs text-gray-500">Set by an admin</span>
-                                ) : !showPw && (
+                                {!showPw && (
                                     <button onClick={() => setShowPw(true)} className="h-8 rounded-lg border border-gray-200 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
                                         Change password
                                     </button>
@@ -274,8 +271,7 @@ export default function AdminProfilePage() {
                             </li>
                         </ul>
 
-                        {/* Editors keep the password an admin set for them (the API refuses too). */}
-                        {showPw && role !== 'editor' && (
+                        {showPw && (
                             <div className="mt-5 rounded-lg border border-gray-200 p-5">
                                 <div className="mb-4 flex items-center gap-2">
                                     <FiLock size={15} className="text-gray-500" />

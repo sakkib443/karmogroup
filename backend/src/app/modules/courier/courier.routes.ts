@@ -1,6 +1,7 @@
 import express from 'express';
 import CourierController from './courier.controller';
 import { authMiddleware, authorizeRoles } from '../../middlewares/auth';
+import { R } from '../../constants/roles';
 
 const router = express.Router();
 
@@ -8,7 +9,8 @@ const router = express.Router();
 router.post('/webhook', CourierController.webhook);
 
 // ── Admin / super admin: Steadfast courier management ──
-const admin = [authMiddleware, authorizeRoles('admin', 'superadmin')];
+// Courier booking and tracking is order-desk work: admin, manager, online sales.
+const admin = [authMiddleware, authorizeRoles(...R.orderDesk)];
 
 // Shipments board — flat order list with state filters.
 router.get('/orders', ...admin, CourierController.listOrders);

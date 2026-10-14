@@ -2,9 +2,29 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import AppError from '../../utils/AppError';
-import UserService from './user.service';
+import UserService, { type Actor } from './user.service';
+
+const actorOf = (req: Request): Actor => ({ userId: req.user!.userId, role: req.user!.role });
 
 const UserController = {
+    // POST /api/users/admin — add any account (admin / super admin)
+    adminCreateUser: catchAsync(async (req: Request, res: Response) => {
+        const user = await UserService.adminCreateUser(actorOf(req), req.body);
+        sendResponse(res, { statusCode: 201, success: true, message: 'Account created', data: user });
+    }),
+
+    // POST /api/users/admin/customers — add a buyer by hand
+    adminCreateCustomer: catchAsync(async (req: Request, res: Response) => {
+        const user = await UserService.adminCreateCustomer(req.body);
+        sendResponse(res, { statusCode: 201, success: true, message: 'Customer added', data: user });
+    }),
+
+    // GET /api/users/admin/lookup?phone= — the customer on file for a mobile number, or null
+    lookupCustomer: catchAsync(async (req: Request, res: Response) => {
+        const user = await UserService.lookupCustomer(String(req.query.phone || ''));
+        sendResponse(res, { statusCode: 200, success: true, message: user ? 'Customer found' : 'No customer with this number', data: user });
+    }),
+
     // GET /api/users/admin/all (admin)
     getAllUsers: catchAsync(async (req: Request, res: Response) => {
         const { users, meta } = await UserService.getAllUsers(req.query as Record<string, unknown>);
@@ -37,7 +57,7 @@ const UserController = {
 
     // PATCH /api/users/admin/:id (admin)
     adminUpdateUser: catchAsync(async (req: Request, res: Response) => {
-        const user = await UserService.adminUpdateUser(req.params.id, req.body);
+        const user = await UserService.adminUpdateUser(actorOf(req), req.params.id, req.body);
         sendResponse(res, { statusCode: 200, success: true, message: 'User updated successfully', data: user });
     }),
 
@@ -102,13 +122,13 @@ const UserController = {
 
     // PATCH /api/users/admin/:id/status (admin)
     updateUserStatus: catchAsync(async (req: Request, res: Response) => {
-        const user = await UserService.updateUserStatus(req.params.id, req.body.status);
+        const user = await UserService.updateUserStatus(actorOf(req), req.params.id, req.body.status);
         sendResponse(res, { statusCode: 200, success: true, message: 'User status updated', data: user });
     }),
 
     // DELETE /api/users/admin/:id (admin)
     deleteUser: catchAsync(async (req: Request, res: Response) => {
-        await UserService.deleteUser(req.params.id);
+        await UserService.deleteUser(actorOf(req), req.params.id);
         sendResponse(res, { statusCode: 200, success: true, message: 'User deleted successfully' });
     }),
 };
