@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element, @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
@@ -5,8 +6,8 @@ import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { addToCart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart, updateCartItemVariant, CartItem } from '@/redux/slices/cartSlice';
 import { saveForLater, removeFromSaved, hydrateSaved } from '@/redux/slices/savedForLaterSlice';
-import { LuTrash2, LuChevronLeft, LuTriangleAlert, LuMinus, LuPlus, LuShoppingCart, LuTag, LuX, LuCheck, LuBookmark, LuHeart, LuChevronRight } from 'react-icons/lu';
-import EmptyState from '@/components/shared/EmptyState';
+import { LuTrash2, LuChevronLeft, LuTriangleAlert, LuMinus, LuPlus, LuX, LuCheck, LuBookmark, LuHeart, LuChevronRight } from 'react-icons/lu';
+import { ShopHeader, LeafRule, TrustRow, BagIcon, LockIcon, TruckIcon, TagIcon, ORANGE, tk } from '@/components/karmo/shop/ShopChrome';
 import { toast } from 'react-hot-toast';
 import { useValidateCouponMutation } from '@/redux/api/couponApi';
 import { useGetShippingQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
@@ -48,7 +49,10 @@ const CartItemVariants = ({
     onStatusChange: (id: string, incomplete: boolean) => void;
 }) => {
     const dispatch = useAppDispatch();
-    const { data: productRes } = useGetProductByIdQuery(item.productId, { skip: !item.productId });
+    // Karmo's mattresses and foam are configured on their own page and carry a slug, not a
+    // product id — there is nothing to look up for them (and no colour/size to pick here).
+    const isDbProduct = /^[a-f0-9]{24}$/i.test(item.productId || '');
+    const { data: productRes } = useGetProductByIdQuery(item.productId, { skip: !isDbProduct });
     const product = (productRes as any)?.data;
 
     const variants: any[] = product?.variants || [];
@@ -138,7 +142,7 @@ const CartItemVariants = ({
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {item.color && (
                     <span className="inline-flex items-center gap-1.5 text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
-                        <span className="w-2 h-2 rounded-full border border-ink/12" style={{ background: item.colorHex || '#ccc' }} />
+                        <span className="w-2 h-2 border border-ink/12" style={{ background: item.colorHex || '#ccc' }} />
                         {item.color}
                     </span>
                 )}
@@ -166,7 +170,7 @@ const CartItemVariants = ({
                                     title={c.name}
                                     disabled={disabled}
                                     onClick={() => apply(c.name, item.size || '')}
-                                    className="w-6 h-6 rounded-full flex-shrink-0 transition-all disabled:opacity-35 disabled:cursor-not-allowed"
+                                    className="w-6 h-6 flex-shrink-0 transition-all disabled:opacity-35 disabled:cursor-not-allowed"
                                     style={{
                                         background: c.hex,
                                         border: selected ? '2px solid #D44348' : '1.5px solid #d1d5db',
@@ -366,449 +370,314 @@ const CartPage = () => {
         }
     };
 
-    /* ═══ SAVED FOR LATER SECTION (shared between empty + filled cart) ═══ */
+    /* ═══ SAVED FOR LATER (shared between empty + filled bag) ═══ */
     const savedSection = savedItems.length > 0 && (
-        <div className="border border-ink/10 bg-white">
-            <div className="px-4 sm:px-5 py-3.5 border-b border-ink/8 flex items-center gap-2">
-                <LuHeart size={16} className="text-brand" />
-                <h2 className="text-sm font-semibold text-ink">
-                    Saved for Later
-                    <span className="ml-2 text-xs font-medium text-ink/50 bg-cream px-2 py-0.5 rounded">
-                        {savedItems.length}
-                    </span>
+        <section className="border border-ink/10 bg-white">
+            <div className="flex items-center justify-between gap-3 border-b border-ink/8 px-5 py-4">
+                <h2 className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
+                    <LuHeart size={15} className="text-brand" /> Saved for later
                 </h2>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/40">{savedItems.length} item{savedItems.length > 1 ? 's' : ''}</span>
             </div>
-            <div className="divide-y divide-ink/8">
+            <ul className="divide-y divide-ink/8">
                 {savedItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 px-4 sm:px-5 py-4">
-                        <div className="w-16 h-16 rounded border border-ink/8 bg-white p-1 flex-shrink-0">
-                            <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                    <li key={item.id} className="flex items-center gap-4 px-5 py-4">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-ink/8 bg-[#f3f1ec]">
+                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
                         </div>
                         <div className="min-w-0 flex-1">
-                            <h3 className="text-sm text-ink line-clamp-2 leading-snug">{item.name}</h3>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                <span className="text-sm font-semibold text-brand">৳{item.price.toLocaleString()}</span>
-                                {item.color && (
-                                    <span className="inline-flex items-center gap-1.5 text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
-                                        <span className="w-2 h-2 rounded-full border border-ink/12" style={{ background: item.colorHex || '#ccc' }} />
-                                        {item.color}
-                                    </span>
-                                )}
-                                {item.size && (
-                                    <span className="text-xs text-ink/50 bg-cream/60 px-2 py-0.5 rounded border border-ink/8">
-                                        {item.size}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-3 mt-2.5">
-                                <button
-                                    onClick={() => handleMoveToCart(item)}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-brand hover:opacity-90 transition-opacity px-3 py-1.5 rounded"
-                                >
-                                    <LuShoppingCart size={12} />
-                                    Move to Cart
-                                </button>
-                                <button
-                                    onClick={() => dispatch(removeFromSaved(item.id))}
-                                    className="inline-flex items-center gap-1 text-xs font-medium text-ink/50 hover:text-red-500 transition-colors"
-                                >
-                                    <LuTrash2 size={12} />
-                                    Remove
-                                </button>
-                            </div>
+                            <p className="display line-clamp-1 text-[13px] font-semibold uppercase tracking-[0.04em] text-ink">{item.name}</p>
+                            <p className="mt-0.5 text-xs text-ink/45">{[item.color, item.size].filter(Boolean).join(' · ')}</p>
+                            <p className="mt-1 text-sm font-semibold text-brand">{tk(item.price)}</p>
                         </div>
-                    </div>
+                        <div className="flex shrink-0 flex-col items-end gap-2 sm:flex-row sm:items-center">
+                            <button onClick={() => handleMoveToCart(item)} className="inline-flex h-9 items-center gap-1.5 bg-ink px-3.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-brand">
+                                <BagIcon className="h-4 w-4" accent="#ffffff" /> Move to bag
+                            </button>
+                            <button onClick={() => dispatch(removeFromSaved(item.id))} className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/40 hover:text-brand">
+                                Remove
+                            </button>
+                        </div>
+                    </li>
                 ))}
-            </div>
-        </div>
+            </ul>
+        </section>
     );
 
-    /* ═══ EMPTY CART STATE ═══ */
+    const checkoutLabel = hasVariantIssues ? 'Choose options first' : canCheckout ? `Checkout · ${selectedIds.length}` : 'Select an item';
+
+    /* ═══ EMPTY BAG ═══ */
     if (items.length === 0) {
         return (
-            <div className="bg-white min-h-screen pb-20">
-                {savedItems.length === 0 ? (
-                    <div className="py-20">
-                        <EmptyState
-                            title="Your cart is empty"
-                            description="Looks like you haven't added anything to your cart yet."
-                            buttonText="Start Shopping"
-                            buttonLink="/"
-                        />
-                    </div>
-                ) : (
-                    <div className="shell pt-8 pb-12 lg:pt-10 lg:pb-16">
-                        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-ink/50 hover:text-ink mb-5 transition-colors">
-                            <LuChevronLeft size={16} />
-                            Back to Shopping
-                        </Link>
-                        <div className="border border-ink/10 bg-white px-5 py-8 text-center mb-6">
-                            <LuShoppingCart size={28} className="text-ink/25 mx-auto mb-3" />
-                            <p className="text-sm text-ink/50">Your cart is empty — your saved items are below.</p>
+            <div className="bg-white pb-20">
+                <ShopHeader eyebrow="Karmo · Shopping bag" title="Your" accent="bag" step={1} />
+                <div className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 py-12 lg:py-16">
+                    <div className="mx-auto max-w-2xl border border-ink/10 bg-white px-6 py-12 text-center">
+                        <span className="mx-auto flex h-20 w-20 items-center justify-center bg-[#f5f3ef] text-ink/60">
+                            <BagIcon className="h-11 w-11" />
+                        </span>
+                        <h2 className="display mt-6 text-[1.35rem] font-light uppercase tracking-[0.02em] text-ink">Your bag is empty</h2>
+                        <LeafRule align="center" />
+                        <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
+                            Foam, mattresses and HomeTex — pick what fits your home and it waits here for you.
+                        </p>
+                        <div className="mt-7 flex flex-wrap justify-center gap-3">
+                            <Link href="/mattress" className="inline-flex h-12 items-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark">
+                                Shop mattresses <LuChevronRight size={16} />
+                            </Link>
+                            <Link href="/foam" className="inline-flex h-12 items-center gap-2 border border-ink/15 px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink/40">
+                                Shop foam
+                            </Link>
                         </div>
-                        {savedSection}
+                        <div className="mx-auto mt-10 max-w-md border-t border-ink/8 pt-8">
+                            <TrustRow />
+                        </div>
                     </div>
-                )}
+                    {savedSection ? <div className="mx-auto mt-6 max-w-2xl">{savedSection}</div> : null}
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="bg-white min-h-screen pb-24 lg:pb-20">
-            <div className="shell pt-8 pb-12 lg:pt-10 lg:pb-16">
+        <div className="bg-white pb-28 lg:pb-20">
+            <ShopHeader
+                eyebrow="Karmo · Shopping bag"
+                title="Your"
+                accent="bag"
+                step={1}
+                sub={`${totalQuantity} ${totalQuantity === 1 ? 'item' : 'items'} ready for checkout`}
+            />
 
-                {/* ═══ HEADER ═══ */}
-                <Link href="/" className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink/45 hover:text-brand mb-6 transition-colors">
-                    <LuChevronLeft size={14} />
-                    Back to Shopping
-                </Link>
+            <div className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 py-8 lg:py-12">
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start xl:gap-12">
 
-                <div className="flex items-end justify-between gap-4 mb-7 border-b border-ink/10 pb-5">
-                    <div>
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">Karmo</span>
-                        <h1 className="display mt-2 text-[1.55rem] font-light uppercase leading-[1.1] tracking-[0.01em] text-ink sm:text-[1.85rem]">
-                            Your Cart
-                        </h1>
-                        <p className="mt-1.5 text-sm text-ink/50">
-                            {totalQuantity} {totalQuantity === 1 ? 'item' : 'items'} ready for checkout
-                        </p>
-                    </div>
-                    <button
-                        onClick={handleClearCart}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-ink/45 hover:text-brand transition-colors mb-1"
-                    >
-                        <LuTrash2 size={13} />
-                        Clear
-                    </button>
-                </div>
-
-                {/* ═══ MAIN LAYOUT ═══ */}
-                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-5">
-
-                    {/* ═══ LEFT: CART ITEMS ═══ */}
-                    <div className="lg:col-span-8">
-                        <div className="border border-ink/10 bg-white overflow-hidden">
-
-                            {/* Select-all bar (Daraz-style) */}
-                            <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-ink/8">
-                                <button onClick={toggleAll} className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/80">
-                                    <span className={`w-[18px] h-[18px] border flex items-center justify-center transition-colors ${allSelected ? 'bg-brand border-brand' : 'border-ink/20'}`}>
-                                        {allSelected && <LuCheck size={12} className="text-white" />}
-                                    </span>
-                                    Select All ({items.length})
+                    {/* ═══ ITEMS ═══ */}
+                    <div className="min-w-0">
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/10 pb-3">
+                            <button onClick={toggleAll} className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-ink/80">
+                                <span className={`flex h-[18px] w-[18px] items-center justify-center border transition-colors ${allSelected ? 'border-brand bg-brand' : 'border-ink/25 bg-white'}`}>
+                                    {allSelected && <LuCheck size={12} className="text-white" />}
+                                </span>
+                                Select all ({items.length})
+                            </button>
+                            <div className="flex items-center gap-5">
+                                <button onClick={deleteSelected} disabled={selectedIds.length === 0}
+                                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink/45 transition-colors hover:text-brand disabled:opacity-40 disabled:hover:text-ink/45">
+                                    Remove selected
                                 </button>
-                                <button
-                                    onClick={deleteSelected}
-                                    disabled={selectedIds.length === 0}
-                                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink/50 hover:text-red-500 transition-colors disabled:opacity-40 disabled:hover:text-ink/50 uppercase"
-                                >
-                                    <LuTrash2 size={14} /> Delete
+                                <button onClick={handleClearCart} className="text-[11px] font-bold uppercase tracking-[0.14em] text-ink/45 transition-colors hover:text-brand">
+                                    Clear bag
                                 </button>
-                            </div>
-
-                            {/* Cart Items */}
-                            <div className="divide-y divide-ink/8">
-                                {items.map((item) => (
-                                    <div key={item.id} className="group flex gap-3 sm:gap-4 px-4 sm:px-5 py-4">
-                                        {/* Select checkbox */}
-                                        <button onClick={() => toggleItem(item.id)} className="self-center flex-shrink-0" aria-label="Select item">
-                                            <span className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors ${isSelected(item.id) ? 'bg-brand border-brand' : 'border-ink/20'}`}>
-                                                {isSelected(item.id) && <LuCheck size={12} className="text-white" />}
-                                            </span>
-                                        </button>
-                                        {/* Product image */}
-                                        <div className="w-20 h-20 sm:w-[88px] sm:h-[88px] rounded-none border border-ink/8 bg-white p-1.5 flex-shrink-0">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
-                                        </div>
-
-                                        {/* Details */}
-                                        <div className="flex-1 min-w-0 flex flex-col">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <h3 className="text-sm text-ink line-clamp-2 leading-snug pr-1">{item.name}</h3>
-                                                {/* Delete (desktop) */}
-                                                <button
-                                                    onClick={() => setDeleteConfirmId(item.id)}
-                                                    className="hidden sm:flex w-7 h-7 rounded items-center justify-center text-ink/25 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
-                                                    aria-label="Remove item"
-                                                >
-                                                    <LuTrash2 size={15} />
-                                                </button>
-                                            </div>
-
-                                            {/* Variant editor (color / size) — read-only badges when the product has no options */}
-                                            <CartItemVariants item={item} onStatusChange={reportVariantStatus} />
-
-                                            {/* Unit price */}
-                                            <div className="mt-1.5 flex items-baseline gap-2">
-                                                <span className="text-sm font-semibold text-brand">৳{item.price.toLocaleString()}</span>
-                                                {item.mrp && item.mrp > item.price && (
-                                                    <span className="text-xs text-ink/40 line-through">৳{item.mrp.toLocaleString()}</span>
-                                                )}
-                                            </div>
-
-                                            {/* Bottom row: stepper + line total */}
-                                            <div className="mt-auto pt-3 flex items-end justify-between gap-2">
-                                                <div className="flex flex-col gap-2">
-                                                    {/* Quantity stepper */}
-                                                    <div className="flex items-center border border-ink/12 rounded-none overflow-hidden w-fit">
-                                                        <button
-                                                            onClick={() => dispatch(decreaseQuantity(item.id))}
-                                                            disabled={item.quantity <= 1}
-                                                            className="w-8 h-8 flex items-center justify-center text-ink/65 hover:bg-cream/60 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                                                            aria-label="Decrease quantity"
-                                                        >
-                                                            <LuMinus size={13} />
-                                                        </button>
-                                                        <div className="w-10 h-8 flex items-center justify-center text-sm font-semibold text-ink border-x border-ink/12">
-                                                            {item.quantity}
-                                                        </div>
-                                                        <button
-                                                            onClick={() => dispatch(increaseQuantity(item.id))}
-                                                            className="w-8 h-8 flex items-center justify-center text-ink/65 hover:bg-cream/60 transition-colors"
-                                                            aria-label="Increase quantity"
-                                                        >
-                                                            <LuPlus size={13} />
-                                                        </button>
-                                                    </div>
-
-                                                    {/* Save for later */}
-                                                    <button
-                                                        onClick={() => handleSaveForLater(item)}
-                                                        className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/50 hover:text-brand transition-colors w-fit"
-                                                    >
-                                                        <LuBookmark size={12} />
-                                                        Save for later
-                                                    </button>
-                                                </div>
-
-                                                {/* Line total + mobile delete */}
-                                                <div className="flex items-end gap-2">
-                                                    <div className="text-right">
-                                                        <p className="text-[11px] text-ink/40">৳{item.price.toLocaleString()} × {item.quantity}</p>
-                                                        <p className="text-base font-bold text-ink">৳{(item.price * item.quantity).toLocaleString()}</p>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setDeleteConfirmId(item.id)}
-                                                        className="sm:hidden w-7 h-7 rounded flex items-center justify-center text-ink/25 hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
-                                                        aria-label="Remove item"
-                                                    >
-                                                        <LuTrash2 size={14} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
 
-                        {/* Continue Shopping */}
-                        <div className="pt-4">
-                            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-ink/65 hover:text-brand transition-colors">
-                                <LuChevronLeft size={14} />
-                                Continue Shopping
+                        <ul className="divide-y divide-ink/8">
+                            {items.map((item) => {
+                                const selected = isSelected(item.id);
+                                const save = item.mrp && item.mrp > item.price ? Math.round(((item.mrp - item.price) / item.mrp) * 100) : 0;
+                                return (
+                                    <li key={item.id} className={`group relative flex gap-4 py-6 transition-opacity sm:gap-5 ${selected ? '' : 'opacity-60'}`}>
+                                        <button onClick={() => toggleItem(item.id)} className="mt-1 shrink-0 self-start sm:self-center" aria-label={selected ? 'Leave out of this order' : 'Include in this order'}>
+                                            <span className={`flex h-[18px] w-[18px] items-center justify-center border transition-colors ${selected ? 'border-brand bg-brand' : 'border-ink/25 bg-white'}`}>
+                                                {selected && <LuCheck size={12} className="text-white" />}
+                                            </span>
+                                        </button>
+
+                                        <div className="relative h-24 w-24 shrink-0 overflow-hidden border border-ink/8 bg-[#f3f1ec] sm:h-32 sm:w-32">
+                                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
+                                            {save > 0 ? (
+                                                <span className="absolute left-0 top-0 bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">−{save}%</span>
+                                            ) : null}
+                                        </div>
+
+                                        <div className="flex min-w-0 flex-1 flex-col">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                    {item.category ? <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-brand">{item.category}</span> : null}
+                                                    <h3 className="display mt-0.5 line-clamp-2 text-[14px] font-semibold uppercase leading-snug tracking-[0.03em] text-ink sm:text-[15px]">{item.name}</h3>
+                                                </div>
+                                                <p className="shrink-0 text-right">
+                                                    <span className="block text-base font-bold tabular-nums text-ink sm:text-lg">{tk(item.price * item.quantity)}</span>
+                                                    {item.quantity > 1 ? <span className="block text-[11px] text-ink/40">{tk(item.price)} each</span> : null}
+                                                </p>
+                                            </div>
+
+                                            <CartItemVariants item={item} onStatusChange={reportVariantStatus} />
+
+                                            <div className="mt-1.5 flex items-baseline gap-2 text-sm">
+                                                <span className="font-semibold text-brand">{tk(item.price)}</span>
+                                                {item.mrp && item.mrp > item.price ? <span className="text-xs text-ink/35 line-through">{tk(item.mrp)}</span> : null}
+                                            </div>
+
+                                            <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-3">
+                                                <div className="flex h-9 items-center border border-ink/15">
+                                                    <button onClick={() => dispatch(decreaseQuantity(item.id))} disabled={item.quantity <= 1} aria-label="Decrease quantity"
+                                                        className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:bg-[#f5f3ef] disabled:cursor-not-allowed disabled:opacity-30">
+                                                        <LuMinus size={13} />
+                                                    </button>
+                                                    <span className="flex h-full w-10 items-center justify-center border-x border-ink/15 text-sm font-bold tabular-nums text-ink">{item.quantity}</span>
+                                                    <button onClick={() => dispatch(increaseQuantity(item.id))} disabled={item.quantity >= 99} aria-label="Increase quantity"
+                                                        className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:bg-[#f5f3ef] disabled:cursor-not-allowed disabled:opacity-30">
+                                                        <LuPlus size={13} />
+                                                    </button>
+                                                </div>
+                                                <button onClick={() => handleSaveForLater(item)} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink/45 transition-colors hover:text-brand">
+                                                    <LuBookmark size={12} /> Save for later
+                                                </button>
+                                                <button onClick={() => setDeleteConfirmId(item.id)} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink/45 transition-colors hover:text-brand">
+                                                    <LuTrash2 size={12} /> Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+
+                        <div className="border-t border-ink/10 pt-5">
+                            <Link href="/" className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/55 transition-colors hover:text-brand">
+                                <LuChevronLeft size={14} /> Continue shopping
                             </Link>
                         </div>
 
-                        {/* ═══ SAVED FOR LATER ═══ */}
-                        {savedSection && (
-                            <div className="mt-5">
-                                {savedSection}
-                            </div>
-                        )}
+                        {savedSection ? <div className="mt-8">{savedSection}</div> : null}
                     </div>
 
-                    {/* ═══ RIGHT: ORDER SUMMARY ═══ */}
-                    <div className="lg:col-span-4 lg:sticky lg:top-[136px] h-fit">
-                        <div className="border border-ink/10 bg-white">
+                    {/* ═══ SUMMARY ═══ */}
+                    <aside className="lg:sticky lg:top-[150px]">
+                        <div className="relative border border-[#e5e7eb] bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                            <div className="relative px-6 pb-6 pt-7">
+                                <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">Summary</span>
+                                <h2 className="display mt-1.5 text-[1.3rem] font-light uppercase tracking-[0.02em] text-ink">Your order</h2>
 
-                            <div className="px-5 py-3.5 border-b border-ink/8">
-                                <h2 className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink">Order Summary</h2>
-                            </div>
+                                {/* Free delivery progress */}
+                                {freeThreshold > 0 ? (
+                                    <div className="mt-5 border border-[#e5e7eb] bg-[#fafafa] px-4 py-3">
+                                        <p className="flex items-center gap-2 text-[13px] font-medium text-ink/75">
+                                            <TruckIcon className="h-5 w-5 shrink-0" />
+                                            {freeShipping ? <>Free delivery unlocked</> : <>Add <b className="font-bold text-ink">{tk(remainingForFree)}</b> more for free delivery</>}
+                                        </p>
+                                        <span className="mt-2.5 block h-1.5 overflow-hidden bg-ink/10">
+                                            <span className="block h-full transition-all duration-500" style={{ width: `${freeShipping ? 100 : Math.min(100, (selectedSubtotal / freeThreshold) * 100)}%`, backgroundColor: ORANGE }} />
+                                        </span>
+                                    </div>
+                                ) : null}
 
-                            {/* Coupon Input */}
-                            <div className="px-5 pt-4">
-                                <div className="border border-dashed border-brand/30 rounded-none p-3 bg-brand/[0.03]">
-                                    <p className="text-xs font-semibold text-ink/80 mb-2 flex items-center gap-1.5">
-                                        <LuTag size={12} className="text-brand" /> Apply Coupon / Voucher
-                                    </p>
-                                    <div className="flex gap-2">
+                                {/* Coupon */}
+                                <div className="mt-5">
+                                    <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-ink/55"><TagIcon className="h-3.5 w-3.5" /> Coupon</p>
+                                    <div className="flex">
                                         <input
                                             type="text"
                                             value={couponCode}
                                             onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                             onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                                            placeholder="Enter coupon code"
-                                            className="flex-1 min-w-0 px-3 py-2 text-sm border border-ink/12 rounded outline-none focus:border-brand bg-white uppercase placeholder:normal-case placeholder:text-ink/40"
+                                            placeholder="Enter code"
+                                            className="h-11 min-w-0 flex-1 border border-[#d1d5db] bg-white px-3.5 text-sm uppercase text-ink outline-none transition-colors placeholder:normal-case placeholder:text-ink/35 focus:border-brand"
                                         />
-                                        <button
-                                            onClick={handleApplyCoupon}
-                                            disabled={isValidating || !couponCode.trim()}
-                                            className="px-4 py-2 text-xs font-semibold bg-brand text-white rounded hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-                                        >
-                                            {isValidating ? '...' : 'Apply'}
+                                        <button onClick={handleApplyCoupon} disabled={isValidating || !couponCode.trim()}
+                                            className="h-11 shrink-0 bg-ink px-5 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brand disabled:cursor-not-allowed disabled:opacity-40">
+                                            {isValidating ? '…' : 'Apply'}
                                         </button>
                                     </div>
-                                    {couponError && (
-                                        <p className="mt-1.5 text-xs text-red-500">{couponError}</p>
-                                    )}
-                                    {/* Applied coupons — stack as many as you like */}
+                                    {couponError && <p className="mt-1.5 text-xs text-brand">{couponError}</p>}
                                     {appliedCoupons.length > 0 && (
-                                        <div className="mt-2 space-y-1.5">
+                                        <ul className="mt-2.5 space-y-1.5">
                                             {appliedCoupons.map((c) => (
-                                                <div key={c.code} className="flex items-center justify-between gap-2 bg-white border border-green-200 rounded px-2.5 py-1.5">
-                                                    <span className="flex items-center gap-1.5 text-xs font-semibold text-green-700 min-w-0">
-                                                        <LuCheck size={12} className="flex-shrink-0" />
+                                                <li key={c.code} className="flex items-center justify-between gap-2 border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2">
+                                                    <span className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-[#15803d]">
+                                                        <LuCheck size={12} className="shrink-0" />
                                                         <span className="truncate">{c.code}</span>
-                                                        <span className="text-[11px] font-medium text-ink/40 flex-shrink-0">
-                                                            {c.freeShipping && c.discount === 0 ? 'Free shipping' : `−৳${(c.discount || 0).toLocaleString()}`}
-                                                        </span>
+                                                        <span className="shrink-0 font-medium text-ink/45">{c.freeShipping && c.discount === 0 ? 'Free delivery' : `−${tk(c.discount || 0)}`}</span>
                                                     </span>
-                                                    <button
-                                                        onClick={() => handleRemoveCoupon(c.code)}
-                                                        className="text-ink/40 hover:text-red-500 transition-colors flex-shrink-0"
-                                                        aria-label={`Remove ${c.code}`}
-                                                    >
-                                                        <LuX size={13} />
-                                                    </button>
-                                                </div>
+                                                    <button onClick={() => handleRemoveCoupon(c.code)} aria-label={`Remove ${c.code}`} className="text-ink/35 hover:text-brand"><LuX size={13} /></button>
+                                                </li>
                                             ))}
-                                        </div>
+                                        </ul>
                                     )}
                                 </div>
-                            </div>
 
-                            {/* Totals */}
-                            <div className="px-5 py-4 space-y-2.5">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-ink/50">Subtotal ({selectedQty} {selectedQty === 1 ? 'item' : 'items'})</span>
-                                    <span className="text-ink font-medium">৳{selectedSubtotal.toLocaleString()}</span>
-                                </div>
-                                {couponDiscount > 0 && (
-                                    <div className="flex justify-between text-sm text-green-600">
-                                        <span className="flex items-center gap-1">
-                                            <LuTag size={12} />
-                                            Coupon{appliedCoupons.length > 1 ? `s (${appliedCoupons.length})` : ` (${appliedCoupons.find(c => c.discount > 0)?.code || ''})`}
-                                        </span>
-                                        <span className="font-medium">-৳{couponDiscount.toLocaleString()}</span>
+                                {/* Totals */}
+                                <dl className="mt-6 space-y-2.5 border-t border-[#eee] pt-5 text-[14px]">
+                                    <div className="flex justify-between"><dt className="text-ink/60">Subtotal ({selectedQty} {selectedQty === 1 ? 'item' : 'items'})</dt><dd className="tabular-nums">{tk(selectedSubtotal)}</dd></div>
+                                    {couponDiscount > 0 && (
+                                        <div className="flex justify-between text-[#15803d]"><dt>Coupon discount</dt><dd className="tabular-nums">−{tk(couponDiscount)}</dd></div>
+                                    )}
+                                    <div className="flex justify-between">
+                                        <dt className="text-ink/60">Delivery <span className="block text-[11px] text-ink/35">Exact charge at checkout</span></dt>
+                                        <dd className={freeShipping ? 'font-semibold text-[#15803d]' : 'tabular-nums'}>{freeShipping ? 'Free' : tk(shippingCost)}</dd>
                                     </div>
-                                )}
-                                {couponFreeShipping && (
-                                    <div className="flex justify-between text-sm text-green-600">
-                                        <span className="flex items-center gap-1"><LuTag size={12} /> Free shipping coupon</span>
-                                        <span className="font-medium">Applied</span>
-                                    </div>
-                                )}
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-ink/50">
-                                        Delivery (estimated)
-                                        <span className="block text-xs text-ink/40">Final cost calculated at checkout</span>
+                                </dl>
+                                <div className="mt-5 flex items-end justify-between border-t border-[#eee] pt-5">
+                                    <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-ink/70">Total</span>
+                                    <span className="text-right">
+                                        {(couponDiscount > 0 || couponFreeShipping) && preDiscountTotal > finalTotal ? (
+                                            <span className="block text-[14px] text-[#9ca3af] line-through">{tk(preDiscountTotal)}</span>
+                                        ) : null}
+                                        <span className="text-[1.65rem] font-bold leading-none tabular-nums tracking-tight text-brand sm:text-[1.85rem]">{tk(finalTotal)}</span>
                                     </span>
-                                    {freeShipping ? (
-                                        <span className="font-medium text-green-600">FREE</span>
-                                    ) : (
-                                        <span className="text-ink font-medium">৳{shippingCost.toLocaleString()}</span>
-                                    )}
                                 </div>
-                                {remainingForFree > 0 && (
-                                    <div className="text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-none px-2.5 py-1.5 flex items-center gap-1.5">
-                                        🚚 Add <span className="font-bold">৳{remainingForFree.toLocaleString()}</span> more for FREE shipping
-                                    </div>
-                                )}
-                                <div className="flex justify-between items-center pt-3 mt-1 border-t border-ink/8">
-                                    <span className="text-sm font-semibold text-ink">Total</span>
-                                    <div className="text-right">
-                                        {(couponDiscount > 0 || couponFreeShipping) && preDiscountTotal > finalTotal && (
-                                            <p className="text-xs line-through text-ink/40">৳{preDiscountTotal.toLocaleString()}</p>
-                                        )}
-                                        <span className="text-xl font-bold text-brand">৳{finalTotal.toLocaleString()}</span>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Proceed to Checkout */}
-                            <div className="px-5 pb-5">
                                 {hasVariantIssues && (
-                                    <div className="mb-3 flex items-start gap-2 rounded-none border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                                        <LuTriangleAlert size={14} className="mt-0.5 flex-shrink-0" />
-                                        <span>
-                                            {incompleteSelected.length} selected item{incompleteSelected.length > 1 ? 's need' : ' needs'} a color/size choice before checkout.
-                                        </span>
-                                    </div>
+                                    <p className="mt-4 flex items-start gap-2 border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                                        <LuTriangleAlert size={14} className="mt-0.5 shrink-0" />
+                                        {incompleteSelected.length} selected item{incompleteSelected.length > 1 ? 's need' : ' needs'} a colour or size.
+                                    </p>
                                 )}
-                                {!canCheckout ? (
-                                    <button disabled className="w-full flex items-center justify-center gap-2 py-3.5 bg-ink/10 text-ink/35 rounded-none text-[12px] font-bold uppercase tracking-[0.14em] cursor-not-allowed">
-                                        {hasVariantIssues ? 'Select Variations' : 'Checkout (0)'}
-                                    </button>
-                                ) : (
-                                    <Link
-                                        href="/checkout"
-                                        onClick={goCheckout}
-                                        className="w-full flex items-center justify-center gap-2 py-3.5 bg-brand text-white rounded-none text-[12px] font-bold uppercase tracking-[0.14em] hover:bg-brand-dark transition-colors"
-                                    >
-                                        Checkout ({selectedIds.length})
-                                        <LuChevronRight size={16} />
+
+                                {canCheckout ? (
+                                    <Link href="/checkout" onClick={goCheckout}
+                                        className="group mt-5 flex h-11 w-full items-center justify-center gap-2 bg-brand text-[15px] font-bold uppercase tracking-[0.06em] text-white transition-colors hover:bg-brand-dark">
+                                        <LockIcon className="h-4 w-4" /> {checkoutLabel}
+                                        <LuChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                                     </Link>
+                                ) : (
+                                    <button disabled className="mt-5 flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 bg-ink/10 text-[15px] font-bold uppercase tracking-[0.06em] text-ink/35">
+                                        {checkoutLabel}
+                                    </button>
                                 )}
+                                <p className="mt-3 text-center text-[12px] text-ink/45">Cash on delivery available · Secure checkout</p>
+                            </div>
+                            <div className="border-t border-[#eee] px-5 py-5">
+                                <TrustRow />
                             </div>
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </div>
 
-            {/* ═══ MOBILE STICKY CHECKOUT BAR ═══ */}
-            <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-ink/12 px-4 py-3 flex items-center justify-between gap-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            {/* ═══ MOBILE CHECKOUT BAR ═══ */}
+            <div className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-3 border-t border-ink/12 bg-white px-4 py-3 shadow-[0_-6px_18px_rgba(0,0,0,0.06)] lg:hidden">
                 <div className="min-w-0">
-                    <p className="text-[11px] text-ink/50">Total</p>
-                    <p className="text-lg font-bold text-brand leading-none">৳{finalTotal.toLocaleString()}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">Total</p>
+                    <p className="text-lg font-bold leading-none tabular-nums text-ink">{tk(finalTotal)}</p>
                 </div>
-                {!canCheckout ? (
-                    <button disabled className="flex items-center justify-center gap-1.5 px-6 py-3.5 bg-ink/10 text-ink/35 rounded-none text-[12px] font-bold uppercase tracking-[0.12em] flex-shrink-0 cursor-not-allowed">
-                        {hasVariantIssues ? 'Select Variations' : 'Checkout (0)'}
-                    </button>
-                ) : (
-                    <Link
-                        href="/checkout"
-                        onClick={goCheckout}
-                        className="flex items-center justify-center gap-1.5 px-6 py-3.5 bg-brand text-white rounded-none text-[12px] font-bold uppercase tracking-[0.12em] hover:bg-brand-dark transition-colors flex-shrink-0"
-                    >
-                        Checkout ({selectedIds.length})
-                        <LuChevronRight size={16} />
+                {canCheckout ? (
+                    <Link href="/checkout" onClick={goCheckout} className="flex h-11 shrink-0 items-center justify-center gap-1.5 bg-brand px-6 text-[14px] font-bold uppercase tracking-[0.06em] text-white">
+                        <LockIcon className="h-4 w-4" /> {checkoutLabel}
                     </Link>
+                ) : (
+                    <button disabled className="flex h-12 shrink-0 cursor-not-allowed items-center justify-center bg-ink/10 px-6 text-[12px] font-bold uppercase tracking-[0.12em] text-ink/35">{checkoutLabel}</button>
                 )}
             </div>
 
-            {/* ═══ DELETE CONFIRMATION MODAL ═══ */}
+            {/* ═══ REMOVE CONFIRMATION ═══ */}
             {deleteConfirmId && (
-                <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4"
-                    onClick={() => setDeleteConfirmId(null)}
-                >
-                    <div
-                        className="bg-white rounded-none p-6 max-w-sm w-full text-center"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-                            <LuTriangleAlert size={22} className="text-red-500" />
-                        </div>
-                        <h3 className="text-base font-semibold text-ink mb-1.5">Remove Item?</h3>
-                        <p className="text-sm text-ink/50 mb-6 leading-relaxed">
-                            Are you sure you want to remove this item from your cart?
-                        </p>
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setDeleteConfirmId(null)}
-                                className="flex-1 py-2.5 rounded border border-ink/12 text-sm font-medium text-ink/65 hover:bg-cream/60 transition-colors"
-                            >
-                                Keep It
-                            </button>
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4" onClick={() => setDeleteConfirmId(null)}>
+                    <div className="w-full max-w-sm bg-white p-7 text-center" onClick={(e) => e.stopPropagation()}>
+                        <span className="mx-auto flex h-14 w-14 items-center justify-center bg-[#f5f3ef] text-brand"><BagIcon className="h-8 w-8" /></span>
+                        <h3 className="display mt-5 text-[1.05rem] font-semibold uppercase tracking-[0.04em] text-ink">Remove this item?</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-ink/55">It leaves your bag. You can save it for later instead.</p>
+                        <div className="mt-6 grid grid-cols-2 gap-2.5">
+                            <button onClick={() => setDeleteConfirmId(null)} className="h-11 border border-ink/15 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/70 transition-colors hover:border-ink/40">Keep it</button>
                             <button
                                 onClick={() => {
                                     dispatch(removeFromCart(deleteConfirmId));
                                     toast.success('Item removed');
                                     setDeleteConfirmId(null);
                                 }}
-                                className="flex-1 py-2.5 rounded bg-red-500 text-sm font-medium text-white hover:bg-red-600 transition-colors"
+                                className="h-11 bg-brand text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark"
                             >
                                 Remove
                             </button>

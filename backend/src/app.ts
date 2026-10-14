@@ -33,6 +33,8 @@ import { ActivityLogRoutes } from './app/modules/activityLog/activityLog.routes'
 import { NewsletterRoutes } from './app/modules/newsletter/newsletter.routes';
 import { CourierRoutes } from './app/modules/courier/courier.routes';
 import { ImageSearchRoutes } from './app/modules/imageSearch/imageSearch.routes';
+import { MediaRoutes } from './app/modules/media/media.routes';
+import { PageContentRoutes } from './app/modules/pageContent/pageContent.routes';
 
 const app: Application = express();
 
@@ -108,6 +110,8 @@ app.use('/api/activity-logs', ActivityLogRoutes);
 app.use('/api/newsletter', NewsletterRoutes);
 app.use('/api/courier', CourierRoutes);
 app.use('/api/image-search', ImageSearchRoutes);
+app.use('/api/media', MediaRoutes);            // Site content images & videos (GridFS)
+app.use('/api/page-content', PageContentRoutes); // Site content: each page's editable content
 
 // ── Error Handlers ────────────────────────────────────────────────
 app.use(notFoundHandler);

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { mattressTitleOverlay } from "@/components/karmo/chrome/mattressHeroVeil";
+import { overlayStyle } from "@/cms/core";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
@@ -69,9 +70,14 @@ function SlideVideo({ video, on }) {
       preload="auto"
       aria-hidden
       className={`absolute inset-0 h-full w-full object-cover ${video.position || "object-center"}`}
+      style={video.style}
     />
   );
 }
+
+/* Site content: a slide's own darkness ({ color, opacity }), over the picture. */
+const overlayBg = (o) =>
+  o && Number(o.opacity) > 0 ? overlayStyle(o) : null;
 
 export default function OverlayHeroSlider({
   slides = [],
@@ -180,6 +186,7 @@ export default function OverlayHeroSlider({
                   className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"
                   } ${s.image.className || ""}`}
+                  style={s.image.style}
                 />
                 )}
                 {s.image?.overlay ? (
@@ -220,6 +227,16 @@ export default function OverlayHeroSlider({
                   animate={{ opacity: on ? 1 : 0 }}
                   transition={fadeMs}
                   className="pointer-events-none absolute inset-0 bg-black/32"
+                />
+              ) : null}
+              {overlayBg(s.overlay) ? (
+                <motion.span
+                  aria-hidden
+                  initial={false}
+                  animate={{ opacity: on ? 1 : 0 }}
+                  transition={fadeMs}
+                  className="pointer-events-none absolute inset-0"
+                  style={overlayBg(s.overlay)}
                 />
               ) : null}
               {titleCard ? (
@@ -331,7 +348,10 @@ export default function OverlayHeroSlider({
                             right ? "text-right" : middle || center ? "text-center" : ""
                           } ${s.headingClassName || ""}`}
                           style={{
-                            fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
+                            fontSize:
+                              s.headingScale && Number(s.headingScale) !== 100
+                                ? `calc(clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem) * ${Number(s.headingScale) / 100})`
+                                : "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
                             fontWeight: 350,
                             fontVariationSettings: '"wght" 350',
                             letterSpacing: "0.12em",

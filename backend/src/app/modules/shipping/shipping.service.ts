@@ -129,7 +129,8 @@ export async function computeShippingCost(
     }
 
     // 6) Default flat rate.
-    const isDhaka = cityStr.includes('dhaka');
+    // "Dhaka" typed in English or Bangla.
+    const isDhaka = cityStr.includes('dhaka') || cityStr.includes('ঢাকা');
     return {
         shippingCost: isDhaka ? insideRate : outsideRate,
         estimatedDays: defaultDays,

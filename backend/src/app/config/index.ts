@@ -151,4 +151,18 @@ export default {
         zone_id: process.env.PATHAO_ZONE_ID || '',
         item_weight_kg: Number(process.env.PATHAO_ITEM_WEIGHT_KG) || 0.5,
     },
+
+    // SMS to customers from the order desk ("Send SMS" after an order is confirmed).
+    // Empty provider = not set up yet: the button still records the attempt and says so.
+    sms: {
+        provider: (process.env.SMS_PROVIDER || '').toLowerCase(),   // 'bulksmsbd'
+        api_key: process.env.SMS_API_KEY || '',
+        sender_id: process.env.SMS_SENDER_ID || '',
+        base_url: process.env.SMS_BASE_URL || 'http://bulksmsbd.net',
+    },
+
+    business: {
+        name: process.env.BUSINESS_NAME || 'Karmo',
+        phone: process.env.BUSINESS_PHONE || '01713-483284',
+    },
 };

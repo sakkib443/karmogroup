@@ -2,6 +2,7 @@ import { Server as HttpServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
+import { isStaffRole } from '../constants/roles';
 
 let io: SocketIOServer | null = null;
 
@@ -52,9 +53,10 @@ export const initSocket = (httpServer: HttpServer): SocketIOServer => {
         if (userId) {
             socket.join('user:' + userId);
         }
-        // Admins/superadmins also join a shared room for live business/finance pushes.
+        // Staff who work the order desk join a shared room, so their lists refresh live
+        // when orders move.
         const role = socket.data.role as string;
-        if (role === 'admin' || role === 'superadmin') {
+        if (isStaffRole(role)) {
             socket.join('admins');
         }
 

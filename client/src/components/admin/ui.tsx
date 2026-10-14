@@ -80,8 +80,8 @@ export function Btn({ variant = 'secondary', href, icon, className, children, ..
 
 /* ─── Filters ────────────────────────────────────────────── */
 
-export function SearchInput({ value, onChange, placeholder = 'Search…', className }: {
-    value: string; onChange: (v: string) => void; placeholder?: string; className?: string;
+export function SearchInput({ value, onChange, placeholder = 'Search…', className, inputClassName }: {
+    value: string; onChange: (v: string) => void; placeholder?: string; className?: string; inputClassName?: string;
 }) {
     return (
         <div className={cx('relative w-full sm:w-72', className)}>
@@ -91,17 +91,18 @@ export function SearchInput({ value, onChange, placeholder = 'Search…', classN
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="h-9 w-full rounded-full border border-transparent bg-gray-100 pl-10 pr-4 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[var(--color-primary-border)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.12)]"
+                className={cx('h-9 w-full rounded-full border border-transparent bg-gray-100 pl-10 pr-4 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[var(--color-primary-border)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(var(--color-primary-rgb),0.12)]', inputClassName)}
             />
         </div>
     );
 }
 
-export function SelectPill({ value, onChange, options, className, ariaLabel }: {
+export function SelectPill({ value, onChange, options, className, selectClassName, ariaLabel }: {
     value: string;
     onChange: (v: string) => void;
     options: { value: string; label: string }[];
     className?: string;
+    selectClassName?: string;
     ariaLabel?: string;
 }) {
     return (
@@ -110,7 +111,7 @@ export function SelectPill({ value, onChange, options, className, ariaLabel }: {
                 aria-label={ariaLabel}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="h-9 w-full cursor-pointer appearance-none rounded-full border border-transparent bg-gray-100 pl-4 pr-10 text-sm text-gray-800 outline-none transition focus:border-[var(--color-primary-border)] focus:bg-white"
+                className={cx('h-9 w-full cursor-pointer appearance-none rounded-full border border-transparent bg-gray-100 pl-4 pr-10 text-sm text-gray-800 outline-none transition focus:border-[var(--color-primary-border)] focus:bg-white', selectClassName)}
             >
                 {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -295,7 +296,7 @@ export type RowMenuItem =
 /**
  * The dropdown is position:fixed so the table's overflow container can never clip it.
  */
-export function RowMenu({ items, label = 'Actions' }: { items: RowMenuItem[]; label?: string }) {
+export function RowMenu({ items, label = 'Actions', buttonClassName }: { items: RowMenuItem[]; label?: string; buttonClassName?: string }) {
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
     const btnRef = useRef<HTMLButtonElement>(null);
@@ -349,7 +350,7 @@ export function RowMenu({ items, label = 'Actions' }: { items: RowMenuItem[]; la
                 aria-label={label}
                 aria-expanded={open}
                 onClick={() => setOpen((o) => !o)}
-                className={cx('inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-800', open && 'bg-gray-100 text-gray-800')}
+                className={cx('inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-800', open && 'bg-gray-100 text-gray-800', buttonClassName)}
             >
                 <LuEllipsisVertical size={16} />
             </button>

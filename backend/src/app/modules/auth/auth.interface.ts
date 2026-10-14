@@ -1,7 +1,9 @@
+import type { Role } from '../../constants/roles';
+
 export interface IJwtPayload {
     userId: string;
     email: string;
-    role: 'superadmin' | 'admin' | 'user';
+    role: Role;
     iat?: number;
     exp?: number;
 }

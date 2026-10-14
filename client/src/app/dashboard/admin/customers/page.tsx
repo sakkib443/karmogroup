@@ -3,7 +3,9 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LuPlus, LuEye, LuBan, LuCircleCheck, LuPencil, LuUsers } from 'react-icons/lu';
+import { LuPlus, LuEye, LuBan, LuCircleCheck, LuPencil, LuUsers, LuTrash2, LuGift } from 'react-icons/lu';
+import { canManageUser } from '@/components/admin/access';
+import { UserFormModal, useUserActions } from '@/components/admin/users/UserForm';
 import {
     useGetAdminUsersQuery,
     useGetAdminUserStatsQuery,
@@ -18,7 +20,8 @@ import {
     TH, TD, TR, EmptyRow, SkeletonRows, Pager, RowMenu, Modal, Field, INPUT, taka, fmtDate, type Tone,
 } from '@/components/admin/ui';
 
-// Buyers only. Staff accounts live on their own page (Settings → Staff).
+// Buyers only. Every account, staff too, is on Settings → Users. Managers see this list
+// and add buyers; admins also edit, block and delete them.
 const PAGE_SIZE = 10;
 const COLS = 9;
 
@@ -109,20 +112,11 @@ export default function CustomersPage() {
         }
     };
 
-    /* ─── Block / unblock ─── */
-    // Every row here is a buyer; the only one you may not block is yourself.
-    const canBlock = (u: any) => u._id !== currentUser?.id;
-
-    const handleToggleBlock = async (u: any) => {
-        const next = u.status === 'blocked' ? 'active' : 'blocked';
-        if (!window.confirm(`${next === 'blocked' ? 'Block' : 'Unblock'} ${u.firstName} ${u.lastName || ''}?`)) return;
-        try {
-            await updateUser({ id: u._id, status: next }).unwrap();
-            toast.success(next === 'blocked' ? 'Blocked' : 'Unblocked');
-        } catch (err: any) {
-            toast.error(errMsg(err, 'Failed to update status'));
-        }
-    };
+    /* ─── Edit / block / delete (super admin and admins) ─── */
+    const manage = canManageUser(currentUser?.role, 'user');
+    const [editingUser, setEditingUser] = useState<any>(null);
+    const { toggleBlock: handleToggleBlock, remove } = useUserActions();
+    const canBlock = (u: any) => manage && u._id !== currentUser?.id;
 
     return (
         <div>
@@ -200,8 +194,10 @@ export default function CustomersPage() {
                                     <td className={`${TD} text-right`}>
                                         <RowMenu items={[
                                             { label: 'View details', icon: <LuEye size={15} />, href: `/dashboard/admin/customers/${u._id}` },
-                                            { label: 'Points & discount', icon: <LuPencil size={15} />, onClick: () => openLoyalty(u) },
+                                            { label: 'Edit details & password', icon: <LuPencil size={15} />, onClick: () => setEditingUser(u), hidden: !manage },
+                                            { label: 'Points & discount', icon: <LuGift size={15} />, onClick: () => openLoyalty(u), hidden: !manage },
                                             blockItem,
+                                            { label: 'Delete', icon: <LuTrash2 size={15} />, onClick: () => remove(u), danger: true, hidden: !canBlock(u) },
                                         ]} />
                                     </td>
                                 </tr>
@@ -243,6 +239,8 @@ export default function CustomersPage() {
                     </Field>
                 </div>
             </Modal>
+
+            {editingUser && <UserFormModal user={editingUser} onClose={() => setEditingUser(null)} />}
 
             {/* ═══ Points & discount ═══ */}
             <Modal

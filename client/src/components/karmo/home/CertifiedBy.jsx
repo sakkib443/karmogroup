@@ -4,47 +4,22 @@ import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import { useGlobal, CmsText } from "@/cms/CmsProvider";
+import { imageStyle } from "@/cms/core";
+import { certified } from "@/cms/pages/global";
 
 /**
  * Awards & trust — above the footer on every karmo-2 page.
- * Four gold marks on the dark band: number one plus three original
- * certification badges (transparent, no plate).
+ * Gold marks on the dark band: number one plus the certification badges
+ * (transparent, no plate). Content: Admin → Site content → Brand & contact →
+ * Certifications.
  */
-
-const pillars = [
-  {
-    id: "number-one",
-    src: "/shared/trust/badge-number-one-gold-fullheight.webp",
-    alt: "Bangladesh’s number one comfort brand badge",
-    title: "Number one brand",
-    body: "Leading on lasting comfort across foam, mattress, HomeTex and adhesives — the brand Bangladesh trusts for everyday rest.",
-  },
-  {
-    id: "iso",
-    src: "/shared/certified/logos/logo-iso-9001-gold-v9.webp",
-    alt: "ISO 9001 quality management gold seal",
-    title: "ISO 9001",
-    body: "International Organization for Standardization — the international standard for quality management.",
-  },
-  {
-    id: "ukas",
-    src: "/shared/certified/logos/logo-ukas-gold-v14.webp",
-    alt: "UKAS Quality Management gold badge, registration number 014",
-    title: "UKAS Quality Management",
-    body: "Registration Number 014 — registered name Karmo Foam & Adhesive Industries Ltd.",
-  },
-  {
-    id: "moody",
-    src: "/shared/certified/logos/logo-moody-gold-sharp.webp",
-    alt: "Moody International gold mark — ISO 9001 Approved",
-    title: "Moody International",
-    body: "ISO 9001 Approved — independent certification of the quality-management system.",
-  },
-];
-
 export default function CertifiedBy() {
+  const c = useGlobal("certified", certified.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  if (c.hidden) return null;
+  const pillars = c.pillars || [];
 
   return (
     <section
@@ -73,21 +48,24 @@ export default function CertifiedBy() {
           className="mx-auto max-w-3xl text-center"
         >
           <h2 className="display section-heading title-card-line uppercase text-white">
-            Built on trust since 1965
+            <CmsText value={c.heading} size={c.headingSize} />
           </h2>
-          <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]">
-            Number one in Bangladesh — with ISO 9001, UKAS and Moody
-            International certification behind every batch.
-          </p>
+          {c.intro ? (
+            <p className="mt-4 text-[13px] leading-relaxed text-white/55 sm:text-[14px]" style={{ whiteSpace: "pre-line" }}>
+              {c.intro}
+            </p>
+          ) : null}
         </motion.header>
 
         <motion.ul
           variants={group}
-          className="mt-12 grid grid-cols-1 sm:mt-14 md:mt-16 md:grid-cols-2 lg:grid-cols-4"
+          className={`mt-12 grid grid-cols-1 sm:mt-14 md:mt-16 md:grid-cols-2 ${
+            pillars.length === 3 ? "lg:grid-cols-3" : pillars.length >= 5 ? "lg:grid-cols-5" : "lg:grid-cols-4"
+          }`}
         >
-          {pillars.map(({ id, src, alt, title, body }, i) => (
+          {pillars.map(({ image, title, body }, i) => (
             <motion.li
-              key={id}
+              key={`${i}-${title}`}
               variants={fade}
               className={`relative flex flex-col items-center px-5 py-8 text-center md:px-8 md:py-10 lg:px-10 lg:py-2 xl:px-12 ${
                 i < pillars.length - 1 ? "border-b border-white/20" : ""
@@ -102,15 +80,18 @@ export default function CertifiedBy() {
                 />
               ) : null}
               <div className="relative flex h-[13.5rem] w-[13.5rem] items-center justify-center sm:h-[15.5rem] sm:w-[15.5rem] lg:h-[17rem] lg:w-[17rem]">
-                <Image
-                  src={src}
-                  alt={alt}
-                  width={2048}
-                  height={2048}
-                  sizes="(min-width: 1024px) 272px, 248px"
-                  unoptimized
-                  className="h-full w-full object-contain"
-                />
+                {image?.src ? (
+                  <Image
+                    src={image.src}
+                    alt={image.alt || title || ""}
+                    width={2048}
+                    height={2048}
+                    sizes="(min-width: 1024px) 272px, 248px"
+                    unoptimized
+                    className="h-full w-full object-contain"
+                    style={imageStyle(image)}
+                  />
+                ) : null}
               </div>
               <h3 className="display mt-5 text-[0.78rem] font-bold uppercase tracking-[0.12em] text-white sm:mt-6">
                 {title}
@@ -122,17 +103,16 @@ export default function CertifiedBy() {
           ))}
         </motion.ul>
 
-        <motion.p
-          variants={fade}
-          {...reveal}
-          viewport={VIEWPORT}
-          className="mx-auto mt-10 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-12 sm:text-[11px]"
-        >
-          Reflects Karmo Group’s position since 1965, and ISO 9001 quality
-          management accredited by UKAS (Registration Number 014) and approved
-          by Moody International — held by Karmo Foam &amp; Adhesive Industries
-          Ltd.
-        </motion.p>
+        {c.footnote ? (
+          <motion.p
+            variants={fade}
+            {...reveal}
+            viewport={VIEWPORT}
+            className="mx-auto mt-10 max-w-4xl text-center text-[10px] leading-relaxed tracking-[0.02em] text-white/35 sm:mt-12 sm:text-[11px]"
+          >
+            {c.footnote}
+          </motion.p>
+        ) : null}
       </motion.div>
     </section>
   );

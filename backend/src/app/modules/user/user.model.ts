@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import config from '../../config';
 import { IUser, IUserMethods, UserModel } from './user.interface';
+import { ROLES } from '../../constants/roles';
 
 const shippingAddressSchema = new Schema({
     label: { type: String, default: 'Home' },
@@ -33,10 +34,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         // ── Role & Status ────────────────────────────
         role: {
             type: String,
-            enum: { values: ['superadmin', 'admin', 'user'], message: '{VALUE} is not a valid role' },
+            enum: { values: [...ROLES], message: '{VALUE} is not a valid role' },
             default: 'user',
         },
         permissions: { type: [String], default: [] },
+        // Factory staff: the divisions whose orders they see and scan (empty = all).
+        divisions: { type: [String], default: [] },
         status: {
             type: String,
             enum: { values: ['active', 'blocked', 'pending'], message: '{VALUE} is not a valid status' },
@@ -54,6 +57,10 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         // ── Stats ────────────────────────────────────
         totalOrders: { type: Number, default: 0 },
         totalSpent: { type: Number, default: 0 },
+
+        // ── Customer terms (set by an admin) ─────────
+        loyaltyPoints: { type: Number, default: 0, min: 0 },
+        defaultDiscount: { type: Number, default: 0, min: 0, max: 100 },
 
         // ── Password Reset ───────────────────────────
         passwordResetToken: String,

@@ -8,6 +8,9 @@ import { FiMail, FiPhone, FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
+import { useGlobal, CmsText } from "@/cms/CmsProvider";
+import { imageStyle } from "@/cms/core";
+import { orderContact, contact as contactSection, telHref } from "@/cms/pages/global";
 
 /**
  * Order guide + contact — content from the client's live site, rebuilt to
@@ -20,31 +23,13 @@ import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 const ORANGE = "#FF9A1F";
 
-const steps = [
-  {
-    n: "01",
-    icon: "/shared/trust/order-cartoon/select-v2.webp",
-    title: "Select your product",
-    body: "Choose the foam, mattress or HomeTex piece that fits the room.",
-  },
-  {
-    n: "02",
-    icon: "/shared/trust/order-cartoon/cart-v2.webp",
-    title: "Add it to the cart",
-    body: "Drop your picks in — sizes and quantities stay with you.",
-  },
-  {
-    n: "03",
-    icon: "/shared/trust/order-cartoon/checkout-v2.webp",
-    title: "Complete the checkout",
-    body: "Just three details: name, full address, and mobile number.",
-  },
-  {
-    n: "04",
-    icon: "/shared/trust/order-cartoon/enjoy-v2.webp",
-    title: "Receive & enjoy",
-    body: "We deliver. You settle in. Comfort shows up at the door.",
-  },
+/* Icon box sizes by step (the third icon is drawn larger, the fourth smaller). The
+   steps' words and icons: Admin → Site content → Brand & contact → How to order. */
+const ICON_SIZES = [
+  "h-[4.65rem] w-[4.65rem] lg:h-[5.15rem] lg:w-[5.15rem]",
+  "h-[4.65rem] w-[4.65rem] lg:h-[5.15rem] lg:w-[5.15rem]",
+  "h-[4.35rem] w-[4.35rem] lg:h-[4.85rem] lg:w-[4.85rem]",
+  "h-[5.25rem] w-[5.25rem] lg:h-24 lg:w-24",
 ];
 
 function LeafRule({ align = "start" }) {
@@ -73,15 +58,15 @@ function LeafRule({ align = "start" }) {
   );
 }
 
-function ColumnHeading({ eyebrow, title, accent }) {
+function ColumnHeading({ eyebrow, title, accent, size }) {
   return (
     <div>
       <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
         {eyebrow}
       </span>
       <h2 className="display section-heading title-card-line mt-3 uppercase text-ink">
-        {title}{" "}
-        <span className="text-brand">{accent}</span>
+        <CmsText value={title} size={size} />{" "}
+        <CmsText className="text-brand" value={accent} size={size} />
       </h2>
       <LeafRule />
     </div>
@@ -89,6 +74,8 @@ function ColumnHeading({ eyebrow, title, accent }) {
 }
 
 export default function OrderAndContact({ textureSlides = false }) {
+  const c = useGlobal("orderContact", orderContact.defaults);
+  const info = useGlobal("contact", contactSection.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -103,9 +90,13 @@ export default function OrderAndContact({ textureSlides = false }) {
     const body = encodeURIComponent(
       `Name: ${name}\nTelephone: ${telephone}\n\n${message}`
     );
-    window.location.href = `mailto:info@karmogroup.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:${info.email || "info@karmogroup.com"}?subject=${subject}&body=${body}`;
     setSent(true);
   }
+
+  if (c.hidden) return null;
+  const steps = (c.steps || []).map((st, i) => ({ ...st, n: String(i + 1).padStart(2, "0"), i }));
+  const ordered = steps.length === 4 ? [steps[0], steps[2], steps[1], steps[3]] : steps;
 
   return (
     <section className="relative overflow-hidden py-16 lg:py-24">
@@ -135,9 +126,10 @@ export default function OrderAndContact({ textureSlides = false }) {
           {/* ── Order steps ─────────────────────────────────────────────── */}
           <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
             <ColumnHeading
-              eyebrow="Simple path"
-              title="How to make"
-              accent="an order"
+              eyebrow={c.orderEyebrow}
+              title={c.orderTitle}
+              accent={c.orderAccent}
+              size={c.orderTitleSize}
             />
 
             {/* 2×2 aligned rows: 01|03 on top, 02|04 below — shared row height
@@ -151,7 +143,7 @@ export default function OrderAndContact({ textureSlides = false }) {
                 aria-hidden
                 className="pointer-events-none absolute bottom-8 top-8 left-[calc(50%+3.75rem)] hidden w-px bg-ink/10 sm:block"
               />
-              {[steps[0], steps[2], steps[1], steps[3]].map((step, index) => (
+              {ordered.map((step, index) => (
                 <div
                   key={step.n}
                   className={`relative flex items-start gap-4 py-5 lg:gap-5 ${
@@ -159,20 +151,17 @@ export default function OrderAndContact({ textureSlides = false }) {
                   }`}
                 >
                   <span className="relative z-[1] flex h-[5rem] w-[5rem] shrink-0 items-center justify-center overflow-visible bg-white lg:h-[5.5rem] lg:w-[5.5rem]">
-                    <Image
-                      src={step.icon}
-                      alt=""
-                      aria-hidden="true"
-                      width={88}
-                      height={88}
-                      className={`object-contain ${
-                        step.n === "04"
-                          ? "h-[5.25rem] w-[5.25rem] lg:h-24 lg:w-24"
-                          : step.n === "03"
-                            ? "h-[4.35rem] w-[4.35rem] lg:h-[4.85rem] lg:w-[4.85rem]"
-                            : "h-[4.65rem] w-[4.65rem] lg:h-[5.15rem] lg:w-[5.15rem]"
-                      }`}
-                    />
+                    {step.icon?.src ? (
+                      <Image
+                        src={step.icon.src}
+                        alt=""
+                        aria-hidden="true"
+                        width={88}
+                        height={88}
+                        className={`object-contain ${ICON_SIZES[step.i] || ICON_SIZES[0]}`}
+                        style={imageStyle(step.icon)}
+                      />
+                    ) : null}
                   </span>
                   <div className="min-w-0 pt-1">
                     <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand/80">
@@ -193,14 +182,15 @@ export default function OrderAndContact({ textureSlides = false }) {
           {/* ── Contact ─────────────────────────────────────────────────── */}
           <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
             <ColumnHeading
-              eyebrow="Talk to us"
-              title="Have any"
-              accent="questions?"
+              eyebrow={c.contactEyebrow}
+              title={c.contactTitle}
+              accent={c.contactAccent}
+              size={c.contactTitleSize}
             />
 
             <div className="mt-10 grid gap-3 sm:grid-cols-2">
               <Link
-                href="mailto:info@karmogroup.com"
+                href={`mailto:${info.email}`}
                 className="group flex items-start gap-3.5 border border-ink/10 bg-white px-4 py-4 transition-colors duration-300 hover:border-brand/40"
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-brand/25 text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
@@ -211,13 +201,13 @@ export default function OrderAndContact({ textureSlides = false }) {
                     Mail us
                   </span>
                   <span className="mt-1 block truncate text-[14px] font-semibold text-ink">
-                    info@karmogroup.com
+                    {info.email}
                   </span>
                 </span>
               </Link>
 
               <Link
-                href="tel:+8801713483284"
+                href={telHref(info.hotline)}
                 className="group flex items-start gap-3.5 border border-ink/10 bg-white px-4 py-4 transition-colors duration-300 hover:border-brand/40"
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-brand/25 text-brand transition-colors duration-300 group-hover:bg-brand group-hover:text-white">
@@ -228,7 +218,7 @@ export default function OrderAndContact({ textureSlides = false }) {
                     Call us
                   </span>
                   <span className="mt-1 block text-[14px] font-semibold text-ink">
-                    01713483284
+                    {info.hotline}
                   </span>
                 </span>
               </Link>
@@ -276,7 +266,7 @@ export default function OrderAndContact({ textureSlides = false }) {
                   type="submit"
                   className="inline-flex items-center gap-2.5 bg-brand px-7 py-3.5 text-[12px] font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-brand-dark"
                 >
-                  Send message
+                  {c.sendLabel || "Send message"}
                   <FiArrowRight className="text-[15px]" />
                 </button>
                 {sent ? (
