@@ -8,6 +8,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
+import HometexLoungeSlider from "@/components/karmo/HometexLoungeSlider";
 import { useMattressHeroVeil } from "@/components/karmo/chrome/mattressHeroVeil";
 
 const ORANGE = "#FF9A1F";
@@ -55,6 +56,9 @@ export default function DivisionAbout({
   layout = "split",
   asHero = false,
   frameClassName,
+  /* Only the HomeTex lounge sets "hometex-floating" to use the isolated
+     side-arrow slider; every other band keeps the shared OverlayHeroSlider. */
+  sliderVariant,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -77,8 +81,12 @@ export default function DivisionAbout({
               image,
             },
           ];
+    const SliderComp =
+      sliderVariant === "hometex-floating"
+        ? HometexLoungeSlider
+        : OverlayHeroSlider;
     return (
-      <OverlayHeroSlider
+      <SliderComp
         slides={frames}
         asHero={asHero}
         size={asHero ? "viewport" : "band"}
