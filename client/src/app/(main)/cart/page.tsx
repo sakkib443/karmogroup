@@ -372,7 +372,7 @@ const CartPage = () => {
 
     /* ═══ SAVED FOR LATER (shared between empty + filled bag) ═══ */
     const savedSection = savedItems.length > 0 && (
-        <section className="border border-ink/10 bg-white">
+        <section className="overflow-hidden rounded-md border border-ink/10 bg-white">
             <div className="flex items-center justify-between gap-3 border-b border-ink/8 px-5 py-4">
                 <h2 className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
                     <LuHeart size={15} className="text-brand" /> Saved for later
@@ -382,7 +382,7 @@ const CartPage = () => {
             <ul className="divide-y divide-ink/8">
                 {savedItems.map((item) => (
                     <li key={item.id} className="flex items-center gap-4 px-5 py-4">
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden border border-ink/8 bg-[#f3f1ec]">
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec]">
                             <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -409,10 +409,10 @@ const CartPage = () => {
     /* ═══ EMPTY BAG ═══ */
     if (items.length === 0) {
         return (
-            <div className="bg-white pb-20">
+            <div className="min-h-screen bg-gray-50 pb-20">
                 <ShopHeader eyebrow="Karmo · Shopping bag" title="Your" accent="bag" step={1} />
                 <div className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 py-12 lg:py-16">
-                    <div className="mx-auto max-w-2xl border border-ink/10 bg-white px-6 py-12 text-center">
+                    <div className="mx-auto max-w-2xl rounded-md border border-ink/10 bg-white px-6 py-12 text-center">
                         <span className="mx-auto flex h-20 w-20 items-center justify-center bg-[#f5f3ef] text-ink/60">
                             <BagIcon className="h-11 w-11" />
                         </span>
@@ -440,7 +440,7 @@ const CartPage = () => {
     }
 
     return (
-        <div className="bg-white pb-28 lg:pb-20">
+        <div className="min-h-screen bg-gray-50 pb-28 lg:pb-20">
             <ShopHeader
                 eyebrow="Karmo · Shopping bag"
                 title="Your"
@@ -484,7 +484,7 @@ const CartPage = () => {
                                             </span>
                                         </button>
 
-                                        <div className="relative h-24 w-24 shrink-0 overflow-hidden border border-ink/8 bg-[#f3f1ec] sm:h-32 sm:w-32">
+                                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec] sm:h-32 sm:w-32">
                                             <img src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
                                             {save > 0 ? (
                                                 <span className="absolute left-0 top-0 bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">−{save}%</span>
@@ -497,10 +497,17 @@ const CartPage = () => {
                                                     {item.category ? <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-brand">{item.category}</span> : null}
                                                     <h3 className="display mt-0.5 line-clamp-2 text-[14px] font-semibold uppercase leading-snug tracking-[0.03em] text-ink sm:text-[15px]">{item.name}</h3>
                                                 </div>
-                                                <p className="shrink-0 text-right">
-                                                    <span className="block text-base font-bold tabular-nums text-ink sm:text-lg">{tk(item.price * item.quantity)}</span>
-                                                    {item.quantity > 1 ? <span className="block text-[11px] text-ink/40">{tk(item.price)} each</span> : null}
-                                                </p>
+                                                <div className="flex shrink-0 items-start gap-3">
+                                                    <p className="text-right">
+                                                        <span className="block text-base font-bold tabular-nums text-ink sm:text-lg">{tk(item.price * item.quantity)}</span>
+                                                        {item.quantity > 1 ? <span className="block text-[11px] text-ink/40">{tk(item.price)} each</span> : null}
+                                                    </p>
+                                                    {/* Delete — always in view, top-right of every line */}
+                                                    <button onClick={() => setDeleteConfirmId(item.id)} aria-label={`Remove ${item.name}`} title="Remove from cart"
+                                                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-ink/12 bg-white text-ink/50 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-600">
+                                                        <LuTrash2 size={16} />
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <CartItemVariants item={item} onStatusChange={reportVariantStatus} />
@@ -511,7 +518,7 @@ const CartPage = () => {
                                             </div>
 
                                             <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-3">
-                                                <div className="flex h-9 items-center border border-ink/15">
+                                                <div className="flex h-9 items-center overflow-hidden rounded-sm border border-ink/15 bg-white">
                                                     <button onClick={() => dispatch(decreaseQuantity(item.id))} disabled={item.quantity <= 1} aria-label="Decrease quantity"
                                                         className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:bg-[#f5f3ef] disabled:cursor-not-allowed disabled:opacity-30">
                                                         <LuMinus size={13} />
@@ -525,8 +532,8 @@ const CartPage = () => {
                                                 <button onClick={() => handleSaveForLater(item)} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink/45 transition-colors hover:text-brand">
                                                     <LuBookmark size={12} /> Save for later
                                                 </button>
-                                                <button onClick={() => setDeleteConfirmId(item.id)} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-ink/45 transition-colors hover:text-brand">
-                                                    <LuTrash2 size={12} /> Remove
+                                                <button onClick={() => setDeleteConfirmId(item.id)} className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-red-500/80 transition-colors hover:text-red-600">
+                                                    <LuTrash2 size={13} /> Delete
                                                 </button>
                                             </div>
                                         </div>
@@ -546,19 +553,19 @@ const CartPage = () => {
 
                     {/* ═══ SUMMARY ═══ */}
                     <aside className="lg:sticky lg:top-[150px]">
-                        <div className="relative border border-[#e5e7eb] bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                        <div className="relative overflow-hidden rounded-md border border-ink/10 bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                             <div className="relative px-6 pb-6 pt-7">
                                 <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">Summary</span>
                                 <h2 className="display mt-1.5 text-[1.3rem] font-light uppercase tracking-[0.02em] text-ink">Your order</h2>
 
                                 {/* Free delivery progress */}
                                 {freeThreshold > 0 ? (
-                                    <div className="mt-5 border border-[#e5e7eb] bg-[#fafafa] px-4 py-3">
+                                    <div className="mt-5 rounded-sm border border-ink/10 bg-gray-50 px-4 py-3">
                                         <p className="flex items-center gap-2 text-[13px] font-medium text-ink/75">
                                             <TruckIcon className="h-5 w-5 shrink-0" />
                                             {freeShipping ? <>Free delivery unlocked</> : <>Add <b className="font-bold text-ink">{tk(remainingForFree)}</b> more for free delivery</>}
                                         </p>
-                                        <span className="mt-2.5 block h-1.5 overflow-hidden bg-ink/10">
+                                        <span className="mt-2.5 block h-1.5 overflow-hidden rounded-full bg-ink/10">
                                             <span className="block h-full transition-all duration-500" style={{ width: `${freeShipping ? 100 : Math.min(100, (selectedSubtotal / freeThreshold) * 100)}%`, backgroundColor: ORANGE }} />
                                         </span>
                                     </div>
@@ -574,10 +581,10 @@ const CartPage = () => {
                                             onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
                                             onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
                                             placeholder="Enter code"
-                                            className="h-11 min-w-0 flex-1 border border-[#d1d5db] bg-white px-3.5 text-sm uppercase text-ink outline-none transition-colors placeholder:normal-case placeholder:text-ink/35 focus:border-brand"
+                                            className="h-11 min-w-0 flex-1 rounded-l-sm border border-[#d1d5db] bg-white px-3.5 text-sm uppercase text-ink outline-none transition-colors placeholder:normal-case placeholder:text-ink/35 focus:border-brand"
                                         />
                                         <button onClick={handleApplyCoupon} disabled={isValidating || !couponCode.trim()}
-                                            className="h-11 shrink-0 bg-ink px-5 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brand disabled:cursor-not-allowed disabled:opacity-40">
+                                            className="h-11 shrink-0 rounded-r-sm bg-ink px-5 text-[12px] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-brand disabled:cursor-not-allowed disabled:opacity-40">
                                             {isValidating ? '…' : 'Apply'}
                                         </button>
                                     </div>
@@ -585,7 +592,7 @@ const CartPage = () => {
                                     {appliedCoupons.length > 0 && (
                                         <ul className="mt-2.5 space-y-1.5">
                                             {appliedCoupons.map((c) => (
-                                                <li key={c.code} className="flex items-center justify-between gap-2 border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2">
+                                                <li key={c.code} className="flex items-center justify-between gap-2 rounded-sm border border-[#bbf7d0] bg-[#f0fdf4] px-3 py-2">
                                                     <span className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-[#15803d]">
                                                         <LuCheck size={12} className="shrink-0" />
                                                         <span className="truncate">{c.code}</span>
@@ -628,12 +635,12 @@ const CartPage = () => {
 
                                 {canCheckout ? (
                                     <Link href="/checkout" onClick={goCheckout}
-                                        className="group mt-5 flex h-11 w-full items-center justify-center gap-2 bg-brand text-[15px] font-bold uppercase tracking-[0.06em] text-white transition-colors hover:bg-brand-dark">
+                                        className="group mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-brand text-[15px] font-bold uppercase tracking-[0.06em] text-white transition-colors hover:bg-brand-dark">
                                         <LockIcon className="h-4 w-4" /> {checkoutLabel}
                                         <LuChevronRight size={16} className="transition-transform group-hover:translate-x-0.5" />
                                     </Link>
                                 ) : (
-                                    <button disabled className="mt-5 flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 bg-ink/10 text-[15px] font-bold uppercase tracking-[0.06em] text-ink/35">
+                                    <button disabled className="mt-5 flex h-11 w-full cursor-not-allowed rounded-sm items-center justify-center gap-2 bg-ink/10 text-[15px] font-bold uppercase tracking-[0.06em] text-ink/35">
                                         {checkoutLabel}
                                     </button>
                                 )}
@@ -654,7 +661,7 @@ const CartPage = () => {
                     <p className="text-lg font-bold leading-none tabular-nums text-ink">{tk(finalTotal)}</p>
                 </div>
                 {canCheckout ? (
-                    <Link href="/checkout" onClick={goCheckout} className="flex h-11 shrink-0 items-center justify-center gap-1.5 bg-brand px-6 text-[14px] font-bold uppercase tracking-[0.06em] text-white">
+                    <Link href="/checkout" onClick={goCheckout} className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-sm bg-brand px-6 text-[14px] font-bold uppercase tracking-[0.06em] text-white">
                         <LockIcon className="h-4 w-4" /> {checkoutLabel}
                     </Link>
                 ) : (
@@ -665,7 +672,7 @@ const CartPage = () => {
             {/* ═══ REMOVE CONFIRMATION ═══ */}
             {deleteConfirmId && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4" onClick={() => setDeleteConfirmId(null)}>
-                    <div className="w-full max-w-sm bg-white p-7 text-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-full max-w-sm rounded-md bg-white p-7 text-center" onClick={(e) => e.stopPropagation()}>
                         <span className="mx-auto flex h-14 w-14 items-center justify-center bg-[#f5f3ef] text-brand"><BagIcon className="h-8 w-8" /></span>
                         <h3 className="display mt-5 text-[1.05rem] font-semibold uppercase tracking-[0.04em] text-ink">Remove this item?</h3>
                         <p className="mt-2 text-sm leading-relaxed text-ink/55">It leaves your bag. You can save it for later instead.</p>

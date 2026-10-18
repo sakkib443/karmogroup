@@ -21,6 +21,8 @@ import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
 import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
 import BedAutomotiveShapeGrid from "@/components/karmo/division/BedAutomotiveShapeGrid";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
+import MattressBrandReels from "@/components/karmo/division/MattressBrandReels";
+import DivisionImagePair from "@/components/karmo/division/DivisionImagePair";
 import MattressLayers from "@/components/karmo/division/MattressLayers";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
@@ -131,7 +133,13 @@ export default function DivisionPage({ data }) {
       {data.furnitureGrades && (
         <FurnitureGradesLineup {...data.furnitureGrades} />
       )}
-      {data.brochureBrands && <MattressBrands {...data.brochureBrands} />}
+      {data.brochureBrands && !data.brochureBrands.hidden &&
+        (data.brochureBrands.layout === "reels" ? (
+          <MattressBrandReels {...data.brochureBrands} />
+        ) : (
+          <MattressBrands {...data.brochureBrands} />
+        ))}
+      {data.imagePair && <DivisionImagePair {...data.imagePair} />}
       {data.mattressFilm && <MattressFilmStage {...data.mattressFilm} />}
       {data.recommended?.columns && (
         <DivisionRecommended {...data.recommended} />
