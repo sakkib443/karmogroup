@@ -14,6 +14,20 @@ import { FeatureIcon } from "@/components/karmo/division/mattressFeatureIcons";
  * Driven by `zones` on the mattress division only (layout: "editorial").
  */
 
+/**
+ * Navy → transparent over the photo: solid to FADE_FROM %, then an eased fade
+ * (opacity = (1 + cos πt) / 2) that reaches zero at FADE_TO %. Stops every 1/16th
+ * of the way keep the curve smooth instead of a few straight segments.
+ */
+const FADE_FROM = 20;
+const FADE_TO = 46;
+const NAVY_FADE = `linear-gradient(to right, #0b1a33 0%, ${Array.from({ length: 17 }, (_, i) => {
+  const t = i / 16;
+  const alpha = ((1 + Math.cos(Math.PI * t)) / 2).toFixed(4);
+  const at = (FADE_FROM + (FADE_TO - FADE_FROM) * t).toFixed(2);
+  return `rgba(11,26,51,${alpha}) ${at}%`;
+}).join(", ")}, rgba(11,26,51,0) 100%)`;
+
 export default function MattressLayers({
   src,
   alt,
@@ -47,15 +61,13 @@ export default function MattressLayers({
           />
         </div>
 
-        {/* Navy wash — dark under the copy, then one long, gentle fade that
-            melts into the photo (no hard edge). */}
+        {/* Navy wash — solid under the copy, then an eased (sine in-out) fade
+            into the light photo. Many close stops follow the curve, so there is
+            no visible kink or start/end line — just navy melting into white. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-0 hidden w-[42%] lg:block"
-          style={{
-            background:
-              "linear-gradient(to right, #0b1a33 0%, #0b1a33 52%, rgba(11,26,51,0.7) 68%, rgba(11,26,51,0.32) 84%, rgba(11,26,51,0) 100%)",
-          }}
+          className="pointer-events-none absolute inset-0 hidden lg:block"
+          style={{ background: NAVY_FADE }}
         />
 
         {/* Callouts — desktop only, pinned to the photo box */}

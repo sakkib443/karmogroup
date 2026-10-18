@@ -7,6 +7,7 @@
  * Karmo's own icons (Bag → Details → Done).
  */
 import Image from "next/image";
+import { LuShoppingBag, LuTruck, LuPackageCheck, LuCheck } from "react-icons/lu";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 export const ORANGE = "#FF9A1F";
@@ -110,45 +111,39 @@ export function LeafRule({ align = "start" }) {
 /* ─── Steps: Bag → Details → Done ───────────────────────────────────────── */
 
 const STEPS = [
-  { id: 1, label: "Your bag", note: "Review & save", Icon: BagIcon },
-  { id: 2, label: "Details", note: "Delivery & payment", Icon: ParcelIcon },
-  { id: 3, label: "Done", note: "Order placed", Icon: SealIcon },
+  { id: 1, label: "Bag", Icon: LuShoppingBag },
+  { id: 2, label: "Details", Icon: LuTruck },
+  { id: 3, label: "Done", Icon: LuPackageCheck },
 ];
 
+/** Compact step bar — square tiles, a check on the steps behind you. */
 export function ShopSteps({ step = 1 }) {
   return (
-    <ol className="flex w-full max-w-xl items-start" aria-label="Checkout steps">
-      {STEPS.map(({ id, label, note, Icon }, i) => {
+    <ol className="flex items-center gap-2 sm:gap-3" aria-label="Checkout steps">
+      {STEPS.map(({ id, label, Icon }, i) => {
         const done = id < step;
         const on = id === step;
         return (
-          <li key={id} className="flex flex-1 items-start last:flex-none" aria-current={on ? "step" : undefined}>
-            <div className="flex flex-col items-center text-center">
+          <li key={id} className="flex items-center gap-2 sm:gap-3" aria-current={on ? "step" : undefined}>
+            <span className="flex items-center gap-2.5">
               <span
-                className={`relative flex h-12 w-12 items-center justify-center transition-colors sm:h-14 sm:w-14 ${
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border transition-colors ${
                   on
-                    ? "bg-brand text-white shadow-[0_10px_24px_-10px_rgba(212,67,72,0.75)]"
+                    ? "border-brand bg-brand text-white"
                     : done
-                      ? "bg-ink text-white"
-                      : "border border-ink/15 bg-white text-ink/45"
+                      ? "border-brand/30 bg-brand/[0.08] text-brand"
+                      : "border-ink/15 bg-white text-ink/35"
                 }`}
               >
-                <Icon className="h-6 w-6 sm:h-7 sm:w-7" accent={on || done ? "#ffffff" : undefined} />
-                {done ? (
-                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center bg-[#16a34a] text-white ring-2 ring-white">
-                    <svg viewBox="0 0 24 24" className="h-3 w-3" aria-hidden>
-                      <path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                ) : null}
+                {done ? <LuCheck size={16} strokeWidth={2.6} /> : <Icon size={17} strokeWidth={1.9} />}
               </span>
-              <span className={`mt-2 text-[11px] font-bold uppercase tracking-[0.14em] ${on ? "text-ink" : "text-ink/45"}`}>{label}</span>
-              <span className="mt-0.5 hidden text-[11px] text-ink/40 sm:block">{note}</span>
-            </div>
+              <span className="leading-tight">
+                <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/40">Step {id}</span>
+                <span className={`block text-[13px] font-semibold ${on ? "text-ink" : "text-ink/55"}`}>{label}</span>
+              </span>
+            </span>
             {i < STEPS.length - 1 ? (
-              <span aria-hidden className="relative mx-2 mt-6 h-[2px] flex-1 bg-ink/10 sm:mx-3 sm:mt-7">
-                <span className="absolute inset-y-0 left-0 bg-brand transition-all duration-500" style={{ width: done ? "100%" : on ? "50%" : "0%" }} />
-              </span>
+              <span aria-hidden className={`h-px w-5 sm:w-10 ${done ? "bg-brand" : "bg-ink/15"}`} />
             ) : null}
           </li>
         );
@@ -157,24 +152,23 @@ export function ShopSteps({ step = 1 }) {
   );
 }
 
-/* ─── The band at the top of both pages ─────────────────────────────────── */
+/* ─── The band at the top of both pages — kept short ────────────────────── */
 
 /** @param {{ eyebrow: string, title: string, accent?: string, sub?: string, step?: number, aside?: import("react").ReactNode }} props */
 export function ShopHeader({ eyebrow, title, accent, sub, step = 1, aside }) {
   return (
     <section className="relative overflow-hidden border-b border-ink/8">
       <TextureSlides lighter />
-      <div className="relative z-[1] mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 flex flex-col gap-7 py-7 lg:flex-row lg:items-end lg:justify-between lg:py-9">
+      <div className="relative z-[1] mx-auto flex w-full max-w-[1760px] flex-col gap-4 px-5 py-5 sm:px-8 md:flex-row md:items-center md:justify-between md:px-10 lg:px-12 lg:py-6">
         <div className="min-w-0">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">{eyebrow}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand">{eyebrow}</span>
           <h1
-            className="display title-card-line mt-2.5 uppercase text-ink"
-            style={{ fontSize: "clamp(1.6rem, 1.1rem + 1.6vw, 2.5rem)", fontWeight: 350, lineHeight: 1.06, letterSpacing: "-0.015em" }}
+            className="display title-card-line mt-1 uppercase text-ink"
+            style={{ fontSize: "clamp(1.25rem, 1.05rem + 0.6vw, 1.6rem)", fontWeight: 350, lineHeight: 1.1, letterSpacing: "-0.01em" }}
           >
             {title} {accent ? <span className="text-brand">{accent}</span> : null}
           </h1>
-          <LeafRule />
-          {sub ? <p className="mt-3 text-sm text-ink/55">{sub}</p> : null}
+          {sub ? <p className="mt-1 text-[13px] text-ink/50">{sub}</p> : null}
           {aside}
         </div>
         <ShopSteps step={step} />

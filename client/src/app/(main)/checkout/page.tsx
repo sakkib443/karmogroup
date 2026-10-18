@@ -10,7 +10,7 @@ import { useCreateOrderMutation, useGuestCheckoutMutation } from '@/redux/api/or
 import { useInitPaymentMutation, useGetPaymentMethodsQuery } from '@/redux/api/paymentApi';
 import { useGetShippingQuoteQuery } from '@/redux/api/shippingApi';
 import { useGetMyAddressesQuery, useAddAddressMutation } from '@/redux/api/userApi';
-import { LuChevronLeft, LuInfo, LuCheck, LuCopy, LuCreditCard } from 'react-icons/lu';
+import { LuChevronLeft, LuInfo, LuCheck, LuCopy, LuCreditCard, LuUser, LuPhone, LuMapPin, LuBuilding2, LuNavigation, LuMail } from 'react-icons/lu';
 import { ShopHeader, LeafRule, TrustRow, SealIcon, LockIcon, TruckIcon, TagIcon, tk } from '@/components/karmo/shop/ShopChrome';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
@@ -52,7 +52,7 @@ const SUBLINE: Record<PayMode, (m: PayMethod) => string> = {
 };
 
 const inputClass =
-    "h-12 w-full px-4 bg-white border border-ink/15 rounded-none text-sm text-ink outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(212,67,72,0.08)] transition-[border-color,box-shadow] placeholder:text-ink/35";
+    "h-12 w-full px-4 bg-white border border-[#d1d5db] rounded-sm text-[15px] text-ink outline-none hover:border-ink/35 focus:border-brand focus:shadow-[0_0_0_3px_rgba(212,67,72,0.10)] transition-[border-color,box-shadow] placeholder:text-ink/35";
 
 const labelClass =
     "block text-[11px] font-bold uppercase tracking-[0.14em] text-ink/55 mb-1.5";
@@ -80,7 +80,11 @@ const CheckoutPage = () => {
 
     // The server decides what may be offered and how each method collects money.
     const { data: methodsRes, isLoading: isLoadingMethods } = useGetPaymentMethodsQuery(undefined);
-    const methods: PayMethod[] = methodsRes?.data?.methods || [];
+    // Cash on delivery first — it is what most customers choose.
+    const methods: PayMethod[] = React.useMemo(() => {
+        const list: PayMethod[] = methodsRes?.data?.methods || [];
+        return [...list].sort((x, y) => (x.mode === 'cod' ? -1 : y.mode === 'cod' ? 1 : 0));
+    }, [methodsRes]);
     const paymentInstructions: string = methodsRes?.data?.instructions || '';
     const availableIds = methods.map(m => m.id).join(',');
 
@@ -88,7 +92,7 @@ const CheckoutPage = () => {
         fullName: '', email: '', phone: '', address: '', city: '', area: '', postalCode: '',
     });
 
-    const [selectedPayment, setSelectedPayment] = useState('bkash');
+    const [selectedPayment, setSelectedPayment] = useState('cod');
     const [paymentDetails, setPaymentDetails] = useState({
         senderNumber: '', transactionId: '', paymentTime: '',
     });
@@ -185,7 +189,7 @@ const CheckoutPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [availableIds]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
         if (errors[e.target.name]) setErrors(prev => { const n = { ...prev }; delete n[e.target.name]; return n; });
     };
@@ -405,17 +409,17 @@ const CheckoutPage = () => {
     if (placedOrder) {
         const orderRef = placedOrder.orderId || (placedOrder._id ? `#${placedOrder._id.slice(-8).toUpperCase()}` : '');
         return (
-            <div className="bg-white pb-20">
+            <div className="min-h-screen bg-gray-50 pb-20">
                 <ShopHeader eyebrow="Karmo · Thank you" title="Order" accent="placed" step={3} />
                 <div className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 py-12 lg:py-16">
-                    <div className="mx-auto max-w-2xl border border-ink/10 bg-white px-6 py-12 text-center sm:px-10">
-                        <span className="mx-auto flex h-20 w-20 items-center justify-center bg-brand text-white shadow-[0_14px_30px_-12px_rgba(212,67,72,0.8)]">
+                    <div className="mx-auto max-w-2xl rounded-md border border-ink/10 bg-white px-6 py-12 text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:px-10">
+                        <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-md bg-brand text-white shadow-[0_14px_30px_-12px_rgba(212,67,72,0.8)]">
                             <SealIcon className="h-11 w-11" accent="#ffffff" />
                         </span>
                         <h2 className="display mt-6 text-[1.45rem] font-light uppercase tracking-[0.02em] text-ink">Thank you for your order</h2>
                         <LeafRule align="center" />
                         {orderRef ? (
-                            <p className="mt-5 inline-flex items-center gap-2 border border-ink/12 px-4 py-2 text-sm">
+                            <p className="mt-5 inline-flex items-center gap-2 rounded-sm border border-ink/12 px-4 py-2 text-sm">
                                 <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-ink/45">Order</span>
                                 <span className="font-bold tracking-wide text-ink">{orderRef}</span>
                             </p>
@@ -426,11 +430,11 @@ const CheckoutPage = () => {
                         </p>
                         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                             <button onClick={() => router.push('/dashboard/user/orders')}
-                                className="inline-flex h-12 items-center justify-center gap-2 bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark">
+                                className="inline-flex h-12 items-center justify-center gap-2 rounded-sm bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark">
                                 Track my order
                             </button>
                             <button onClick={() => router.push('/')}
-                                className="inline-flex h-12 items-center justify-center border border-ink/15 px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink/40">
+                                className="inline-flex h-12 items-center justify-center rounded-sm border border-ink/15 bg-white px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink/40">
                                 Continue shopping
                             </button>
                         </div>
@@ -448,53 +452,42 @@ const CheckoutPage = () => {
     const manualForm = !isAuthenticated || savedAddresses.length === 0 || selectedAddressId === 'new';
 
     return (
-        <div className="bg-white pb-28 lg:pb-20">
+        <div className="min-h-screen bg-gray-50 pb-28 lg:pb-20">
             <ShopHeader
                 eyebrow="Karmo · Checkout"
                 title="Almost"
                 accent="there"
                 step={2}
-                sub="Where should we deliver, and how would you like to pay?"
                 aside={
-                    <Link href="/cart" className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink/50 transition-colors hover:text-brand">
+                    <Link href="/cart" className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-ink/50 transition-colors hover:text-brand">
                         <LuChevronLeft size={14} /> Back to bag
                     </Link>
                 }
             />
 
             <form id="checkout-form" onSubmit={handleSubmit} className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 md:px-10 lg:px-12 py-8 lg:py-12">
-                {!isAuthenticated && (
-                    <div className="mb-6 flex items-start gap-3 border-l-[3px] border-brand bg-[#f5f3ef] px-4 py-3.5">
-                        <LuInfo size={16} className="mt-0.5 shrink-0 text-brand" />
-                        <p className="text-sm leading-relaxed text-ink/70">
-                            No account needed — we make one for you. Log in later with your phone number; it is also your password.{' '}
-                            <Link href="/login?redirect=/checkout" className="font-semibold text-brand underline underline-offset-2">Already have an account?</Link>
-                        </p>
-                    </div>
-                )}
-
                 <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start xl:gap-12">
                     {/* ══ LEFT ══ */}
                     <div className="min-w-0 space-y-6">
                         {/* 01 — Delivery */}
-                        <StepCard n="01" title="Delivery details" note="Name, phone and the full address">
+                        <StepCard n="01" title="Where should we deliver?" note="We call this number to confirm the order">
                             {isAuthenticated && savedAddresses.length > 0 && (
                                 <div className={`space-y-2.5 ${manualForm ? 'mb-5' : ''}`}>
                                     {savedAddresses.map((a: any) => {
                                         const active = selectedAddressId === a._id;
                                         return (
                                             <label key={a._id}
-                                                className={`flex cursor-pointer items-start gap-3 border px-4 py-3.5 transition-colors ${active ? 'border-brand bg-brand/[0.04]' : 'border-ink/12 hover:border-ink/25'}`}>
+                                                className={`flex cursor-pointer items-start gap-3 rounded-sm border px-4 py-3.5 transition-colors ${active ? 'border-brand bg-brand/[0.04]' : 'border-ink/12 hover:border-ink/25'}`}>
                                                 <input type="radio" name="savedAddress" className="sr-only" checked={active} onChange={() => { setSelectedAddressId(a._id); applyAddress(a); }} />
-                                                <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center border-2 ${active ? 'border-brand' : 'border-ink/25'}`}>
-                                                    {active && <span className="h-2 w-2 bg-brand" />}
+                                                <span className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${active ? 'border-brand' : 'border-ink/25'}`}>
+                                                    {active && <span className="h-2 w-2 rounded-full bg-brand" />}
                                                 </span>
                                                 <span className="min-w-0">
                                                     <span className="block text-sm font-semibold text-ink">
                                                         {a.fullName} <span className="font-normal text-ink/45">· {a.phone}</span>
                                                         {a.isDefault && <span className="ml-2 bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">Default</span>}
                                                     </span>
-                                                    <span className="mt-0.5 block text-xs text-ink/50">{[a.address, a.area, a.city, a.postalCode].filter(Boolean).join(', ')}</span>
+                                                    <span className="mt-0.5 block text-xs text-ink/50">{[a.address, a.area, a.city].filter(Boolean).join(', ')}</span>
                                                 </span>
                                             </label>
                                         );
@@ -502,7 +495,7 @@ const CheckoutPage = () => {
                                     <div className="flex flex-wrap items-center justify-between gap-2">
                                         <button type="button"
                                             onClick={() => { setSelectedAddressId('new'); setFormData(prev => ({ ...prev, address: '', area: '', city: '', postalCode: '' })); }}
-                                            className={`border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors ${selectedAddressId === 'new' ? 'border-brand text-brand' : 'border-dashed border-ink/25 text-ink/55 hover:border-ink/45'}`}>
+                                            className={`rounded-sm border px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors ${selectedAddressId === 'new' ? 'border-brand text-brand' : 'border-dashed border-ink/25 text-ink/55 hover:border-ink/45'}`}>
                                             + Deliver to a new address
                                         </button>
                                         <Link href="/dashboard/user/addresses" className="text-xs font-medium text-brand hover:underline">Manage addresses</Link>
@@ -511,44 +504,30 @@ const CheckoutPage = () => {
                             )}
 
                             {manualForm && (
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                    <div className="md:col-span-2">
-                                        <label className={labelClass}>Full name <span className="text-brand">*</span></label>
-                                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="Your full name" className={cls('fullName')} />
-                                        {fieldError("fullName")}
-                                    </div>
-                                    <div>
-                                        <label className={labelClass}>Mobile number <span className="text-brand">*</span></label>
-                                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="01XXXXXXXXX" className={cls('phone')} />
-                                        {fieldError("phone")}
-                                    </div>
-                                    <div>
-                                        <label className={labelClass}>Email <span className="font-normal normal-case tracking-normal text-ink/35">(optional)</span></label>
-                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" className={cls('email')} />
-                                        {fieldError("email")}
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className={labelClass}>Address <span className="text-brand">*</span></label>
-                                        <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="House, road, area" className={cls('address')} />
-                                        {fieldError("address")}
-                                    </div>
-                                    <div>
-                                        <label className={labelClass}>City / district <span className="text-brand">*</span></label>
-                                        <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="Dhaka, Chattogram…" className={cls('city')} />
-                                        {fieldError("city")}
-                                    </div>
-                                    <div>
-                                        <label className={labelClass}>Area / thana</label>
-                                        <input type="text" name="area" value={formData.area} onChange={handleChange} placeholder="Mirpur, Dhanmondi…" className={inputClass} />
-                                    </div>
-                                    <div>
-                                        <label className={labelClass}>Postal code</label>
-                                        <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} placeholder="1207" className={inputClass} />
-                                    </div>
+                                <div className="grid grid-cols-1 gap-x-4 gap-y-5 md:grid-cols-2">
+                                    <FormField label="Full name" required icon={<LuUser size={17} />} error={errors.fullName}>
+                                        <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} placeholder="e.g. Rahim Uddin" autoComplete="name" className={cls('fullName')} />
+                                    </FormField>
+                                    <FormField label="Mobile number" required icon={<LuPhone size={17} />} error={errors.phone} hint="11 digits, starting with 01">
+                                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="01XXXXXXXXX" inputMode="tel" autoComplete="tel" className={cls('phone')} />
+                                    </FormField>
+                                    <FormField label="Full address" required icon={<LuMapPin size={17} />} error={errors.address} className="md:col-span-2" top>
+                                        <textarea name="address" value={formData.address} onChange={handleChange} rows={2} placeholder="House / flat no., road, block, nearby landmark" autoComplete="street-address" className={`${cls('address')} h-auto min-h-[76px] resize-none py-3 leading-relaxed`} />
+                                    </FormField>
+                                    <FormField label="City / district" required icon={<LuBuilding2 size={17} />} error={errors.city}>
+                                        <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="e.g. Dhaka" autoComplete="address-level2" className={cls('city')} />
+                                    </FormField>
+                                    <FormField label="Area / thana" icon={<LuNavigation size={16} />}>
+                                        <input type="text" name="area" value={formData.area} onChange={handleChange} placeholder="e.g. Mirpur, Dhanmondi" autoComplete="address-level3" className={inputClass} />
+                                    </FormField>
+                                    <FormField label="Email" optional icon={<LuMail size={17} />} error={errors.email} className="md:col-span-2"
+                                        hint="Optional — only for the order confirmation email. You can leave it empty.">
+                                        <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" autoComplete="email" className={cls('email')} />
+                                    </FormField>
                                     {isAuthenticated && (
-                                        <label className="flex cursor-pointer select-none items-center gap-2.5 self-end md:col-span-1">
+                                        <label className="flex cursor-pointer select-none items-center gap-2.5 md:col-span-2">
                                             <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} className="h-4 w-4 cursor-pointer accent-brand" />
-                                            <span className="text-xs text-ink/60">Save this address for next time</span>
+                                            <span className="text-[13px] text-ink/60">Save this address for next time</span>
                                         </label>
                                     )}
                                 </div>
@@ -556,7 +535,7 @@ const CheckoutPage = () => {
                         </StepCard>
 
                         {/* 02 — Payment */}
-                        <StepCard n="02" title="Payment" note="Choose how you would like to pay" right={<span className="hidden items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#16a34a] sm:inline-flex"><LockIcon className="h-3.5 w-3.5" /> Secure</span>}>
+                        <StepCard n="02" title="How would you like to pay?">
                             {isLoadingMethods && (
                                 <div className="space-y-2.5">{[...Array(2)].map((_, i) => <div key={i} className="h-[68px] animate-pulse bg-[#f5f3ef]" />)}</div>
                             )}
@@ -566,10 +545,10 @@ const CheckoutPage = () => {
                                     const brand = BRAND[method.id] || { name: method.label, color: '#64748b', short: '' };
                                     return (
                                         <label key={method.id}
-                                            className={`relative flex cursor-pointer items-center gap-3.5 border px-4 py-3.5 transition-all ${active ? '' : 'border-ink/12 hover:border-ink/25'}`}
+                                            className={`relative flex cursor-pointer items-center gap-3.5 rounded-md border px-4 py-3.5 transition-all ${active ? '' : 'border-ink/12 bg-white hover:border-ink/25'}`}
                                             style={active ? { borderColor: brand.color, boxShadow: `inset 0 0 0 1px ${brand.color}`, background: `${brand.color}08` } : {}}>
                                             <input type="radio" name="paymentMethod" value={method.id} checked={active} onChange={() => setSelectedPayment(method.id)} className="sr-only" />
-                                            <span className="flex h-11 w-11 shrink-0 items-center justify-center text-[13px] font-extrabold text-white" style={{ background: brand.color }}>
+                                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm text-[13px] font-extrabold text-white" style={{ background: brand.color }}>
                                                 {method.mode === 'cod' ? <TruckIcon className="h-5 w-5" /> : method.id === 'sslcommerz' ? <LuCreditCard size={18} /> : brand.short}
                                             </span>
                                             <span className="min-w-0 flex-1">
@@ -584,7 +563,7 @@ const CheckoutPage = () => {
                                                 </span>
                                                 <span className="mt-0.5 block truncate text-xs text-ink/45">{SUBLINE[method.mode](method)}</span>
                                             </span>
-                                            <span className="flex h-5 w-5 shrink-0 items-center justify-center border-2 transition-colors"
+                                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors"
                                                 style={active ? { borderColor: brand.color, background: brand.color } : { borderColor: '#d1d5db' }}>
                                                 {active && <LuCheck size={11} className="text-white" strokeWidth={3.5} />}
                                             </span>
@@ -601,7 +580,7 @@ const CheckoutPage = () => {
                             )}
 
                             {selectedPayment === 'cod' && (
-                                <div className="mt-4 flex items-start gap-3 bg-[#f0fdf4] px-4 py-3.5">
+                                <div className="mt-4 flex items-start gap-3 rounded-sm bg-[#f0fdf4] px-4 py-3.5">
                                     <TruckIcon className="mt-0.5 h-5 w-5 shrink-0 text-[#16a34a]" />
                                     <p className="text-sm leading-relaxed text-[#166534]">
                                         <b className="font-semibold">Pay when it arrives.</b> No advance needed — the delivery agent collects the amount in cash at your door.
@@ -610,7 +589,7 @@ const CheckoutPage = () => {
                             )}
 
                             {isGatewayMethod && activeMethod && (
-                                <div className="mt-4 px-4 py-3.5" style={{ background: `${activeBrand.color}0D` }}>
+                                <div className="mt-4 rounded-sm px-4 py-3.5" style={{ background: `${activeBrand.color}0D` }}>
                                     <p className="flex items-center gap-2 text-sm font-semibold text-ink"><LockIcon className="h-4 w-4" /> You&apos;ll finish payment on {activeBrand.name}</p>
                                     <p className="mt-1 text-xs leading-relaxed text-ink/60">
                                         Place the order and we&apos;ll take you to the secure {activeBrand.name} page — your card or wallet details never touch this site.
@@ -626,14 +605,14 @@ const CheckoutPage = () => {
 
                             {isManualMethod && activeMethod && (
                                 <div className="mt-4 space-y-4">
-                                    <div className="border-2 border-dashed px-4 py-4" style={{ borderColor: `${activeBrand.color}59`, background: `${activeBrand.color}08` }}>
+                                    <div className="rounded-sm border-2 border-dashed px-4 py-4" style={{ borderColor: `${activeBrand.color}59`, background: `${activeBrand.color}08` }}>
                                         <div className="flex flex-wrap items-center justify-between gap-3">
                                             <div className="min-w-0">
                                                 <p className="text-[11px] font-bold uppercase tracking-wide" style={{ color: activeBrand.color }}>Step 1 · Send Money ({activeMethod.accountType}) to</p>
                                                 <p className="mt-1 text-xl font-extrabold tabular-nums tracking-wider text-ink">{activeMethod.number}</p>
                                             </div>
                                             <button type="button" onClick={copyNumber}
-                                                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90" style={{ background: activeBrand.color }}>
+                                                className="inline-flex items-center gap-1.5 rounded-sm px-3.5 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90" style={{ background: activeBrand.color }}>
                                                 {copied ? <><LuCheck size={13} /> Copied</> : <><LuCopy size={13} /> Copy</>}
                                             </button>
                                         </div>
@@ -668,7 +647,7 @@ const CheckoutPage = () => {
 
                     {/* ══ RIGHT — summary ══ */}
                     <aside className="lg:sticky lg:top-[150px]">
-                        <div className="relative border border-[#e5e7eb] bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                        <div className="relative overflow-hidden rounded-md border border-ink/10 bg-white text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                             <div className="relative px-6 pb-6 pt-7">
                                 <div className="flex items-end justify-between">
                                     <div>
@@ -681,9 +660,9 @@ const CheckoutPage = () => {
                                 <ul className="mt-5 max-h-[320px] space-y-4 overflow-y-auto pr-1">
                                     {items.map((item) => (
                                         <li key={item.id} className="flex gap-3.5">
-                                            <span className="relative h-16 w-16 shrink-0 border border-ink/8 bg-[#f3f1ec]">
+                                            <span className="relative h-16 w-16 shrink-0 rounded-sm border border-ink/8 bg-[#f3f1ec]">
                                                 <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
-                                                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center bg-brand px-1 text-[10px] font-bold text-white">{item.quantity}</span>
+                                                <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">{item.quantity}</span>
                                             </span>
                                             <span className="min-w-0 flex-1">
                                                 <span className="line-clamp-2 text-[13px] font-semibold uppercase leading-snug tracking-[0.02em] text-ink">{item.name}</span>
@@ -720,7 +699,7 @@ const CheckoutPage = () => {
                                 </div>
 
                                 <button type="submit" disabled={isSubmitting}
-                                    className="mt-6 flex h-11 w-full items-center justify-center gap-2 bg-brand text-[15px] font-bold uppercase tracking-[0.06em] text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
+                                    className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-sm bg-brand text-[15px] font-bold uppercase tracking-[0.06em] text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60">
                                     {isSubmitting ? (
                                         <><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> Placing order…</>
                                     ) : (
@@ -731,9 +710,6 @@ const CheckoutPage = () => {
                                     {selectedPayment === 'cod' ? 'Cash on delivery · ' : `Paying with ${activeBrand.name} · `}
                                     By placing this order you agree to our <Link href="/terms" className="underline hover:text-brand">terms</Link>.
                                 </p>
-                            </div>
-                            <div className="border-t border-[#eee] px-5 py-5">
-                                <TrustRow />
                             </div>
                         </div>
                     </aside>
@@ -747,7 +723,7 @@ const CheckoutPage = () => {
                     <p className="text-lg font-bold leading-none tabular-nums text-ink">{tk(orderTotal)}</p>
                 </div>
                 <button type="submit" form="checkout-form" disabled={isSubmitting}
-                    className="flex h-11 shrink-0 items-center justify-center gap-1.5 bg-brand px-6 text-[14px] font-bold uppercase tracking-[0.06em] text-white disabled:opacity-60">
+                    className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-sm bg-brand px-6 text-[14px] font-bold uppercase tracking-[0.06em] text-white disabled:opacity-60">
                     <LockIcon className="h-4 w-4" /> {isSubmitting ? 'Placing…' : 'Place order'}
                 </button>
             </div>
@@ -758,7 +734,7 @@ const CheckoutPage = () => {
 /** A numbered checkout step: "01  DELIVERY DETAILS". */
 function StepCard({ n, title, note, right, children }: { n: string; title: string; note?: string; right?: React.ReactNode; children: React.ReactNode }) {
     return (
-        <section className="border border-ink/10 bg-white">
+        <section className="overflow-hidden rounded-md border border-ink/10 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
             <header className="flex items-center gap-4 border-b border-ink/8 px-5 py-4 sm:px-6">
                 <span className="display text-[1.7rem] font-light leading-none text-brand">{n}</span>
                 <div className="min-w-0 flex-1">
@@ -769,6 +745,33 @@ function StepCard({ n, title, note, right, children }: { n: string; title: strin
             </header>
             <div className="px-5 py-5 sm:px-6">{children}</div>
         </section>
+    );
+}
+
+/**
+ * One labelled field with an icon inside the box, a clear "required" / "optional" tag,
+ * a hint under it and the error in red when something is wrong.
+ */
+function FormField({ label, required, optional, icon, hint, error, className = '', top = false, children }: {
+    label: string; required?: boolean; optional?: boolean; icon?: React.ReactNode; hint?: string; error?: string;
+    className?: string; top?: boolean; children: React.ReactNode;
+}) {
+    return (
+        <div className={className}>
+            <label className="mb-1.5 flex items-center gap-2 text-[13px] font-semibold text-ink/80">
+                {label}
+                {required ? <span className="text-brand">*</span> : null}
+                {optional ? <span className="rounded border border-ink/12 bg-gray-50 px-1.5 py-px text-[10px] font-bold uppercase tracking-[0.1em] text-ink/50">Optional</span> : null}
+            </label>
+            <div className={`relative ${icon ? '[&>input]:!pl-11 [&>textarea]:!pl-11' : ''}`}>
+                {icon ? (
+                    <span className={`pointer-events-none absolute left-3.5 text-ink/35 ${top ? 'top-3.5' : 'top-1/2 -translate-y-1/2'}`}>{icon}</span>
+                ) : null}
+                {children}
+            </div>
+            {error ? <p className="mt-1.5 text-xs font-medium text-red-500">{error}</p>
+                : hint ? <p className="mt-1.5 text-xs text-ink/40">{hint}</p> : null}
+        </div>
     );
 }
 

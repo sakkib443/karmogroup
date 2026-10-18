@@ -14,6 +14,7 @@ export default function MattressBrands({
   heading,
   imageAlt,
   background,
+  backgroundAspect = "1916 / 821",
   composed = false,
   items = [],
 }) {
@@ -27,7 +28,7 @@ export default function MattressBrands({
         className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0c1c33]"
         style={{ ["--mattress-brands-h"]: "auto" }}
       >
-        <div className="relative aspect-[1916/821] w-full">
+        <div className="relative w-full" style={{ aspectRatio: backgroundAspect }}>
           <Image
             src={background}
             alt={imageAlt || heading || "Our mattress brands"}

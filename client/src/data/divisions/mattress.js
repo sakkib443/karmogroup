@@ -100,84 +100,102 @@ const mattress = {
     },
   ],
 
-  /* Brand marks centred on the left. Bedroom photo is the full-bleed background. */
+  /* Two pictures side by side, full width — under Our mattress brands, above
+     the film: sleeper positions on the red floral mattress + the sleep-support
+     infographic. (Its place in the page is set in DivisionPage.) */
+  imagePair: {
+    id: "mattress-sleep-support",
+    label: "Karmo mattress support for every sleeping position",
+    /* Half and half. Each cell is 1.15 : 1 — the square photo loses only a
+       strip of wall / rug top and bottom, the wide infographic only its plain
+       sides; every sleeper card, the bed and the icons stay whole. */
+    split: [50, 50],
+    cellAspect: 1.15,
+    images: [
+      {
+        src: "/pages/mattress/bands/sleep-positions-red-floral.webp",
+        alt: "Karmo red floral mattress — support for side, back and stomach sleepers",
+        width: 1254,
+        height: 1254,
+      },
+      {
+        src: "/pages/mattress/bands/sleep-support-infographic-wide.webp",
+        alt: "Karmo mattress — breathable comfort, pressure relief, spinal alignment and motion isolation for every sleeping position",
+        width: 1916,
+        height: 821,
+      },
+    ],
+  },
+
+  /* Showroom photo with the brand marks — the image pair follows right under
+     it, then the film. The copy, link and per-brand `video` fields are only
+     read by the reel layout (MattressBrandReels) — add `layout: "reels"` to
+     try that again. */
   brochureBrands: {
     heading: "Our mattress brands",
+    eyebrow: "Karmo",
+    eyebrowNote: "Mattress brands",
+    titleLine1: "Our mattress",
+    titleLine2: "brands",
     kicker: "We test every mattress. Every single one.",
+    body: "From Imperial euro-top luxury to everyday Bonnell spring — seven Karmo ranges, each built for a different kind of sleep. Pick a brand to see its sizes and prices.",
+    link: { label: "Find your mattress", href: "#mattress-offers" },
     image: "/pages/mattress/brochure/page-03-brands.webp",
-    imageAlt:
-      "Karmo mattress brands beside a red floral mattress in a blue bedroom",
-    /* The artwork already carries the logos on the left and the bed on the right. */
+    imageAlt: "Karmo luxury mattress showroom interior",
+    /* One full-width photograph, shown whole at its own proportions. */
     composed: true,
-    background: "/pages/mattress/bands/brands-bedroom-showcase.webp",
+    background: "/pages/mattress/bands/mattress-showroom-interior.webp",
+    backgroundAspect: "1774 / 887",
     items: [
       {
         id: "imperial",
         href: "/mattress/imperial-eurotop",
         src: "/pages/mattress/brochure/logos/logo-imperial-trim.webp",
         alt: "Karmo Imperial Mattress",
+        video: "/shared/videos/shorts/fb-karmo-mattress-offer.mp4",
       },
       {
         id: "king",
         href: "/mattress/king",
         src: "/pages/mattress/brochure/logos/logo-king-trim.webp",
         alt: "Karmo King Mattress",
+        video: "/shared/videos/shorts/fb-reel-921228060438784.mp4",
       },
       {
         id: "prestige",
         href: "/mattress/prestige",
         src: "/pages/mattress/brochure/logos/logo-prestige-trim.webp",
         alt: "Karmo Prestige Mattress",
+        video: "/shared/videos/shorts/fb-reel-845505688502810.mp4",
       },
       {
         id: "orthopedic",
         href: "/mattress/orthopedic",
         src: "/pages/mattress/brochure/logos/logo-orthopedic-trim.webp",
         alt: "Karmo Orthopaedic Mattress",
+        video: "/shared/videos/shorts/fb-reel-785013297942063.mp4",
       },
       {
         id: "bonnell",
         href: "/mattress/bonnell-spring",
         src: "/pages/mattress/brochure/logos/logo-bonnell-trim.webp",
         alt: "Karmo Bonnell Spring Mattress",
+        video: "/shared/videos/shorts/fb-reel-747210751746270.mp4",
       },
       {
         id: "natural",
         href: "/mattress",
         src: "/pages/mattress/brochure/logos/logo-natural-trim.webp",
         alt: "Karmo Natural Mattress",
+        video: "/shared/videos/shorts/fb-reel-3242808395880988.mp4",
       },
       {
         id: "pocket",
         href: "/mattress/pillow-top-pocket-spring",
         src: "/pages/mattress/brochure/logos/logo-pocket-trim.webp",
         alt: "Karmo Pocket Spring Mattress",
+        video: "/shared/videos/shorts/fb-reel-1822025445099889.mp4",
         wide: true,
-      },
-    ],
-  },
-
-  /* Why-buy band — half-screen tall; photos only in assets, copy in HTML. */
-  recommended: {
-    heading: "Which Karmo is right for you",
-    columns: [
-      {
-        id: "pain",
-        image: "/pages/mattress/why/why-back-pain-hq.webp",
-        alt: "Half-body rear view on a Karmo mattress with a soft wellness glow along the spine",
-        caption: "If you have chronic neck & back pain",
-      },
-      {
-        id: "posture",
-        image: "/products/mattress/why/why-posture-v5-hq.webp",
-        alt: "Side-profile aligned sleep on a Karmo mattress with posture-support light",
-        caption: "If you need firm support to correct your posture",
-      },
-      {
-        id: "cool",
-        image: "/products/mattress/why/why-sweaty-v5-hq.webp",
-        alt: "Cool comfortable sleep on a Karmo mattress",
-        caption: "If you are a sweaty sleeper",
       },
     ],
   },
@@ -300,8 +318,9 @@ const mattress = {
 
   /* Sleep Well film — own full-viewport stage, under Inside every Karmo. */
   mattressFilm: {
-    src: "/shared/videos/mattress-sleep-well.mp4",
-    still: "/products/mattress/bands/sleep-well-film-still-hq.webp",
+    /* "Mattress 5" film — 1080p, no audio (plays muted), web-compressed. */
+    src: "/shared/videos/mattress-film-5.mp4",
+    still: "/products/mattress/bands/mattress-film-5-still.webp",
     alt: "Karmo mattress Sleep Well film",
     /* Official mattress tagline #24 — title card on the Sleep Well film. */
     heading: "The Art of Restful Living",
