@@ -8,7 +8,7 @@ import { FiArrowRight } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
-import { useMattressHeroVeil } from "@/components/karmo/chrome/mattressHeroVeil";
+import { MATTRESS_VEIL } from "@/components/karmo/chrome/mattressHeroVeil";
 
 const ORANGE = "#FF9A1F";
 
@@ -59,7 +59,6 @@ export default function DivisionAbout({
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const path = usePathname();
-  const [veil] = useMattressHeroVeil();
   const mattressHero = asHero && path === "/mattress";
 
   if (layout === "overlay") {
@@ -85,7 +84,7 @@ export default function DivisionAbout({
         frameClassName={frameClassName}
         firstSlideMs={asHero ? 2600 : undefined}
         autoplayMs={asHero ? 4800 : undefined}
-        veilPercent={mattressHero ? veil : undefined}
+        veilPercent={mattressHero ? MATTRESS_VEIL : undefined}
       />
     );
   }
