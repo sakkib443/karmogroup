@@ -79,7 +79,7 @@ const hometex = {
     columns: [
       {
         id: "comfort",
-        image: "/pages/hometex/hometex-first-sub/made.png",
+        image: "/pages/hometex/hometex-first-sub/comforter-6.png",
         caption: "Unmatched Everyday Comfort",
         alt: "Karmo HomeTex bedding set",
       },
@@ -209,20 +209,20 @@ const hometex = {
 
   lounge: {
     layout: "overlay",
+    /* HomeTex-only slider with side floating arrows (isolated component). */
+    sliderVariant: "hometex-floating",
     headingLead: "The comfort you feel every day",
     image: {
       src: "/pages/hometex/comforter-3.png",
-      alt: "A woman resting on a plush foam sofa in a calm living room",
+      alt: "Karmo HomeTex luxury bedroom bedding collection",
       width: 1920,
       height: 1080,
     },
     slides: [
       {
-        id: "lounge",
+        id: "lounge-comfort",
         align: "left",
         titleCard: true,
-        /* Sit the copy in the upper third, smaller and lighter than the
-           default title card (client ask, Sep 2026). */
         valign: "center",
         headingClassName: "text-white/85",
         headingStyle: {
@@ -234,9 +234,49 @@ const hometex = {
         headingLead: "The comfort you feel every day",
         image: {
           src: "/pages/hometex/comforter-3.png",
-          alt: "A woman resting on a plush foam sofa in a calm living room",
+          alt: "Karmo HomeTex golden comfort bed set",
           width: 1920,
           height: 1080,
+        },
+      },
+      {
+        id: "lounge-floral-red",
+        align: "left",
+        titleCard: true,
+        valign: "center",
+        headingClassName: "text-white/85",
+        headingStyle: {
+          fontSize: "clamp(0.92rem, 0.78rem + 1.05vw, 1.7rem)",
+          fontWeight: 300,
+          fontVariationSettings: '"wght" 300',
+          letterSpacing: "0.14em",
+        },
+        headingLead: "Elegance woven for peaceful nights",
+        image: {
+          src: "/pages/hometex/hometex-slide-red.jpeg",
+          alt: "Karmo HomeTex floral luxury duvet and bedding",
+          width: 2880,
+          height: 1235,
+        },
+      },
+      {
+        id: "lounge-mosaic-blue",
+        align: "left",
+        titleCard: true,
+        valign: "center",
+        headingClassName: "text-white/85",
+        headingStyle: {
+          fontSize: "clamp(0.92rem, 0.78rem + 1.05vw, 1.7rem)",
+          fontWeight: 300,
+          fontVariationSettings: '"wght" 300',
+          letterSpacing: "0.14em",
+        },
+        headingLead: "Bespoke patterns, pure warmth",
+        image: {
+          src: "/pages/hometex/hometex-slide-blue.jpeg",
+          alt: "Karmo HomeTex royal blue duvet bedroom setup",
+          width: 2880,
+          height: 1235,
         },
       },
     ],
