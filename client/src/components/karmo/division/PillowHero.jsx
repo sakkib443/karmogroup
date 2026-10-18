@@ -8,16 +8,15 @@ import { motion, useReducedMotion } from "framer-motion";
  * two-slide rotation with a single image and one line of copy, so the
  * autoplay, pager dots and per-slide state are gone.
  *
- * The artwork is a cream wall over a rattan sideboard, with the two pillows
- * (68–99% of the width) on the right and the left half empty wall, so the
- * picture is anchored right and centred vertically, and the heading sits on
- * the empty left. White on the same dark overlay every other hero on the site
- * uses. It has held two images so far: this one, and before it the suitcase
- * flat-lay, which now lives in the lower "Cloud-Like Comfort" band.
+ * The artwork is a sunlit living room: a grey sofa piled with white Karmo
+ * pillows and a knit throw, centred in the frame with feathers drifting
+ * around it. The picture is centred (not anchored) and fills the tall hero,
+ * and the heading sits over the darker left wall. White on the same dark
+ * overlay every other hero on the site uses.
  */
 const HERO = {
-  src: "/pages/hometex/pillow/karmo-pillow-cane-sideboard-hero.webp",
-  alt: "Two white Karmo pillows stacked on a light wood cane sideboard, one with an open corner showing its soft filling beside a pile of feathers, with dried-branch vases and a lantern against a cream wall",
+  src: "/pages/hometex/pillow/pillow-banner.png",
+  alt: "A sunlit living room with a grey sofa piled with white Karmo pillows and a knit throw, soft feathers drifting in the air, framed by panelled walls, potted plants and a bright window",
   title: "PREMIUM COMFORT",
 };
 
@@ -29,17 +28,17 @@ export default function PillowHero() {
       aria-labelledby="pillow-title"
       className="relative isolate h-[calc(100dvh-112px)] overflow-hidden bg-[#efe6dc]"
     >
-      {/* A 2.9:1 banner in a tall hero: `cover` crops the sides, and the height
-          always fills, so the picture stays vertically centred. Anchored to
-          the right from `md` up so both pillows stay in frame; on phones the
-          window is narrower than the pair, so it is centred on them instead. */}
+      {/* A wide banner in a tall hero: `cover` crops the sides and the height
+          always fills, so the picture stays vertically centred. The sofa and
+          pillows sit in the middle of the frame, so this one is centred at
+          every width instead of anchored right. */}
       <Image
         src={HERO.src}
         alt={HERO.alt}
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[92%_center] md:object-right"
+        className="object-cover object-center"
       />
       {/* Same scrim as the Home / HomeTex / Bed & Automotive heroes. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black/40" />
