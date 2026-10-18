@@ -561,7 +561,7 @@ function OrganizedSpotlight({ data, reveal }) {
       variants={fade}
       {...reveal}
       viewport={VIEWPORT}
-      className="relative min-h-[260px] overflow-hidden bg-[#f4f0e8] md:min-h-0"
+      className="relative h-full min-h-[260px] overflow-hidden bg-[#f4f0e8] md:min-h-0"
     >
       <Image
         src={data.image}
@@ -727,34 +727,20 @@ function OrganizedInside({ inside, reveal }) {
 }
 
 function OrganizedGrid({
-  highlights,
   spotlight,
   inside,
   reveal,
 }) {
-  const primary = highlights[0];
-  const pair = highlights.slice(1, 3);
-
   return (
-    <div className="relative z-[1] mx-auto w-full max-w-[1600px] px-5 py-[6px] sm:px-8 lg:px-10">
+    <div className="relative z-[1] w-full">
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid w-full grid-cols-1 gap-[6px] md:h-[min(90svh,980px)] md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"
+        className="grid w-full grid-cols-1 gap-[6px] md:h-[min(49svh,535px)] md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"
       >
-        <div className="grid min-h-0 grid-cols-1 gap-[6px] md:h-full md:grid-rows-[minmax(0,1fr)_minmax(0,1.2fr)]">
-          <div className="grid min-h-0 h-full grid-cols-1 gap-[6px] md:grid-cols-2">
-            <OrganizedClaim item={primary} reveal={reveal} />
-            {pair.length > 1 ? (
-              <OrganizedPair items={pair} reveal={reveal} />
-            ) : pair.length === 1 ? (
-              <OrganizedClaim item={pair[0]} reveal={reveal} />
-            ) : null}
-          </div>
-          <OrganizedSpotlight data={spotlight} reveal={reveal} />
-        </div>
-        <OrganizedInside inside={inside} reveal={reveal} />
+        <OrganizedSpotlight data={spotlight} reveal={reveal} />
+        <InsidePhotoCard photo={inside?.photo} />
       </motion.div>
     </div>
   );
@@ -853,17 +839,19 @@ export default function HometexShapeGrid({
       id={hasInside ? "inside-every-karmo" : undefined}
       className={`relative w-full overflow-hidden ${className}`}
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <Image
-          src={bg}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-55"
-          priority={false}
-        />
-        <span className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/55 to-white/70" />
-      </div>
+      {!organized && (
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <Image
+            src={bg}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center opacity-55"
+            priority={false}
+          />
+          <span className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/55 to-white/70" />
+        </div>
+      )}
 
       {organized && hasInside ? (
         <OrganizedGrid
