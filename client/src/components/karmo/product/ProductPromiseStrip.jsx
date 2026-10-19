@@ -19,20 +19,21 @@ const DEFAULT_PROMISES = [
   {
     src: "/shared/trust/cartoon-v3/superbrand-v3.webp",
     scale: 0.92,
-    title: "30 Nights Free Trial",
-    note: "Sleep on it — return within 30 nights if it is not right",
+    title: "Quality Checked",
+    note: "Every mattress is inspected before it leaves our factory",
   },
   {
-    src: "/shared/trust/cartoon-v3/delivery-v2.webp",
+    /* Same rider as delivery-v2, with a bolt on the box instead of "FREE DELIVERY". */
+    src: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
     scale: 1,
-    title: "Free Delivery",
-    note: "Doorstep delivery across Bangladesh on this range",
+    title: "Fast Delivery",
+    note: "Quick, careful doorstep delivery across Bangladesh",
   },
   {
     src: "/shared/trust/cartoon-v3/legacy-60-v2.webp",
     scale: 1,
-    title: "Up to 20 Years Warranty",
-    note: "Covered for long-term durability and manufacturing defects",
+    title: "Trusted Since 1965",
+    note: "Six decades of comfort from the country's first foam maker",
   },
 ];
 
@@ -86,14 +87,14 @@ export default function ProductPromiseStrip({ items } = {}) {
               i > 0 ? "lg:border-l lg:border-ink/10" : ""
             }`}
           >
-            <span className="relative mx-auto flex h-14 w-14 items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-16 sm:w-16">
+            <span className="relative mx-auto flex h-16 w-16 items-center justify-center overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 sm:h-[76px] sm:w-[76px]">
               <Image
                 src={item.src}
                 alt=""
                 aria-hidden="true"
-                width={64}
-                height={64}
-                className="absolute inset-0 m-auto h-14 w-14 object-contain sm:h-16 sm:w-16"
+                width={76}
+                height={76}
+                className="absolute inset-0 m-auto h-16 w-16 object-contain sm:h-[76px] sm:w-[76px]"
                 style={item.scale !== 1 ? { transform: `scale(${item.scale})` } : undefined}
               />
             </span>

@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   FiChevronDown,
+  FiChevronLeft,
+  FiChevronRight,
   FiMinus,
+  FiPlay,
   FiPlus,
   FiShoppingCart,
 } from "react-icons/fi";
@@ -83,6 +86,95 @@ function ThumbButton({ src, active, onClick, label, className = "" }) {
       } ${className}`}
     >
       <Image src={src} alt="" fill unoptimized sizes="120px" className="object-contain bg-[#f3f1ec]" />
+    </button>
+  );
+}
+
+/**
+ * Thumbnails under the main picture, starting at the picture's left edge.
+ * When there are more than fit, the row scrolls sideways (swipe or wheel) and
+ * a square arrow shows at whichever end still has pictures to reveal.
+ */
+function ThumbStrip({ items, mainSrc, onPick, labelFor, film, className = "", itemClassName = "w-[68px] xl:w-[76px]" }) {
+  const ref = useRef(null);
+  const [edges, setEdges] = useState({ prev: false, next: false });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const update = () =>
+      setEdges({
+        prev: el.scrollLeft > 2,
+        next: el.scrollLeft + el.clientWidth < el.scrollWidth - 2,
+      });
+    el.addEventListener("scroll", update, { passive: true });
+    // Fires once on observe, then on every resize — covers the first measure too.
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [items.length]);
+
+  const go = (dir) => {
+    const el = ref.current;
+    if (el) el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+  };
+
+  return (
+    <div className={`relative mt-3 ${className}`}>
+      <ul ref={ref} className="scrollbar-hide flex snap-x gap-2 overflow-x-auto">
+        {film ? (
+          <li className={`shrink-0 snap-start ${itemClassName}`}>
+            <button
+              type="button"
+              onClick={() => onPick(film.src)}
+              aria-label="Play product video"
+              aria-pressed={mainSrc === film.src}
+              className={`relative block aspect-square w-full overflow-hidden border transition-colors ${
+                mainSrc === film.src ? "border-brand" : "border-ink/10 hover:border-ink/30"
+              }`}
+            >
+              <Image src={film.poster} alt="" fill unoptimized sizes="120px" className="object-cover" />
+              <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                <span className="flex h-7 w-7 items-center justify-center bg-white/95 text-brand">
+                  <FiPlay className="ml-0.5 text-[14px]" aria-hidden />
+                </span>
+              </span>
+            </button>
+          </li>
+        ) : null}
+        {items.map((src, i) => (
+          <li key={`${src}-${i}`} className={`shrink-0 snap-start ${itemClassName}`}>
+            <ThumbButton
+              src={src}
+              active={mainSrc === src}
+              onClick={() => onPick(src)}
+              label={labelFor(i)}
+              className="aspect-square w-full"
+            />
+          </li>
+        ))}
+      </ul>
+      {edges.prev ? <StripArrow dir={-1} onClick={() => go(-1)} /> : null}
+      {edges.next ? <StripArrow dir={1} onClick={() => go(1)} /> : null}
+    </div>
+  );
+}
+
+function StripArrow({ dir, onClick }) {
+  const Icon = dir < 0 ? FiChevronLeft : FiChevronRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={dir < 0 ? "Previous photos" : "More photos"}
+      className={`absolute top-1/2 z-[2] flex h-9 w-8 -translate-y-1/2 items-center justify-center border border-ink/15 bg-white/95 text-ink shadow-[0_2px_10px_rgba(0,0,0,0.12)] transition-colors hover:border-brand hover:text-brand ${
+        dir < 0 ? "left-0" : "right-0"
+      }`}
+    >
+      <Icon className="text-[18px]" aria-hidden />
     </button>
   );
 }
@@ -259,7 +351,7 @@ export default function ProductHero({ product }) {
     name: product.name,
     price: unitPrice,
     mrp: mrpUnit || unitPrice,
-    image: selectedFabric?.image || mainSrc || cover,
+    image: selectedFabric?.image || (product.film && mainSrc === product.film.src ? cover : mainSrc) || cover,
     category: product.division,
     quantity: qty,
     size: [selectedFabric?.label, sizeLabel].filter(Boolean).join(" · "),
@@ -341,13 +433,15 @@ export default function ProductHero({ product }) {
                 ) : null}
 
                 <div className="min-w-0 flex-1">
+                  {/* Picture and its thumbnails share one width, so the row starts at the picture's left edge. */}
                   <div
-                    className="relative mx-auto overflow-hidden bg-[#f3f1ec]"
+                    className="mx-auto"
                     style={{
                       width: "min(100%, calc(100svh - 14rem))",
                       maxWidth: "100%",
                     }}
                   >
+                  <div className="relative overflow-hidden bg-[#f3f1ec]">
                   <div className="relative w-full" style={{ paddingTop: "100%" }}>
                     <AnimatePresence mode="wait">
                       <motion.div
@@ -358,7 +452,18 @@ export default function ProductHero({ product }) {
                         transition={{ duration: 0.28 }}
                         className="absolute inset-0"
                       >
-                        {mainSrc ? (
+                        {product.film && mainSrc === product.film.src ? (
+                          <video
+                            src={product.film.src}
+                            poster={product.film.poster}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            aria-label={`${product.name} video`}
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                        ) : mainSrc ? (
                           <Image
                             src={mainSrc}
                             alt={product.name}
@@ -376,36 +481,26 @@ export default function ProductHero({ product }) {
                   </div>
 
                   {realGallery.length ? (
-                    <ul className="mt-3 flex justify-center gap-2 overflow-x-auto">
-                      {realGallery.map((src, i) => (
-                        <li key={`real-${src}`} className="w-[68px] shrink-0 xl:w-[76px]">
-                          <ThumbButton
-                            src={src}
-                            active={mainSrc === src}
-                            onClick={() => setMainSrc(src)}
-                            label={i === 0 ? "Cover photo" : `Product photo ${i + 1}`}
-                            className="aspect-square w-full"
-                          />
-                        </li>
-                      ))}
-                    </ul>
+                    <ThumbStrip
+                      items={realGallery}
+                      film={product.film}
+                      mainSrc={mainSrc}
+                      onPick={setMainSrc}
+                      labelFor={(i) => (i === 0 ? "Cover photo" : `Product photo ${i + 1}`)}
+                    />
                   ) : null}
 
                   {letterGallery.length ? (
-                  <ul className="mt-3 flex justify-center gap-2 overflow-x-auto xl:hidden">
-                    {letterGallery.map((src, i) => (
-                      <li key={`m-letter-${i}`} className="w-[64px] shrink-0">
-                        <ThumbButton
-                          src={src}
-                          active={mainSrc === src}
-                          onClick={() => setMainSrc(src)}
-                          label={`KARMO letter view ${i + 1}`}
-                          className="aspect-square w-full"
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                    <ThumbStrip
+                      items={letterGallery}
+                      mainSrc={mainSrc}
+                      onPick={setMainSrc}
+                      labelFor={(i) => `KARMO letter view ${i + 1}`}
+                      className="xl:hidden"
+                      itemClassName="w-[64px]"
+                    />
                   ) : null}
+                  </div>
                 </div>
               </div>
             </motion.div>

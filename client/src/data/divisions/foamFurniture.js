@@ -297,7 +297,9 @@ const foamFurniture = {
 
   shapeGrid: {
     skin: "organized",
-    background: "/pages/foam/mosaic/foam-texture-hq.webp",
+    /* Calm brand damask, same as the mattress page — the old foam-cell photo
+       (/pages/foam/mosaic/foam-texture-hq.webp) read as noise behind the cards. */
+    background: "/products/mattress/mosaic/karmo-pattern-texture.webp",
     highlights: [
       {
         id: "no-filler",
@@ -338,7 +340,7 @@ const foamFurniture = {
       heading: "Inside every",
       accent: "set",
       body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
-      background: "/pages/foam/mosaic/foam-texture-hq.webp",
+      background: "/products/mattress/mosaic/karmo-pattern-texture.webp",
       layers: [
         {
           id: "open-cell",
@@ -413,26 +415,32 @@ const foamFurniture = {
     layout: "overlay",
     headingLead: "The comfort you feel every day",
     image: {
-      src: `${IMG}/bands/lounge-mustard-user-hq.webp`,
-      alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
-      width: 1920,
-      height: 1080,
+      src: `${IMG}/mosaic/spotlight-emerald-left-hq.webp`,
+      alt: "Emerald velvet armchair and oak dresser in a sunlit living room",
+      width: 1280,
+      height: 720,
       unoptimized: true,
-      position: "object-left",
+      position: "object-[center_58%]",
     },
     slides: [
       {
         id: "lounge",
         align: "right",
         titleCard: true,
+        headingScale: 80,
         headingLead: "The comfort you feel every day",
+        /* One even, light wash across the whole photo (no fade). The heading has its
+           own shadow, so it stays readable on the pale wall. */
+        titleOverlay: "linear-gradient(rgba(11,21,40,0.24), rgba(11,21,40,0.24))",
+        /* A little further right on desktop. */
+        headingClassName: "lg:translate-x-[3vw]",
         image: {
-          src: `${IMG}/bands/lounge-mustard-user-hq.webp`,
-          alt: "Mustard velvet sofa set with teak frames in a sunlit living room",
-          width: 1920,
-          height: 1080,
+          src: `${IMG}/mosaic/spotlight-emerald-left-hq.webp`,
+          alt: "Emerald velvet armchair and oak dresser in a sunlit living room",
+          width: 1280,
+          height: 720,
           unoptimized: true,
-          position: "object-left",
+          position: "object-[center_58%]",
         },
       },
     ],
