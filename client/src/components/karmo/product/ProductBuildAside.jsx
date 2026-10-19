@@ -290,11 +290,11 @@ export default function ProductBuildAside() {
             <TallMorph />
             <VideoTile
               src={productFeatures[0]?.video}
-              label="Spine-aware support"
+              label={productFeatures[0]?.title}
             />
             <VideoTile
               src={productFeatures[1]?.video}
-              label="Anti-dust cover"
+              label={productFeatures[1]?.title}
             />
           </div>
         </motion.div>

@@ -363,15 +363,12 @@ function MattressFloatCard({ item }) {
   );
 }
 
-/** Mattress catalogue card — rating, specs, cartoon sizes. */
+/** Mattress catalogue card — kept plain: photo, name, rating, price, size icons, order. */
 function MattressCatalogueCard({ item }) {
   const [size, setSize] = useState(item.defaultSize || "Queen");
   const price = priceForSize(item, size);
   const href = sizedHref(item.href || "/mattress", size);
-  const pct = discountPct(price.was, price.now);
   const rating = item.rating ?? 4.8;
-  const reviews = item.reviews ?? 120;
-  const specs = item.specs || [];
   const badge = item.badge;
   const hoverSrc = item.imageHover;
 
@@ -382,14 +379,14 @@ function MattressCatalogueCard({ item }) {
     >
       <Link
         href={href}
-        className="relative block aspect-[5/4] shrink-0 overflow-hidden bg-white focus-visible:outline-none"
+        className="relative block aspect-square shrink-0 overflow-hidden bg-white focus-visible:outline-none"
       >
         <Image
           src={item.image}
           alt={item.alt || item.name}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className={`object-cover object-center transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.02] ${
+          className={`object-cover object-center scale-[1.08] transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.1] ${
             hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
           }`}
         />
@@ -417,39 +414,18 @@ function MattressCatalogueCard({ item }) {
           </Link>
         </h3>
 
-        <div className="mt-2.5 grid grid-cols-2 gap-3">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-1 text-[11px] text-ink/70">
-              <Stars value={rating} />
-              <span className="font-semibold tabular-nums text-ink">{rating.toFixed(1)}</span>
-              <span className="text-ink/30">|</span>
-              <span>({reviews})</span>
-            </div>
-            {item.thickness ? (
-              <p className="mt-1.5 text-[11px] font-medium text-ink/45">
-                Available in {item.thickness}
-              </p>
-            ) : null}
-            <p className="mt-1.5 text-[11.5px] font-medium leading-snug text-ink/55 sm:text-[12px]">
-              {specs.length > 0 ? specs.join(" · ") : item.line}
-            </p>
+        <div className="mt-2 flex items-end justify-between gap-3">
+          <div className="flex items-center gap-1.5 text-[12px] text-ink/70">
+            <Stars value={rating} />
+            <span className="font-semibold tabular-nums text-ink">{rating.toFixed(1)}</span>
           </div>
-
-          <div className="flex min-w-0 flex-col items-end justify-start text-right">
+          <div className="flex items-baseline gap-2 text-right">
+            {price.was ? (
+              <s className="text-[12px] tabular-nums text-ink/35">{price.was}</s>
+            ) : null}
             <span className="text-[18px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
               {price.now}
             </span>
-            {price.was ? (
-              <s className="mt-1 text-[12px] tabular-nums text-ink/40">{price.was}</s>
-            ) : null}
-            {pct != null ? (
-              <span
-                className="mt-1.5 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.04em] text-white"
-                style={{ backgroundColor: ORANGE }}
-              >
-                {pct}% off
-              </span>
-            ) : null}
           </div>
         </div>
 
@@ -505,22 +481,6 @@ function MattressCatalogueCard({ item }) {
               className="h-[22px] w-[22px] object-contain transition-transform duration-300 group-hover/cta:scale-110"
             />
             <span>Order Now</span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden
-              className="transition-transform duration-300 group-hover/cta:translate-x-0.5"
-            >
-              <path
-                d="M5 12h14M13 6l6 6-6 6"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
           </Link>
         </div>
       </div>

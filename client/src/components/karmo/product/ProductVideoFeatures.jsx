@@ -44,6 +44,7 @@ export default function ProductVideoFeatures({ features = [] }) {
                   loop
                   playsInline
                   preload="metadata"
+                  poster={feat.poster}
                   aria-hidden
                 >
                   <source src={feat.video} type="video/mp4" />

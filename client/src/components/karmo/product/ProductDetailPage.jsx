@@ -4,9 +4,11 @@ import Link from "next/link";
 import ProductHero from "@/components/karmo/product/ProductHero";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
 import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlides";
-import ProductMattressBanner from "@/components/karmo/product/ProductMattressBanner";
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
+import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
+import ProductInside from "@/components/karmo/product/ProductInside";
+import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 /**
@@ -32,8 +34,18 @@ export default function ProductDetailPage({ product }) {
     <>
       <ProductHero product={product} />
       <ProductPromiseStrip />
+      <ProductInside product={product} />
       <ProductFeatureSlides />
-      <ProductMattressBanner />
+      {product.film ? (
+        <MattressFilmStage
+          src={product.film.src}
+          still={product.film.poster}
+          alt={`${product.name} film`}
+          heading={product.film.heading}
+          headingScale={1.2}
+        />
+      ) : null}
+      <ProductVideoFeatures features={product.featureBands || []} />
       <ProductFirmnessScale highlight={product.firmness || "Medium Firm"} />
       <ProductBuildAside />
       <OrderAndContact />

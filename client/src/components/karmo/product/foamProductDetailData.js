@@ -36,12 +36,12 @@ export const foamProductFeatures = [
   {
     title: "Pure rubber grade",
     body: "No filler fluff — dense open-cell foam that holds shape for furniture, footwear and specialty builds across Bangladesh.",
-    video: "/products/videos/m.mp4",
+    video: "/products/videos/ball-drop.mp4",
   },
   {
     title: "Cut clean. Ready to build.",
     body: "Sheets and blocks cut to the inch for makers and workshops — airflow that lasts, edges that stay true.",
-    video: "/products/videos/p.mp4",
+    video: "/products/videos/durability-test.mp4",
   },
 ];
 

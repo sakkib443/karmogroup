@@ -12,6 +12,8 @@ export default function MattressFilmStage({
   still,
   alt = "",
   heading = "The Art of Restful Living",
+  /* Multiplies the heading size (1 = the /mattress page's own). */
+  headingScale = 1,
   /* Band height. Defaults to a full viewport (the mattress "Sleep Well" film);
      callers can pass a shorter value so the whole band fits on screen. */
   minH = "100svh",
@@ -78,7 +80,10 @@ export default function MattressFilmStage({
         <h2
           className="display hero-heading title-card-line whitespace-nowrap uppercase text-white"
           style={{
-            fontSize: "clamp(1.35rem, 1.1rem + 2.1vw, 3.15rem)",
+            fontSize:
+              headingScale === 1
+                ? "clamp(1.35rem, 1.1rem + 2.1vw, 3.15rem)"
+                : `calc(clamp(1.35rem, 1.1rem + 2.1vw, 3.15rem) * ${headingScale})`,
             fontWeight: 350,
             fontVariationSettings: '"wght" 350',
             letterSpacing: "0.12em",
