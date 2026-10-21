@@ -19,7 +19,7 @@ import DivisionRecommended from "@/components/karmo/division/DivisionRecommended
 import DivisionWhyChoose from "@/components/karmo/division/DivisionWhyChoose";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
 import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
-import BedAutomotiveShapeGrid from "@/components/karmo/division/BedAutomotiveShapeGrid";
+import BedAutomotiveTwoBanners from "@/components/karmo/division/BedAutomotiveTwoBanners";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
 import MattressBrandReels from "@/components/karmo/division/MattressBrandReels";
 import DivisionImagePair from "@/components/karmo/division/DivisionImagePair";
@@ -154,7 +154,7 @@ export default function DivisionPage({ data }) {
         (data.shapeGridVariant === "hometex" ? (
           <HometexShapeGrid {...data.shapeGrid} />
         ) : data.shapeGridVariant === "bed-automotive-legacy" ? (
-          <BedAutomotiveShapeGrid {...data.shapeGrid} />
+          <BedAutomotiveTwoBanners {...data.shapeGrid} />
         ) : (
           <DivisionShapeGrid {...data.shapeGrid} />
         ))}
