@@ -132,9 +132,10 @@ export function buildFoamCategoryData(key) {
         },
         {
           id: "support",
-          image: "/pages/foam/bed-automotive/why-support-landscape-v2.webp",
-          alt: "Bed and bus seat cushioning shown together with their foam layers",
+          image: "/pages/foam/bed-automotive/karmo_sofa_633x421.png",
+          alt: "Karmo Sofa Foam Support",
           caption: "Support for beds and beyond",
+          fit: "object-cover",
         },
       ],
     } : foam.recommended,

@@ -3,11 +3,10 @@ import PillowHero from "@/components/karmo/division/PillowHero";
 import DivisionFeatures from "@/components/karmo/division/DivisionFeatures";
 import DivisionProducts from "@/components/karmo/division/DivisionProducts";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
-import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
+import PillowTwoBanners from "@/components/karmo/division/PillowTwoBanners";
 import DivisionAbout from "@/components/karmo/division/DivisionAbout";
 
 import hometex from "@/data/divisions/hometex";
-import foam from "@/data/divisions/foam";
 
 export const metadata = {
   title: "Pillow | Karmo Group",
@@ -41,8 +40,8 @@ function WhyChoosePillows() {
   ];
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+    <section className="bg-white pt-8 sm:pt-10 lg:pt-12 pb-3 sm:pb-4 mb-1.5">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 mb-5 sm:mb-6">
         <h2 className="display section-heading title-card-line text-center uppercase text-[#17191c]">
           WHY CHOOSE KARMO PILLOWS?
         </h2>
@@ -54,7 +53,7 @@ function WhyChoosePillows() {
               <Image src={item.img} alt={item.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-black/20" />
             </div>
-            <div className="pt-4 pb-2 text-center px-4">
+            <div className="pt-3 pb-1 text-center px-4">
               <h3 className="text-[12px] sm:text-[13px] lg:text-[14px] font-bold text-[#17191c] uppercase tracking-[0.1em]">{item.title}</h3>
             </div>
           </div>
@@ -64,46 +63,6 @@ function WhyChoosePillows() {
   );
 }
 
-const customShapeGrid = {
-  ...foam.shapeGrid,
-  highlights: [
-    {
-      id: "feather-touch",
-      icon: "feather",
-      badge: "red",
-      title: "Feather-Touch Microfibre",
-      overview: "Premium down-like softness crafted for ultimate relaxation and breathability, bringing a luxurious hotel-feel to your everyday sleep.",
-      background: "/pages/hometex/pillow/card-01.png",
-    },
-    {
-      id: "soft-luxurious",
-      icon: "certificate",
-      badge: "blue",
-      title: "Soft & Luxurious",
-      overview: "Experience a plush, cloud-like feel that gently cradles your head, providing a soothing rest free from pressure points.",
-    },
-    {
-      id: "long-lasting",
-      icon: "shield",
-      badge: "green",
-      title: "Long-Lasting Shape",
-      overview: "Engineered with resilient microfibre that retains its loft and bounce night after night, resisting flattening over time.",
-    }
-  ],
-  spotlight: {
-    image: "/pages/hometex/pillow/banner-02.png",
-    alt: "Karmo Pillow Banner",
-    overlay: true, // we'll add support for this
-    headingLead: "",
-    headingAccent: "",
-    headingEnd: "",
-    subline: "",
-    brand: "",
-  },
-  film: null,
-  still: "/pages/hometex/pillow/card-02.png",
-  filmOverlay: true,
-};
 
 const PILLOW_IMG = "/products/hometex/pillow";
 
@@ -265,7 +224,7 @@ const pillowCatalogue = [
 ];
 
 const customLounge = {
-  ...foam.lounge,
+  layout: "overlay",
   // 90vh-tall showcase band. It holds the client's own suitcase flat-lay (the
   // artwork that was in the hero before the sideboard image), not the original
   // `bottom-banner.png`. That one was 16:9 and letterboxed with `contain`; this
@@ -282,8 +241,8 @@ const customLounge = {
       kicker: "",
       cta: [],
       image: {
-        src: "/pages/hometex/pillow/karmo-plush-travel-suitcase-hero-v2.png",
-        alt: "A Karmo Plush pillow packed in an open suitcase beside headphones, a wallet, an orange knit and a travel list, on a warm cream backdrop",
+        src: "/pages/hometex/pillow/Minimalist Suitcase Travel Flatlay.png",
+        alt: "A Karmo Plush pillow packed in an open suitcase beside headphones, a wallet, an orange knit and notepad, on a warm cream backdrop",
         position: "object-[63%_center] lg:object-right",
       },
       veil: true,
@@ -297,7 +256,7 @@ export default function PillowRoute() {
       <PillowHero />
       <DivisionFeatures items={pillowPage.features} />
       <WhyChoosePillows />
-      <HometexShapeGrid {...customShapeGrid} />
+      <PillowTwoBanners />
       <DivisionAbout {...customLounge} />
       <DivisionProducts
         eyebrow="Best price"
