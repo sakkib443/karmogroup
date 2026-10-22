@@ -55,7 +55,7 @@ export default function DivisionRecommended({
                   fill
                   unoptimized
                   sizes="(min-width: 640px) 33vw, 100vw"
-                  className={uncropped ? "object-contain object-center" : "object-cover object-center"}
+                  className={col.fit ? `${col.fit} ${col.position || "object-center"}` : uncropped ? "object-contain object-center" : "object-cover object-center"}
                   style={{ objectPosition: col.objectPosition || "center" }}
                 />
                 {imageOverlay ? (
