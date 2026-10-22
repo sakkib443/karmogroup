@@ -30,6 +30,8 @@ router.post('/factory/scan', authMiddleware, authorizeRoles(...R.scanners), vali
 // ── Order desk (staff) ───────────────────────────
 // Manual orders (phone / walk-in): super admin, admin, manager and online sales.
 router.post('/admin', authMiddleware, authorizeRoles(...R.orderDesk), validateRequest(staffOrderValidation), OrderController.createManual);
+// Excel of the filtered list — before /admin/:id, which would otherwise take "export" as an id.
+router.get('/admin/export', authMiddleware, authorizeRoles(...R.ops), OrderController.exportXlsx);
 router.get('/admin/all', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getAll);
 router.get('/admin/stats', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getStats);
 router.get('/admin/sms-log', authMiddleware, authorizeRoles(...R.confirmers), OrderController.smsLog);

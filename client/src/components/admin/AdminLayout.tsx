@@ -11,7 +11,7 @@ import {
     LuStore, LuTruck, LuWallet, LuSettings, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog, LuShield,
     LuMessageSquare, LuMail, LuBriefcase, LuFileText, LuBell, LuMapPin,
     LuScanBarcode, LuMessageSquareText, LuHouse, LuPalette, LuFiles, LuSlidersHorizontal,
-    LuPanelLeft, LuChevronRight, LuLogOut, LuX,
+    LuPanelLeft, LuChevronRight, LuLogOut, LuX, LuEye, LuArrowLeft,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { SiteMark } from '@/components/shared/SiteLogo';
@@ -21,6 +21,8 @@ import { logout } from '@/redux/slices/authSlice';
 import { useLogoutMutation } from '@/redux/api/authApi';
 import { baseApi } from '@/redux/api/baseApi';
 import { ADMIN_ROOT, ROLE_LABEL, canOpen, homeFor } from './access';
+import AccountMenu from './AccountMenu';
+import { canSwitch, setViewAs, useViewRole } from './viewRole';
 
 interface AdminLayoutProps { children: React.ReactNode; }
 
@@ -227,7 +229,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const pathname = usePathname();
     const router = useRouter();
     const user = useSelector((s: RootState) => s.auth.user);
-    const role = user?.role;
+    // The role the screens act as: your own, or the one a super admin / admin switched to.
+    const { role, realRole, viewing } = useViewRole();
 
     useEffect(() => { setMobileOpen(false); }, [pathname]);
 
@@ -256,6 +259,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const dispatch = useDispatch();
     const [serverLogout] = useLogoutMutation();
     const handleLogout = () => {
+        setViewAs(null);
         serverLogout(undefined).unwrap().catch(() => {});
         dispatch(logout());
         dispatch(baseApi.util.resetApiState());
@@ -322,19 +326,33 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         >
                             <LuStore size={15} /> Store
                         </Link>
-                        {role && (
+                        {role && !canSwitch(realRole) && (
                             <span className="hidden rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 md:inline">
                                 {ROLE_LABEL[role] || role}
                             </span>
                         )}
-                        <span
-                            title={`${name}${role ? ` · ${ROLE_LABEL[role] || role}` : ''}`}
-                            className="ml-1 inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-700"
-                        >
-                            {initials}
-                        </span>
+                        <AccountMenu name={name} initials={initials} onLogout={handleLogout} />
                     </div>
                 </header>
+
+                {viewing && (
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-b border-amber-200 bg-amber-50 px-4 py-2 text-[13px] text-amber-900 sm:px-6 lg:px-8">
+                        <p className="flex items-center gap-2">
+                            <LuEye size={15} className="shrink-0" />
+                            <span>
+                                Viewing the <b className="font-semibold">{ROLE_LABEL[role || ''] || role}</b> dashboard
+                                <span className="hidden text-amber-800/80 sm:inline"> — you are signed in as {ROLE_LABEL[realRole || ''] || realRole}, so anything you do still uses your own permissions.</span>
+                            </span>
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => { setViewAs(null); router.push(ADMIN_ROOT); }}
+                            className="inline-flex h-7 items-center gap-1.5 rounded-md border border-amber-300 bg-white px-2.5 text-xs font-medium text-amber-900 hover:bg-amber-100"
+                        >
+                            <LuArrowLeft size={13} /> Back to {ROLE_LABEL[realRole || ''] || realRole}
+                        </button>
+                    </div>
+                )}
 
                 <main className="px-4 py-6 sm:px-6 lg:px-8">
                     {/* Nothing of a page this role may not open, even for a moment before the redirect. */}

@@ -12,6 +12,7 @@ import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import {
     LuPhoneCall, LuCheck, LuX, LuArrowRight, LuScanBarcode, LuTruck, LuUndo2, LuClock, LuFactory,
     LuPackageCheck, LuClipboardList, LuShoppingCart, LuUsers, LuChartColumn, LuSend,
@@ -49,11 +50,12 @@ const itemsLine = (o: any) => (o.items || []).map((it: any) => `${it.quantity}×
 
 function Hello({ subtitle, actions }: { subtitle: React.ReactNode; actions?: React.ReactNode }) {
     const user = useSelector((s: RootState) => s.auth.user);
+    const { role: viewedRole } = useViewRole();
     const first = (user?.name || '').trim().split(/\s+/)[0];
     return (
         <PageHeader
             title={`${greeting()}${first ? `, ${first}` : ''}`}
-            subtitle={<>{ROLE_LABEL[user?.role || ''] || 'Staff'} · {subtitle}</>}
+            subtitle={<>{ROLE_LABEL[viewedRole || ''] || 'Staff'} · {subtitle}</>}
             actions={actions}
         />
     );
@@ -312,7 +314,7 @@ const PIPELINE: { key: string; label: string }[] = [
 ];
 
 export function OverviewDashboard() {
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const { data: statsRes, isLoading } = useGetOrderStatsQuery({});
     const { data: pendingRes } = useGetAdminOrdersQuery({ status: 'pending', limit: 6, sort: 'createdAt' });
     const { data: readyRes } = useGetAdminOrdersQuery({ status: 'challan_ready', limit: 6, sort: 'updatedAt' });
@@ -386,7 +388,7 @@ export function OverviewDashboard() {
 
 /** The right dashboard for whoever is signed in. Nothing renders until the role is known. */
 export default function RoleDashboard() {
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     if (!role) return null;
     if (role === 'agency') return <AgencyDashboard />;
     if (role === 'factory') return <FactoryDashboard />;

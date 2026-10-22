@@ -279,11 +279,13 @@ const CheckoutPage = () => {
                 color: item.color || undefined,
                 size: item.size || undefined,
                 // Karmo catalogue lines (mattress, foam, pillows…) are not in the products
-                // collection, so they travel with their name, configured price and division.
+                // collection, so they travel with their name, price, division and size; the
+                // server re-quotes the price from the size and refuses one that differs.
                 name: item.name,
                 price: item.price,
                 image: item.image,
                 division: item.category,
+                dims: item.dims,
             })),
             shippingAddress: {
                 fullName: formData.fullName,

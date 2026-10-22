@@ -12,8 +12,7 @@
  */
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import { toast } from 'react-hot-toast';
 import {
     LuTruck, LuRefreshCw, LuPackage, LuExternalLink, LuTriangleAlert, LuX, LuPhone, LuUndo2, LuWallet,
@@ -85,7 +84,7 @@ export default function CourierPage() {
     const connected = setup?.configured ?? true;   // assume yes until we know, so nothing flashes
 
     // The Steadfast balance is shop money: admins only (managers and online sales work this board too).
-    const staffRole = useSelector((s: RootState) => s.auth.user?.role);
+    const { role: staffRole } = useViewRole();
     const isEditor = staffRole !== 'superadmin' && staffRole !== 'admin';
     const { data: balanceData } = useGetCourierBalanceQuery(undefined, { skip: !setup?.configured || isEditor });
     const balance = balanceData?.data?.current_balance;

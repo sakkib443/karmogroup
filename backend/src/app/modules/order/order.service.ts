@@ -11,6 +11,7 @@ import { notifyOrderToWhatsApp } from '../../utils/whatsappNotify';
 import { emitFinanceUpdate } from '../../utils/socket';
 import { computeShippingCost } from '../shipping/shipping.service';
 import { type Viewer, actorOf, scopeFor, present, assertVisible, assertTransition, ensureJobs, dhakaDayStart } from './order.desk';
+import { type CatalogueQuote, quoteCatalogueLines } from './order.quote';
 
 /**
  * Tell the customer their payment status changed. Shared by the admin's manual
@@ -77,22 +78,29 @@ const isProductId = (v: unknown) => /^[a-f0-9]{24}$/i.test(String(v || ''));
 const divisionKey = (v: unknown) => String(v || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
 
 /**
- * A line for Karmo's own catalogue. Mattresses, foam and pillows are priced by size and
- * fabric on the product page and are not in the products collection, so the line arrives
- * with its name, configured price and division. That price is checked by staff when the
- * order is confirmed by phone — the first step of the order desk.
+ * A line for Karmo's own catalogue. Mattresses and foam are priced by size on the product
+ * page and are not in the products collection, so the line arrives by slug with its size.
+ * The price is the website's own quote for that size (order.quote.ts), never the one in
+ * the request: a line whose price differs from it by more than ৳1 is refused, so a
+ * tampered checkout cannot buy a King Mattress for ৳1.
  */
-function catalogueLine(item: any) {
-    const name = String(item.name || '').trim();
-    const price = Math.round(Number(item.price));
+function catalogueLine(item: any, quote: CatalogueQuote | undefined) {
+    const label = String(item.name || item.product || 'this item').trim();
     const quantity = Math.floor(Number(item.quantity));
-    if (!name) throw new AppError(400, `Missing product name for: ${item.product}`);
-    if (!Number.isFinite(price) || price <= 0) throw new AppError(400, `Missing price for: ${name}`);
-    if (!Number.isFinite(quantity) || quantity < 1 || quantity > 99) throw new AppError(400, `Invalid quantity for: ${name}`);
+    if (!Number.isFinite(quantity) || quantity < 1 || quantity > 99) throw new AppError(400, `Invalid quantity for: ${label}`);
+    if (!quote?.name) throw new AppError(400, `${label} isn't sold online. Please call us to order it.`);
+    if (!quote.ok || !(quote.unit > 0)) {
+        throw new AppError(400, `${quote.name} can't be ordered online at this size. Please call us to order it.`);
+    }
+    const price = Math.round(quote.unit);
+    const sent = Number(item.price);
+    if (item.price != null && !(Math.abs(sent - price) <= 1)) {
+        throw new AppError(400, `The price of ${quote.name || label} has changed. Please open the product again and add it to your cart afresh.`);
+    }
     return {
         slug: String(item.product),
-        division: divisionKey(item.division),
-        name,
+        division: divisionKey(quote.division || item.division),
+        name: quote.name || label,
         thumbnail: item.image || '',
         price,
         cost: 0,
@@ -253,9 +261,18 @@ const OrderService = {
             return product.originalPrice && product.originalPrice > 0 ? product.originalPrice : product.price;
         };
 
+        // Every catalogue line is priced in one round trip to the website.
+        const catalogueItems = items.filter((item: any) => !isProductId(item.product));
+        const quotes = await quoteCatalogueLines(catalogueItems.map((item: any) => ({
+            slug: String(item.product),
+            division: item.division,
+            dims: item.dims,
+            size: item.size,
+        })));
+
         for (const item of items) {
             if (!isProductId(item.product)) {
-                const line = catalogueLine(item);
+                const line = catalogueLine(item, quotes[catalogueItems.indexOf(item)]);
                 subtotal += line.total;
                 orderItems.push(line);
                 stagedItems.push({ product: null });

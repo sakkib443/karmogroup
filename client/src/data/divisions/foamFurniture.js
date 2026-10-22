@@ -110,7 +110,7 @@ export const liveFurnitureFoamOffers = [
     thickness: "1 set",
     rating: 4.9,
     reviews: 210,
-    specs: ["50 kg/m³", "Yellow", "5 sit + 5 back"],
+    specs: ["50 kg/m³", "Bright yellow", "5 sit + 5 back"],
     defaultSize: "Queen",
   },
   {
@@ -297,6 +297,8 @@ const foamFurniture = {
 
   shapeGrid: {
     skin: "organized",
+    /* Top claim row is off. The room and the film fill the screen. */
+    stage: "lower",
     /* Calm brand damask, same as the mattress page — the old foam-cell photo
        (/pages/foam/mosaic/foam-texture-hq.webp) read as noise behind the cards. */
     background: "/products/mattress/mosaic/karmo-pattern-texture.webp",

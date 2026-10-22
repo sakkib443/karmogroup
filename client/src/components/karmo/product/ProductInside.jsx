@@ -1,135 +1,152 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-
-import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import LeafRule from "@/components/karmo/about/LeafRule";
 
 /**
- * Inside the mattress — the product's own cross-section, layer by layer.
+ * Inside the mattress — the exploded cross-section picture as a full-width
+ * backdrop, one straight line per layer running to a numbered label.
+ * The picture has no text; copy lives in productDetailData.js (INSIDE_BUILD),
+ * the same on every mattress page.
  *
- * Foam mattresses use the exploded brochure view (its numbers 1–6 are part of
- * the picture); spring mattresses use the cut-away photo with numbered markers
- * placed on each layer. The list on the right reads in the same order, and on
- * the spring view hovering a layer lights up its marker.
+ * Height follows the screen: the band is one screen tall (100svh), a little more
+ * on a very wide screen where the whole picture needs it, and never taller than
+ * 1.3 × the picture on a tall one. The picture itself is always shown whole at
+ * the page width — never zoomed or cropped. Spare height above and below is
+ * filled with the picture's own soft, extended edges (imageTall).
  *
- * The band runs edge to edge in a warm tone close to the pictures' own
- * backdrop, and the picture's rim is feathered so it melts into it.
- * Data: productDetailData.js → buildFor(slug). Hidden when a product has none.
+ * Desktop: labels sit on the empty right wall, sized in container units (cqw) so
+ * the lines keep pointing at the same layer at any width. Below `lg` the wall is
+ * too narrow for text: numbered pins on the picture, the list underneath.
  */
 
-const BAND = "#f7eee6";
+/** Right edge of each layer in the picture (x %, y %), top layer first. */
+const PINS = [
+  [53.4, 33.4],
+  [53.8, 41.0],
+  [53.6, 47.6],
+  [53.8, 54.8],
+  [52.6, 62.4],
+  [53.6, 73.0],
+];
+const LABEL_X = 62; // % from the left where the number badges start
 
 export default function ProductInside({ product }) {
-  const reduceMotion = useReducedMotion();
-  const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-  const [active, setActive] = useState(null);
-
   const build = product?.build;
-  if (!build?.layers?.length) return null;
-  const ratio = build.width / build.height;
-  const specs = product.specs || [];
+  if (!build?.image) return null;
+  const layers = build.layers || [];
+  const ratio = build.width / build.height; // 2
+  const vbH = 1000 / ratio;
+  const ext = build.extend || 0;
+
+  const heading = (
+    <h2
+      className="display uppercase text-ink"
+      style={{ fontSize: "clamp(1.05rem, 2.1cqw, 2.3rem)", fontWeight: 350, lineHeight: 1.05, letterSpacing: "-0.01em" }}
+    >
+      <span className="block">{build.title}</span>
+      <span className="mt-[0.12em] block text-brand">{build.accent}</span>
+    </h2>
+  );
 
   return (
-    <section
-      aria-label={`Inside the ${product.shortName}`}
-      className="relative overflow-hidden border-b border-ink/8"
-      style={{ backgroundColor: BAND }}
-    >
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="mx-auto grid w-full max-w-[1760px] items-center gap-8 px-5 py-10 sm:px-8 md:px-10 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:gap-12 lg:px-12 lg:py-14 xl:gap-16"
-      >
-        {/* ── Picture ───────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="min-w-0">
-          <div
-            className="relative mx-auto"
-            style={{
-              width: `min(100%, calc((100svh - 11rem) * ${ratio}))`,
-              aspectRatio: `${build.width} / ${build.height}`,
-            }}
-          >
-            <Image
-              src={build.image}
-              alt={build.alt}
-              fill
-              sizes="(min-width: 1024px) 56vw, 100vw"
-              className="object-contain"
-              style={{
-                WebkitMaskImage: "radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%)",
-                maskImage: "radial-gradient(ellipse 72% 70% at 50% 50%, #000 62%, transparent 100%)",
-              }}
-            />
-            {build.spots?.map(([x, y], i) => (
-              <span
-                key={`${x}-${y}`}
-                aria-hidden
-                className={`absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center border-2 border-white text-[12px] font-bold text-white shadow-[0_4px_14px_rgba(0,0,0,0.22)] transition-[transform,background-color] duration-300 sm:h-8 sm:w-8 sm:text-[13px] ${
-                  active === i ? "scale-125 bg-ink" : "bg-brand"
-                }`}
-                style={{ left: `${x}%`, top: `${y}%` }}
-              >
-                {i + 1}
-              </span>
-            ))}
-          </div>
-        </motion.div>
+    <section aria-label="Inside the mattress" className="relative w-full overflow-hidden bg-[#dcbb9c]">
+      {/* ── Desktop: one screen tall, lines and labels over the picture ── */}
+      <div className="@container hidden w-full lg:block">
+        <div className="relative w-full" style={{ height: "max(calc(100cqw / 2), min(100svh, calc(100cqw / 2 * 1.3)))" }}>
+          {/* The stage is exactly the picture's size, centred in the band. */}
+          <div className="absolute left-0 w-full" style={{ top: "50%", transform: "translateY(-50%)", aspectRatio: ratio }}>
+            {/* Reaches `ext`% above and below the stage; the stage itself is the picture. */}
+            <div className="absolute left-0 w-full" style={{ top: `-${ext}%`, height: `${100 + 2 * ext}%` }}>
+              <Image src={build.imageTall || build.image} alt={build.alt} fill sizes="100vw" className="object-fill" />
+            </div>
 
-        {/* ── Words ─────────────────────────────────────────────────── */}
-        <motion.div variants={fade} className="min-w-0">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
-            Layer by layer
-          </span>
-          <h2 className="display section-heading mt-2 uppercase text-ink">
-            Inside the <span className="text-brand">{product.shortName}</span>
-          </h2>
-          <LeafRule align="start" className="mt-4" />
+            <svg
+              className="pointer-events-none absolute inset-0 h-full w-full"
+              viewBox={`0 0 1000 ${vbH}`}
+              preserveAspectRatio="none"
+              aria-hidden
+            >
+              {PINS.map(([x, y], i) => {
+                const cy = (y / 100) * vbH;
+                return (
+                  <g key={i}>
+                    <line
+                      x1={x * 10}
+                      y1={cy}
+                      x2={LABEL_X * 10 - 2}
+                      y2={cy}
+                      className="stroke-brand"
+                      strokeWidth="1.5"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <circle cx={x * 10} cy={cy} r="3.6" className="fill-brand stroke-white" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                  </g>
+                );
+              })}
+            </svg>
 
-          {specs.length ? (
-            <ul className="mt-5 flex flex-wrap gap-2">
-              {specs.map((s) => (
-                <li
-                  key={s}
-                  className="border border-ink/15 bg-white/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink/70"
-                >
-                  {s}
-                </li>
-              ))}
-            </ul>
-          ) : null}
+            {/* Sits in the open wall above the first callout, aligned with the
+                number column — not up in the corner or running off the right edge. */}
+            <div className="absolute" style={{ left: `${LABEL_X}%`, top: "15%", width: "26%" }}>
+              {heading}
+            </div>
 
-          <ol className="mt-6 border-t border-ink/10">
-            {build.layers.map((layer, i) => (
-              <li
+            {layers.map((layer, i) => (
+              <div
                 key={layer.title}
-                onMouseEnter={() => setActive(i)}
-                onMouseLeave={() => setActive(null)}
-                className="group grid grid-cols-[2rem_minmax(0,1fr)] gap-4 border-b border-ink/10 py-3 sm:py-3.5"
+                className="absolute flex items-center"
+                style={{ left: `${LABEL_X}%`, top: `${PINS[i][1]}%`, width: "33%", transform: "translateY(-50%)", gap: "0.8cqw" }}
               >
                 <span
-                  className={`flex h-8 w-8 items-center justify-center text-[13px] font-bold text-white transition-colors duration-300 ${
-                    active === i ? "bg-brand" : "bg-ink"
-                  }`}
+                  className="flex shrink-0 items-center justify-center bg-brand font-bold text-white"
+                  style={{ width: "2cqw", height: "2cqw", minWidth: 18, minHeight: 18, fontSize: "clamp(10px, 0.95cqw, 16px)" }}
                 >
                   {i + 1}
                 </span>
-                <div>
-                  <h3 className="text-[13px] font-bold uppercase tracking-[0.1em] text-ink">
+                <div className="min-w-0">
+                  <h3 className="font-bold uppercase text-ink" style={{ fontSize: "clamp(10px, 0.95cqw, 17px)", letterSpacing: "0.08em", lineHeight: 1.2 }}>
                     {layer.title}
                   </h3>
-                  <p className="body-copy mt-1 text-[13.5px] leading-relaxed text-ink/60">
+                  <p className="text-ink/60" style={{ fontSize: "clamp(9.5px, 0.85cqw, 15px)", lineHeight: 1.3 }}>
                     {layer.body}
                   </p>
                 </div>
-              </li>
+              </div>
             ))}
-          </ol>
-        </motion.div>
-      </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Phones and tablets: picture with numbered pins, list below ── */}
+      <div className="@container lg:hidden" style={{ backgroundColor: "#f7eee6" }}>
+        <div className="px-5 pb-4 pt-7 sm:px-8">{heading}</div>
+        <div className="relative w-full" style={{ aspectRatio: ratio }}>
+          <Image src={build.image} alt={build.alt} fill sizes="100vw" className="object-fill" />
+          {PINS.map(([x, y], i) => (
+            <span
+              key={i}
+              aria-hidden
+              className="absolute flex h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-white bg-brand text-[10px] font-bold text-white shadow-[0_2px_8px_rgba(0,0,0,0.25)] sm:h-6 sm:w-6 sm:text-[12px]"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            >
+              {i + 1}
+            </span>
+          ))}
+        </div>
+        <ol className="grid gap-x-6 gap-y-3 px-5 pb-7 pt-5 sm:grid-cols-2 sm:px-8">
+          {layers.map((layer, i) => (
+            <li key={layer.title} className="flex items-center gap-3">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-brand text-[12px] font-bold text-white">
+                {i + 1}
+              </span>
+              <div>
+                <h3 className="text-[12px] font-bold uppercase tracking-[0.08em] text-ink">{layer.title}</h3>
+                <p className="text-[12.5px] leading-snug text-ink/60">{layer.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

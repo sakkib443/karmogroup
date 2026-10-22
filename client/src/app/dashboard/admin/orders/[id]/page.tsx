@@ -50,8 +50,7 @@ import EditOrderModal from '@/components/admin/orders/EditOrderModal';
 import OrderPipeline from '@/components/admin/orders/OrderPipeline';
 import { CancelOrderModal } from '@/components/admin/orders/OrderActions';
 import { can, nextStatuses, ROLE_LABEL } from '@/components/admin/access';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 
 // Shared status badge built from the canonical 11-state config
 const StatusBadge = ({ status }: { status: string }) => {
@@ -286,7 +285,7 @@ export default function OrderDetailsPage() {
     const [sendPkgId, setSendPkgId] = useState<string | null>(null);
     const [sendError, setSendError] = useState('');
     // What this person may do comes from their role (components/admin/access.ts); the server checks again.
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const seeMoney = can(role, 'seeMoney');
     const [cancelOpen, setCancelOpen] = useState(false);
 

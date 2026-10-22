@@ -10,12 +10,11 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import {
     LuPlus, LuMinus, LuX, LuSearch, LuUserCheck, LuUserPlus, LuPackagePlus, LuCheck, LuPenLine, LuChevronDown,
 } from 'react-icons/lu';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import { useCreateAdminOrderMutation, type ManualOrderInput } from '@/redux/api/orderApi';
 import { useLookupCustomerQuery } from '@/redux/api/userApi';
 import { useGetProductsQuery } from '@/redux/api/productApi';
@@ -320,7 +319,7 @@ function Choice({ on, onClick, children }: { on: boolean; onClick: () => void; c
 
 export default function AddOrderPage() {
     const router = useRouter();
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const mayMarkPaid = can(role, 'payment');
     const [createOrder, { isLoading: saving }] = useCreateAdminOrderMutation();
     const [savingAs, setSavingAs] = useState<'pending' | 'confirmed' | null>(null);

@@ -35,7 +35,7 @@ export const productFeatures = [
     id: "durability",
     title: "Tested to last",
     body: "Pressed again and again on a test rig, so the comfort layers keep their shape and support for years of everyday use.",
-    video: `${VID}/durability-test.mp4`,
+    video: `${VID}/pressure-press.gif?v=2`,
     poster: `${VID}/durability-test-poster.webp`,
   },
 ];
@@ -57,123 +57,33 @@ export const productFeatureBands = [
 
 /* ─── Inside the mattress — the cross-section band under the icon strip ─── */
 
-const INSIDE = "/pages/mattress/brochure/inside";
-
-const COVER = {
-  title: "Quilted damask cover",
-  body: "Breathable, anti-allergic fabric quilted over soft wadding — cool to the touch and easy to live with.",
-};
-const FELT = {
-  title: "Felt insulator",
-  body: "A felt pad keeps the comfort layers off the core, so the mattress holds its shape and stays even.",
-};
-const BASE_COVER = {
-  title: "Quilted base",
-  body: "A tough quilted underside with taped edges that keep the mattress square and stable on the bed.",
-};
-
-/** Foam builds — the exploded image already carries the numbers 1–6. */
-const FOAM_LAYERS = {
-  king: [
-    COVER,
-    { title: "PE comfort foam", body: "Hi-density PE foam cushions shoulders and hips without letting you sink." },
-    FELT,
-    { title: "Rebonded foam core", body: "A dense rebonded core for firm, even support from edge to edge — the heart of the mattress." },
-    { title: "PE support foam", body: "A second PE layer balances the core, so it feels the same night after night." },
-    BASE_COVER,
-  ],
-  prestige: [
-    COVER,
-    { title: "Soft comfort foam", body: "The softer side — settle in gently for a relaxed, cushioned feel." },
-    FELT,
-    { title: "Rebonded foam core", body: "A dense rebonded core keeps both sides supportive and long-lasting." },
-    { title: "Firm comfort foam", body: "Flip it over for the firmer side — two feels in one mattress." },
-    BASE_COVER,
-  ],
-  orthopedic: [
-    COVER,
-    { title: "Firm comfort foam", body: "A thin, firm top keeps the spine level instead of letting it dip." },
-    FELT,
-    { title: "Orthopedic rebonded core", body: "Extra-dense rebonded foam for firm, posture-friendly support through the back." },
-    { title: "Support foam", body: "Spreads your weight across the core so support stays even all over." },
-    BASE_COVER,
-  ],
-  "imperial-eurotop": [
-    { title: "Euro top cover", body: "A plush, quilted euro top for a soft first touch and pressure relief." },
-    { title: "Comfort foam", body: "Eases pressure at shoulders and hips while the core does the holding up." },
-    FELT,
-    { title: "Hi-density PE core", body: "An extra-firm hi-density PE core for strong support that lasts." },
-    { title: "Support foam", body: "Keeps the core stable and the surface level over the years." },
-    BASE_COVER,
+/**
+ * One picture and one short copy deck for every mattress page. The picture carries
+ * no text; ProductInside draws one line per layer to a numbered label, top layer first.
+ */
+const INSIDE_BUILD = {
+  image: "/products/mattress/inside/exploded-display.webp",
+  width: 1774,
+  height: 887,
+  /* Same picture with 16% of soft haze added above and below, so a tall screen can be
+     filled without stretching or zooming it. */
+  imageTall: "/products/mattress/inside/exploded-display-tall.webp",
+  extend: 16,
+  alt: "Exploded view of a Karmo mattress in a sunlit bedroom: quilted cover, wave comfort foam, moisture-proof layer, transition layer, pocket springs and base",
+  title: "Inside every",
+  accent: "Karmo mattress",
+  layers: [
+    { title: "Quilted knitted cover", body: "Soft, breathable, skin-friendly" },
+    { title: "3D wave foam", body: "Eases pressure points" },
+    { title: "Moisture-proof layer", body: "Stays fresh and dry" },
+    { title: "Transition layer", body: "Balances support and comfort" },
+    { title: "Pocket springs", body: "Strong, motion-free support" },
+    { title: "Support base", body: "Stable and long-lasting" },
   ],
 };
 
-/** Spring builds — numbered markers sit on the cut-away photo (x %, y %). */
-const SPRING_SPOTS = [
-  [60, 22],
-  [45, 41],
-  [84, 45],
-  [52, 62],
-  [45, 86],
-];
-const EDGE = {
-  title: "Foam edge support",
-  body: "A firm foam frame around the springs, so the edge stays strong when you sit on it.",
-};
-const BASE_PAD = {
-  title: "Base pad",
-  body: "A felt pad and quilted base protect the springs and keep the mattress steady.",
-};
-const POCKET = {
-  title: "Pocket spring unit",
-  body: "Individually wrapped coils that move on their own — support follows your body and a partner's movement stays on their side.",
-};
-const SPRING_LAYERS = {
-  "bonnell-spring": [
-    COVER,
-    { title: "Comfort foam", body: "Soft foam over the coils for a cushioned, even feel." },
-    EDGE,
-    { title: "Bonnell spring unit", body: "Linked open coils give a firm, springy and breathable support base." },
-    BASE_PAD,
-  ],
-  "pillow-top-pocket-spring": [
-    { title: "3\" pillow top", body: "A plush pillow top stitched on top for deep, cloud-soft comfort." },
-    { title: "Comfort foam", body: "Cushions the springs and eases pressure at shoulders and hips." },
-    EDGE,
-    POCKET,
-    BASE_PAD,
-  ],
-  "euro-top-pocket-spring": [
-    { title: "Euro pillow top", body: "A flush euro top for a soft, smooth first touch from edge to edge." },
-    { title: "Memory foam layer", body: "Moulds to your shape and relieves pressure points, then springs back." },
-    EDGE,
-    POCKET,
-    BASE_PAD,
-  ],
-};
-
-function buildFor(id) {
-  if (FOAM_LAYERS[id]) {
-    return {
-      image: `${INSIDE}/exploded-layers.webp`,
-      width: 1152,
-      height: 864,
-      alt: "Exploded view of a Karmo foam mattress, its six layers numbered from the cover down",
-      layers: FOAM_LAYERS[id],
-      spots: null,
-    };
-  }
-  if (SPRING_LAYERS[id]) {
-    return {
-      image: `${INSIDE}/pocket-cutaway.webp`,
-      width: 1280,
-      height: 720,
-      alt: "Cut-away of a Karmo spring mattress showing the cover, comfort foam, foam edge, springs and base",
-      layers: SPRING_LAYERS[id],
-      spots: SPRING_SPOTS,
-    };
-  }
-  return null;
+function buildFor() {
+  return INSIDE_BUILD;
 }
 
 /**
@@ -324,8 +234,8 @@ function toDetail(item) {
     features: productFeatures,
     /** Own product film (or null) — first thumb in the gallery row. */
     film: FILM_BY_ID[item.id] || null,
-    /** Cross-section band (null for the topper). */
-    build: buildFor(item.id),
+    /** Cross-section band — the same picture and layers on every page. */
+    build: buildFor(),
     shortName: item.shortName || item.name,
     specs: item.specs || [],
     /** Feature bands that apply to this mattress. */

@@ -1,25 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowUpRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import {
-  foamBuildSlides,
-  foamProductFeatures,
-} from "@/components/karmo/product/foamProductDetailData";
+import { foamProductFeatures } from "@/components/karmo/product/foamProductDetailData";
 
 const ORANGE = "#FF9A1F";
-const BAND_H = "calc(100svh - 140px)";
-const GAP = "gap-1.5";
-const EASE = [0.33, 1, 0.68, 1];
-const FIRST_HOLD_MS = 550;
-const HOLD_MS = 2000;
-const FADE_S = 0.18;
-const ZOOM_MS = 14000;
 
 function LeafRule() {
   return (
@@ -44,162 +33,31 @@ function LeafRule() {
   );
 }
 
-function HoverChrome({ label }) {
-  return (
-    <>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[2] bg-black/0 transition-colors duration-500 ease-out group-hover:bg-black/45"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-[10%] z-[2] border-2 border-white/0 transition-all duration-500 ease-out group-hover:border-white/95 sm:inset-[12%] lg:inset-[13%]"
-      />
-      <span className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <span className="display translate-y-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:text-[14px] lg:text-[15px]">
-          {label}
-        </span>
-      </span>
-    </>
-  );
-}
-
-function TallMorph() {
-  const reduceMotion = useReducedMotion();
-  const rootRef = useRef(null);
-  const firstSwapDone = useRef(false);
-  const [index, setIndex] = useState(0);
-  const [inView, setInView] = useState(false);
-  const slides = foamBuildSlides;
-
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return undefined;
-    }
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const visible = Boolean(entry?.isIntersecting);
-        setInView(visible);
-        if (visible) {
-          firstSwapDone.current = false;
-          setIndex(0);
-        }
-      },
-      { threshold: 0.25 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion || !inView) return undefined;
-    const delay = firstSwapDone.current ? HOLD_MS : FIRST_HOLD_MS;
-    const id = window.setTimeout(() => {
-      firstSwapDone.current = true;
-      setIndex((i) => (i + 1) % slides.length);
-    }, delay);
-    return () => window.clearTimeout(id);
-  }, [reduceMotion, inView, index, slides.length]);
-
-  const active = slides[index];
-
-  return (
-    <div
-      ref={rootRef}
-      className="group relative row-span-2 min-h-0 overflow-hidden bg-[#ebe7e1]"
-    >
-      <motion.div
-        className="absolute inset-0 origin-[50%_40%] will-change-transform"
-        initial={false}
-        animate={
-          reduceMotion
-            ? { scale: 1, y: 0 }
-            : { scale: [1, 1.03], y: ["0%", "-0.6%"] }
-        }
-        transition={
-          reduceMotion
-            ? { duration: 0 }
-            : {
-                duration: ZOOM_MS / 1000,
-                ease: "linear",
-                repeat: Infinity,
-                repeatType: "loop",
-              }
-        }
-      >
-        {slides.map((slide, i) => {
-          const on = i === index;
-          return (
-            <motion.div
-              key={slide.id}
-              initial={false}
-              animate={{ opacity: on ? 1 : 0 }}
-              transition={{ duration: reduceMotion ? 0 : FADE_S, ease: EASE }}
-              className={`absolute inset-0 ${on ? "z-[1]" : "pointer-events-none z-0"}`}
-            >
-              <Image
-                src={slide.src}
-                alt={on ? slide.alt : ""}
-                fill
-                sizes="(min-width: 1024px) 28vw, 45vw"
-                quality={85}
-                className="object-cover object-[center_18%]"
-              />
-            </motion.div>
-          );
-        })}
-      </motion.div>
-      <HoverChrome label={active?.label || "Karmo Foam"} />
-    </div>
-  );
-}
-
-function StillTile({ src, label }) {
-  return (
-    <div className="group relative min-h-0 overflow-hidden bg-[#0c0c0c]">
-      <Image
-        src={src}
-        alt=""
-        fill
-        sizes="(min-width: 1024px) 22vw, 40vw"
-        className="object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-      />
-      <HoverChrome label={label} />
-    </div>
-  );
-}
-
 export default function ProductFoamBuildAside() {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section
-      className="relative my-[6px] overflow-x-clip py-12 lg:overflow-visible lg:py-0"
-      style={{ ["--build-h"]: BAND_H }}
-      aria-label="Inside every Karmo foam grade"
-    >
+    <section className="relative overflow-hidden border-y border-ink/8 bg-white py-14 lg:py-20" aria-label="Inside every Karmo foam grade">
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
           src="/products/foam/foam-texture-bg.webp"
           alt=""
           fill
           sizes="100vw"
-          className="object-cover object-center opacity-[0.22]"
+          className="object-cover object-center opacity-[0.18]"
           priority={false}
         />
-        <span className="absolute inset-0 bg-white/58" />
+        <span className="absolute inset-0 bg-white/70" />
       </div>
 
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="relative z-[1] grid items-center gap-8 px-6 md:px-14 lg:h-[var(--build-h)] lg:min-h-[var(--build-h)] lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
+        className="shell relative z-[1]"
       >
-        <motion.div variants={fade} className="min-w-0 max-w-md self-center lg:max-w-[28rem]">
+        <motion.div variants={fade} className="max-w-3xl">
           <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
               Pure rubber grade
@@ -216,22 +74,23 @@ export default function ProductFoamBuildAside() {
 
           <LeafRule />
 
-          <p className="body-copy mt-4 text-[15px] leading-[1.7] text-ink/55 sm:text-[16px] lg:text-[17px]">
+          <p className="body-copy mt-4 max-w-2xl text-[15px] leading-[1.7] text-ink/55 sm:text-[16px] lg:text-[17px]">
             Open-cell rubber-grade foam — no fillers, firm airflow, cut clean for
             furniture and specialty makers who need density that endures.
           </p>
+        </motion.div>
 
-          <ul className="mt-5 space-y-3 border-t border-ink/10 pt-5">
-            {foamProductFeatures.map((f) => (
-              <li key={f.title} className="body-copy text-[13.5px] leading-[1.55] text-ink/65">
-                <span className="font-bold text-ink">{f.title}</span>
-                {" — "}
-                {f.body}
-              </li>
-            ))}
-          </ul>
+        <motion.ul variants={fade} className="mt-10 grid gap-6 border-t border-ink/10 pt-8 md:grid-cols-2">
+          {foamProductFeatures.map((feature) => (
+            <li key={feature.title}>
+              <p className="text-[15px] font-bold text-ink">{feature.title}</p>
+              <p className="body-copy mt-2 max-w-md text-[14px] leading-[1.65] text-ink/60">{feature.body}</p>
+            </li>
+          ))}
+        </motion.ul>
 
-          <Link href="/contact" className="group mt-5 inline-flex items-center gap-3">
+        <motion.div variants={fade}>
+          <Link href="/contact" className="group mt-8 inline-flex items-center gap-3">
             <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
               Talk to us
             </span>
@@ -239,25 +98,6 @@ export default function ProductFoamBuildAside() {
               <FiArrowUpRight />
             </span>
           </Link>
-        </motion.div>
-
-        <motion.div
-          variants={fade}
-          className="flex h-[min(52svh,380px)] w-full min-w-0 justify-end self-stretch lg:h-full lg:min-h-0"
-        >
-          <div
-            className={`grid h-full w-full max-w-[min(100%,48rem)] grid-cols-[0.78fr_0.9fr] grid-rows-2 sm:max-w-[min(100%,54rem)] ${GAP} lg:max-w-[min(100%,62rem)]`}
-          >
-            <TallMorph />
-            <StillTile
-              src="/products/foam/detail/build-02.webp"
-              label={foamProductFeatures[0]?.title || "Pure rubber"}
-            />
-            <StillTile
-              src="/products/foam/detail/build-03.webp"
-              label={foamProductFeatures[1]?.title || "Cut clean"}
-            />
-          </div>
         </motion.div>
       </motion.div>
     </section>

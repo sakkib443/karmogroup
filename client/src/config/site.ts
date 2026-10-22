@@ -28,7 +28,8 @@ export const SITE_KEYWORDS = [
 ];
 
 /** Hero photograph — wide enough for WhatsApp / Facebook link previews. */
-export const OG_IMAGE = "/karmo/images/home-02/hero/karmo-family-white-outfits.webp";
+/** Link-preview picture (1200×630 JPG — social apps read JPG everywhere). */
+export const OG_IMAGE = "/og-image.jpg";
 
 export const OG_IMAGE_ALT =
   "A Karmo family on a sofa — foam, mattress and HomeTex made in Bangladesh since 1965";

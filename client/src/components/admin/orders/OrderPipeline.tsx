@@ -3,7 +3,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useSelector } from 'react-redux';
 import {
     LuCheck, LuCopy, LuArrowRight, LuUndo2, LuTruck, LuX, LuEye, LuFileText, LuReceiptText, LuCopyPlus,
     LuScanBarcode, LuShieldCheck, LuLock, LuPrinter,
@@ -13,7 +12,7 @@ import {
     useUpdateOrderStatusMutation, useSendWithPathaoMutation, useIssueMemoMutation, useReprintMemoMutation,
     useIssueChallanMutation, useReprintChallanMutation,
 } from '@/redux/api/orderApi';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import { ORDER_DESK_STEPS, STATUS_COLOR as STEP_COLOR, getStatusConfig } from '@/lib/orderStatus';
 import { can, nextStatuses } from '@/components/admin/access';
 import { Btn, Modal, Field, TEXTAREA, cx } from '@/components/admin/ui';
@@ -50,7 +49,7 @@ const tryOpen = (fn: () => void) => {
 type Reprint = { kind: 'memo' } | { kind: 'challan'; job: any };
 
 export default function OrderPipeline({ order }: { order: any }) {
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const [updateStatus, { isLoading: isMoving }] = useUpdateOrderStatusMutation();
     const [sendWithPathao, { isLoading: isBooking }] = useSendWithPathaoMutation();
     const [issueMemo, { isLoading: isIssuingMemo }] = useIssueMemoMutation();

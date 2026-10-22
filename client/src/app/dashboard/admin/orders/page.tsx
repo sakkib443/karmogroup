@@ -22,6 +22,8 @@ import { useGetProductsQuery } from '@/redux/api/productApi';
 import { useGetZonesQuery } from '@/redux/api/shippingApi';
 import { BD_DIVISIONS, BD_DISTRICTS, getDivision, getDistrict, districtTerms, divisionTerms, zoneTerms } from '@/lib/bdGeo';
 import { toast } from 'react-hot-toast';
+import ExportMenu from './_components/ExportMenu';
+import { dateRange } from './_components/dateRange';
 import { ORDER_STATUS_CONFIG, ORDER_DESK_STEPS, getStatusConfig, paymentMethodLabel, statusColor } from '@/lib/orderStatus';
 import {
     PageHeader, Btn, SearchInput, SelectPill, TableCard, TR, EmptyRow, SkeletonRows, RowMenu, Modal,
@@ -32,8 +34,7 @@ import { orderSummaryText, orderDocumentText, orderDivisions, divisionLabel, ope
 import PrintOrdersModal, { type PrintJob, type PrintKind } from '@/components/admin/print/PrintOrdersModal';
 import { CancelOrderModal, SmsButton, CANCEL_REASONS } from '@/components/admin/orders/OrderActions';
 import { can, nextStatuses } from '@/components/admin/access';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 
 /* ─── Small corners ──────────────────────────────────────── */
 
@@ -152,29 +153,6 @@ function money(o: any) {
 const fmtDay = (d?: string) => d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 const fmtTime = (d?: string) => d ? new Date(d).toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }) : '';
 const isToday = (d?: string) => !!d && new Date(d).toDateString() === new Date().toDateString();
-
-/** A date preset → the start and end of those local days, as ISO moments for the server. */
-function dateRange(preset: string, from: string, to: string): { from?: string; to?: string } {
-    const sod = (d: Date) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
-    const eod = (d: Date) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
-    const now = new Date();
-    const ago = (n: number) => { const x = new Date(now); x.setDate(x.getDate() - n); return x; };
-    let a: Date | undefined;
-    let b: Date | undefined;
-    switch (preset) {
-        case 'today': a = sod(now); b = eod(now); break;
-        case 'yesterday': a = sod(ago(1)); b = eod(ago(1)); break;
-        case '7d': a = sod(ago(6)); b = eod(now); break;
-        case '30d': a = sod(ago(29)); b = eod(now); break;
-        case 'this_month': a = new Date(now.getFullYear(), now.getMonth(), 1); b = eod(now); break;
-        case 'last_month': a = new Date(now.getFullYear(), now.getMonth() - 1, 1); b = eod(new Date(now.getFullYear(), now.getMonth(), 0)); break;
-        case 'custom':
-            if (from) a = sod(new Date(`${from}T00:00:00`));
-            if (to) b = eod(new Date(`${to}T00:00:00`));
-            break;
-    }
-    return { from: a?.toISOString(), to: b?.toISOString() };
-}
 
 function useDebounced<T>(value: T, ms = 300) {
     const [v, setV] = useState(value);
@@ -361,7 +339,7 @@ function OrdersPageInner() {
     const [addNote, { isLoading: isSavingNote }] = useAddAdminNoteMutation();
     // What this person may do here comes from their role (components/admin/access.ts);
     // the server checks every step again.
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const seeMoney = can(role, 'seeMoney');
     const allowed = (o: any) => nextStatuses(role, o.status || 'pending', ALL_STATUSES);
     const mayMove = (o: any, to: string) => allowed(o).includes(to);
@@ -371,6 +349,36 @@ function OrdersPageInner() {
     const stats = statsData?.data || {};
     const products: any[] = productsData?.data || [];
     const hasMore = orders.length < (meta.total || 0);
+
+    // The Export menu: every filter on screen except the dates, and a plain-words list of them.
+    const exportBase = {
+        sort,
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        paymentStatus: paymentFilter !== 'all' ? paymentFilter : undefined,
+        paymentMethod: methodFilter !== 'all' ? methodFilter : undefined,
+        'items.product': productFilter !== 'all' ? productFilter : undefined,
+        division: divisionFilter !== 'all' ? divisionFilter : undefined,
+        courier: courierFilter !== 'all' ? courierFilter : undefined,
+        searchTerm: q.trim() || undefined,
+        minTotal: minQ || undefined,
+        maxTotal: maxQ || undefined,
+        places,
+        zonePlaces,
+    };
+    const exportFilters = [
+        statusFilter !== 'all' && `Status: ${STATUS_OPTIONS.find((o) => o.value === statusFilter)?.label || statusFilter}`,
+        paymentFilter !== 'all' && `Payment: ${PAYMENT[paymentFilter]?.label || paymentFilter}`,
+        methodFilter !== 'all' && `Method: ${paymentMethodLabel(methodFilter)}`,
+        productFilter !== 'all' && `Product: ${products.find((p) => p._id === productFilter)?.name || 'selected'}`,
+        divisionFilter !== 'all' && `Division: ${DIVISION_OPTIONS.find((o) => o.value === divisionFilter)?.label || divisionFilter}`,
+        courierFilter !== 'all' && `Courier: ${COURIER_OPTIONS.find((o) => o.value === courierFilter)?.label || courierFilter}`,
+        q.trim() && `Search: ${q.trim()}`,
+        (minQ || maxQ) && `Total: ${minQ || 0}–${maxQ || '∞'}`,
+        (geoDivision !== 'all' || geoDistrict !== 'all' || zoneFilter !== 'all') && 'Location',
+    ].filter(Boolean) as string[];
+    const screenLabel = datePreset === 'custom'
+        ? 'Custom dates'
+        : DATE_PRESETS.find((d) => d.value === datePreset)?.label || 'All time';
     // The factory sees no prices, so the Payment and Amount columns are not there for it.
     const show = (k: ColKey) => !hidden.has(k) && (seeMoney || (k !== 'payment' && k !== 'amount'));
     const colCount = 3 + COLUMNS.filter((c) => show(c.key)).length;
@@ -820,7 +828,9 @@ function OrdersPageInner() {
                 title="Orders"
                 subtitle="Every sales order — from the store and taken by phone — from first call to the courier."
                 actions={<>
-                    {can(role, 'export') && <Button icon={<LuDownload size={15} />} onClick={() => exportOrdersCsv(orders, 'orders')}>Export</Button>}
+                    {can(role, 'export') && (
+                        <ExportMenu baseParams={exportBase} screenRange={range} screenLabel={screenLabel} activeFilters={exportFilters} total={meta.total || 0} />
+                    )}
                     {can(role, 'createOrder') && <Button variant="primary" icon={<LuPlus size={16} />} href="/dashboard/admin/orders/new">Add order</Button>}
                 </>}
             />

@@ -624,7 +624,9 @@ export default function DivisionProducts({
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell relative z-[1] mb-8 text-center lg:mb-10"
+        className={`shell relative z-[1] text-center ${
+          catalogue ? "mb-4 lg:mb-5" : "mb-8 lg:mb-10"
+        }`}
       >
         <motion.div variants={fade}>
           <span className="text-[12px] font-semibold uppercase tracking-[0.3em] text-brand">
@@ -677,7 +679,9 @@ export default function DivisionProducts({
           viewport={VIEWPORT}
           className={
             threeCol
-              ? "relative z-[1] mx-auto grid w-full max-w-[1680px] grid-cols-1 items-stretch gap-5 px-5 pt-6 sm:grid-cols-2 sm:gap-6 sm:pt-8 md:px-8 lg:grid-cols-3 lg:gap-7 lg:px-10 lg:pt-10"
+              ? `relative z-[1] mx-auto grid w-full max-w-[1680px] grid-cols-1 items-stretch gap-5 px-5 sm:grid-cols-2 sm:gap-6 md:px-8 lg:grid-cols-3 lg:gap-7 lg:px-10 ${
+                  catalogue ? "pt-2 sm:pt-3 lg:pt-3" : "pt-6 sm:pt-8 lg:pt-10"
+                }`
               : "relative z-[1] mx-auto grid w-full max-w-[1760px] grid-cols-1 gap-5 px-6 sm:grid-cols-2 sm:gap-6 md:px-10 lg:grid-cols-4 lg:gap-8 lg:px-12"
           }
         >
