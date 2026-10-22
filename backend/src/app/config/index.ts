@@ -33,6 +33,10 @@ export default {
 
     frontend_url: process.env.FRONTEND_URL || 'http://localhost:3000',
 
+    // Where checkout asks the website for the price of a Karmo catalogue line (mattress,
+    // foam). Empty = FRONTEND_URL + /api/catalogue-quote. Must reach the live website.
+    catalogue_quote_url: process.env.CATALOGUE_QUOTE_URL || '',
+
     // Public base URL of THIS backend. Used to build absolute URLs for locally
     // stored image uploads (disk storage). Leave empty to auto-detect from the
     // incoming request — on the VPS, set it to your backend domain e.g.

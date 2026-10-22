@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -41,6 +41,20 @@ const LoginPageInner = () => {
 
   const isExpired = searchParams.get("expired") === "true";
   const redirectPath = searchParams.get("redirect");
+
+  // Already signed in (a saved session) → no sign-in form: go to the page you were sent
+  // for, or your own dashboard. Runs once on arrival, not after this page's own sign-in.
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("token");
+      const saved = JSON.parse(localStorage.getItem("user") || "null");
+      if (!token || !saved) return;
+      router.replace(redirectPath || (isStaffRole(saved.role) ? "/dashboard/admin" : "/dashboard/user"));
+    } catch {
+      /* no usable saved session — show the form */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

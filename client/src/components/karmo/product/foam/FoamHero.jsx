@@ -3,9 +3,8 @@
 /**
  * Karmo Foam — product hero. Built on the Matrexx buy box's frame and measures
  * (same 1760px stage, square gallery, sticky left column, bordered calculator box,
- * square corners, one quiet texture behind every product), with foam's own pieces:
- * a grade switcher, square colour swatches, the foam's specs and a cut-to-size
- * calculator. Pricing is the catalogue's sales calculator (foamPricing.js).
+ * square corners, one quiet texture behind every product), with the foam's
+ * specs and a cut-to-size calculator. Pricing is the catalogue's sales calculator.
  */
 import { useState } from "react";
 import Image from "next/image";
@@ -18,47 +17,11 @@ import { toast } from "react-hot-toast";
 import { useAppDispatch } from "@/redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
-import { getFoamPricingRule, quoteFoamListPrice, quoteFoamPrice } from "@/components/karmo/product/foamPricing";
-import { getFoamProductDetail, getFoamProductSlugs } from "@/components/karmo/product/foamProductDetailData";
+import { getFoamPricingRule } from "@/components/karmo/product/foamPricing";
+import { quoteFoamUnit } from "@/components/karmo/product/catalogueQuote";
 
 const EASE = [0.22, 1, 0.36, 1];
-/** The website's standing sales discount. */
-const OFFER_PCT = 15;
 const MAX_QTY = 99;
-
-/* The colour a grade is made in, so the page opens on it. */
-const NATURAL = {
-  "combo-280": "coral",
-  "combo-2001": "olive",
-  "combo-4g": "lavender",
-  "combo-1965": "gold",
-  "combo-signature": "blue",
-  "rebonded-set": "rebonded",
-};
-
-/* Short grade name for the switcher: "280", "HD", "Sit"… */
-function gradeLabel(p) {
-  const m = /combo-(.+)/.exec(p.slug);
-  if (m) return m[1] === "signature" ? "Signature" : m[1].toUpperCase();
-  if (p.slug === "foam-sit") return "Sit";
-  if (p.slug === "foam-back") return "Back";
-  return String(p.name || p.slug).split(" ")[0];
-}
-
-function OptionBlock({ title, aside = "", children }) {
-  return (
-    <div className="border-b border-ink/10 py-2.5">
-      <div className="mb-2.5 flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2">
-          <FiChevronDown className="shrink-0 text-ink/65" size={14} />
-          <span className="text-[15px] font-semibold text-ink/85">{title}</span>
-        </span>
-        {aside ? <span className="text-[13px] font-medium text-ink/55">{aside}</span> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
 
 function ThumbButton({ src, active, onClick, label, className = "" }) {
   return (
@@ -84,45 +47,18 @@ export default function FoamHero({ product }) {
   const letterGallery = product.letterGallery || [];
   const realGallery = product.realGallery?.length ? product.realGallery : product.gallery || [];
   const cover = product.cover || realGallery[0] || letterGallery[0];
-  const sizes = (product.sizes || []).filter((s) => s.id !== "custom");
-  const ref = (product.sizes || []).find((s) => s.id === "queen") || sizes[0];
-  const colours = product.fabrics || [];
-  const grades = getFoamProductSlugs().map((s) => getFoamProductDetail(s)).filter(Boolean);
+  const ref = (product.sizes || []).find((s) => s.id === "queen") || (product.sizes || [])[0];
   const textureSrc = product.textureSrc || "/products/foam/foam-texture-bg.webp";
   const buyboxIcons = product.buyboxIcons || [];
 
   const [mainSrc, setMainSrc] = useState(cover);
-  const [colour, setColour] = useState(
-    NATURAL[product.slug] && colours.some((c) => c.id === NATURAL[product.slug]) ? NATURAL[product.slug] : colours[0]?.id || "",
-  );
-  const [sizeId, setSizeId] = useState(ref?.id || "custom");
   const [length, setLength] = useState(String(ref?.l || 72));
   const [width, setWidth] = useState(String(ref?.w || 48));
   const [height, setHeight] = useState(String(ref?.h || product.defaultHeight || 4));
   const [qty, setQty] = useState(1);
 
-  const picked = colours.find((c) => c.id === colour);
-  const refL = ref?.l;
-  const refW = ref?.w;
-  const refH = ref?.h || product.defaultHeight;
-
-  // Cheap to work out on every render.
-  const quote = (() => {
-    const listMrp = product.mrp || 0;
-    const listOffer = product.price || 0;
-    if (fixedPrice) {
-      const base = listMrp || listOffer;
-      if (!base) return { ok: false, total: 0, base: 0 };
-      const total = listOffer && listMrp > listOffer ? listOffer : Math.round(base * (1 - OFFER_PCT / 100));
-      return { ok: true, total, base };
-    }
-    return listMrp
-      ? quoteFoamListPrice(product.slug, {
-          length, width, height, discountPct: OFFER_PCT, listMrp, listOffer,
-          refLength: refL, refWidth: refW, refHeight: refH,
-        })
-      : quoteFoamPrice(product.slug, { length, width, height, discountPct: OFFER_PCT });
-  })();
+  // Cheap to work out on every render. The same quote the order server checks against.
+  const quote = quoteFoamUnit(product, { length, width, height });
 
   const unitPrice = quote.total || 0;
   const mrpUnit = quote.base || unitPrice;
@@ -131,14 +67,7 @@ export default function FoamHero({ product }) {
   const savePct = quote.ok && mrpUnit > unitPrice ? Math.round(((mrpUnit - unitPrice) / mrpUnit) * 100) : 0;
   const sizeLabel = fixedPrice ? product.pack || "Standard" : `${length} × ${width} × ${height} inch`;
   const cft = !fixedPrice && quote.ok ? ((Number(length) * Number(width) * Number(height)) / 1728).toFixed(2) : null;
-  const cartId = `${product.slug}_${colour || "std"}_${fixedPrice ? "std" : `${width}x${length}x${height}`}`;
-
-  const pickSize = (s) => {
-    setSizeId(s.id);
-    setWidth(String(s.w));
-    setLength(String(s.l));
-    setHeight(String(s.h));
-  };
+  const cartId = `${product.slug}_${fixedPrice ? "std" : `${width}x${length}x${height}`}`;
 
   const cartItem = () => ({
     id: cartId,
@@ -149,7 +78,9 @@ export default function FoamHero({ product }) {
     image: cover || mainSrc,
     category: product.division,
     quantity: qty,
-    size: [picked?.label, sizeLabel].filter(Boolean).join(" · "),
+    size: sizeLabel,
+    /* The order server re-quotes the price from these (see catalogueQuote). */
+    dims: fixedPrice ? undefined : { width: Number(width), length: Number(length), height: Number(height) },
   });
 
   const onAdd = () => {
@@ -285,61 +216,12 @@ export default function FoamHero({ product }) {
             ) : null}
 
             <div className="mt-1">
-              {/* Grade — every foam on the shop, one click away */}
-              {grades.length > 1 ? (
-                <OptionBlock title="Grade" aside={gradeLabel(product)}>
-                  <ul className="flex flex-wrap gap-1.5">
-                    {grades.map((g) => {
-                      const on = g.slug === product.slug;
-                      return (
-                        <li key={g.slug}>
-                          <Link
-                            href={`/foam/${g.slug}`}
-                            aria-current={on ? "page" : undefined}
-                            className={`inline-flex h-9 min-w-[3.25rem] items-center justify-center border px-3 text-[12px] font-bold uppercase tracking-[0.06em] transition-colors ${
-                              on ? "border-brand bg-brand/[0.07] text-brand" : "border-ink/15 text-ink/70 hover:border-ink/35"
-                            }`}
-                          >
-                            {gradeLabel(g)}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </OptionBlock>
-              ) : null}
-
-              {/* Colour — square swatches, like the mattress fabrics */}
-              {colours.length ? (
-                <OptionBlock title={product.fabricTitle || "Foam colour"} aside={picked?.label}>
-                  <ul className="flex flex-wrap gap-1.5">
-                    {colours.map((c) => {
-                      const on = colour === c.id;
-                      return (
-                        <li key={c.id}>
-                          <button
-                            type="button"
-                            title={c.label}
-                            aria-label={c.label}
-                            aria-pressed={on}
-                            onClick={() => setColour(c.id)}
-                            className={`relative block h-12 w-12 overflow-hidden border transition-colors sm:h-14 sm:w-14 ${on ? "border-brand" : "border-ink/15 hover:border-ink/35"}`}
-                          >
-                            <Image src={c.image} alt="" fill sizes="56px" className="object-cover" />
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </OptionBlock>
-              ) : null}
-
               {/* Specs */}
               {product.specs?.length ? (
                 <div className="grid border-b border-ink/10 py-3" style={{ gridTemplateColumns: `repeat(${Math.min(3, product.specs.length)}, minmax(0, 1fr))` }}>
                   {product.specs.slice(0, 3).map((s, i) => (
                     <div key={s} className={`px-3 text-center ${i > 0 ? "border-l border-ink/10" : ""}`}>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">{["Density", "Colour", "In the set"][i] || "Spec"}</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">{product.specLabels?.[i] || "Spec"}</p>
                       <p className="mt-1 text-[14px] font-semibold text-ink/85">{s}</p>
                     </div>
                   ))}
@@ -359,26 +241,6 @@ export default function FoamHero({ product }) {
 
               {!fixedPrice ? (
                 <>
-                  {sizes.length ? (
-                    <div className="mb-3 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                      {sizes.map((s) => {
-                        const on = sizeId === s.id;
-                        return (
-                          <button
-                            key={s.id}
-                            type="button"
-                            onClick={() => pickSize(s)}
-                            aria-pressed={on}
-                            className={`flex flex-col items-center gap-0.5 border px-1 py-2.5 transition-colors ${on ? "border-brand bg-brand/[0.07]" : "border-[#e5e7eb] hover:border-[#c7c9cc]"}`}
-                          >
-                            <span className={`text-[12px] font-bold uppercase tracking-[0.04em] ${on ? "text-ink" : "text-[#555]"}`}>{s.note}</span>
-                            <span className="text-[12px] tabular-nums text-[#777]">{s.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
                   <div className="grid grid-cols-3 gap-2.5">
                     {[
                       ["Length (inch)", length, setLength],
@@ -391,7 +253,7 @@ export default function FoamHero({ product }) {
                           type="number"
                           min="1"
                           value={value}
-                          onChange={(e) => { setter(e.target.value); setSizeId("custom"); }}
+                          onChange={(e) => setter(e.target.value)}
                           className={input}
                         />
                       </label>

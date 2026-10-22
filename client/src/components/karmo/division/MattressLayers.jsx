@@ -10,9 +10,13 @@ import { FeatureIcon } from "@/components/karmo/division/mattressFeatureIcons";
  * Mattress "Built layer by layer" band.
  *
  * Navy copy panel on the left that bleeds into the pocket-spring cutaway,
- * callouts pinned to the photo, and a light feature strip underneath.
+ * with callouts pinned to the photo. The light feature row under the photo
+ * is the same mattress side edge that closes the homepage size band.
  * Driven by `zones` on the mattress division only (layout: "editorial").
  */
+
+/* Same tile as ShopBySize — a seamless middle cut, repeated side by side. */
+const EDGE_SRC = "/pages/home/sizes/mattress-side-edge-tile.webp";
 
 /**
  * Navy → transparent over the photo: solid to FADE_FROM %, then an eased fade
@@ -39,7 +43,6 @@ export default function MattressLayers({
   icons = [],
   cta,
   callouts = [],
-  features = [],
 }) {
   return (
     <section
@@ -177,33 +180,19 @@ export default function MattressLayers({
         </div>
       </div>
 
-      {/* Feature strip */}
-      {features.length > 0 && (
-        <div className="w-full bg-[#f4f5f7]">
-          <ul className="mx-auto grid max-w-[1600px] grid-cols-2 gap-y-6 px-6 py-8 sm:grid-cols-3 sm:px-10 lg:grid-cols-5 lg:gap-y-0 lg:px-12 xl:px-16">
-            {features.map((f, i) => (
-              <li
-                key={f.id}
-                className={`flex items-center gap-3 lg:px-5 ${
-                  i > 0 ? "lg:border-l lg:border-ink/10" : "lg:pl-0"
-                }`}
-              >
-                <span className="relative h-16 w-16 shrink-0 sm:h-[4.5rem] sm:w-[4.5rem]">
-                  <FeatureIcon id={f.id} />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase leading-tight tracking-[0.08em] text-ink xl:text-[11px]">
-                    {f.title}
-                  </p>
-                  <p className="mt-1 text-[10px] leading-[1.45] text-ink/55 xl:text-[11px]">
-                    {f.note}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="bg-white">
+        <div
+          role="img"
+          aria-label="Side view of a Karmo pillow-top mattress showing its thickness"
+          className="h-[50px] w-full opacity-70 sm:h-[66px] lg:h-[clamp(44px,7.5svh,82px)]"
+          style={{
+            backgroundImage: `url(${EDGE_SRC})`,
+            backgroundRepeat: "repeat-x",
+            backgroundSize: "auto 100%",
+            backgroundPosition: "center",
+          }}
+        />
+      </div>
     </section>
   );
 }

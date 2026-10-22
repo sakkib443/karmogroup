@@ -190,19 +190,26 @@ function TallMorph() {
 }
 
 function VideoTile({ src, label }) {
+  const gif = typeof src === "string" && src.split("?")[0].endsWith(".gif");
+  const mediaClass =
+    "absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]";
   return (
     <div className="group relative min-h-0 overflow-hidden bg-ink">
-      <video
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        aria-label={label}
-      >
-        <source src={src} type="video/mp4" />
-      </video>
+      {gif ? (
+        <img src={src} alt={label} className={mediaClass} />
+      ) : (
+        <video
+          className={mediaClass}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-label={label}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      )}
       <HoverChrome label={label} />
     </div>
   );

@@ -15,6 +15,8 @@ export interface CartItem {
     variantId?: string;
     wholesalePrice?: number;
     discount?: number;
+    /** Karmo catalogue lines priced by size (inch): the order server re-quotes from these. */
+    dims?: { width: number; length: number; height: number };
 }
 
 interface CartState {

@@ -8,6 +8,7 @@ import Logo from "@/components/karmo/Logo";
 import { useGlobal } from "@/cms/CmsProvider";
 import { brand } from "@/cms/pages/global";
 import { useAppSelector } from "@/redux";
+import { isStaffRole } from "@/components/admin/access";
 import {
   FiMapPin,
   FiSearch,
@@ -114,6 +115,7 @@ const nav = [
       {
         label: "Mattress",
         heading: "All mattresses",
+        href: "/mattress",
         icon: `${MENU}/nav-mattress.webp?v=2`,
         items: [
           { name: "Karmo Euro Top Mattress", href: "/mattress/imperial-eurotop", icon: `${MENU}/imperial.webp` },
@@ -462,7 +464,8 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                   aria-current={isActive ? "page" : undefined}
                   onMouseEnter={() => openPanel(entry.name)}
                   onFocus={() => openPanel(entry.name)}
-                  className={triggerClass}
+                  onClick={dismissPanel}
+                  className={`${triggerClass} z-[1101]`}
                 >
                   {label}
                 </Link>
@@ -507,8 +510,8 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                     : "bg-white"
                 } ${
                   panel === entry.name
-                    ? "visible translate-y-0 opacity-100"
-                    : "invisible translate-y-1 opacity-0"
+                    ? "visible translate-y-0 opacity-100 pointer-events-auto"
+                    : "invisible translate-y-1 opacity-0 pointer-events-none"
                 }`}
               >
                 {entry.textureSrc ? (
@@ -680,6 +683,10 @@ export default function Navbar({ scrolled = false }) {
   const [panel, setPanel] = useState(null);
   const closeTimer = useRef(null);
   const cartCount = useAppSelector((state) => state.cart.items.length);
+  // Signed in → the person's own dashboard (staff: admin panel, shopper: My account); else sign in.
+  const authUser = useAppSelector((state) => state.auth.user);
+  const accountHref = !authUser ? "/login" : isStaffRole(authUser.role) ? "/dashboard/admin" : "/dashboard/user";
+  const accountLabel = authUser ? "My account" : "Sign in";
 
   useEffect(() => {
     if (!open) return undefined;
@@ -816,7 +823,7 @@ export default function Navbar({ scrolled = false }) {
             <Tool icon={FiHeart} label="Favourites" href="/wishlist" />
           </span>
           <span className="hidden xl:flex">
-            <Tool icon={FiUser} label="Account" href="/login" />
+            <Tool icon={FiUser} label={accountLabel} href={accountHref} />
           </span>
           <Tool icon={FiShoppingBag} label="Cart" href="/cart" count={cartCount} />
 
@@ -1039,7 +1046,7 @@ export default function Navbar({ scrolled = false }) {
                   Favourites
                 </Link>
                 <Link
-                  href="/login"
+                  href={accountHref}
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center gap-2 border border-ink/12 py-3 text-[12px] font-bold uppercase tracking-[0.1em] text-ink"
                 >

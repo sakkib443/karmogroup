@@ -19,16 +19,9 @@ import { toast } from "react-hot-toast";
 import { useAppDispatch } from "@/redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
-import {
-  getPricingRule,
-  quoteMattressListPrice,
-  quoteMattressPrice,
-} from "@/components/karmo/product/mattressPricing";
-import {
-  getFoamPricingRule,
-  quoteFoamListPrice,
-  quoteFoamPrice,
-} from "@/components/karmo/product/foamPricing";
+import { getPricingRule } from "@/components/karmo/product/mattressPricing";
+import { getFoamPricingRule } from "@/components/karmo/product/foamPricing";
+import { OFFER_PCT, quoteMattressUnit } from "@/components/karmo/product/catalogueQuote";
 
 const DEFAULT_BUYBOX_ICONS = [
   {
@@ -50,9 +43,6 @@ const DEFAULT_BUYBOX_ICONS = [
 ];
 
 const EASE = [0.22, 1, 0.36, 1];
-
-/** Fixed sales discount — not a user control. */
-const OFFER_DISCOUNT_PCT = 15;
 
 const SIZE_ICONS = {
   single: "/products/common/size-icons/single.webp",
@@ -255,64 +245,14 @@ export default function ProductHero({ product }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.slug]);
 
-  const discountPct = OFFER_DISCOUNT_PCT;
+  /* Fixed sales discount — not a user control. */
+  const discountPct = OFFER_PCT;
 
-  const quote = useMemo(() => {
-    const listMrp = product.mrp || 0;
-    const listOffer = product.price || 0;
-
-    if (!pricingRule) {
-      const base = listMrp || listOffer;
-      if (!base) return { ok: false, base: 0, total: 0, discountPct };
-      const catalogPct =
-        listOffer && listMrp > listOffer
-          ? Math.round(((listMrp - listOffer) / listMrp) * 100)
-          : null;
-      let total = base;
-      if (catalogPct != null && discountPct === catalogPct && listOffer) {
-        total = listOffer;
-      } else if (discountPct) {
-        total = Math.round(base * (1 - discountPct / 100));
-      }
-      return { ok: true, base, total, discountPct };
-    }
-
-    /* Anchor to catalogue was/now at Queen / sofa-set base. */
-    if (listMrp) {
-      const listArgs = {
-        length,
-        width,
-        height,
-        discountPct,
-        listMrp,
-        listOffer,
-        refLength: defaultSize?.l,
-        refWidth: defaultSize?.w,
-        refHeight: defaultSize?.h || product.defaultHeight,
-      };
-      return isFoam
-        ? quoteFoamListPrice(product.slug, listArgs)
-        : quoteMattressListPrice(product.slug, listArgs);
-    }
-
-    return isFoam
-      ? quoteFoamPrice(product.slug, { length, width, height, discountPct })
-      : quoteMattressPrice(product.slug, { length, width, height, discountPct });
-  }, [
-    isFoam,
-    pricingRule,
-    product.slug,
-    product.price,
-    product.mrp,
-    product.defaultHeight,
-    defaultSize?.l,
-    defaultSize?.w,
-    defaultSize?.h,
-    length,
-    width,
-    height,
-    discountPct,
-  ]);
+  /* The same quote the order server checks the checkout against (catalogueQuote). */
+  const quote = useMemo(
+    () => quoteMattressUnit(product, { width, length, height }),
+    [product, width, length, height]
+  );
 
   const unitPrice = quote.total || 0;
   const mrpUnit = quote.base || unitPrice;
@@ -355,6 +295,8 @@ export default function ProductHero({ product }) {
     category: product.division,
     quantity: qty,
     size: [selectedFabric?.label, sizeLabel].filter(Boolean).join(" · "),
+    /* The order server re-quotes the price from these (see catalogueQuote). */
+    dims: fixedPrice ? undefined : { width: Number(width), length: Number(length), height: Number(height) },
   });
 
   const onAdd = () => {

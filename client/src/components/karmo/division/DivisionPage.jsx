@@ -27,6 +27,7 @@ import MattressLayers from "@/components/karmo/division/MattressLayers";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
+import MattressReviews from "@/components/karmo/division/MattressReviews";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 import StandardStrip from "@/components/karmo/home/StandardStrip";
 
@@ -270,6 +271,7 @@ export default function DivisionPage({ data }) {
       {data.products && !data.products.hidden ? (
         <DivisionProducts {...data.products} categoryId={categoryId} />
       ) : null}
+      {data.reviews?.items?.length > 0 && <MattressReviews {...data.reviews} />}
       <OrderAndContact />
     </>
   );

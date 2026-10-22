@@ -9,8 +9,7 @@
  */
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import {
     LuScanBarcode, LuCircleCheck, LuCircleX, LuPrinter, LuTag, LuKeyboard, LuFactory, LuHistory, LuEye, LuHand,
 } from 'react-icons/lu';
@@ -52,7 +51,7 @@ export default function FactoryPage() {
 }
 
 function FactoryStation() {
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const focusChallan = useSearchParams().get('challan');
     const { data, isLoading, refetch } = useGetFactoryQueueQuery(undefined, { pollingInterval: 30000 });
     const [scan, { isLoading: isScanning }] = useFactoryScanMutation();

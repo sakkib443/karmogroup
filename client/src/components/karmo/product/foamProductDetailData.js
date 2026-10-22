@@ -134,11 +134,125 @@ function densityFromSpecs(item) {
   return hit || "Firm support";
 }
 
+const SET_SIZES = [
+  "22″ × 22″ × 4″ — 5 sit pieces",
+  "22″ × 18″ × 3″ — 5 back pieces",
+];
+
+const BED_SIZES = [
+  "72″ × 36″ × 4″",
+  "72″ × 36″ × 3″",
+  "72″ × 36″ × 2″",
+  "72″ × 36″ × 1″",
+  "72″ × 36″ × ½″",
+  "Any size on request",
+];
+
+const CUSHION_USE =
+  "Cushioning for bedding, furniture, automotive interiors, carpet underlay and packaging. Light, durable and comfortable. Also used in vehicle seats, roof liners, dashboards and instrument panels, and in footwear and garment accessories.";
+
+const UPHOLSTERY_USE =
+  "A major component for upholstery and furniture, and known for bedding and automotive work. Also used in vehicle seats, roof liners, dashboards and instrument panels, and in footwear and garment accessories.";
+
+function tds(density, ifd25, ifd65, tensile, elongation, airflow) {
+  return [
+    { label: "Density", value: density },
+    { label: "IFD 25%", value: ifd25 },
+    { label: "IFD 65%", value: ifd65 },
+    { label: "Tensile strength", value: tensile },
+    { label: "Elongation", value: elongation },
+    { label: "Air flow", value: airflow },
+  ];
+}
+
+/**
+ * Facts taken from the Karmo Foam Catalogue grade pages.
+ * Only furniture SKUs with their own page are listed.
+ */
+const FOAM_CATALOGUE = {
+  poly: {
+    grade: "Standard grade",
+    color: "Ash",
+    noFiller: true,
+    technical: tds("25 (±) kg/m³", "58.5 lbs", "120.8 lbs", "14.7 PSI", "111%", "3.3 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["Durable", "Resilient", "Flexible", "Higher durability"],
+    use: CUSHION_USE,
+  },
+  "combo-280": {
+    grade: "Semi rubber grade",
+    color: "Pink",
+    noFiller: true,
+    technical: tds("30 (±) kg/m³", "61.6 lbs", "127.7 lbs", "15.1 PSI", "122%", "2.4 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["Durable", "Resilient", "Flexible", "Higher durability", "Semi rubber foam grade"],
+    use: CUSHION_USE,
+  },
+  "combo-2001": {
+    grade: "Full rubber grade",
+    color: "Purple",
+    noFiller: true,
+    technical: tds("37 (±) kg/m³", "62.8 lbs", "130.3 lbs", "15.9 PSI", "135%", "2.2 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["More loaded foam", "Naturally elastic", "More resilient", "Fine cell structure", "Rubber grade foam"],
+    use: UPHOLSTERY_USE,
+  },
+  hd: {
+    grade: "Full rubber grade",
+    color: "Lime green",
+    noFiller: true,
+    technical: tds("40 (±) kg/m³", "66.1 lbs", "137.5 lbs", "18 PSI", "171%", "1.7 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["Elastic nature", "More resilient", "Fine cell structure", "Rubber grade foam", "Higher durability"],
+    use: CUSHION_USE,
+  },
+  "combo-4g": {
+    grade: "Pure rubber grade",
+    color: "Olive",
+    noFiller: true,
+    technical: tds("45 (±) kg/m³", "66 lbs", "137.5 lbs", "18.4 PSI", "185%", "1.5 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["More hardness", "More bounce", "Higher durability", "More resilience", "More flexible", "Pure rubber grade foam", "Higher density"],
+    use: UPHOLSTERY_USE,
+  },
+  "combo-1965": {
+    grade: "Full rubber grade",
+    color: "Bright yellow",
+    noFiller: true,
+    technical: tds("50 (±) kg/m³", "65.7 lbs", "137 lbs", "18.9 PSI", "207%", "1.3 scfm"),
+    setSizes: SET_SIZES,
+    bedSizes: BED_SIZES,
+    features: ["Most durable", "Most resilient", "Flexible", "Weighted foam", "Pure rubber grade foam", "Finest cell structure", "High density"],
+    use: CUSHION_USE,
+  },
+  "foam-sit": {
+    grade: "Sit piece",
+    piece: "22″ × 22″ × 4″",
+    specLabels: ["Size", "Pack", "Place"],
+    setSizes: ["Sold here as 1 piece", "A catalogue set includes 5 of these sit pieces"],
+    note: "This is the sit cushion listed on every furniture grade page. The brochure does not give it a density of its own.",
+  },
+  "foam-back": {
+    grade: "Back piece",
+    piece: "22″ × 18″ × 3″",
+    specLabels: ["Size", "Pack", "Place"],
+    setSizes: ["Sold here as 1 piece", "A catalogue set includes 5 of these back pieces"],
+    note: "This is the back cushion listed on every furniture grade page. The brochure does not give it a density of its own.",
+  },
+};
+
 function toDetail(item) {
   const price = parseTaka(item.now);
   const mrp = parseTaka(item.was) || price;
   const realGallery = buildRealGallery(item);
   const cover = item.image || realGallery[0];
+  const catalogue = FOAM_CATALOGUE[item.id] || null;
+  const densityValue = catalogue?.technical?.find((row) => row.label === "Density")?.value;
 
   return {
     slug: item.id,
@@ -155,8 +269,8 @@ function toDetail(item) {
       item.line ||
       "High-density resilience for furniture, footwear and specialty padding — pure rubber grade with firm airflow that holds for years.",
     category: item.category || "foam",
-    firmness: densityFromSpecs(item),
-    density: densityFromSpecs(item),
+    firmness: densityValue || densityFromSpecs(item),
+    density: densityValue || densityFromSpecs(item),
     cover,
     letterGallery: FOAM_LETTER_GALLERY,
     realGallery,
@@ -170,6 +284,8 @@ function toDetail(item) {
     showCustomSize: Boolean(getFoamPricingRule(item.id)),
     pack: item.thickness || "",
     specs: item.specs || [],
+    specLabels: catalogue?.specLabels || ["Density", "Colour", "In the set"],
+    catalogue,
     badge: item.badge || "",
     rating: item.rating || 0,
     reviews: item.reviews || 0,

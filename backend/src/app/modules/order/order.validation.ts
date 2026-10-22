@@ -2,7 +2,8 @@ import { z } from 'zod';
 import { ORDER_STATUSES } from './order.model';
 
 const orderItemValidation = z.object({
-    // A product _id, or the slug of a Karmo catalogue item (then name, price and division come with it).
+    // A product _id, or the slug of a Karmo catalogue item (then name, price, division and,
+    // when priced by size, dims come with it; the server re-quotes the price from dims).
     product: z.string().min(1, 'Product ID required'),
     quantity: z.number().min(1, 'Quantity must be at least 1'),
     name: z.string().optional(),
@@ -11,6 +12,11 @@ const orderItemValidation = z.object({
     division: z.string().optional(),
     color: z.string().optional(),
     size: z.string().optional(),
+    dims: z.object({
+        width: z.number().nullable().optional(),
+        length: z.number().nullable().optional(),
+        height: z.number().nullable().optional(),
+    }).optional(),
 });
 
 const shippingAddressValidation = z.object({

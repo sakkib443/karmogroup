@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import OrderService from './order.service';
 import { OrderDesk, present, type Viewer } from './order.desk';
+import { buildOrdersXlsx } from './order.export';
 import { R } from '../../constants/roles';
 
 /** The signed-in staff member, as the desk rules need them. */
@@ -12,6 +13,9 @@ const viewerOf = (req: Request): Viewer => ({
     name: req.user!.name,
     divisions: req.user!.divisions,
 });
+
+/** Most orders one Excel file will hold — far above a month's volume; the Summary sheet says if it was hit. */
+const EXPORT_CAP = 10000;
 
 const isOrderStaff = (role?: string) => role === 'superadmin' || R.orderViewers.includes(role as any);
 
@@ -25,6 +29,42 @@ const OrderController = {
     getAll: catchAsync(async (req: Request, res: Response) => {
         const { orders, meta } = await OrderService.getAllOrders(req.query as Record<string, unknown>, viewerOf(req));
         sendResponse(res, { statusCode: 200, success: true, message: 'Orders fetched', data: orders, meta });
+    }),
+
+    // GET /api/orders/admin/export — every order the filters match (not one page), as an Excel file.
+    // Takes the same query as /admin/all (status, dateFrom, dateTo, search…), plus `title`
+    // for the Summary sheet. Staff who may export only (R.ops); a super admin always passes.
+    exportXlsx: catchAsync(async (req: Request, res: Response) => {
+        const { title, page: _page, limit: _limit, ...q } = req.query as Record<string, unknown>;
+        const { orders, meta } = await OrderService.getAllOrders({ ...q, page: 1, limit: EXPORT_CAP }, viewerOf(req));
+
+        const text = (k: string) => String(q[k] ?? '').trim();
+        const filters = [
+            text('status') && `Status: ${text('status')}`,
+            text('paymentStatus') && `Payment: ${text('paymentStatus')}`,
+            text('paymentMethod') && `Method: ${text('paymentMethod')}`,
+            text('division') && `Division: ${text('division')}`,
+            text('courier') && `Courier: ${text('courier')}`,
+            (text('searchTerm') || text('search')) && `Search: ${text('searchTerm') || text('search')}`,
+            (text('minTotal') || text('maxTotal')) && `Total: ${text('minTotal') || 0}–${text('maxTotal') || '∞'}`,
+            (text('places') || text('zonePlaces')) && 'Location filter',
+        ].filter(Boolean) as string[];
+
+        const buf = await buildOrdersXlsx(orders, {
+            title: String(title || 'Orders').slice(0, 60),
+            from: q.dateFrom ? new Date(String(q.dateFrom)) : null,
+            to: q.dateTo ? new Date(String(q.dateTo)) : null,
+            matched: Number(meta?.total) || orders.length,
+            filters,
+            generatedBy: req.user?.name || 'Admin',
+        });
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename="karmo-orders.xlsx"');
+        res.setHeader('Content-Length', String(buf.length));
+        // How many orders are inside, so the browser can say "none found" instead of saving an empty sheet.
+        res.setHeader('X-Order-Count', String(orders.length));
+        res.setHeader('Access-Control-Expose-Headers', 'X-Order-Count, Content-Disposition');
+        res.send(buf);
     }),
 
     getMyOrders: catchAsync(async (req: Request, res: Response) => {

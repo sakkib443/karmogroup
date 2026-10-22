@@ -574,7 +574,7 @@ function OrganizedSpotlight({ data, reveal }) {
       variants={fade}
       {...reveal}
       viewport={VIEWPORT}
-      className="relative min-h-[260px] overflow-hidden bg-[#f4f0e8] md:min-h-0"
+      className="relative h-full min-h-[260px] overflow-hidden bg-[#f4f0e8] md:min-h-0"
     >
       <Image
         src={data.image}
@@ -736,9 +736,25 @@ function OrganizedInside({ inside, reveal }) {
   );
 }
 
-function OrganizedGrid({ highlights, spotlight, inside, reveal }) {
+function OrganizedGrid({ highlights, spotlight, inside, reveal, stage }) {
   const primary = highlights[0];
   const pair = highlights.slice(1, 3);
+
+  if (stage === "lower") {
+    return (
+      <div className="relative z-[1] w-full">
+        <motion.div
+          variants={group}
+          {...reveal}
+          viewport={VIEWPORT}
+          className="grid h-[calc(100svh-112px)] w-full grid-cols-1 grid-rows-2 gap-[6px] md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] md:grid-rows-1"
+        >
+          <OrganizedSpotlight data={spotlight} reveal={reveal} />
+          <InsidePhotoCard photo={inside?.photo} />
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative z-[1] mx-auto w-full max-w-[1600px] px-5 py-[6px] sm:px-8 lg:px-10">
@@ -838,6 +854,7 @@ export default function DivisionShapeGrid({
   filmAlt = "",
   filmOverlay = false,
   skin = "mosaic",
+  stage,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -870,6 +887,7 @@ export default function DivisionShapeGrid({
           spotlight={spotlight}
           inside={inside}
           reveal={reveal}
+          stage={stage}
         />
       ) : (
         <MosaicGrid

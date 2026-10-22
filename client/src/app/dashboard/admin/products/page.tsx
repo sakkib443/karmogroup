@@ -9,8 +9,7 @@ import { useGetProductsQuery, useGetProductStatsQuery, useDeleteProductMutation 
 import { toast } from 'react-hot-toast';
 import BulkUploadModal from './BulkUploadModal';
 import { useGetUnitsQuery, findUnit } from '@/redux/api/unitApi';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import { useViewRole } from '@/components/admin/viewRole';
 import {
     PageHeader, Btn, SearchInput, SelectPill, FilterBar, StatTile, Badge, TableCard, TH, TD, TR,
     EmptyRow, SkeletonRows, Pager, RowMenu, taka, fmtDateTime, type Tone,
@@ -51,7 +50,7 @@ export default function ProductsPage() {
     const { data: statsData } = useGetProductStatsQuery(undefined);
     const [deleteProduct] = useDeleteProductMutation();
     // Managers add and update products; deleting and bulk upload are for admins.
-    const role = useSelector((s: RootState) => s.auth.user?.role);
+    const { role } = useViewRole();
     const isEditor = role !== 'superadmin' && role !== 'admin';
     const { data: units } = useGetUnitsQuery({ scope: 'all' });
     // Products store their unit as a word (e.g. "piece"); show the unit's short name.

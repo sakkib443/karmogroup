@@ -113,15 +113,15 @@ const mattress = {
     cellAspect: 1.15,
     images: [
       {
-        src: "/pages/mattress/bands/sleep-positions-red-floral.webp",
-        alt: "Karmo red floral mattress — support for side, back and stomach sleepers",
+        src: "/pages/mattress/bands/sleep-positions-premium-floral.webp",
+        alt: "Karmo red floral mattress in a bedroom — support for side, back and stomach sleepers",
         width: 1254,
         height: 1254,
       },
       {
-        src: "/pages/mattress/bands/sleep-support-infographic-wide.webp",
-        alt: "Karmo mattress — breathable comfort, pressure relief, spinal alignment and motion isolation for every sleeping position",
-        width: 1916,
+        src: "/pages/mattress/bands/sleep-support-minimal-ad.webp",
+        alt: "Karmo mattress sleep support — side, back and stomach sleepers with breathable comfort, pressure relief, spinal alignment and motion isolation",
+        width: 1915,
         height: 821,
       },
     ],
@@ -333,8 +333,8 @@ const mattress = {
     width: 2032,
     height: 774,
     /* Editorial treatment — navy copy panel bleeding into the cutaway, with
-       callouts on the photo and a light feature strip underneath. Only the
-       mattress division uses it; foam keeps the plain rail. */
+       callouts on the photo and the homepage mattress-edge strip underneath.
+       Only the mattress division uses it; foam keeps the plain rail. */
     layout: "editorial",
     eyebrow: "Karmo Mattress",
     heading: "Built layer by layer",
@@ -387,13 +387,6 @@ const mattress = {
         anchorY: 68,
         place: "below",
       },
-    ],
-    features: [
-      { id: "materials", title: "Premium materials", note: "Quality you can feel, comfort you can trust.", src: "/shared/trust/cartoon-v3/feat-materials-v2.webp" },
-      { id: "comfort", title: "Superior comfort", note: "Balanced support for deeper, restorative sleep.", src: "/shared/trust/cartoon-v3/feat-comfort-v2.webp" },
-      { id: "durability", title: "Long-lasting durability", note: "Engineered for everyday performance.", src: "/shared/trust/cartoon-v3/feat-durability-v2.webp" },
-      { id: "breathable", title: "Breathable design", note: "Keeps you cool and comfortable all night.", src: "/shared/trust/cartoon-v3/feat-breathable-v2.webp" },
-      { id: "healthier", title: "Healthier sleep", note: "Hypoallergenic materials for a cleaner, fresher rest.", src: "/shared/trust/cartoon-v3/feat-healthier-v2.webp" },
     ],
   },
 
@@ -730,6 +723,64 @@ const mattress = {
         specs: ["Soft foam", "Microfibre fill", "Easy fit"],
         highlights: ["Instant comfort upgrade", "Washable cover options"],
         defaultSize: "Queen",
+      },
+    ],
+  },
+
+  /* Shown, never submitted. Demo notes only — no form on the page. */
+  reviews: {
+    eyebrow: "Guest notes",
+    headingLead: "Rated by",
+    headingAccent: "families",
+    note: "A few notes from homes already sleeping on Karmo.",
+    items: [
+      {
+        id: "nusrat",
+        name: "Nusrat Jahan",
+        city: "Dhaka",
+        image: "/pages/mattress/reviews/nusrat.webp",
+        rating: 5,
+        quote: "The King holds both of us without a dip in the middle. Cool enough for a Dhaka summer, and the quilted top still looks new.",
+      },
+      {
+        id: "imran",
+        name: "Imran Hossain",
+        city: "Chattogram",
+        image: "/pages/mattress/reviews/imran.webp",
+        rating: 5,
+        quote: "My back used to complain by morning. Two weeks on the Orthopedic and I wake up straight. Firm, not hard.",
+      },
+      {
+        id: "farzana",
+        name: "Farzana Akter",
+        city: "Sylhet",
+        image: "/pages/mattress/reviews/farzana.webp",
+        rating: 4,
+        quote: "Soft where it should be, supportive underneath. Delivery was on time and the cover feels properly made.",
+      },
+      {
+        id: "rafiq",
+        name: "Rafiqul Islam",
+        city: "Rajshahi",
+        image: "/pages/mattress/reviews/rafiq.webp",
+        rating: 5,
+        quote: "The euro top is the part we notice every night. Plush at the shoulder, still steady through the hips.",
+      },
+      {
+        id: "mehjabin",
+        name: "Mehjabin Chowdhury",
+        city: "Khulna",
+        image: "/pages/mattress/reviews/mehjabin.webp",
+        rating: 4,
+        quote: "We turn a lot. The pocket springs keep one side still when the other moves. Quiet, which we did not expect.",
+      },
+      {
+        id: "tanvir",
+        name: "Tanvir Ahmed",
+        city: "Gazipur",
+        image: "/pages/mattress/reviews/tanvir.webp",
+        rating: 5,
+        quote: "Simple, honest comfort for the price. The edge stays firm when I sit to tie my shoes. No sag after three months.",
       },
     ],
   },

@@ -450,7 +450,7 @@ export const partners = {
     titleBeforeSize: 100,
     titleAccent: "100+",
     titleAfter: "makers",
-    logos: PARTNER_LOGOS.map(([slug, name, w, h]) => ({ name, logo: img(`/pages/home/partners/${slug}.png`, name, { fit: "contain", width: w, height: h }) })),
+    logos: PARTNER_LOGOS.map(([slug, name, w, h]) => ({ name, logo: img(`/pages/home/partners/${slug}.webp`, name, { fit: "contain", width: w, height: h }) })),
   },
 };
 
