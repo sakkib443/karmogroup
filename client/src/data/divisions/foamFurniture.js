@@ -174,6 +174,12 @@ const foamFurniture = {
      going back to the static banner later is deleting this one field, not
      redoing the page. */
   videoHero: {
+    /* Embossed KARMO charcoal foam layers, heading centred, screen height
+       under the header. Remove `image` to bring the acoustic-foam clip below
+       back. */
+    image: `${IMG}/hero/karmo-embossed-charcoal-foam-layers.webp`,
+    imageAlt: "Layers of Karmo charcoal foam embossed with the KARMO logo",
+    imagePosition: "center",
     video: "/pages/foam/videos/acoustic-foam-wall-pan.mp4",
     heading: "All your upholstery needs",
     /* 0.25 was slow-motion; 0.85 came back reading as barely slowed at all.

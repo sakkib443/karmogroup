@@ -29,7 +29,16 @@ const CROSSFADE = 0.8;
 export default function DivisionVideoHero({
   video,
   poster,
+  /* A still picture instead of the clip. When set it wins over `video`, so
+     switching back is removing this one field. */
+  image,
+  imageAlt = "",
+  /* Where the still is anchored when the screen crops it (CSS object-position). */
+  imagePosition = "75% center",
   heading,
+  /* "center" (the video default) or "left" — over a picture with an empty
+     dark left side, the heading sits there. */
+  align = "center",
   /* Client asked for the clip "a little slow" — under 1 plays it back at that
      fraction of native speed. Applied on the element itself rather than to
      the video file, so the source stays untouched. */
@@ -99,9 +108,21 @@ export default function DivisionVideoHero({
   return (
     <section
       aria-label={heading}
-      className="relative isolate h-[calc(100vh-112px)] overflow-hidden bg-[#f7f8f8] text-white"
+      className={`relative isolate h-[calc(100vh-112px)] overflow-hidden text-white ${
+        image ? "bg-black" : "bg-[#f7f8f8]"
+      }`}
     >
-      {reduceMotion ? (
+      {image ? (
+        <Image
+          src={image}
+          alt={imageAlt}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          style={{ objectPosition: imagePosition }}
+        />
+      ) : reduceMotion ? (
         poster && (
           <Image src={poster} alt="" fill sizes="100vw" className="object-cover" />
         )
@@ -111,13 +132,29 @@ export default function DivisionVideoHero({
           <video {...layerProps(1)} />
         </>
       )}
-      {/* Same dark scrim every other hero on the site uses for white text over
-          footage. Separate from `hero-breathe`, which dims/lifts the footage
-          itself — this stays a flat, constant read for the heading. */}
-      <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+      {/* Footage, or a still with the heading centred: the same flat dark
+          scrim every other hero on the site uses for white text (separate
+          from `hero-breathe`, which dims/lifts the footage itself). A still
+          with a left heading keeps its own light — it only gets a left-side
+          shade, so the heading still reads where a narrow screen crops the
+          picture's dark side away. */}
+      {image && align === "left" ? (
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent lg:from-black/40 lg:via-transparent"
+          aria-hidden="true"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+      )}
 
       {heading && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center sm:px-8 lg:px-14 xl:px-20">
+        <div
+          className={`absolute inset-0 flex flex-col justify-center px-4 sm:px-8 lg:px-14 xl:px-20 ${
+            align === "left"
+              ? "items-start text-left lg:pl-[max(3.5rem,calc((100vw-1600px)/2+4rem))]"
+              : "items-center text-center"
+          }`}
+        >
           <motion.h1
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}

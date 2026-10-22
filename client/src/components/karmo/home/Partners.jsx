@@ -74,7 +74,8 @@ function Row({ items, direction, still }) {
   );
 }
 
-export default function Partners() {
+/** `texture={false}` drops the section texture (About puts it on the next band instead). */
+export default function Partners({ texture = true }) {
   const c = useSection("partners", partners.defaults);
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -86,10 +87,10 @@ export default function Partners() {
   return (
     <section
       id="partners"
-      className="relative overflow-hidden pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
+      className="relative scroll-mt-[112px] overflow-hidden pt-4 pb-8 md:pt-5 md:pb-10 lg:pt-6 lg:pb-12"
       aria-label="Partners and clients"
     >
-      <TextureSlides lighter />
+      {texture ? <TextureSlides lighter /> : null}
 
       <motion.div
         variants={group}

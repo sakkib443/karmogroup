@@ -1,108 +1,77 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiCheck } from "react-icons/fi";
+import { LuArrowUpRight } from "react-icons/lu";
 
 import { aboutStory } from "@/components/karmo/about/aboutData";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
- * The founding story — picture left, copy right, the same two-column editorial
- * arrangement `FoamStory` uses on the homepage (left heading scale, 1.65rem →
- * 2.15rem, not the centred 2.4rem one).
- *
- * The four facts under the copy are the load-bearing claims from the profile's
- * opening page, pulled out of the prose so they can be scanned without reading
- * two paragraphs first.
+ * The journey and the four industries (#history): the four industries as tall
+ * picture panels, edge to edge with 6px gutters like the homepage grids. No
+ * visible heading — the pictures carry the names. On a computer the panels keep
+ * the height they had under the old heading (screen − 112px header − 200px).
+ * Phones get two-by-two portrait cards.
  */
 export default function AboutStory() {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const c = aboutStory;
 
   return (
-    <section id="history" className="relative mb-1.5 scroll-mt-[140px] bg-white">
-      {/* Split band: the picture runs off the left screen edge and the copy
-          keeps a measured column on the right — the shape `ChemicalsBand` uses
-          on the homepage.
+    <section
+      id="history"
+      className="relative flex scroll-mt-[112px] flex-col bg-white lg:h-[calc(100svh-112px-12.5rem)]"
+      aria-label="The journey since 1965"
+    >
+      {/* No visible heading: the four pictures carry the names. Kept for search engines and screen readers. */}
+      <h2 className="sr-only">
+        {c.eyebrow}: {c.titleLead} {c.titleAccent}. {c.lead}
+      </h2>
 
-          This was a `shell` two-column with a 40/64px gap, which held the photo
-          in a 684px box floating in white. On a page whose neighbours all run
-          edge to edge that reads as a different site; the picture is the band
-          here, not an illustration inside one. */}
-      <motion.div
+      <motion.ul
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid items-center gap-8 lg:grid-cols-2 lg:gap-0"
+        className="grid min-h-0 flex-1 grid-cols-2 gap-[6px] p-[6px] lg:grid-cols-4"
       >
-        {/* ── Picture ─────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} {...reveal} viewport={VIEWPORT} className="relative">
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-cream lg:aspect-auto lg:h-full lg:min-h-[560px]">
-            <Image
-              src={aboutStory.image.src}
-              alt={aboutStory.image.alt}
-              fill
-              sizes="(min-width: 1024px) 44vw, 100vw"
-              className="object-cover"
-            />
-          </div>
-
-          {/* The year, sat on the corner of the frame. It is the one number the
-              whole page hangs off, so it gets to be an object rather than a
-              line of body copy. */}
-          <div className="absolute -bottom-5 left-5 bg-brand px-6 py-4 text-center shadow-[0_18px_40px_-18px_rgba(212,67,72,0.55)] lg:-bottom-6 lg:left-8">
-            <span className="block text-[10px] font-bold uppercase tracking-[0.24em] text-white/75">
-              {aboutStory.plaque.label}
-            </span>
-            <span className="display mt-1 block text-[1.6rem] font-bold leading-none tabular-nums text-white lg:text-[1.85rem]">
-              {aboutStory.plaque.figure}
-            </span>
-          </div>
-        </motion.div>
-
-        {/* ── Copy ────────────────────────────────────────────────────────── */}
-        {/* Carries its own padding now that the grid has left `shell`: the
-            picture is allowed to touch the screen edge, the words are not. */}
-        <motion.div
-          variants={fade}
-          {...reveal}
-          viewport={VIEWPORT}
-          className="px-6 pb-12 pt-6 md:px-12 lg:max-w-[46rem] lg:py-16 lg:pl-14 lg:pr-16"
-        >
-          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-            {aboutStory.eyebrow}
-          </span>
-          <h2 className="display section-heading mt-3 uppercase text-ink">
-            {aboutStory.titleLead}{" "}
-            <span className="font-bold text-brand">{aboutStory.titleAccent}</span>
-          </h2>
-
-          <div className="mt-6 space-y-4">
-            {aboutStory.paragraphs.map((text) => (
-              <p
-                key={text.slice(0, 24)}
-                className="body-copy max-w-[34rem] text-[15px] leading-[1.85] text-ink/58"
-              >
-                {text}
-              </p>
-            ))}
-          </div>
-
-          <ul className="mt-8 space-y-3 border-t border-ink/8 pt-7">
-            {aboutStory.facts.map((factText) => (
-              <li key={factText} className="flex gap-3.5">
-                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-brand text-white">
-                  <FiCheck className="text-[12px]" strokeWidth={3} />
+        {c.industries.map((d) => (
+          <motion.li key={d.index} variants={fade} className="min-h-0">
+            <Link
+              href={d.href}
+              className="group relative block aspect-[3/4] h-full w-full overflow-hidden bg-ink lg:aspect-auto"
+            >
+              <Image
+                src={d.image}
+                alt={d.alt}
+                fill
+                sizes="(min-width: 1024px) 25vw, 50vw"
+                className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+              />
+              <span
+                aria-hidden
+                className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent"
+              />
+              <span className="absolute top-4 left-4 text-[12px] font-semibold tabular-nums tracking-[0.2em] text-white/80 lg:top-6 lg:left-6">
+                {d.index}
+              </span>
+              <span className="absolute inset-x-4 bottom-4 text-white lg:inset-x-6 lg:bottom-6">
+                <span className="display block text-[clamp(1rem,0.8rem+0.9vw,1.6rem)] font-semibold uppercase leading-tight tracking-[0.02em]">
+                  {d.name}
                 </span>
-                <span className="body-copy text-[14px] leading-[1.7] text-ink/70">
-                  {factText}
+                <span className="mt-1 flex items-center justify-between gap-3 text-[12px] text-white/75 sm:text-[13px]">
+                  {d.line}
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/40 transition-colors duration-300 group-hover:border-brand group-hover:bg-brand">
+                    <LuArrowUpRight size={15} />
+                  </span>
                 </span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      </motion.div>
+              </span>
+            </Link>
+          </motion.li>
+        ))}
+      </motion.ul>
     </section>
   );
 }

@@ -6,7 +6,10 @@ import {
 } from "@/components/karmo/contact/contactData";
 import ContactBanner from "@/components/karmo/contact/ContactBanner";
 import ContactChannels from "@/components/karmo/contact/ContactChannels";
-import ContactFormSection from "@/components/karmo/contact/ContactFormSection";
+import ContactVisit from "@/components/karmo/contact/ContactVisit";
+import ContactBulk from "@/components/karmo/contact/ContactBulk";
+import ContactFaqs from "@/components/karmo/contact/ContactFaqs";
+import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
 function toWaNumber(raw) {
   const digits = String(raw || "").replace(/\D/g, "");
@@ -16,6 +19,13 @@ function toWaNumber(raw) {
   return `880${digits}`;
 }
 
+/**
+ * `/contact` — built from the homepage's own pieces: its hero slider as the
+ * cover, its contact cards, a full-width map of the head office (#address), a
+ * chemicals-band-style bulk and dealership band (#bulk), FAQs (#faqs) and, last
+ * before the footer, its how-to-order + contact form band (#message). Phones,
+ * email, WhatsApp, office and hours come from Admin → Settings, with defaults.
+ */
 export default function ContactPage() {
   const { data: res } = useGetSiteContentQuery({});
   const c = res?.data?.contact || {};
@@ -35,14 +45,6 @@ export default function ContactPage() {
     Array.isArray(c.hours) && c.hours.length > 0
       ? c.hours
       : contactDefaults.hours;
-  const subjects =
-    Array.isArray(c.subjects) && c.subjects.length > 0
-      ? c.subjects
-      : contactDefaults.subjects;
-  const tips =
-    Array.isArray(c.tips) && c.tips.length > 0
-      ? c.tips
-      : contactDefaults.tips;
 
   const waNumber = toWaNumber(whatsapp);
   const primaryPhone = phones[0];
@@ -53,7 +55,7 @@ export default function ContactPage() {
           kind: "phone",
           label: "Call us",
           primary: phones.join(" / "),
-          secondary: "Everyday 9 AM – 10 PM",
+          secondary: "Saturday – Thursday, 9 AM – 10 PM",
           href: `tel:${primaryPhone}`,
         }
       : null,
@@ -92,13 +94,14 @@ export default function ContactPage() {
     <>
       <ContactBanner />
       <ContactChannels channels={channels} />
-      <ContactFormSection
-        subjects={subjects}
-        hours={hours}
-        tips={tips}
-        office={office}
-        email={email}
-      />
+      <ContactVisit office={office} hours={hours} />
+      <ContactBulk phone={primaryPhone} />
+      <ContactFaqs phone={primaryPhone} waNumber={waNumber} />
+      {/* Last, right above the awards band and footer: the homepage's
+          how-to-order steps and contact form, on its texture. */}
+      <div id="message" className="mt-1.5 scroll-mt-[112px]">
+        <OrderAndContact textureSlides />
+      </div>
     </>
   );
 }

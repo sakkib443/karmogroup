@@ -3,148 +3,129 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
 
+import OverlayHeroSlider from "@/components/karmo/OverlayHeroSlider";
 import MediaAdsGrid from "@/components/karmo/media/MediaAdsGrid";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { mediaNav } from "@/data/media";
 
+/** Story tiles: big on the left, a wide one top right, two small under it. */
+const TILE = [
+  "col-span-2 aspect-[4/3] lg:col-span-2 lg:row-span-2 lg:aspect-auto",
+  "col-span-2 aspect-[16/9] lg:aspect-auto",
+  "aspect-square lg:aspect-auto",
+  "aspect-square lg:aspect-auto",
+];
+
+/** The three Media Center pages as tabs, the homepage's quiet uppercase with a brand rule. */
+function MediaTabs({ current }) {
+  return (
+    <nav aria-label="Media Center sections" className="shrink-0 border-b border-ink/8 bg-white">
+      <div className="shell flex items-center justify-center gap-6 sm:gap-10">
+        {mediaNav.map((item) => {
+          const active = item.href === current;
+          return (
+            <Link
+              key={item.id}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={`relative py-4 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors sm:py-5 sm:text-[12px] ${
+                active ? "text-brand" : "text-ink/55 hover:text-ink"
+              }`}
+            >
+              {item.name}
+              <span
+                aria-hidden
+                className={`absolute inset-x-0 -bottom-px h-[2px] origin-left bg-brand transition-transform duration-300 ${
+                  active ? "scale-x-100" : "scale-x-0"
+                }`}
+              />
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+/** One story: the picture fills the tile, tag on top, title (and a line on the big one) at the foot. */
+function StoryTile({ item, index }) {
+  const big = index === 0;
+  return (
+    <motion.li variants={fade} className={`group relative overflow-hidden bg-ink ${TILE[index] || TILE[3]}`}>
+      <Image
+        src={item.src}
+        alt={item.alt}
+        fill
+        sizes={big ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, 50vw"}
+        className="object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]"
+      />
+      <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
+      <span className="absolute top-4 left-4 bg-brand px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white lg:top-5 lg:left-5">
+        {item.tag}
+      </span>
+      <div className={`absolute inset-x-4 bottom-4 text-white ${big ? "lg:inset-x-8 lg:bottom-8" : "lg:inset-x-5 lg:bottom-5"}`}>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/65">{item.date}</span>
+        <h3
+          className={`display mt-1.5 font-semibold uppercase leading-[1.15] tracking-[0.02em] ${
+            big ? "text-[clamp(1.25rem,0.9rem+1.4vw,2.2rem)]" : "text-[clamp(0.95rem,0.8rem+0.5vw,1.25rem)]"
+          }`}
+        >
+          {item.title}
+        </h3>
+        {big ? <p className="body-copy mt-2 max-w-lg text-[14px] leading-[1.6] text-white/75">{item.excerpt}</p> : null}
+      </div>
+    </motion.li>
+  );
+}
+
 /**
- * Shared Media Center page — hero + sibling tabs + cards or reels.
+ * Shared Media Center page, built from the homepage's pieces: its hero slider
+ * as the cover, then the tabs and the stories as one screen of pictures with
+ * 6px gutters (or the reels on Karmo Ads), and its how-to-order + contact band.
  */
-
-const VIEW_H = "h-[calc(100svh-112px)] min-h-[calc(100svh-112px)]";
-
 export default function MediaPage({ page }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const reels = page.layout === "reels";
 
   return (
     <>
-      <section
-        className={`relative w-full overflow-hidden bg-[#1a1a1a] ${VIEW_H}`}
-        aria-label={page.title}
-      >
-        <Image
-          src={page.hero.src}
-          alt={page.hero.alt}
-          fill
-          priority
-          sizes="100vw"
-          quality={90}
-          className="object-cover object-center"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/80 via-[#1a1a1a]/40 to-[#1a1a1a]/25"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(26,26,26,0.15)_0%,rgba(26,26,26,0.55)_70%)]"
-        />
+      <OverlayHeroSlider
+        slides={page.slides}
+        asHero
+        size="viewport"
+        firstSlideMs={5200}
+        autoplayMs={4500}
+        fadeDuration={1.25}
+        className="mb-0"
+      />
 
-        <div className="shell-home-two relative z-20 flex h-full flex-col items-center justify-center px-4 pb-10 pt-8 text-center sm:pb-14 lg:pb-16">
-          <motion.div
-            variants={fade}
+      {reels ? (
+        <>
+          <MediaTabs current={page.path} />
+          <MediaAdsGrid />
+        </>
+      ) : (
+        <section className="flex flex-col bg-white lg:h-[calc(100svh-112px)]" aria-label={page.title}>
+          <MediaTabs current={page.path} />
+          <motion.ul
+            variants={group}
             {...reveal}
             viewport={VIEWPORT}
-            className="mx-auto flex w-full max-w-[44rem] flex-col items-center"
+            className="grid min-h-0 flex-1 grid-cols-2 gap-[6px] p-[6px] lg:grid-cols-4 lg:grid-rows-2"
           >
-            <div className="flex items-center justify-center gap-2">
-              <span className="h-px w-7 bg-brand" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/65">
-                {page.eyebrow}
-              </span>
-              <span className="h-px w-7 bg-brand" />
-            </div>
-            <h1 className="display section-heading mt-3 whitespace-nowrap text-center uppercase text-white">
-              {page.title}
-            </h1>
-            <p className="body-copy mx-auto mt-4 max-w-[42ch] text-center text-[14px] leading-[1.65] text-white/70 sm:text-[15px]">
-              {page.lead}
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <nav
-        aria-label="Media Center sections"
-        className="border-b border-ink/8 bg-[#f6f3ee]"
-      >
-        <div className="shell-home-two flex flex-wrap justify-center gap-1 py-3 sm:gap-2 sm:py-4">
-          {mediaNav.map((item) => {
-            const active = item.href === page.path;
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`px-3 py-2 text-[11px] font-bold uppercase tracking-[0.14em] transition-colors sm:px-4 sm:text-[12px] ${
-                  active
-                    ? "bg-ink text-white"
-                    : "bg-white/70 text-ink/60 hover:bg-white hover:text-ink"
-                }`}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-
-      {page.layout === "reels" ? (
-        <MediaAdsGrid />
-      ) : (
-        <section className="bg-[#f6f3ee]">
-          <div className="shell-home-two py-10 sm:py-12 lg:py-14">
-            <motion.ul
-              variants={group}
-              {...reveal}
-              viewport={VIEWPORT}
-              className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6"
-            >
-              {page.items.map((item) => (
-                <motion.li key={item.id} variants={fade}>
-                  <article className="group flex h-full flex-col">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-[#ebe6de]">
-                      <Image
-                        src={item.src}
-                        alt={item.alt}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        quality={86}
-                        className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col border border-t-0 border-ink/8 bg-[#fffefb] px-4 py-4 sm:px-5 sm:py-5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brand">
-                          {item.tag}
-                        </span>
-                        <span className="text-[10px] uppercase tracking-[0.12em] text-ink/35">
-                          {item.date}
-                        </span>
-                      </div>
-                      <h3 className="display mt-2 text-[1.05rem] font-bold uppercase leading-[1.2] tracking-[0.02em] text-ink sm:text-[1.15rem]">
-                        {item.title}
-                      </h3>
-                      <p className="body-copy mt-2 flex-1 text-[13px] leading-[1.6] text-ink/55">
-                        {item.excerpt}
-                      </p>
-                      <span className="mt-4 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/25 underline-offset-4 transition-colors group-hover:decoration-brand">
-                        Open
-                        <FiArrowRight className="text-[13px] transition-transform group-hover:translate-x-0.5" />
-                      </span>
-                    </div>
-                  </article>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </div>
+            {page.items.map((item, i) => (
+              <StoryTile key={item.id} item={item} index={i} />
+            ))}
+          </motion.ul>
         </section>
       )}
 
-      <OrderAndContact />
+      <div className="mt-1.5">
+        <OrderAndContact textureSlides />
+      </div>
     </>
   );
 }

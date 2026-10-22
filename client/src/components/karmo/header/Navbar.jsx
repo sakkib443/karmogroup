@@ -254,22 +254,26 @@ const nav = [
   },
   {
     name: "Company",
-    line: "About, media, contact, dealership",
+    line: "About, media and contact",
     panelAlign: "right",
-    /* Same as Chemicals & Polymers: hover panel stays, nothing navigates
-       until these pages are designed. */
+    /* Every column here is designed now: "Company" opens /about, and About
+       Us, Media Center and Contact Us open their pages (About and Contact
+       rows jump to their sections). Dealership is off the menu for now. */
     linksDisabled: true,
+    linkEnabled: true,
     href: "/about",
-    panelWidth: "56rem",
+    /* Three columns now that Dealership is off (was 56rem for four). */
+    panelWidth: "44rem",
     columns: [
       {
         label: "About Us",
         heading: "About Us",
         href: "/about",
+        enabled: true,
         items: [
           { name: "Company History, Mission & Vision", href: "/about#history" },
-          { name: "Board of Directors", href: "/about" },
-          { name: "Awards & Achievements", href: "/about" },
+          { name: "Board of Directors", href: "/about#board" },
+          { name: "Awards & Achievements", href: "/about#achievements" },
           { name: "Our Partners", href: "/about#partners" },
         ],
       },
@@ -277,6 +281,7 @@ const nav = [
         label: "Media Center",
         heading: "Media Center",
         href: "/media/news",
+        enabled: true,
         items: [
           { name: "News & Blogs", href: "/media/news" },
           { name: "Karmo Memory", href: "/media/memory" },
@@ -287,18 +292,14 @@ const nav = [
         label: "Contact Us",
         heading: "Contact Us",
         href: "/contact",
+        /* /contact is designed: each row jumps to its band there. */
+        enabled: true,
         items: [
-          { name: "Catalogues", href: "/contact" },
-          { name: "Bulk Order", href: "/contact" },
-          { name: "Address / Map", href: "/contact" },
-          { name: "FAQs", href: "/contact" },
+          { name: "Catalogues", href: "/contact#bulk" },
+          { name: "Bulk Order", href: "/contact#bulk" },
+          { name: "Address / Map", href: "/contact#address" },
+          { name: "FAQs", href: "/contact#faqs" },
         ],
-      },
-      {
-        label: "Dealership",
-        heading: "Dealership",
-        href: "/contact",
-        items: [{ name: "Dealership Apply", href: "/contact" }],
       },
     ],
   },
@@ -458,7 +459,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                 >
                   {label}
                 </span>
-              ) : entry.href && !entry.linksDisabled ? (
+              ) : entry.href && (!entry.linksDisabled || entry.linkEnabled) ? (
                 <Link
                   href={entry.href}
                   aria-current={isActive ? "page" : undefined}
@@ -911,7 +912,7 @@ export default function Navbar({ scrolled = false }) {
                         </span>
                       ) : (
                         <>
-                          {entry.href && !entry.linksDisabled ? (
+                          {entry.href && (!entry.linksDisabled || entry.linkEnabled) ? (
                             <Link
                               href={entry.href}
                               onClick={() => setOpen(false)}
