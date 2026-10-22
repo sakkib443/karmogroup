@@ -146,20 +146,20 @@ export function buildFoamCategoryData(key) {
       ...foam.lounge,
       image: {
         ...foam.lounge.image,
-        src: "/pages/foam/bed-automotive/banner-01.webp",
-        position: "object-top"
+        src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.png",
+        position: "object-center"
       },
       slides: [{
         id: "bed-auto-lounge",
-        align: "left",
+        align: "right",
         headingLead: "Premium Automotive Foam",
         headingAccent: "",
         kicker: "",
         cta: null,
         image: { 
-          src: "/pages/foam/bed-automotive/banner-01.webp", 
-          alt: "Bed & Automotive Banner",
-          position: "object-top"
+          src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.png", 
+          alt: "A brown Karmo leather executive office chair beside a wooden desk in a sunlit modern office",
+          position: "object-center"
         },
         veil: true
       }]
