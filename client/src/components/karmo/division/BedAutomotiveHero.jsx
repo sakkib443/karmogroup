@@ -10,10 +10,10 @@ import { motion, useReducedMotion } from "framer-motion";
  * and the bottom-left placement are specific to this page.
  */
 const SLIDE = {
-  image: "/pages/foam/bed-automotive/bed-approved-banner.webp",
-  alt: "A sunlit bedroom with exposed blue and cream mattress foam and Karmo branding",
+  image: "/pages/foam/bed-automotive/sunlit-bedroom-karmo-foam-detail.png",
+  alt: "A sunlit modern bedroom with a wooden platform bed and white quilted Karmo mattress, with a magnifier revealing the Karmo foam layers inside",
   title: "THE COMFORT BEHIND YOUR SLEEP",
-  objectPosition: "75% center",
+  objectPosition: "center",
 };
 
 export default function BedAutomotiveHero() {
