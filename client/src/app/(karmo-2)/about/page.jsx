@@ -1,4 +1,5 @@
 import AboutPage from "@/components/karmo/about/AboutPage";
+import { getPageContent } from "@/cms/server";
 
 export const metadata = {
   title: "About Karmo — Foam, Mattress, HomeTex & Chemicals since 1965",
@@ -11,6 +12,8 @@ export const metadata = {
  * `/about` — lives in (karmo-2) so it inherits HeaderTwo, the header offset and
  * the Karmo footer from the homepage layout, the same way `/foam` does.
  */
-export default function AboutRoute() {
-  return <AboutPage />;
+export default async function AboutRoute() {
+  // The partners strip is the homepage's, so it shows what Admin → Home saved.
+  const homeContent = await getPageContent("home");
+  return <AboutPage homeContent={homeContent} />;
 }

@@ -2,232 +2,113 @@
  * Every claim on the About page, in one place.
  *
  * Source: the client's own 31-page company profile
- * (`recource/Karmo Website/Karmo Group Company Profile.pdf`). Nothing here is
- * written to fill a slot — figures, partner names, plant locations and the
- * chairman's words are all lifted from that document, so the page can be
- * checked against it line by line.
+ * (`karmo-library/02-catalogues/Company Profile`). Figures, plant locations,
+ * strengths and the chairman's words are lifted from it, kept short: the page
+ * leads with pictures, and each band carries one heading and a line or two.
+ * The chairman's portrait, the three industrial parks
+ * and the dealer map are cut from the profile pages themselves.
  *
- * Two things in the profile were deliberately left out:
- *   · "For the past 30 years…" — it contradicts the 1965 founding date on the
- *     same page, so quoting it would put two ages on one screen.
- *   · The full dealer roster (four pages of shop names) — a directory, not an
- *     about page. Only the 747 total and the seven divisions are used.
+ * Left out on purpose: "For the past 30 years…" (it contradicts the 1965
+ * founding date on the same page) and the four pages of dealer shop names.
  */
 
-/* ── The banner ─────────────────────────────────────────────────────────── */
+/* ── The cover ──────────────────────────────────────────────────────────── */
 
 export const aboutBanner = {
-  src: "/pages/about/collections/popular.jpg",
-  alt: "A Karmo-furnished living room — foam, mattress and bedding made in Bangladesh",
+  /* The cover carries the Karmo mark and "Timeless comfort since 1965" itself,
+     so it is shown whole, with no veil or type on top. */
+  src: "/pages/about/karmo-timeless-comfort-cover.webp",
+  width: 2056,
+  height: 765,
+  alt: "Karmo, timeless comfort since 1965 — foam, cotton, thread and a Karmo mattress over sketches of the factory floor",
   eyebrow: "About us",
   title: "The Journey Since 1965",
   line: "The first company in Bangladesh to produce polyurethane — and still the one the country builds its comfort on.",
 };
 
-/* ── Figures strip under the banner ─────────────────────────────────────── */
+/* ── Figures strip (not on the page now; the trust icons sit under the cover) ── */
 
 export const aboutFigures = [
-  {
-    id: "founded",
-    figure: "1965",
-    title: "Founded",
-    note: "Karmo Foam Industry incorporated — six decades of manufacturing.",
-  },
-  {
-    id: "industries",
-    figure: "04",
-    title: "Industries",
-    note: "Foam, Mattress, HomeTex and Chemicals under one group.",
-  },
-  {
-    id: "dealers",
-    figure: "747",
-    title: "Dealer points",
-    note: "Dealers and sales points serving every corner of the country.",
-  },
-  {
-    id: "accreditations",
-    figure: "03",
-    title: "Accreditations",
-    note: "International quality accreditation and certification.",
-  },
+  { id: "founded", figure: "1965", title: "Founded", note: "Karmo Foam Industry incorporated — six decades of manufacturing." },
+  { id: "industries", figure: "04", title: "Industries", note: "Foam, Mattress, HomeTex and Chemicals under one group." },
+  { id: "dealers", figure: "747", title: "Dealer points", note: "Dealers and sales points serving every corner of the country." },
+  { id: "accreditations", figure: "03", title: "Accreditations", note: "International quality accreditation and certification." },
 ];
 
-/* ── The story ──────────────────────────────────────────────────────────── */
+/* ── The journey and the four industries (#history) ─────────────────────── */
 
 export const aboutStory = {
-  eyebrow: "Our story",
-  titleLead: "First in Bangladesh to",
-  titleAccent: "pour polyurethane",
-  image: {
-    src: "/pages/about/mosaic/suite-interior.jpg",
-    alt: "A Karmo mattress dressed in a styled bedroom suite",
-  },
-  plaque: { figure: "1965", label: "Since" },
-  paragraphs: [
-    "Karmo Group of Industries is the first company in Bangladesh to have started the production of polyurethane products, and the journey began in 1965. Today Karmo is the leading industry in the formulation and manufacturing of both rigid and flexible polyurethane products.",
-    "That position was earned on consistency rather than campaigns. Karmo holds the largest raw-material stock in Bangladesh, which is what keeps production running and deliveries predictable — and it is why consumers have never had reason to doubt the name on the label.",
-  ],
-  facts: [
-    "First polyurethane producer in the country, manufacturing since 1965",
-    "Rigid and flexible polyurethane, formulated and manufactured in-house",
-    "The largest raw-material stock in Bangladesh, held for uninterrupted supply",
-    "Custom-formulated grades developed to each customer's own requirement",
+  eyebrow: "About Karmo",
+  titleLead: "The journey",
+  titleAccent: "since 1965",
+  lead: "The first in Bangladesh to make polyurethane — today four industries under one name.",
+  industries: [
+    {
+      index: "01",
+      name: "Karmo Foam",
+      line: "The chemistry of comfort",
+      href: "/foam",
+      image: "/pages/home/divisions/editorial-v2/foam-luxury-arch-sofa-hq.webp",
+      alt: "A sofa built on Karmo Foam in a sunlit arched room",
+    },
+    {
+      index: "02",
+      name: "Karmo Mattress",
+      line: "Complete bedding solution",
+      href: "/mattress",
+      image: "/pages/home/divisions/editorial-v2/mattress-press-pro-fill-hq.webp",
+      alt: "A Karmo mattress pressed to show its fill",
+    },
+    {
+      index: "03",
+      name: "Karmo HomeTex",
+      line: "Where comfort meets elegance",
+      href: "/hometex",
+      image: "/pages/home/divisions/editorial-v2/hometex-quilt-stack-hq.webp",
+      alt: "A stack of Karmo HomeTex quilts and comforters",
+    },
+    {
+      index: "04",
+      name: "Chemicals & Adhesives",
+      line: "Quality that sticks",
+      href: "/chemicals/polyurethane",
+      image: "/pages/home/divisions/editorial-v2/chemicals-tins-hq.webp",
+      alt: "Karmo adhesive tins",
+    },
   ],
 };
 
-/* ── Chairman's message ─────────────────────────────────────────────────── */
+/* ── Chairman's message (#board) ────────────────────────────────────────── */
 
 export const chairmanMessage = {
   eyebrow: "Message from the Chairman",
   quote:
-    "Since 1965 a history of creation and challenge took its first step with the incorporation of Karmo Foam Industry. Riding the wheels of difficulty over the past several years, Karmo Group has taken a firm root, growing into what it is today.",
-  body: [
-    "Although we have multiple businesses, three products remain at the centre of the group: foam, mattress and chemicals, all developed in Bangladesh. Over the years Karmo Foam has made remarkable advancement through product innovation and diversification.",
-    "The company's positive business policy is to fulfil its prime responsibility to the environment and to customer satisfaction, through the development of its members' creativity and self-innovation. All achievements are the rewards for the sweat shed by a highly motivated and loyal team of professionals.",
-  ],
+    "Since 1965 a history of creation and challenge took its first step with Karmo Foam Industry. Riding the wheels of difficulty, Karmo Group has taken a firm root — and is still growing day by day.",
+  line: "Every achievement is the reward for the sweat of a highly motivated and loyal team.",
   name: "Mofizur Rahman Babul",
   role: "Chairman & Managing Director",
+  portrait: {
+    src: "/pages/about/chairman-mofizur-rahman-babul.webp",
+    alt: "Mofizur Rahman Babul, Chairman and Managing Director of Karmo Group",
+  },
 };
 
-/* ── The four industries ────────────────────────────────────────────────── */
-
-export const aboutDivisions = [
-  {
-    index: "01",
-    name: "Karmo Foam",
-    line: "We create the chemistry of comfort",
-    href: "/foam",
-    image: "/shared/divisions/foam-karmo-sofa-blocks-studio.webp",
-    alt: "A Karmo Foam sofa beside stacked foam blocks in a studio",
-    points: [
-      "Furniture and automotive grades",
-      "Footbeds and insole — high, mid and low density",
-    ],
-  },
-  {
-    index: "02",
-    name: "Karmo Mattress",
-    line: "Your perfect partner for complete bedding",
-    href: "/mattress",
-    image: "/shared/divisions/mattress-karmo-floral-bedroom.webp",
-    alt: "A Karmo floral mattress on an upholstered bed",
-    points: [
-      "Pocket springs that move independently, head to toe",
-      "Quilted on U.S. machinery, edged under 500-ton roller pressure",
-    ],
-  },
-  {
-    index: "03",
-    name: "Karmo HomeTex",
-    line: "Where comfort meets elegance",
-    href: "/hometex",
-    image: "/shared/divisions/hometex-karmo-bedding-room.webp",
-    alt: "Karmo HomeTex bedding in a styled bedroom",
-    points: [
-      "Cotton twill, sateen and Egyptian cotton bedsheets",
-      "The country's largest maker of comforters and duvets",
-    ],
-  },
-  {
-    index: "04",
-    name: "Karmo Chemical & Adhesives",
-    line: "Excelling in chemicals and polymers",
-    href: "/chemicals",
-    image: "/shared/divisions/chemicals-karmo-adhesive-tins.webp",
-    alt: "Karmo Adhesive tins arranged in a showroom",
-    points: [
-      "Industrial-grade adhesives for footwear, board and furniture",
-      "Sodium silicate, EPS and the Evergain distributorship",
-    ],
-  },
-];
-
-/** The four units that sit inside the chemicals arm. */
-export const chemicalUnits = [
-  {
-    n: "i",
-    title: "Industrial grade adhesives",
-    note: "PU and graft solutions, neoprene, primers and hardeners, sealants, silicones, wood-grade resins and superglue — supplied to the local footwear industry and to exporters.",
-  },
-  {
-    n: "ii",
-    title: "Evergain Chemicals",
-    note: "Sole authorised distributor in Bangladesh for Evergain Adhesive Co. Ltd, one of the largest adhesive production bases in Asia.",
-  },
-  {
-    n: "iii",
-    title: "Sodium silicate plant",
-    note: "A 20,000-tonne-per-annum plant in Feni, producing sodium silicate from locally available silica sand and imported soda ash.",
-  },
-  {
-    n: "iv",
-    title: "EPS — Expanded Polystyrene",
-    note: "Insulation board, pipe insulation, fish boxes and packaging for the building, insulation and packaging industries.",
-  },
-];
-
-/* ── Our strength ───────────────────────────────────────────────────────── */
+/* ── Our strength and accreditations (#achievements) ────────────────────── */
 
 export const aboutStrength = {
-  eyebrow: "Our strength",
-  titleLead: "A company",
-  titleAccent: "since 1965",
-  lead: "Karmo runs on two things the profile keeps returning to: material it can rely on, and machinery good enough to hold a standard across every batch.",
+  eyebrow: "Why Karmo",
+  titleLead: "Our",
+  titleAccent: "strength",
   pillars: [
-    {
-      id: "materials",
-      title: "Imported raw material",
-      note: "Sourced from the largest multinational chemical companies in the world, so the formulation starts from a known quantity.",
-    },
-    {
-      id: "machinery",
-      title: "State-of-the-art plant",
-      note: "Computerised machinery through the production line, used extensively rather than in one showpiece corner.",
-    },
-    {
-      id: "stock",
-      title: "Deepest stock in the country",
-      note: "The largest raw-material holding in Bangladesh, which is what makes a smooth production and delivery system possible.",
-    },
-    {
-      id: "rnd",
-      title: "Formulation expertise",
-      note: "Both formulation and application developed for each customer's requirement — adhesive, taxidermy and custom-moulding among them.",
-    },
+    { id: "brand", icon: "award", title: "Unique brand position", note: "Forerunner in foam for 60 years." },
+    { id: "finance", icon: "growth", title: "Financial strength", note: "Own resources, least debt burden." },
+    { id: "supply", icon: "truck", title: "Proven supply chain", note: "Dealers in all 64 districts." },
+    { id: "talent", icon: "people", title: "Diverse talent pool", note: "Young talent running the business." },
+    { id: "assets", icon: "factory", title: "Fixed asset pool", note: "Prime industrial and commercial land." },
+    { id: "trading", icon: "flask", title: "Trading concerns", note: "9 units trading chemicals and more." },
   ],
-  suppliersLabel: "Raw materials sourced from",
+  suppliersLabel: "Raw materials from",
   suppliers: ["BASF", "Momentive", "Shell", "Mitsui", "Dow"],
-};
-
-/* ── Working partners (carousel on About) ─────────────────────────────────
- *
- * Sector partners Karmo actually serves — not invented brand marks. When the
- * client supplies transparent PNGs/SVGs, set `logo: "/karmo/images/about/partners/….png"`
- * on an entry and the carousel tile shows the mark instead of the wordmark.
- */
-
-export const aboutPartners = {
-  eyebrow: "Working partners",
-  titleLead: "Built beside",
-  titleAccent: "the makers who trust us",
-  lead: "From upholstery lines to footwear lasts, automotive trim and hospitality beds — Karmo foam and chemistry sit inside the work of manufacturers across Bangladesh and beyond.",
-  rowOne: [
-    { name: "Furniture OEMs", sector: "Seating & upholstery", logo: null },
-    { name: "Mattress houses", sector: "Core & comfort layers", logo: null },
-    { name: "Footwear plants", sector: "Lasting & midsole", logo: null },
-    { name: "Automotive trim", sector: "Cabin & seating foam", logo: null },
-    { name: "HomeTex mills", sector: "Bedding fill & quilt", logo: null },
-    { name: "Hospitality fit-out", sector: "Hotels & residences", logo: null },
-  ],
-  rowTwo: [
-    { name: "Acoustic studios", sector: "Sound treatment", logo: null },
-    { name: "Packaging lines", sector: "EPS & protection", logo: null },
-    { name: "Construction", sector: "Insulation board", logo: null },
-    { name: "Adhesive users", sector: "Polymers & bonds", logo: null },
-    { name: "Dealer network", sector: "747 points nationwide", logo: null },
-    { name: "Export partners", sector: "Regional supply", logo: null },
-  ],
 };
 
 /* ── Where Karmo is made ────────────────────────────────────────────────── */
@@ -236,30 +117,36 @@ export const aboutFacilities = {
   eyebrow: "Industrial parks",
   titleLead: "Where Karmo",
   titleAccent: "is made",
+  lead: "One park running, one rising, one on the drawing board.",
   units: [
     {
       n: "Unit 01",
-      title: "Industrial Park, Demra",
+      title: "Demra",
       place: "Dhaka",
       status: "Operational",
       tone: "live",
-      note: "The group's established manufacturing base.",
+      image: "/pages/about/park-unit1-demra-gate.webp",
+      alt: "Render of the gate of Karmo Industrial Park Unit 1 in Demra",
     },
     {
       n: "Unit 02",
-      title: "Industrial Park, BSCIC",
+      title: "BSCIC",
       place: "Feni",
       status: "Under construction",
       tone: "building",
-      note: "Second park, adding capacity alongside the sodium silicate project in the same district.",
+      image: "/pages/about/park-unit2-feni-site.webp",
+      alt: "Trucks levelling the site of Karmo Industrial Park Unit 2 in Feni",
     },
     {
       n: "Unit 03",
-      title: "National Special Economic Zone",
+      title: "Economic Zone",
       place: "Mirsarai",
       status: "Upcoming",
       tone: "planned",
-      note: "Planned as a joint venture and collaboration project.",
+      image: "/pages/about/park-unit3-mirsarai-plan.webp",
+      /* Portrait plan: keep Karmo's yellow plot (upper middle) in the frame. */
+      position: "center 32%",
+      alt: "Site plan of Karmo's plot in the National Special Economic Zone, Mirsarai",
     },
   ],
 };
@@ -268,24 +155,15 @@ export const aboutFacilities = {
 
 export const aboutReach = {
   eyebrow: "Dealers & sales points",
-  titleLead: "747 points,",
-  titleAccent: "all over Bangladesh",
-  paragraphs: [
-    "Karmo reaches homes through a dealer network rather than a handful of company showrooms — 747 dealer and sales points carrying foam, mattress and bedding across all seven divisions of the country.",
-  ],
   figure: "747",
-  figureLabel: "Dealer & sales points",
-  divisions: [
-    "Dhaka",
-    "Chittagong",
-    "Rajshahi",
-    "Rangpur",
-    "Khulna",
-    "Sylhet",
-    "Barishal",
-  ],
+  figureLabel: "dealer points across the country",
+  map: {
+    src: "/pages/about/dealer-map-bangladesh.webp",
+    alt: "Map of Bangladesh with Karmo dealer points in every division",
+  },
+  divisions: ["Dhaka", "Chittagong", "Rajshahi", "Rangpur", "Khulna", "Sylhet", "Barishal"],
   office: {
     label: "Head office",
-    lines: ["Ibrahim Chamber, 4th Floor", "95 Motijheel, Dhaka-1000, Bangladesh"],
+    lines: ["Ibrahim Chamber, 4th Floor", "95 Motijheel, Dhaka-1000"],
   },
 };

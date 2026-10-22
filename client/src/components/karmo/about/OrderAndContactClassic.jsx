@@ -14,6 +14,7 @@ import {
 } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
  * Order guide + contact — content from the client's live site, rebuilt to
@@ -94,7 +95,8 @@ function ColumnHeading({ eyebrow, title, accent }) {
   );
 }
 
-export default function OrderAndContact() {
+/** `texture` lays the homepage's section texture behind the band (About uses it). */
+export default function OrderAndContact({ texture = false }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
@@ -114,8 +116,9 @@ export default function OrderAndContact() {
   }
 
   return (
-    <section className="bg-white py-16 lg:py-24">
-      <div className="shell">
+    <section className="relative overflow-hidden bg-white py-16 lg:py-24">
+      {texture ? <TextureSlides lighter /> : null}
+      <div className="shell relative z-[1]">
         <motion.div
           variants={group}
           {...reveal}

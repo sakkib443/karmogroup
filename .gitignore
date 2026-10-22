@@ -73,6 +73,16 @@ Mattress Brochure/
 /*.jpg
 /*.jpeg
 /*.webp
+/*.gif
+
+# Raw video and photo drops at the repo root — source footage (Mattress 5.mp4,
+# 1.6 GB of Mattress Videos/) and the product shoot with its PSDs (mATREXX
+# PIC/, ~760 MB). Far past GitHub's 100 MB limit; what the site uses is
+# compressed into client/public/.
+/*.mp4
+/*.mov
+/Mattress Videos/
+/mATREXX PIC/
 
 # Installers and other binaries that land in the working folder by accident.
 *.exe

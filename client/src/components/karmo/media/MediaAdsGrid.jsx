@@ -76,16 +76,15 @@ export default function MediaAdsGrid() {
   }, []);
 
   return (
-    <section className="bg-[#f6f3ee]" aria-label="Karmo ads and films">
-      <div className="shell-home-two py-10 sm:py-12 lg:py-14">
-        <ul className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 lg:gap-4">
-          {karmoFilms.map((film) => (
-            <li key={film.id}>
-              <AdsReelTile film={film} onOpen={openFilm} />
-            </li>
-          ))}
-        </ul>
-      </div>
+    <section className="bg-white" aria-label="Karmo ads and films">
+      {/* Edge to edge with the homepage's 6px gutters. */}
+      <ul className="grid grid-cols-2 gap-[6px] p-[6px] md:grid-cols-3 lg:grid-cols-5">
+        {karmoFilms.map((film) => (
+          <li key={film.id}>
+            <AdsReelTile film={film} onOpen={openFilm} />
+          </li>
+        ))}
+      </ul>
 
       {open ? (
         <VideoModal

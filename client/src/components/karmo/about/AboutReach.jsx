@@ -1,103 +1,68 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiMapPin } from "react-icons/fi";
+import { LuMapPin } from "react-icons/lu";
 
 import { aboutReach } from "@/components/karmo/about/aboutData";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
 
 /**
- * Reach — the 747 dealer points and the seven divisions they cover.
- *
- * The profile lists every shop by name across four pages. That is a dealer
- * directory and belongs on a "find a store" page, so only the total and the
- * seven divisions are here; the head office closes the section because it is
- * the one address a company page is actually asked for.
+ * Dealers & sales points. One screen tall on a computer: the company profile's
+ * dealer map of Bangladesh fills the left half, the 747 figure and the seven
+ * divisions sit on the right.
  */
 export default function AboutReach() {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const c = aboutReach;
 
   return (
-    <section className="relative mb-1.5 bg-white py-10 md:py-12 lg:py-14">
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="shell grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-20"
-      >
-        {/* ── Copy ────────────────────────────────────────────────────────── */}
-        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
-          <span className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.3em] text-brand">
-            <span className="h-px w-8 bg-brand" />
-            {aboutReach.eyebrow}
-          </span>
-          <h2 className="display section-heading mt-4 uppercase text-ink">
-            {aboutReach.titleLead}{" "}
-            <span className="font-bold text-brand">{aboutReach.titleAccent}</span>
-          </h2>
-
-          {aboutReach.paragraphs.map((text) => (
-            <p
-              key={text.slice(0, 24)}
-              className="body-copy mt-6 max-w-[34rem] text-[15px] leading-[1.85] text-ink/58"
-            >
-              {text}
-            </p>
-          ))}
-
-          <div className="mt-8 flex items-start gap-4 border-t border-ink/8 pt-7">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-brand/25 text-brand">
-              <FiMapPin className="text-[18px]" />
-            </span>
-            <div>
-              <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-brand">
-                {aboutReach.office.label}
-              </span>
-              {aboutReach.office.lines.map((line) => (
-                <span key={line} className="mt-1 block text-[14px] leading-snug text-ink/70">
-                  {line}
-                </span>
-              ))}
-            </div>
-          </div>
+    <section className="relative bg-white lg:h-[calc(100svh-112px)]" aria-label="Dealers and sales points">
+      {/* The homepage's section texture (Admin → Section background texture). */}
+      <TextureSlides lighter />
+      <motion.div variants={group} {...reveal} viewport={VIEWPORT} className="relative z-[1] grid h-full lg:grid-cols-2">
+        <motion.div variants={fade} className="relative min-h-[min(110vw,560px)] lg:min-h-0">
+          <Image
+            src={c.map.src}
+            alt={c.map.alt}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-contain p-4 mix-blend-multiply lg:p-[clamp(1rem,3svh,2.5rem)]"
+          />
         </motion.div>
 
-        {/* ── Figure + the seven divisions ─────────────────────────────────── */}
-        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
-          <div className="border border-ink/10">
-            <div className="border-b border-ink/8 bg-brand px-7 py-8 text-center lg:py-10">
-              <span className="display block text-[3.2rem] font-bold leading-none tabular-nums tracking-[-0.02em] text-white lg:text-[4rem]">
-                {aboutReach.figure}
-              </span>
-              <span className="mt-3 block text-[11px] font-bold uppercase tracking-[0.24em] text-white/80">
-                {aboutReach.figureLabel}
-              </span>
-            </div>
+        <motion.div
+          variants={fade}
+          className="flex flex-col justify-center border-ink/8 px-6 pb-14 text-center sm:px-10 lg:border-l lg:px-[clamp(2.5rem,5vw,6rem)] lg:py-8 lg:text-left"
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/50">{c.eyebrow}</span>
+          <p className="display mt-3 leading-none text-brand" style={{ fontSize: "clamp(5rem, 3rem + 7vw, 10rem)", fontWeight: 700, letterSpacing: "-0.03em" }}>
+            {c.figure}
+          </p>
+          <p className="display mt-2 text-[clamp(1.05rem,0.85rem+0.8vw,1.6rem)] font-semibold uppercase tracking-[0.03em] text-ink">
+            {c.figureLabel}
+          </p>
 
-            <ul className="grid gap-px bg-ink/8 sm:grid-cols-2">
-              {aboutReach.divisions.map((division, index) => (
-                <li
-                  key={division}
-                  className={`flex items-baseline gap-3 bg-white px-6 py-4 ${
-                    /* Seven is odd, so the last cell spans both columns rather
-                       than leaving a hole beside it. */
-                    index === aboutReach.divisions.length - 1 ? "sm:col-span-2" : ""
-                  }`}
-                >
-                  <span className="display text-[11px] font-bold tabular-nums tracking-[0.14em] text-ink/25">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="display text-[13px] font-bold uppercase tracking-[0.12em] text-ink/80">
-                    {division}
-                  </span>
-                  <span className="ml-auto text-[11px] uppercase tracking-[0.14em] text-ink/35">
-                    Division
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="mt-8 flex flex-wrap gap-2 max-lg:justify-center">
+            {c.divisions.map((d) => (
+              <li
+                key={d}
+                className="inline-flex items-center gap-1.5 rounded-full border border-ink/12 px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink/75"
+              >
+                <LuMapPin size={13} className="text-brand" />
+                {d}
+              </li>
+            ))}
+          </ul>
+
+          <address className="mt-10 border-t border-ink/10 pt-5 not-italic">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-ink/45">{c.office.label}</span>
+            {c.office.lines.map((l) => (
+              <span key={l} className="body-copy mt-1 block text-[14px] text-ink/70">{l}</span>
+            ))}
+          </address>
         </motion.div>
       </motion.div>
     </section>
