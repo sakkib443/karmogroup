@@ -43,11 +43,10 @@ export default function PillowHero() {
       {/* Same scrim as the Home / HomeTex / Bed & Automotive heroes. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black/40" />
 
-      {/* Top-left on phones and tablets, over the bare wall above the pillows;
-          dead-centre vertically on the empty left from `lg` up. (It was nudged
-          up to clear the lantern at 16:9, and read as too high on the client's
-          wider screen — so it is true centre now.) */}
-      <div className="absolute inset-0 flex flex-col items-start justify-start px-6 pt-8 sm:px-10 sm:pt-10 lg:justify-center lg:px-14 lg:pt-0 xl:px-20">
+      {/* Centred near the top, on the bare panelled wall above the sofa (client
+          ask) — horizontally centred at every width and nudged down from the
+          header so it sits in the empty panel over the pillows. */}
+      <div className="absolute inset-0 flex flex-col items-center justify-start px-6 pt-[14vh] sm:px-10 sm:pt-[14vh] lg:px-14 lg:pt-[15vh] xl:px-20">
         <motion.h1
           id="pillow-title"
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}
@@ -55,7 +54,7 @@ export default function PillowHero() {
           transition={{ duration: reduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
           /* Same size, weight, tracking and shadow as the Home / HomeTex / Bed &
              Automotive hero headings. */
-          className="display whitespace-nowrap text-left uppercase text-white"
+          className="display whitespace-nowrap text-center uppercase text-white"
           style={{
             fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)",
             fontWeight: 350,

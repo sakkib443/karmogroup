@@ -329,7 +329,7 @@ export default function OverlayHeroSlider({
                                   ? "lg:max-w-[min(40vw,32rem)]"
                                   : "lg:max-w-[min(55vw,46rem)]"
                               } ${copyEnd ? "md:text-right" : "text-left"}`
-                    } ${on ? "pointer-events-auto" : "pointer-events-none"}`}
+                    } ${on ? "pointer-events-auto" : "pointer-events-none"} ${s.copyClassName || ""}`}
                   >
                     {titleCard ? (
                       <motion.div

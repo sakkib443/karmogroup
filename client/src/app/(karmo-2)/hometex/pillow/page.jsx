@@ -236,6 +236,8 @@ const customLounge = {
     {
       id: "pillow-lounge",
       align: "left",
+      // Nudge the copy a little closer to the left edge on desktop (client ask).
+      copyClassName: "lg:-ml-8 xl:-ml-14",
       headingLead: "Experience Cloud-Like Comfort",
       headingAccent: "",
       kicker: "",
