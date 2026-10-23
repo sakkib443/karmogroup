@@ -39,8 +39,8 @@ const company = [
   { name: "License & certificates", href: "/about/awards" },
   { name: "Career", href: "/career" },
   { name: "Privacy policy", href: "/privacy" },
-  { name: "Return policy", href: "/returns" },
-  { name: "Karmo policies", href: "/policies" },
+  { name: "Return policy", href: "/refund" },
+  { name: "Karmo policies", href: "/terms" },
 ];
 
 const needHelp = [
