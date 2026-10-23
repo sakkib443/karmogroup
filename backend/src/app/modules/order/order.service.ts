@@ -74,6 +74,12 @@ const notifyOrderStatus = (order: any, status: string): void => {
 /** A Mongo _id. Slugs are never 24 hex characters, so this tells the two kinds of line apart. */
 const isProductId = (v: unknown) => /^[a-f0-9]{24}$/i.test(String(v || ''));
 
+/* Dashboard groups. The older courier steps (processing, on_the_way…) still sit on some orders. */
+const DAY_MS = 24 * 3600e3;
+const NOT_SOLD = ['cancelled', 'returned', 'refunded'];
+const IN_PROCESS = ['confirmed', 'factory', 'challan_ready', 'courier_entry', 'processing'];
+const ON_THE_WAY = ['shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt'];
+
 /** "Fiber Pillow" → "fiber_pillow" — the key the factory challans are grouped by. */
 const divisionKey = (v: unknown) => String(v || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
 
@@ -874,6 +880,116 @@ const OrderService = {
             ...stats,
             ...(seesMoney ? { totalRevenue: (revenueData as any[])[0]?.totalRevenue || 0 } : {}),
             mine: { confirmedToday, cancelledToday },
+        };
+    },
+
+    /**
+     * The admin / manager dashboard: today at a glance, and the running 7 or 30 days
+     * day by day with their totals. Days are Dhaka calendar days (midnight to
+     * midnight). Money is the order total (products + delivery − discount); cancelled,
+     * returned and refunded orders are never counted as sold.
+     *   sold      = value of the period's orders that still stand
+     *   earned    = the part of it delivered or paid online
+     *   toCollect = sold − earned (still on its way to being paid)
+     */
+    async getOrderOverview(viewer: Viewer, daysParam?: unknown) {
+        const days = Number(daysParam) === 7 ? 7 : 30;
+        const scope = scopeFor(viewer);
+        const today = dhakaDayStart();
+        const from = new Date(today.getTime() - (days - 1) * DAY_MS);
+
+        const unsold = { $in: ['$status', NOT_SOLD] };
+        const soldValue = (field: string) => ({ $sum: { $cond: [unsold, 0, field] } });
+
+        const [placedToday, statusCounts, deliveredToday, cancelledToday, daily, period] = await Promise.all([
+            Order.aggregate([
+                { $match: { ...scope, createdAt: { $gte: today } } },
+                { $group: { _id: null, n: { $sum: 1 }, value: soldValue('$total') } },
+            ]),
+            Order.aggregate([{ $match: scope }, { $group: { _id: '$status', n: { $sum: 1 } } }]),
+            Order.aggregate([
+                { $match: { ...scope, status: 'delivered', timeline: { $elemMatch: { status: 'delivered', createdAt: { $gte: today } } } } },
+                { $group: { _id: null, n: { $sum: 1 }, value: { $sum: '$total' } } },
+            ]),
+            Order.countDocuments({ ...scope, cancelledAt: { $gte: today } }),
+            Order.aggregate([
+                { $match: { ...scope, createdAt: { $gte: from } } },
+                {
+                    $group: {
+                        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt', timezone: 'Asia/Dhaka' } },
+                        orders: { $sum: 1 },
+                        revenue: soldValue('$total'),
+                    },
+                },
+            ]),
+            Order.aggregate([
+                { $match: { ...scope, createdAt: { $gte: from } } },
+                {
+                    $group: {
+                        _id: null,
+                        placed: { $sum: 1 },
+                        unsold: { $sum: { $cond: [unsold, 1, 0] } },
+                        sold: soldValue('$total'),
+                        earned: {
+                            $sum: {
+                                $cond: [
+                                    { $and: [{ $not: [unsold] }, { $or: [{ $eq: ['$status', 'delivered'] }, { $eq: ['$paymentStatus', 'paid'] }] }] },
+                                    '$total',
+                                    0,
+                                ],
+                            },
+                        },
+                        delivery: soldValue('$shippingCost'),
+                        pieces: { $sum: { $cond: [unsold, 0, { $sum: '$items.quantity' }] } },
+                    },
+                },
+            ]),
+        ]);
+
+        const count: Record<string, number> = {};
+        for (const c of statusCounts as any[]) count[c._id] = c.n;
+        const sum = (keys: string[]) => keys.reduce((n, k) => n + (count[k] || 0), 0);
+
+        // Every day of the range, zero when nothing was placed that day.
+        const byDay = new Map((daily as any[]).map((d) => [d._id, d]));
+        const dayKey = (t: number) => new Date(t + 6 * 3600e3).toISOString().slice(0, 10);
+        const series = Array.from({ length: days }, (_, i) => {
+            const date = dayKey(from.getTime() + i * DAY_MS);
+            const d = byDay.get(date);
+            return { date, orders: d?.orders || 0, revenue: d?.revenue || 0 };
+        });
+
+        const p = (period as any[])[0] || { placed: 0, unsold: 0, sold: 0, earned: 0, delivery: 0, pieces: 0 };
+        const t = (placedToday as any[])[0] || { n: 0, value: 0 };
+        const dl = (deliveredToday as any[])[0] || { n: 0, value: 0 };
+        const soldOrders = p.placed - p.unsold;
+
+        return {
+            days,
+            today: {
+                placed: t.n,
+                placedValue: t.value,
+                cancelled: cancelledToday,
+                pending: count.pending || 0,
+                inProcess: sum(IN_PROCESS),
+                onTheWay: sum(ON_THE_WAY),
+                delivered: dl.n,
+                deliveredValue: dl.value,
+            },
+            daily: series,
+            period: {
+                from: series[0].date,
+                to: series[series.length - 1].date,
+                orders: soldOrders,
+                cancelled: p.unsold,
+                pieces: p.pieces,
+                sold: p.sold,
+                earned: p.earned,
+                toCollect: p.sold - p.earned,
+                delivery: p.delivery,
+                average: soldOrders ? Math.round(p.sold / soldOrders) : 0,
+                collectedPct: p.sold ? Math.round((p.earned / p.sold) * 100) : 0,
+            },
         };
     },
 

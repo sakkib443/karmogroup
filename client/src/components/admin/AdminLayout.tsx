@@ -173,7 +173,9 @@ function Sidebar({ pathname, role, onClose, onLogout }: {
             <div className="flex h-16 shrink-0 items-center justify-between px-4">
                 <Link href={homeFor(role)} className="flex items-center gap-2.5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/brand/logo.png" alt="Karmo Group" className="block h-7 w-auto max-w-[200px]" />
+                    {/* The compact logo — "Since 1965" emblem + KARMO®, no "GROUP" — reads on
+                        the light sidebar (logo.png has a white "GROUP" made for dark backgrounds). */}
+                    <img src="/brand/logo-compact.png" alt="Karmo" className="block h-10 w-auto max-w-[200px]" />
                 </Link>
                 {onClose && (
                     <button type="button" aria-label="Close menu" onClick={onClose} className="rounded-full p-1.5 text-gray-500 hover:bg-gray-100 lg:hidden">
