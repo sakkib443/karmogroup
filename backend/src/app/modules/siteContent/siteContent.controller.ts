@@ -17,6 +17,12 @@ const SiteContentController = {
     }),
 
     // PATCH /api/site-content/:section — Admin only (section update)
+    // PUT /api/site-content/payment — the checkout's bKash / Nagad / bank details (admins)
+    updatePayment: catchAsync(async (req: Request, res: Response) => {
+        const content = await SiteContentService.updatePayment(req.body || {});
+        sendResponse(res, { statusCode: 200, success: true, message: 'Payment methods saved', data: content });
+    }),
+
     updateSection: catchAsync(async (req: Request, res: Response) => {
         const { section } = req.params;
         const validSections = ['ticker', 'contact', 'floating', 'footer', 'defaultTagline', 'seo', 'announcement', 'legalPages'];

@@ -5,13 +5,13 @@ import InquiryService from './inquiry.service';
 
 const InquiryController = {
     create: catchAsync(async (req: Request, res: Response) => {
-        const inquiry = await InquiryService.create(req.body);
+        const inquiry = await InquiryService.create(req.body || {});
         sendResponse(res, { statusCode: 201, success: true, message: 'Inquiry submitted successfully', data: inquiry });
     }),
 
     getAll: catchAsync(async (req: Request, res: Response) => {
-        const { inquiries, meta } = await InquiryService.getAll(req.query as Record<string, unknown>);
-        sendResponse(res, { statusCode: 200, success: true, message: 'Inquiries fetched', data: inquiries, meta });
+        const { inquiries, meta, summary } = await InquiryService.getAll(req.query as Record<string, unknown>);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Inquiries fetched', data: inquiries, meta: { ...meta, summary } as any });
     }),
 
     getByProduct: catchAsync(async (req: Request, res: Response) => {
@@ -20,7 +20,7 @@ const InquiryController = {
     }),
 
     updateStatus: catchAsync(async (req: Request, res: Response) => {
-        const inquiry = await InquiryService.updateStatus(req.params.id, req.body);
+        const inquiry = await InquiryService.updateStatus(req.params.id, req.body || {}, { userId: req.user!.userId, name: req.user!.name, role: req.user!.role });
         sendResponse(res, { statusCode: 200, success: true, message: 'Inquiry updated', data: inquiry });
     }),
 

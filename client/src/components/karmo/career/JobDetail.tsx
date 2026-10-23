@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import {
     FiMapPin,
     FiBriefcase,
@@ -40,19 +39,13 @@ import {
  * clean short page rather than a run of empty headings.
  */
 
+/** One row of the summary card: label left, value right. */
 function Meta({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
     if (!value) return null;
     return (
-        <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-brand/8 text-brand">
-                <Icon className="text-[15px]" />
-            </span>
-            <span className="min-w-0">
-                <span className="block text-[10.5px] font-semibold uppercase tracking-[0.12em] text-ink/40">
-                    {label}
-                </span>
-                <span className="mt-0.5 block text-[13.5px] font-medium text-ink">{value}</span>
-            </span>
+        <div className="flex items-start justify-between gap-3 border-b border-ink/8 py-2.5 text-[13px] last:border-0">
+            <span className="flex items-center gap-2 text-ink/50"><Icon className="text-[14px] text-ink/35" />{label}</span>
+            <span className="text-right font-medium text-ink">{value}</span>
         </div>
     );
 }
@@ -60,12 +53,10 @@ function Meta({ icon: Icon, label, value }: { icon: any; label: string; value: s
 function Prose({ title, html }: { title: string; html?: string }) {
     if (!html || !html.trim()) return null;
     return (
-        <div className="mt-8">
-            <h2 className="display text-[1.05rem] font-bold uppercase tracking-[0.04em] text-ink">
-                {title}
-            </h2>
+        <div className="border-t border-ink/8 pt-5 first:border-0 first:pt-0">
+            <h2 className="text-[13px] font-bold uppercase tracking-[0.12em] text-ink">{title}</h2>
             <div
-                className="body-copy career-prose mt-3 text-[14.5px] leading-[1.8] text-ink/70"
+                className="body-copy career-prose mt-2 text-[14px] leading-[1.75] text-ink/70"
                 dangerouslySetInnerHTML={{ __html: html }}
             />
         </div>
@@ -110,55 +101,49 @@ export default function JobDetail({ slug }: { slug: string }) {
 
     return (
         <>
-            {/* ── Header ─────────────────────────────────────────────────── */}
-            <section className="relative border-b border-ink/8 bg-cream/40">
-                {job.bannerImage ? (
-                    <div className="relative h-48 w-full overflow-hidden sm:h-64 lg:h-72">
-                        <Image src={job.bannerImage} alt={job.title} fill sizes="100vw" className="object-cover" priority />
-                        <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-ink/60 to-ink/10" />
-                    </div>
-                ) : null}
-
-                <div className="shell py-8 lg:py-10">
+            {/* ── Header: no banner — title, the key facts, apply ─────────────── */}
+            <section className="border-b border-ink/8 bg-cream/40">
+                <div className="shell pb-6 pt-10 lg:pb-7 lg:pt-12">
                     <Link
                         href="/career"
-                        className="inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink/50 transition-colors hover:text-brand"
+                        className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink/50 transition-colors hover:text-brand"
                     >
                         <FiArrowLeft /> All openings
                     </Link>
 
-                    <div className="mt-4 flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-brand/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-brand">
-                            {labelOf(DIVISIONS, job.division)}
-                        </span>
-                        {job.isUrgent && (
-                            <span className="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-red-600 ring-1 ring-red-200">
-                                Urgent hiring
-                            </span>
-                        )}
-                        {closed && (
-                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-600 ring-1 ring-slate-200">
-                                Closed
-                            </span>
+                    <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2 text-[10.5px] font-bold uppercase tracking-[0.16em]">
+                                <span className="text-brand">{labelOf(DIVISIONS, job.division)}</span>
+                                {job.department ? <span className="text-ink/35">· {job.department}</span> : null}
+                                {job.isUrgent && <span className="rounded-sm bg-red-50 px-1.5 py-0.5 text-red-600">Urgent</span>}
+                                {closed && <span className="rounded-sm bg-slate-100 px-1.5 py-0.5 text-slate-600">Closed</span>}
+                            </div>
+                            <h1 className="mt-1.5 text-[1.5rem] font-bold leading-tight text-ink lg:text-[1.85rem]">{job.title}</h1>
+                            <ul className="mt-2.5 flex flex-wrap gap-x-5 gap-y-1 text-[13px] text-ink/55">
+                                {job.location ? <li className="flex items-center gap-1.5"><FiMapPin className="text-ink/35" />{job.location}</li> : null}
+                                <li className="flex items-center gap-1.5"><FiBriefcase className="text-ink/35" />{labelOf(EMPLOYMENT_TYPES, job.employmentType)}</li>
+                                {formatExperience(job) ? <li className="flex items-center gap-1.5"><FiClock className="text-ink/35" />{formatExperience(job)}</li> : null}
+                                {left !== null && !expired ? <li className="flex items-center gap-1.5"><FiCalendar className="text-ink/35" />{left === 0 ? "Closes today" : `${left} day${left > 1 ? "s" : ""} left`}</li> : null}
+                            </ul>
+                        </div>
+                        {!closed && (
+                            <a
+                                href="#apply"
+                                className="inline-flex h-11 shrink-0 items-center justify-center self-start rounded-md bg-brand px-7 text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark lg:self-auto"
+                            >
+                                Apply now
+                            </a>
                         )}
                     </div>
-
-                    <h1 className="display section-heading mt-3 uppercase text-ink">{job.title}</h1>
-                    {job.department ? (
-                        <p className="mt-2 text-[14px] text-ink/55">{job.department}</p>
-                    ) : null}
-                    {job.summary ? (
-                        <p className="body-copy mt-4 max-w-3xl text-[15px] leading-[1.75] text-ink/60">
-                            {job.summary}
-                        </p>
-                    ) : null}
                 </div>
             </section>
 
             {/* ── Body ───────────────────────────────────────────────────── */}
-            <section className="bg-white py-10 lg:py-14">
-                <div className="shell grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-12">
-                    <div className="min-w-0">
+            <section className="bg-white py-7 lg:py-9">
+                <div className="shell grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] lg:gap-10">
+                    <div className="min-w-0 space-y-5">
+                        {job.summary ? <p className="body-copy text-[14.5px] leading-[1.75] text-ink/70">{job.summary}</p> : null}
                         <Prose title="About the role" html={job.description} />
                         <Prose title="Responsibilities" html={job.responsibilities} />
                         <Prose title="Requirements" html={job.requirements} />
@@ -166,36 +151,26 @@ export default function JobDetail({ slug }: { slug: string }) {
                         <Prose title="Benefits" html={job.benefits} />
 
                         {job.skills?.length > 0 && (
-                            <div className="mt-8">
-                                <h2 className="display text-[1.05rem] font-bold uppercase tracking-[0.04em] text-ink">
-                                    Skills
-                                </h2>
-                                <ul className="mt-3 flex flex-wrap gap-2">
-                                    {job.skills.map((s: string) => (
-                                        <li
-                                            key={s}
-                                            className="rounded-full bg-cream px-3 py-1.5 text-[12.5px] text-ink/70"
-                                        >
-                                            {s}
-                                        </li>
+                            <div className="border-t border-ink/8 pt-5">
+                                <h2 className="text-[13px] font-bold uppercase tracking-[0.12em] text-ink">Skills</h2>
+                                <ul className="mt-2.5 flex flex-wrap gap-1.5">
+                                    {job.skills.map((sk: string) => (
+                                        <li key={sk} className="rounded-md border border-ink/10 px-2.5 py-1 text-[12.5px] text-ink/70">{sk}</li>
                                     ))}
                                 </ul>
                             </div>
                         )}
 
                         {/* ── Apply ──────────────────────────────────────── */}
-                        <div id="apply" className="mt-12 scroll-mt-[130px]">
-                            <h2 className="display section-heading uppercase text-ink">
-                                Apply for this position
-                            </h2>
-                            <p className="body-copy mt-2 max-w-2xl text-[14px] leading-[1.7] text-ink/55">
-                                No account needed. Fill in your details, attach your CV and submit —
-                                our HR team will contact you directly if you are shortlisted.
+                        <div id="apply" className="scroll-mt-[130px] border-t border-ink/8 pt-7">
+                            <h2 className="text-[1.2rem] font-bold text-ink">Apply for this position</h2>
+                            <p className="body-copy mt-1 text-[13.5px] text-ink/55">
+                                No account needed — fill in your details and attach your CV.
                             </p>
 
-                            <div className="mt-6">
+                            <div className="mt-5">
                                 {closed ? (
-                                    <div className="rounded-lg border border-ink/12 bg-cream/40 p-8 text-center">
+                                    <div className="rounded-lg border border-ink/12 bg-cream/40 p-6 text-center">
                                         <h3 className="display text-[1.1rem] font-bold uppercase text-ink">
                                             Applications are closed
                                         </h3>
@@ -220,11 +195,9 @@ export default function JobDetail({ slug }: { slug: string }) {
 
                     {/* ── Sidebar ────────────────────────────────────────── */}
                     <aside className="lg:sticky lg:top-[130px] lg:self-start">
-                        <div className="rounded-lg border border-ink/10 bg-cream/30 p-5">
-                            <h2 className="display text-[0.95rem] font-bold uppercase tracking-[0.06em] text-ink">
-                                Job summary
-                            </h2>
-                            <div className="mt-4 space-y-4">
+                        <div className="rounded-lg border border-ink/10 bg-white p-5">
+                            <h2 className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink">Job summary</h2>
+                            <div className="mt-2">
                                 <Meta icon={FiMapPin} label="Location" value={job.location} />
                                 <Meta icon={FiBriefcase} label="Job type" value={labelOf(EMPLOYMENT_TYPES, job.employmentType)} />
                                 <Meta icon={FiHome} label="Workplace" value={labelOf(WORKPLACE_TYPES, job.workplaceType)} />
@@ -249,7 +222,7 @@ export default function JobDetail({ slug }: { slug: string }) {
                             {!closed && (
                                 <a
                                     href="#apply"
-                                    className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-brand text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark"
+                                    className="mt-4 flex h-11 w-full items-center justify-center rounded-md bg-brand text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-brand-dark"
                                 >
                                     Apply now
                                 </a>
@@ -260,14 +233,14 @@ export default function JobDetail({ slug }: { slug: string }) {
                                     href={job.jdFile}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mt-2.5 flex h-12 w-full items-center justify-center gap-2 rounded-md border border-ink/15 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:border-brand hover:text-brand"
+                                    className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-ink/15 text-[12px] font-bold uppercase tracking-[0.12em] text-ink transition-colors hover:border-brand hover:text-brand"
                                 >
                                     <FiDownload /> Job description
                                 </a>
                             ) : null}
 
                             {(job.contactEmail || job.contactPhone) && (
-                                <div className="mt-6 border-t border-ink/10 pt-4">
+                                <div className="mt-4 border-t border-ink/10 pt-3.5">
                                     <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-ink/40">
                                         Questions?
                                     </p>

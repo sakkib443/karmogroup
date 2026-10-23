@@ -156,6 +156,10 @@ const orderSchema = new Schema(
         courierStatus: { type: String, default: '' },   // raw courier status as the courier reports it
         courierFee: { type: Number, default: 0 },        // what the courier charges Karmo for this parcel
         courierBookedAt: { type: Date },
+        courierCod: { type: Number },                    // cash the courier was asked to collect, at booking
+        courierReturnFee: { type: Number, default: 0 },  // what the courier charged for bringing it back
+        courierPayout: { type: Schema.Types.ObjectId, ref: 'CourierPayout' }, // the payout that settled it
+        courierPaidAt: { type: Date },
 
         note: { type: String, default: '' },
         adminNote: { type: String, default: '' }, // internal note shown/editable on the admin order detail

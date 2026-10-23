@@ -1,60 +1,72 @@
 import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
-import CourierService from './courier.service';
+import AppError from '../../utils/AppError';
+import CourierService, { type Carrier } from './courier.service';
 import config from '../../config';
+import type { Viewer } from '../order/order.desk';
+
+const viewerOf = (req: Request): Viewer => ({
+    userId: req.user!.userId,
+    role: req.user!.role,
+    name: req.user!.name,
+    divisions: req.user!.divisions,
+});
+
+/** pathao | steadfast — required when sending a parcel. */
+const carrierOf = (v: unknown): Carrier => {
+    const c = String(v || '').toLowerCase();
+    if (c !== 'pathao' && c !== 'steadfast') throw new AppError(400, 'Choose the courier: Pathao or Steadfast');
+    return c;
+};
+
+/** Bulk bodies send { items: [{ orderId, packageId }] }; older callers send { orderIds }. */
+const idsOf = (body: any): string[] =>
+    Array.isArray(body?.items) ? body.items.map((x: any) => String(x?.orderId || '')).filter(Boolean)
+        : Array.isArray(body?.orderIds) ? body.orderIds.map(String) : [];
 
 const CourierController = {
-    // GET /api/courier/orders?state=&search=&page=&limit=
-    listOrders: catchAsync(async (req: Request, res: Response) => {
-        const { state, search, page, limit } = req.query;
-        const result = await CourierService.listOrders({
-            state: state as string,
-            search: search as string,
-            page: Number(page) || 1,
-            limit: Number(limit) || 20,
-        });
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: 'Courier orders fetched',
-            meta: result.meta,
-            data: result.data,
-        });
+    // GET /api/courier/packages?tab=&search=&page=&limit=
+    listPackages: catchAsync(async (req: Request, res: Response) => {
+        const { tab, search, page, limit } = req.query;
+        const result = await CourierService.listPackages({ tab: tab as string, search: search as string, page: Number(page) || 1, limit: Number(limit) || 20 });
+        sendResponse(res, { statusCode: 200, success: true, message: 'Parcels', meta: result.meta, data: result.data });
     }),
 
-    // POST /api/courier/orders/:orderId/book
-    bookOrder: catchAsync(async (req: Request, res: Response) => {
-        const order = await CourierService.bookOrder(req.params.orderId);
-        sendResponse(res, { statusCode: 200, success: true, message: 'Order booked with Steadfast', data: order });
+    // GET /api/courier/counts?search=
+    counts: catchAsync(async (req: Request, res: Response) => {
+        const data = await CourierService.counts(req.query.search as string);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Parcel counts', data });
     }),
 
-    // POST /api/courier/bulk-book   body: { orderIds: [] }
+    // POST /api/courier/orders/:orderId/packages/:packageId/book   body: { carrier }
+    book: catchAsync(async (req: Request, res: Response) => {
+        const order = await CourierService.book(req.params.orderId, carrierOf(req.body?.carrier), viewerOf(req));
+        sendResponse(res, { statusCode: 200, success: true, message: `Sent with ${order.carrier}`, data: order });
+    }),
+
+    // POST /api/courier/bulk-book   body: { items, carrier }
     bulkBook: catchAsync(async (req: Request, res: Response) => {
-        const result = await CourierService.bulkBook(req.body?.orderIds || []);
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: `Booked ${result.booked}/${result.total} order(s) with Steadfast`,
-            data: result,
-        });
+        const result = await CourierService.bulkBook(idsOf(req.body), carrierOf(req.body?.carrier), viewerOf(req));
+        sendResponse(res, { statusCode: 200, success: true, message: `Sent ${result.booked} of ${result.total}`, data: result });
     }),
 
-    // GET /api/courier/orders/:orderId/status
+    // GET /api/courier/orders/:orderId/packages/:packageId/status
     refreshStatus: catchAsync(async (req: Request, res: Response) => {
         const result = await CourierService.refreshStatus(req.params.orderId);
         sendResponse(res, { statusCode: 200, success: true, message: 'Courier status refreshed', data: result });
     }),
 
-    // POST /api/courier/bulk-status   body: { orderIds: [] }
+    // POST /api/courier/bulk-status   body: { items }
     bulkRefresh: catchAsync(async (req: Request, res: Response) => {
-        const result = await CourierService.bulkRefresh(req.body?.orderIds || []);
-        sendResponse(res, {
-            statusCode: 200,
-            success: true,
-            message: `Synced ${result.ok}/${result.total} order(s)`,
-            data: result,
-        });
+        const result = await CourierService.bulkRefresh(idsOf(req.body));
+        sendResponse(res, { statusCode: 200, success: true, message: `Updated ${result.ok} of ${result.total}`, data: result });
+    }),
+
+    // POST /api/courier/sync-active
+    syncActive: catchAsync(async (_req: Request, res: Response) => {
+        const result = await CourierService.syncActive();
+        sendResponse(res, { statusCode: 200, success: true, message: `Updated ${result.ok} of ${result.total}`, data: result });
     }),
 
     // GET /api/courier/balance

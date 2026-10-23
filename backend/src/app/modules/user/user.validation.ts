@@ -54,6 +54,7 @@ export const updateUserValidation = z.object({
         lastName: z.string().min(1).max(50).optional(),
         phone: z.string().optional(),
         avatar: z.string().url().optional(),
+        coverImage: z.union([z.string().url(), z.literal('')]).optional(),
     }),
 });
 

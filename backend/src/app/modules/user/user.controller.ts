@@ -31,6 +31,12 @@ const UserController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Users fetched successfully', data: users, meta });
     }),
 
+    // GET /api/users/admin/customers — buyers with their orders
+    getCustomers: catchAsync(async (req: Request, res: Response) => {
+        const { customers, meta, stats } = await UserService.getCustomers(req.query as Record<string, unknown>);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Customers', data: { customers, stats }, meta });
+    }),
+
     // GET /api/users/admin/stats (admin)
     getAdminStats: catchAsync(async (req: Request, res: Response) => {
         const stats = await UserService.getAdminStats();

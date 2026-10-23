@@ -5,7 +5,8 @@ import { LuPrinter, LuRefreshCw } from 'react-icons/lu';
 import { Modal, Btn } from '@/components/admin/ui';
 import { useGetOrdersPrintDataQuery } from '@/redux/api/orderApi';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
-import { buildInvoicesHtml, buildLabelsHtml, storeFromSiteContent, type PrintOrder } from './printDocs';
+import { buildLabelsHtml, storeFromSiteContent, type PrintOrder } from './printDocs';
+import { memoDocumentHtml } from '@/components/admin/orders/orderPapers';
 
 /**
  * Print shipping labels or order invoices for one or many orders.
@@ -80,7 +81,8 @@ function PrintDialog({ job, onClose }: { job: PrintJob; onClose: () => void }) {
         if (!orders.length || isSiteLoading) return '';
         const origin = typeof window !== 'undefined' ? window.location.origin : '';
         const store = storeFromSiteContent(siteData?.data, origin);
-        return job.kind === 'labels' ? buildLabelsHtml(orders, store) : buildInvoicesHtml(orders, store);
+        // Invoices are Karmo's own memo (the order desk's design, as a view copy).
+        return job.kind === 'labels' ? buildLabelsHtml(orders, store) : memoDocumentHtml(orders, origin);
     }, [data, siteData, isSiteLoading, job.kind]);
 
     const found: number = data?.data?.length || 0;

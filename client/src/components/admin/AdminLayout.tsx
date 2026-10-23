@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import type { IconType } from 'react-icons';
 import {
-    LuLayoutDashboard, LuPackage, LuPackageCheck, LuLayoutGrid,
-    LuUsers, LuUserCheck, LuShoppingCart, LuChartColumn, LuStar, LuTicketPercent, LuUndo2, LuShieldAlert,
-    LuStore, LuTruck, LuWallet, LuSettings, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog, LuShield,
-    LuMessageSquare, LuMail, LuBriefcase, LuFileText, LuBell, LuMapPin,
-    LuScanBarcode, LuMessageSquareText, LuHouse, LuPalette, LuFiles, LuSlidersHorizontal,
-    LuPanelLeft, LuChevronRight, LuLogOut, LuX, LuEye, LuArrowLeft,
+    LuLayoutDashboard, LuPackage, LuPackageCheck,
+    LuUsers, LuUserCheck, LuShoppingCart, LuChartPie, LuChartColumn, LuStar, LuTicketPercent, LuUndo2, LuShieldAlert,
+    LuStore, LuTruck, LuWallet, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog,
+    LuMessageSquare, LuBriefcase, LuFileText,
+    LuScanBarcode, LuMessageSquareText, LuHouse, LuPalette, LuFiles, LuSlidersHorizontal, LuGlobe,
+    LuPanelLeft, LuChevronRight, LuChevronDown, LuLogOut, LuX, LuEye, LuArrowLeft,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { SiteMark } from '@/components/shared/SiteLogo';
@@ -38,24 +38,34 @@ type MenuItem = { name: string; href: string; icon: IconType };
 // uploading a product), offers & flash sales (hidden until redesigned), stock,
 // warehouses, transfers, suppliers, purchases, expenses, investors, the whole
 // digital-marketing group, system health and the API scanner.
-const menuSections: { label: string; items: MenuItem[] }[] = [
+/**
+ * Sections as plain headings. Site content (`dropdown`) is one menu row with its icon that
+ * folds open, by itself when one of its pages is open.
+ */
+const menuSections: { label: string; items: MenuItem[]; icon?: IconType; dropdown?: boolean }[] = [
     {
         label: '',
         items: [
             { name: 'Dashboard', href: '/dashboard/admin', icon: LuLayoutDashboard },
+            // Order money for any dates and filters, with the change on the period before.
+            { name: 'Analytics', href: '/dashboard/admin/analytics', icon: LuChartColumn },
         ],
     },
     {
         label: 'Orders',
         items: [
             { name: 'Orders', href: '/dashboard/admin/orders', icon: LuShoppingCart },
+            // Who orders, how often, from where, what and when.
+            { name: 'Order insights', href: '/dashboard/admin/order-insights', icon: LuChartPie },
             // Factory members scan products out here and issue each challan once.
             { name: 'Factory scan', href: '/dashboard/admin/factory', icon: LuScanBarcode },
-            { name: 'SMS log', href: '/dashboard/admin/sms', icon: LuMessageSquareText },
-            { name: 'Returns', href: '/dashboard/admin/returns', icon: LuUndo2 },
-            { name: 'Fraud check', href: '/dashboard/admin/fraud-check', icon: LuShieldAlert },
-            // Steadfast parcel booking and sync.
+            // In the order's own path: factory → courier → (if it comes back) returns.
             { name: 'Courier parcels', href: '/dashboard/admin/courier', icon: LuTruck },
+            // Courier money — super admin and admin only (access.ts hides it from the rest).
+            { name: 'Courier payouts', href: '/dashboard/admin/courier-payouts', icon: LuWallet },
+            { name: 'Returns', href: '/dashboard/admin/returns', icon: LuUndo2 },
+            { name: 'SMS log', href: '/dashboard/admin/sms', icon: LuMessageSquareText },
+            { name: 'Fraud check', href: '/dashboard/admin/fraud-check', icon: LuShieldAlert },
         ],
     },
     {
@@ -72,7 +82,6 @@ const menuSections: { label: string; items: MenuItem[] }[] = [
         items: [
             { name: 'Customers', href: '/dashboard/admin/customers', icon: LuUsers },
             { name: 'Inquiries', href: '/dashboard/admin/inquiries', icon: LuMessageSquare },
-            { name: 'Newsletter', href: '/dashboard/admin/newsletter', icon: LuMail },
         ],
     },
     {
@@ -85,40 +94,33 @@ const menuSections: { label: string; items: MenuItem[] }[] = [
     {
         label: 'Reports',
         items: [
-            { name: 'Sales reports', href: '/dashboard/admin/analytics', icon: LuChartColumn },
             { name: 'Staff activity', href: '/dashboard/admin/staff-activity', icon: LuUserCheck },
-        ],
-    },
-    {
-        label: 'Finance',
-        items: [
-            { name: 'Accounts overview', href: '/dashboard/admin/accounts', icon: LuLayoutGrid },
             { name: 'Payments', href: '/dashboard/admin/payments', icon: LuCreditCard },
-            { name: 'Courier payouts', href: '/dashboard/admin/courier-payouts', icon: LuWallet },
-        ],
-    },
-    {
-        label: 'Settings',
-        items: [
-            { name: 'Store settings', href: '/dashboard/admin/settings', icon: LuSettings },
-            { name: 'Shipping', href: '/dashboard/admin/shipping', icon: LuMapPin },
-            { name: 'Notifications', href: '/dashboard/admin/notifications', icon: LuBell },
-            // Every account, customers and staff. Admins manage customers and the staff below
-            // them; the super admin everyone (access.ts → assignableRoles).
-            { name: 'Users', href: '/dashboard/admin/users', icon: LuUserCog },
-            { name: 'Roles & permissions', href: '/dashboard/admin/roles', icon: LuShield },
-            { name: 'My profile', href: '/dashboard/admin/profile', icon: LuUser },
         ],
     },
     {
         // The website's own pages — text, pictures, overlays — with a live preview
         // (super admin and admins; see app/dashboard/admin/site-content).
         label: 'Site content',
+        icon: LuGlobe,
+        dropdown: true,
         items: [
             { name: 'All pages', href: '/dashboard/admin/site-content', icon: LuFiles },
             { name: 'Home page', href: '/dashboard/admin/site-content/home', icon: LuHouse },
             { name: 'Brand & contact', href: '/dashboard/admin/site-content/global', icon: LuPalette },
             { name: 'More settings', href: '/dashboard/admin/site-content/settings', icon: LuSlidersHorizontal },
+        ],
+    },
+    // Finance (Accounts overview) is hidden for now — the page stays in the code. Payments
+    // moved into Reports.
+    {
+        label: 'Settings',
+        items: [
+            // Delivery charges and the checkout's bKash / Nagad numbers.
+            { name: 'Delivery & payment', href: '/dashboard/admin/delivery-payment', icon: LuTruck },
+            // Everyone who works in the dashboard, and what each role may do.
+            { name: 'Staff', href: '/dashboard/admin/staff', icon: LuUserCog },
+            { name: 'My profile', href: '/dashboard/admin/profile', icon: LuUser },
         ],
     },
 ];
@@ -166,15 +168,18 @@ function Sidebar({ pathname, role, onClose, onLogout }: {
 }) {
     const active = matchItem(pathname);
     const isActive = (item: MenuItem) => (item.href === ROOT ? pathname === ROOT : active?.href === item.href);
+    // Site content starts open only when one of its pages is open.
+    const [opened, setOpened] = useState<Record<string, boolean>>({});
+    const isOpen = (label: string, items: MenuItem[]) => opened[label] ?? items.some(isActive);
 
     return (
         <div className="flex h-full flex-col">
             {/* Brand */}
             <div className="flex h-16 shrink-0 items-center justify-between px-4">
                 <Link href={homeFor(role)} className="flex items-center gap-2.5">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     {/* The compact logo — "Since 1965" emblem + KARMO®, no "GROUP" — reads on
                         the light sidebar (logo.png has a white "GROUP" made for dark backgrounds). */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/brand/logo-compact.png" alt="Karmo" className="block h-10 w-auto max-w-[200px]" />
                 </Link>
                 {onClose && (
@@ -190,17 +195,26 @@ function Sidebar({ pathname, role, onClose, onLogout }: {
                     .filter(({ items }) => items.length > 0)
                     .map(({ section, items }) => (
                     <div key={section.label || 'main'} className="mb-1">
-                        {section.label && <p className="px-3 pb-1 pt-4 text-xs font-medium text-gray-500">{section.label}</p>}
-                        {items.map((item) => {
+                        {section.label && !section.dropdown && <p className="px-3 pb-1 pt-4 text-xs font-medium text-gray-500">{section.label}</p>}
+                        {section.dropdown && (() => {
+                            const open = isOpen(section.label, items);
+                            const SectionIcon = section.icon;
+                            return (
+                                <button type="button" aria-expanded={open}
+                                    onClick={() => setOpened((o) => ({ ...o, [section.label]: !open }))}
+                                    className="group mt-3 flex h-9 w-full items-center gap-3 rounded-lg px-3 text-sm text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900">
+                                    {SectionIcon && <SectionIcon size={17} className="text-gray-500 group-hover:text-gray-700" />}
+                                    <span className="min-w-0 flex-1 truncate text-left">{section.label}</span>
+                                    <LuChevronDown size={15} className={`shrink-0 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                </button>
+                            );
+                        })()}
+                        {(!section.dropdown || isOpen(section.label, items)) && items.map((item) => {
                             const on = isActive(item);
                             const Icon = item.icon;
-                            const cls = 'group flex h-9 items-center gap-3 rounded-lg px-3 text-sm transition-colors';
                             return (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    className={`${cls} ${on ? 'bg-gray-200/60 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}
-                                >
+                                <Link key={item.name} href={item.href}
+                                    className={`group flex h-9 items-center gap-3 rounded-lg px-3 text-sm transition-colors ${on ? 'bg-gray-200/60 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`}>
                                     <Icon size={17} className={on ? 'text-[var(--color-primary)]' : 'text-gray-500 group-hover:text-gray-700'} />
                                     <span className="min-w-0 flex-1 truncate">{item.name}</span>
                                 </Link>

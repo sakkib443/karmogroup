@@ -12,7 +12,7 @@ export type CourierAttention = 'confirm_return' | 'on_hold' | null;
 export interface ICourierCounts {
     counts: Record<CourierTab | 'all', number>;
     attention: { confirmReturn: number; onHold: number };
-    setup: { configured: boolean; webhookSecured: boolean; autoSync: boolean };
+    setup: { configured: boolean; steadfast: boolean; pathao: boolean; webhookSecured: boolean; autoSync: boolean };
 }
 
 export interface ICourierPackage {
@@ -73,7 +73,10 @@ export interface ICourierRefreshResult {
 
 type PkgRef = { orderId: string; packageId: string };
 
-// Steadfast (Packzy) courier — admin/superadmin book packages & sync status.
+/** The two couriers a parcel can go with. */
+export type Carrier = 'pathao' | 'steadfast';
+
+// The courier board — Pathao or Steadfast; one parcel per order (packageId = the order's id).
 export const courierApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // GET /courier/packages — flattened shipments (Shipments board)
@@ -98,7 +101,7 @@ export const courierApi = baseApi.injectEndpoints({
         }),
 
         // POST /courier/bulk-book — book many selected packages at once
-        bulkBookCourier: builder.mutation<{ data: IBulkResult }, { items: PkgRef[] }>({
+        bulkBookCourier: builder.mutation<{ data: IBulkResult }, { items: PkgRef[]; carrier: Carrier }>({
             query: (body) => ({ url: '/courier/bulk-book', method: 'POST', body }),
             invalidatesTags: ['Orders'],
         }),
@@ -110,10 +113,11 @@ export const courierApi = baseApi.injectEndpoints({
         }),
 
         // POST /courier/orders/:orderId/packages/:packageId/book
-        bookCourierPackage: builder.mutation<{ data: IBookedPackage; message?: string }, PkgRef>({
-            query: ({ orderId, packageId }) => ({
+        bookCourierPackage: builder.mutation<{ data: IBookedPackage; message?: string }, PkgRef & { carrier: Carrier }>({
+            query: ({ orderId, packageId, carrier }) => ({
                 url: `/courier/orders/${orderId}/packages/${packageId}/book`,
                 method: 'POST',
+                body: { carrier },
             }),
             invalidatesTags: ['Orders'],
         }),

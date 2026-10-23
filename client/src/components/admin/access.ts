@@ -47,7 +47,7 @@ export const ROLE_ACCESS: Record<StaffRole, string[]> = {
     ],
     admin: [
         'The whole order flow, products (with delete), approvals, coupons, customers',
-        'Payments and refunds, store and shipping settings, site content, newsletter, career',
+        'Payments and refunds, store and shipping settings, site content, career',
         'Users: add, edit, reset the password of, block and delete customers, managers, online sales, agency and factory members',
         'Duplicate challans and memos, with a reason',
         'Not: Accounts overview, Courier payouts, Roles; cannot touch other admins or super admins',
@@ -83,11 +83,11 @@ export const ROLE_ACCESS: Record<StaffRole, string[]> = {
 /* ─── Pages ──────────────────────────────────────────────── */
 
 /** Pages only the super admin opens. */
-const SUPERADMIN_ONLY = ['/accounts', '/investors', '/courier-payouts', '/suppliers', '/purchases', '/marketing', '/roles'];
+const SUPERADMIN_ONLY = ['/accounts', '/investors', '/suppliers', '/purchases', '/marketing', '/roles'];
 
 /** Everything each role below admin may open (and nothing else). '/' is the Dashboard. */
 const ROLE_PAGES: Record<string, string[]> = {
-    manager: ['/', '/orders', '/returns', '/courier', '/fraud-check', '/sms', '/products', '/reviews', '/customers', '/inquiries', '/analytics', '/staff-activity', '/notifications', '/profile'],
+    manager: ['/', '/orders', '/order-insights', '/returns', '/courier', '/fraud-check', '/sms', '/products', '/reviews', '/customers', '/inquiries', '/analytics', '/staff-activity', '/payments', '/notifications', '/profile'],
     online_sales: ['/', '/orders', '/returns', '/courier', '/fraud-check', '/sms', '/inquiries', '/notifications', '/profile'],
     agency: ['/', '/orders', '/sms', '/notifications', '/profile'],
     factory: ['/', '/orders', '/factory', '/notifications', '/profile'],

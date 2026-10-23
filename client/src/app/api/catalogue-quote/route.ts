@@ -45,7 +45,8 @@ function quoteLine(line: Line) {
     if (!division || division === 'foam') {
         const product = getFoamProductDetail(slug);
         if (product) {
-            const q = isFoamSet(product) ? quoteFoamSetUnit(product) : quoteFoamUnit(product, sized('lwh'));
+            // Every foam is cut to size now (isFoamSet() is always false); the set branch stays for when one returns.
+            const q = isFoamSet() ? quoteFoamSetUnit(product) : quoteFoamUnit(product, sized('lwh'));
             return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division };
         }
     }

@@ -81,6 +81,27 @@ const SteadfastService = {
         return data as { status: number; delivery_status: string };
     },
 
+    // GET /payments → the payouts Steadfast has made (newest first)
+    async getPayments(): Promise<any[]> {
+        ensureConfigured();
+        const res = await fetch(`${base_url}/payments`, { headers: headers() });
+        const data: any = await res.json().catch(() => ({}));
+        if (!res.ok) throw new AppError(res.status || 502, data?.message || 'Steadfast: failed to fetch payments.');
+        const list = Array.isArray(data) ? data : data?.data?.data || data?.data || data?.payments || [];
+        return Array.isArray(list) ? list : [];
+    },
+
+    // GET /payments/{id} → one payout with the consignments it settled
+    async getPayment(id: string | number): Promise<{ payment: any; consignments: any[] }> {
+        ensureConfigured();
+        const res = await fetch(`${base_url}/payments/${encodeURIComponent(String(id))}`, { headers: headers() });
+        const data: any = await res.json().catch(() => ({}));
+        if (!res.ok) throw new AppError(res.status || 502, data?.message || 'Steadfast: failed to fetch the payment.');
+        const body = data?.data && !Array.isArray(data.data) ? data.data : data;
+        const consignments = body?.consignments || body?.consignment || (Array.isArray(data?.data) ? data.data : []) || [];
+        return { payment: body?.payment || body, consignments: Array.isArray(consignments) ? consignments : [] };
+    },
+
     // GET /get_balance → { status, current_balance }
     async getBalance() {
         ensureConfigured();

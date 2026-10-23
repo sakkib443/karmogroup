@@ -126,6 +126,18 @@ const OrderController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Order stats fetched', data: stats });
     }),
 
+    /** Order insights: customers, places, products, timing… (?days=7|30|90|365|all). */
+    insights: catchAsync(async (req: Request, res: Response) => {
+        const data = await OrderService.getOrderInsights(viewerOf(req), req.query as Record<string, unknown>);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Order insights fetched', data });
+    }),
+
+    /** The orders for "Print invoice" / "Print label": body { ids: [...] }, at most 100. */
+    printData: catchAsync(async (req: Request, res: Response) => {
+        const data = await OrderService.getPrintData(viewerOf(req), req.body?.ids);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Print data fetched', data });
+    }),
+
     /** Admin / manager dashboard: today, and the running 7 or 30 days (?days=7|30). */
     overview: catchAsync(async (req: Request, res: Response) => {
         const data = await OrderService.getOrderOverview(viewerOf(req), req.query.days);
