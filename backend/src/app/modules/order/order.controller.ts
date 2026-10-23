@@ -126,6 +126,12 @@ const OrderController = {
         sendResponse(res, { statusCode: 200, success: true, message: 'Order stats fetched', data: stats });
     }),
 
+    /** Admin / manager dashboard: today, and the running 7 or 30 days (?days=7|30). */
+    overview: catchAsync(async (req: Request, res: Response) => {
+        const data = await OrderService.getOrderOverview(viewerOf(req), req.query.days);
+        sendResponse(res, { statusCode: 200, success: true, message: 'Dashboard overview fetched', data });
+    }),
+
     guestCheckout: catchAsync(async (req: Request, res: Response) => {
         const result = await OrderService.createGuestOrder(req.body);
         const message = result.isNewUser

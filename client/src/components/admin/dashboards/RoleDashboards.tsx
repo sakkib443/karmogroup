@@ -23,6 +23,7 @@ import { PageHeader, Btn, StatTile, Card, Badge, taka, cx } from '@/components/a
 import { getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
 import { ROLE_LABEL, can } from '@/components/admin/access';
 import { CancelOrderModal, SmsButton } from '@/components/admin/orders/OrderActions';
+import { TodayCards, OrdersTrend } from '@/components/admin/dashboards/OrdersOverview';
 
 const ORDERS = '/dashboard/admin/orders';
 
@@ -315,13 +316,12 @@ const PIPELINE: { key: string; label: string }[] = [
 
 export function OverviewDashboard() {
     const { role } = useViewRole();
-    const { data: statsRes, isLoading } = useGetOrderStatsQuery({});
+    const { data: statsRes } = useGetOrderStatsQuery({});
     const { data: pendingRes } = useGetAdminOrdersQuery({ status: 'pending', limit: 6, sort: 'createdAt' });
     const { data: readyRes } = useGetAdminOrdersQuery({ status: 'challan_ready', limit: 6, sort: 'updatedAt' });
     const s = statsRes?.data || {};
     const pending: any[] = pendingRes?.data || [];
     const ready: any[] = readyRes?.data || [];
-    const inFlow = (s.pending || 0) + (s.confirmed || 0) + (s.factory || 0) + (s.challan_ready || 0) + (s.courier_entry || 0);
 
     return (
         <div>
@@ -332,11 +332,9 @@ export function OverviewDashboard() {
                     <Btn variant="primary" icon={<LuChartColumn size={15} />} href="/dashboard/admin/analytics">Sales reports</Btn>
                 </>} />
 
-            <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <StatTile label="All orders" value={isLoading ? '…' : n(s.total)} icon={<LuShoppingCart size={18} />} />
-                <StatTile label="In the pipeline" value={isLoading ? '…' : n(inFlow)} icon={<LuFactory size={18} />} hint="Pending to courier entry" />
-                <StatTile label="Delivered revenue" value={s.totalRevenue !== undefined ? taka(s.totalRevenue) : '—'} icon={<LuChartColumn size={18} />} />
-            </div>
+            {/* Today first, then the running 7 / 30 days day by day (super admin, admin, manager). */}
+            <TodayCards />
+            <OrdersTrend />
 
             <Card title="Order pipeline" description="Click a step to open those orders" className="mb-6">
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-8">

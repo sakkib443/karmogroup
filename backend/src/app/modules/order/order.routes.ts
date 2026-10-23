@@ -34,6 +34,8 @@ router.post('/admin', authMiddleware, authorizeRoles(...R.orderDesk), validateRe
 router.get('/admin/export', authMiddleware, authorizeRoles(...R.ops), OrderController.exportXlsx);
 router.get('/admin/all', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getAll);
 router.get('/admin/stats', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getStats);
+// Dashboard of super admin, admin and manager (money included) — before /admin/:id.
+router.get('/admin/overview', authMiddleware, authorizeRoles(...R.ops), OrderController.overview);
 router.get('/admin/sms-log', authMiddleware, authorizeRoles(...R.confirmers), OrderController.smsLog);
 router.get('/admin/:id', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getById);
 router.patch('/admin/:id/status', authMiddleware, authorizeRoles(...R.confirmers), validateRequest(updateOrderStatusValidation), OrderController.updateStatus);
