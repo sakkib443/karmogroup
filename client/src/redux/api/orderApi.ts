@@ -99,6 +99,15 @@ export const orderApi = baseApi.injectEndpoints({
             }),
             providesTags: ['Orders'],
         }),
+        // Admin / manager dashboard: today + the running 7 or 30 days — GET /api/orders/admin/overview?days=
+        getOrderOverview: builder.query({
+            query: (days: 7 | 30 = 30) => ({
+                url: '/orders/admin/overview',
+                method: 'GET',
+                params: { days },
+            }),
+            providesTags: ['Orders'],
+        }),
         // Admin: get order by id — Backend route: GET /api/orders/admin/:id
         getAdminOrderById: builder.query({
             query: (id) => ({
@@ -291,6 +300,7 @@ export const {
     // Admin hooks
     useGetAdminOrdersQuery,
     useGetOrderStatsQuery,
+    useGetOrderOverviewQuery,
     useGetAdminOrderByIdQuery,
     useUpdateOrderStatusMutation,
     useUpdateAdminOrderMutation,
