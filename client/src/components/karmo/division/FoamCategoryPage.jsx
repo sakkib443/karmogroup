@@ -109,6 +109,9 @@ export function buildFoamCategoryData(key) {
     ...foam,
     bedAutomotiveHero:
       key === "bed-automotive" ? foam.bedAutomotiveHero : null,
+    // Footwear-only: drop the shared shape-grid feature cards and show just the
+    // two "Designed to endure" shoe photos, full-bleed 50/50.
+    footwearEndureBand: key === "footwear" ? true : null,
     // Footwear and Bed & Automotive both drop the generic
     // "Built density by density" zones band.
     zones:
@@ -139,7 +142,12 @@ export function buildFoamCategoryData(key) {
         },
       ],
     } : foam.recommended,
-    shapeGrid: key === "bed-automotive" ? BED_AUTOMOTIVE_SHAPEGRID : foam.shapeGrid,
+    shapeGrid:
+      key === "footwear"
+        ? { hidden: true }
+        : key === "bed-automotive"
+          ? BED_AUTOMOTIVE_SHAPEGRID
+          : foam.shapeGrid,
     shapeGridVariant:
       key === "bed-automotive" ? "bed-automotive-legacy" : foam.shapeGridVariant,
     lounge: key === "bed-automotive" ? {

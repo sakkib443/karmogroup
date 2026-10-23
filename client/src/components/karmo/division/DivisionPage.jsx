@@ -18,6 +18,7 @@ import ExploreSplit from "@/components/karmo/home/ExploreSplit";
 import DivisionRecommended from "@/components/karmo/division/DivisionRecommended";
 import DivisionWhyChoose from "@/components/karmo/division/DivisionWhyChoose";
 import DivisionShapeGrid from "@/components/karmo/division/DivisionShapeGrid";
+import FootwearEndureBand from "@/components/karmo/division/FootwearEndureBand";
 import HometexShapeGrid from "@/components/karmo/division/HometexShapeGrid";
 import BedAutomotiveTwoBanners from "@/components/karmo/division/BedAutomotiveTwoBanners";
 import MattressBrands from "@/components/karmo/division/MattressBrands";
@@ -159,6 +160,7 @@ export default function DivisionPage({ data }) {
         ) : (
           <DivisionShapeGrid {...data.shapeGrid} />
         ))}
+      {data.footwearEndureBand && <FootwearEndureBand />}
       {data.explore && <ExploreSplit {...data.explore} />}
       {data.lounge && <DivisionAbout {...data.lounge} />}
       {data.about && !data.about.asHero && !data.about.beforeShapeGrid && (
