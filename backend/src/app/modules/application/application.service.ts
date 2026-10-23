@@ -70,8 +70,10 @@ const ApplicationService = {
             .lean();
         if (already) throw new Error('You have already applied for this position with this email');
 
+        // From the public form — the HR fields (status, notes, rating, star) are never taken from it.
+        const { status, adminNotes, rating, isStarred, statusHistory, trackingId, jobTitle, _id, createdAt, updatedAt, ...fromApplicant } = data || {};
         const application = await Application.create({
-            ...data,
+            ...fromApplicant,
             jobTitle: job.title,
             trackingId: await makeTrackingId(),
         });

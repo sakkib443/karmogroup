@@ -20,6 +20,7 @@ router.put('/', authMiddleware, authorizeRoles('admin'), SiteContentController.u
 router.put('/legal/:slug', authMiddleware, authorizeRoles('admin'), SiteContentController.updateLegalPage);
 
 // Admin — update specific section
+router.put('/payment', authMiddleware, authorizeRoles('admin'), SiteContentController.updatePayment);
 router.patch('/:section', authMiddleware, authorizeRoles('admin'), SiteContentController.updateSection);
 
 export const SiteContentRoutes = router;

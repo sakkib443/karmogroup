@@ -58,13 +58,17 @@ const fromUser = (u: any, fallbackRole: string): Form => ({
  * Add an account (no `user`) or change one (`user`): name, email, phone, role, divisions,
  * status and a new password. Mount it only while open so it starts from the person's data.
  */
-export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: {
+export function UserFormModal({ user, defaultRole = 'user', staffOnly = false, onClose, onSaved }: {
     user?: any; defaultRole?: string; onClose: () => void; onSaved?: (u: any) => void;
+    /** On the Staff page: staff roles only, never "Customer". */
+    staffOnly?: boolean;
 }) {
     const me = useSelector((s: RootState) => s.auth.user);
-    const canGive = assignableRoles(me?.role);
+    const canGive = assignableRoles(me?.role).filter((r) => !staffOnly || r !== 'user');
     const isEdit = !!user;
     const isSelf = isEdit && user._id === me?.id;
+    // A manager may change a customer's details and password only — not the role or status.
+    const detailsOnly = me?.role === 'manager' && !isSelf;
     const [form, setForm] = useState<Form>(() => fromUser(user, canGive.includes(defaultRole) ? defaultRole : canGive[0] || 'user'));
     const [showPw, setShowPw] = useState(false);
     const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
@@ -83,9 +87,7 @@ export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: 
         if (!isEdit && !form.password) { toast.error('Set a password'); return; }
         if (form.password && form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
         const isCustomer = form.role === 'user';
-        const points = Number(form.loyaltyPoints || 0);
         const discount = Number(form.defaultDiscount || 0);
-        if (isCustomer && (!Number.isInteger(points) || points < 0)) { toast.error('Points must be a whole number, 0 or more'); return; }
         if (isCustomer && !(discount >= 0 && discount <= 100)) { toast.error('Discount must be between 0 and 100%'); return; }
 
         try {
@@ -98,9 +100,9 @@ export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: 
                     phone: form.phone.trim(),
                     isEmailVerified: form.isEmailVerified,
                 };
-                if (!isSelf) { body.role = form.role; body.status = form.status; }
+                if (!isSelf && !detailsOnly) { body.role = form.role; body.status = form.status; }
                 if (form.role === 'factory') body.divisions = form.divisions;
-                if (isCustomer) { body.loyaltyPoints = points; body.defaultDiscount = discount; }
+                if (isCustomer) body.defaultDiscount = discount;
                 if (form.password) body.password = form.password;
                 const res: any = await updateUser(body).unwrap();
                 toast.success(form.password ? 'Saved — new password set' : 'Saved');
@@ -140,7 +142,7 @@ export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: 
             </>}
         >
             <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Role" required className="sm:col-span-2" hint={isSelf ? 'You cannot change your own role.' : undefined}>
+                {!detailsOnly && <Field label="Role" required className="sm:col-span-2" hint={isSelf ? 'You cannot change your own role.' : undefined}>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                         {roleChoices.map((r) => (
                             <button key={r} type="button" disabled={isSelf} onClick={() => set('role', r)}
@@ -150,7 +152,7 @@ export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: 
                             </button>
                         ))}
                     </div>
-                </Field>
+                </Field>}
 
                 {form.role === 'factory' && (
                     <Field label="Divisions" hint="Which factories this person works in. None selected = all divisions." className="sm:col-span-2">
@@ -199,16 +201,14 @@ export function UserFormModal({ user, defaultRole = 'user', onClose, onSaved }: 
                     )}
                 </Field>
 
+                {/* Loyalty points are hidden — the shop does not use them (the field stays on the account). */}
                 {form.role === 'user' && (<>
-                    <Field label="Loyalty points">
-                        <input className={INPUT} type="number" min={0} step={1} value={form.loyaltyPoints} onChange={(e) => set('loyaltyPoints', e.target.value)} />
-                    </Field>
                     <Field label="Default discount (%)">
                         <input className={INPUT} type="number" min={0} max={100} step="0.5" value={form.defaultDiscount} onChange={(e) => set('defaultDiscount', e.target.value)} />
                     </Field>
                 </>)}
 
-                {!isSelf && (
+                {!isSelf && !detailsOnly && (
                     <Field label="Status" className="sm:col-span-2" hint="A blocked account is signed out at once and cannot sign in.">
                         <div className="grid grid-cols-2 gap-2 sm:w-72">
                             {[{ v: 'active', t: 'Active' }, { v: 'blocked', t: 'Blocked' }].map((s) => (

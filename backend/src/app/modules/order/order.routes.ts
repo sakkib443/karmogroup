@@ -34,6 +34,10 @@ router.post('/admin', authMiddleware, authorizeRoles(...R.orderDesk), validateRe
 router.get('/admin/export', authMiddleware, authorizeRoles(...R.ops), OrderController.exportXlsx);
 router.get('/admin/all', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getAll);
 router.get('/admin/stats', authMiddleware, authorizeRoles(...R.orderViewers), OrderController.getStats);
+// Invoices and shipping labels for one or many orders (the print preview).
+router.post('/admin/print', authMiddleware, authorizeRoles(...R.orderDesk), OrderController.printData);
+// Order insights (super admin, admin, manager) — before /admin/:id.
+router.get('/admin/insights', authMiddleware, authorizeRoles(...R.ops), OrderController.insights);
 // Dashboard of super admin, admin and manager (money included) — before /admin/:id.
 router.get('/admin/overview', authMiddleware, authorizeRoles(...R.ops), OrderController.overview);
 router.get('/admin/sms-log', authMiddleware, authorizeRoles(...R.confirmers), OrderController.smsLog);

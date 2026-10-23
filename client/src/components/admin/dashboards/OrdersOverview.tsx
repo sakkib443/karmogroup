@@ -105,8 +105,13 @@ const compactTaka = (v: number) =>
     v >= 100000 ? `৳${+(v / 100000).toFixed(1)}L` : v >= 1000 ? `৳${+(v / 1000).toFixed(1)}k` : `৳${v}`;
 
 const dayLabel = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+/** "2026-10" → "Oct 26" (Order insights' long ranges are drawn month by month). */
+const monthLabel = (ym: string) => new Date(`${ym}-01T00:00:00`).toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
 
-function DailyChart({ daily, metric }: { daily: { date: string; orders: number; revenue: number }[]; metric: 'orders' | 'revenue' }) {
+/** Orders or sales per day (or per month with `by="month"`), as a smooth area chart. */
+export function DailyChart({ daily, metric, by = 'day' }: {
+    daily: { date: string; orders: number; revenue: number }[]; metric: 'orders' | 'revenue'; by?: 'day' | 'month';
+}) {
     const wrap = useRef<HTMLDivElement>(null);
     const [w, setW] = useState(720);
     const [hover, setHover] = useState<number | null>(null);
@@ -164,7 +169,7 @@ function DailyChart({ daily, metric }: { daily: { date: string; orders: number; 
                 ))}
                 {daily.map((d, i) => (i % every === 0 || i === daily.length - 1) && (i === daily.length - 1 || daily.length - 1 - i >= every / 2) ? (
                     <text key={d.date} x={x(i)} y={H - 8} textAnchor={i === daily.length - 1 ? 'end' : i === 0 ? 'start' : 'middle'} fontSize="11" fill="#9ca3af">
-                        {i === daily.length - 1 ? 'Today' : dayLabel(d.date)}
+                        {by === 'month' ? monthLabel(d.date) : i === daily.length - 1 ? 'Today' : dayLabel(d.date)}
                     </text>
                 ) : null)}
                 <path d={area} fill="url(#dash-area)" />
@@ -186,7 +191,9 @@ function DailyChart({ daily, metric }: { daily: { date: string; orders: number; 
                     className="pointer-events-none absolute top-2 z-10 min-w-[150px] rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs shadow-lg"
                     style={{ left: Math.min(Math.max(x(hover) - 75, 0), w - 160) }}
                 >
-                    <p className="font-semibold text-gray-900">{new Date(`${h.date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                    <p className="font-semibold text-gray-900">{by === 'month'
+                        ? new Date(`${h.date}-01T00:00:00`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+                        : new Date(`${h.date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
                     <p className="mt-1 flex justify-between gap-4 text-gray-600"><span>Orders</span><span className="font-semibold text-gray-900">{n(h.orders)}</span></p>
                     <p className="flex justify-between gap-4 text-gray-600"><span>Sales</span><span className="font-semibold text-gray-900">{taka(h.revenue)}</span></p>
                 </div>
@@ -197,14 +204,14 @@ function DailyChart({ daily, metric }: { daily: { date: string; orders: number; 
 
 /* ─── Chart card + the period's totals ───────────────────── */
 
-function Toggle<T extends string | number>({ value, options, onChange }: {
+export function Toggle<T extends string | number>({ value, options, onChange }: {
     value: T; options: { value: T; label: string }[]; onChange: (v: T) => void;
 }) {
     return (
         <div className="inline-flex rounded-xl border border-gray-200 bg-white p-0.5">
             {options.map((o) => (
                 <button key={String(o.value)} type="button" onClick={() => onChange(o.value)}
-                    className={cx('rounded-[10px] px-3 py-1.5 text-xs font-semibold transition',
+                    className={cx('whitespace-nowrap rounded-[10px] px-3 py-1.5 text-xs font-semibold transition',
                         value === o.value ? 'bg-[#d44348] text-white shadow-sm' : 'text-gray-600 hover:bg-gray-50')}>
                     {o.label}
                 </button>

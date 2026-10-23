@@ -47,7 +47,6 @@ export function orderDivisions(order: any): string[] {
 }
 
 const taka = (n: unknown) => `৳${Math.round(Number(n) || 0).toLocaleString('en-IN')}`;
-const num = (n: unknown) => Math.round(Number(n) || 0).toLocaleString('en-IN');
 const fmtDate = (d: unknown) =>
     d ? new Date(d as string).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
 /** 11/10/26 — the short date on Karmo's paper forms. */
@@ -59,6 +58,31 @@ const addressOf = (a: any) => [a?.address, a?.area, a?.city].filter(Boolean).joi
 const lineSpec = (it: any) => [it?.size, it?.color].filter(Boolean).join(' · ');
 const describe = (it: any) => `${it?.name || ''}${lineSpec(it) ? ` (${lineSpec(it)})` : ''}`;
 const isPaid = (o: any) => o?.paymentStatus === 'paid';
+
+/** "81 × 69 × 4 inch" (or with x) → [81, 69, 4]. */
+const DIMS = /^(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*[×x]\s*(\d+(?:\.\d+)?)\s*(?:inch|in|")?$/i;
+
+/**
+ * A line as Karmo's paper forms write it: King Mattress (Size: 81" x 69" x 4", Fabric: DAMASK).
+ * The size is put length first (the larger of the first two numbers), whichever way the
+ * product page wrote it; any other word on the size (the fabric) becomes Fabric. "Standard"
+ * and "1 set" say nothing the name does not, so they are left out, as on Karmo's memo.
+ */
+const paperLine = (it: any) => {
+    const parts = String(it?.size || '').split(/\s*·\s*/).map((x) => x.trim()).filter(Boolean);
+    const dims = parts.map((x) => x.match(DIMS)).find(Boolean);
+    const words = parts.filter((x) => !DIMS.test(x) && !/^(standard|1 set)$/i.test(x));
+    const bits: string[] = [];
+    if (dims) {
+        const [a, b, h] = [Number(dims[1]), Number(dims[2]), dims[3]];
+        bits.push(`Size: ${Math.max(a, b)}" x ${Math.min(a, b)}" x ${h}"`);
+        if (words.length) bits.push(`Fabric: ${words.join(', ').toUpperCase()}`);
+    } else if (words.length) {
+        bits.push(words.join(', '));
+    }
+    if (it?.color) bits.push(`Color: ${it.color}`);
+    return `${it?.name || ''}${bits.length ? ` (${bits.join(', ')})` : ''}`;
+};
 
 const ESC: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 const esc = (v: unknown) => String(v ?? '').replace(/[&<>"']/g, (c) => ESC[c]);
@@ -180,34 +204,37 @@ const stamp = (mode: PaperMode, note = '') =>
 /* ─── Memo (customer copy) ───────────────────────────────── */
 
 const MEMO_CSS = `
-@page { size: A4 portrait; margin: 10mm; }
+@page { size: A4 portrait; margin: 8mm; }
 * { box-sizing: border-box; }
-body { margin: 0; font-family: Arial, "Nirmala UI", "Segoe UI", sans-serif; color: #111; font-size: 12.5px; }
-.memo { position: relative; border: 2px solid #111; padding: 10px; page-break-after: always; min-height: 270mm; display: flex; flex-direction: column; }
+body { margin: 0; font-family: Arial, "Nirmala UI", "Segoe UI", sans-serif; color: #111; font-size: 14px; }
+.memo { position: relative; border: 2px solid #111; padding: 8px 10px 6px; page-break-after: always; min-height: 279mm; display: flex; flex-direction: column; }
 .memo:last-child { page-break-after: auto; }
-.brand { text-align: center; border-bottom: 1.5px solid #111; padding: 6px 0 10px; }
-.brand img { height: 30px; }
-.brand p { margin: 4px 0 0; font-weight: 700; font-size: 12.5px; }
-.top { display: grid; grid-template-columns: 1.5fr 1fr; border: 1.5px solid #111; margin-top: 8px; }
-.top .who { padding: 8px 10px; border-right: 1.5px solid #111; line-height: 1.9; }
-.top .meta > div { border-bottom: 1.5px solid #111; padding: 6px 8px; }
+.brand { text-align: center; border-bottom: 1.5px solid #111; padding: 8px 0 10px; }
+.brand img { height: 44px; display: inline-block; }
+.brand p { margin: 8px 0 0; font-weight: 700; font-size: 15px; }
+.brand p + p { margin-top: 4px; }
+.top { display: grid; grid-template-columns: 1.3fr 1fr; border: 1.5px solid #111; margin-top: 4px; }
+.top .who { padding: 8px 10px; border-right: 1.5px solid #111; font-size: 15px; display: flex; flex-direction: column; gap: 4px; }
+.top .who .gap { height: 18px; }
+.top .meta > div { border-bottom: 1.5px solid #111; padding: 7px 8px; text-align: center; font-size: 14.5px; }
 .top .meta > div:last-child { border-bottom: none; }
-.top .meta .row { display: grid; grid-template-columns: 1fr 1fr; padding: 0; }
-.top .meta .row > div { padding: 6px 8px; } .top .meta .row > div + div { border-left: 1.5px solid #111; }
+.top .meta .row { display: grid; grid-template-columns: 1.5fr 1fr; padding: 0; text-align: left; }
+.top .meta .row > div { padding: 7px 6px; white-space: nowrap; } .top .meta .row > div + div { border-left: 1.5px solid #111; }
 b { font-weight: 700; }
-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-th, td { border: 1.5px solid #111; padding: 8px 6px; vertical-align: middle; }
-th { font-weight: 700; text-align: center; font-size: 12px; }
+table { width: 100%; border-collapse: collapse; margin-top: 4px; flex: 1; }
+th, td { border: 1.5px solid #111; padding: 9px 6px; vertical-align: middle; font-size: 14.5px; }
+th { font-weight: 700; text-align: center; line-height: 1.6; }
 .c { text-align: center; } .r { text-align: right; }
-.sum td { font-weight: 700; }
-.words td { font-weight: 400; }
-.pay { text-align: center; border: 1.5px solid #111; border-top: none; padding: 8px; }
-.pay b { display: block; } .pay span { color: #d00; font-weight: 700; }
-.divs { display: grid; grid-template-columns: repeat(4, 1fr); border: 1.5px solid #111; border-top: none; margin-top: auto; }
-.divs div { text-align: center; padding: 10px 4px; font-weight: 800; font-size: 13px; letter-spacing: .02em; }
+tr.fill td { height: 100%; padding: 0; }
+tr.sum td { font-weight: 700; }
+tr.words td.w { font-weight: 400; }
+.pay { text-align: center; border: 1.5px solid #111; border-top: none; padding: 8px; font-size: 15px; }
+.pay b { display: block; } .pay span { display: block; color: #e00000; font-weight: 700; margin-top: 4px; }
+.divs { display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; border: 1.5px solid #111; border-top: none; margin-top: 10px; }
+.divs div { display: flex; align-items: center; justify-content: center; height: 76px; padding: 8px 10px; }
 .divs div + div { border-left: 1.5px solid #ccc; }
-.divs .k { color: #d71920; } .divs .t { color: #111; }
-.notice { text-align: center; font-weight: 700; font-size: 14px; padding: 8px 4px 2px; }
+.divs img { max-height: 46px; max-width: 100%; object-fit: contain; }
+.notice { text-align: center; font-weight: 700; font-size: 20px; padding: 8px 4px 2px; border-top: 1.5px solid #111; margin-top: 4px; }
 .stamp { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
   font-size: 64px; font-weight: 900; color: rgba(200,0,0,.13); transform: rotate(-24deg); letter-spacing: .08em; z-index: 5; }
 .stamp small { font-size: 18px; letter-spacing: .1em; }
@@ -215,16 +242,25 @@ th { font-weight: 700; text-align: center; font-size: 12px; }
 .issued { font-size: 10px; color: #555; text-align: right; margin-top: 4px; }
 `;
 
+/** The four brand marks along the foot of the memo (cut from Karmo's own memo). */
+const MEMO_BRANDS = ['foam', 'mattress', 'comforter', 'hometex'];
+
+/**
+ * Karmo's cash memo, laid out cell for cell as the memo the company already prints:
+ * Rate and Per stay blank (the Amount carries the line), and the Sub Total is what the
+ * customer pays — products less discount plus delivery — with Advanced (paid online)
+ * and Due under it. An empty row stretches the table so the memo always fills the page.
+ */
 function memoPage(o: any, origin: string, mode: PaperMode, note = '') {
     const a = o?.shippingAddress || {};
     const items: any[] = o?.items || [];
     const rows = items.map((it: any, i: number) => `<tr>
         <td class="c">${i + 1}</td>
-        <td>${esc(describe(it))}</td>
+        <td>${esc(paperLine(it))}</td>
         <td class="c">${esc(it.quantity)}</td>
-        <td class="r">${num(it.price)}</td>
-        <td class="c">Pcs</td>
-        <td class="r">${num(it.total ?? it.price * it.quantity)}</td>
+        <td></td>
+        <td></td>
+        <td class="r">${Math.round(Number(it.total ?? it.price * it.quantity) || 0)}</td>
     </tr>`).join('');
     const itemsTotal = Number(o?.subtotal) || items.reduce((n, it) => n + (Number(it.total) || 0), 0);
     const total = Number(o?.total) || 0;
@@ -241,36 +277,34 @@ function memoPage(o: any, origin: string, mode: PaperMode, note = '') {
         <div class="top">
             <div class="who">
                 <div><b>Name / নাম:</b> ${esc(a.fullName)}</div>
+                <div class="gap"></div>
                 <div><b>Address:</b> ${esc(addressOf(a))}</div>
                 <div><b>Phone:</b> ${esc(a.phone)}</div>
             </div>
             <div class="meta">
                 <div class="row"><div><b>Order Number:</b> ${esc(o?.orderId)}</div><div><b>Date:</b> ${shortDate(o?.createdAt)}</div></div>
-                <div><b>Delivery Note:</b> ${esc(o?.note || '—')}</div>
+                <div><b>Delivery Note:</b> ${esc(o?.note || '')}</div>
                 <div><b>Terms of delivery:</b> ${esc(BUSINESS.terms)}</div>
             </div>
         </div>
         <table>
             <thead><tr>
-                <th style="width:42px">SL<br/>No.</th><th>Description of Goods</th><th style="width:72px">Quantity</th>
-                <th style="width:96px">Terms of Delivery Rate</th><th style="width:52px">Per</th><th style="width:92px">Amount</th>
+                <th style="width:7%">SL<br/>No.</th><th>Description of Goods</th><th style="width:9%">Quantity</th>
+                <th style="width:14%">Terms of<br/>Delivery<br/>Rate</th><th style="width:9.5%">Per</th><th style="width:12%">Amount</th>
             </tr></thead>
             <tbody>
                 ${rows}
-                <tr class="sum"><td colspan="5">Total</td><td class="r">${num(itemsTotal)}</td></tr>
-                <tr class="sum"><td colspan="5">Discount</td><td class="r">${num(o?.discount)}</td></tr>
-                <tr class="sum"><td colspan="5">Delivery charge</td><td class="r">${num(o?.shippingCost)}</td></tr>
-                <tr class="sum"><td colspan="5">Sub Total</td><td class="r">${num(total)}</td></tr>
-                <tr class="words"><td colspan="4"><b>Amount Chargeable (in words):</b> ${esc(inWords(total))} Taka Only</td><td><b>Advanced</b></td><td class="r"><b>${num(advanced)}</b></td></tr>
-                <tr class="sum"><td colspan="4"></td><td>Due</td><td class="r">${num(due)}</td></tr>
+                <tr class="fill"><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="sum"><td colspan="5">Total</td><td class="r">${Math.round(itemsTotal)}</td></tr>
+                <tr class="sum"><td colspan="5">Discount</td><td class="r">${Math.round(Number(o?.discount) || 0)}</td></tr>
+                <tr class="sum"><td colspan="5">Sub Total</td><td class="r">${Math.round(total)}</td></tr>
+                <tr class="words"><td class="w" colspan="4">Amount Chargeable (in words): ${esc(inWords(total))} Taka Only</td><td><b>Advanced</b></td><td class="r">${Math.round(advanced)}</td></tr>
+                <tr><td colspan="4"></td><td><b>Due</b></td><td class="r">${Math.round(due)}</td></tr>
             </tbody>
         </table>
         <div class="pay"><b>Payment Method</b><span>${esc(paymentMethodLabel(o?.paymentMethod || 'cod'))}</span></div>
         <div class="divs">
-            <div><span class="k">KARMO</span> <span class="t">FOAM</span></div>
-            <div><span class="k">KARMO</span> <span class="t">Mattress</span></div>
-            <div><span class="k">KARMO</span> <span class="t">COMFORTER</span></div>
-            <div><span class="k">KARMO</span> <span class="t">HOMETEX</span></div>
+            ${MEMO_BRANDS.map((b) => `<div><img src="${origin}/brand/print/karmo-${b}.png" alt="Karmo ${b}" /></div>`).join('')}
         </div>
         <div class="notice">ডেলিভারি নেওয়ার আগে অবশ্যই ${BUSINESS.phoneBangla} এই নাম্বারে ফোন করবেন।</div>
         ${issued ? `<div class="issued">${issued}</div>` : ''}
@@ -300,19 +334,21 @@ body { margin: 0; font-family: "Times New Roman", Georgia, serif; color: #111; }
 .idrow .dt { text-align: right; font-weight: 700; font-size: 13px; }
 .idrow .dt u { text-decoration: none; border-bottom: 1px dotted #111; font-weight: 400; }
 .party { margin-top: 3mm; font-size: 13px; line-height: 1.7; }
-.party b { font-weight: 700; } .party .v { display: inline-block; min-width: 60%; border-bottom: 1px dotted #555; padding-left: 2mm; }
+.party > div { display: flex; align-items: baseline; gap: 2mm; }
+.party b { font-weight: 700; } .party .v { flex: 0 1 86%; border-bottom: 1px dotted #555; padding-left: 1mm; }
 table { width: 100%; border-collapse: collapse; margin-top: 2mm; flex: 1; }
 th, td { border: 1.5px solid #111; padding: 2mm 2.5mm; font-size: 12.5px; vertical-align: top; }
 th { font-weight: 700; text-align: left; }
 .sl { width: 14mm; text-align: center; } .qty { width: 26mm; text-align: center; }
 tr.fill td { height: 100%; }
 tr.tot td { font-weight: 700; }
-.words { font-size: 13px; margin-top: 2mm; } .words .v { border-bottom: 1px dotted #555; padding: 0 2mm; display: inline-block; min-width: 60%; }
+.words { font-size: 13px; margin-top: 2mm; display: flex; align-items: baseline; gap: 2mm; } .words .v { flex: 0 1 82%; border-bottom: 1px dotted #555; padding: 0 1mm; }
 .sign { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; margin-top: auto; padding-top: 14mm; font: 700 11.5px "Times New Roman", serif; text-align: center; }
 .sign div { border-top: 1.2px solid #111; padding-top: 1.5mm; }
 .wm { position: absolute; inset: 0; pointer-events: none; z-index: 0; display: grid; grid-template-columns: repeat(3, 1fr); align-content: space-around; }
 .wm span { transform: rotate(-22deg); color: rgba(0,0,0,.07); font: 900 22px Arial, sans-serif; text-align: center; white-space: nowrap; }
-.copy > *:not(.wm) { position: relative; z-index: 1; }
+/* Everything sits over the watermark — except the corner tag, which stays absolutely placed. */
+.copy > *:not(.wm):not(.tag) { position: relative; z-index: 1; }
 .stamp { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
   font: 900 64px Arial, sans-serif; color: rgba(200,0,0,.14); transform: rotate(-22deg); letter-spacing: .08em; z-index: 6; }
 .stamp small { font-size: 16px; letter-spacing: .1em; }
@@ -331,7 +367,7 @@ function challanCopy(o: any, division: string, job: any, which: 'Office Copy' | 
     const qty = lines.reduce((n: number, l: any) => n + (Number(l.quantity) || 0), 0);
     const no = job?.challanNo || '—';
     const label = divisionLabel(division);
-    const rows = lines.map((l: any, i: number) => `<tr><td class="sl">${i + 1}</td><td>${esc(describe(l))}</td><td class="qty">${esc(l.quantity)} Pcs</td></tr>`).join('');
+    const rows = lines.map((l: any, i: number) => `<tr><td class="sl">${i + 1}</td><td>${esc(paperLine(l))}</td><td class="qty">${esc(l.quantity)} Pcs</td></tr>`).join('');
     const a = o?.shippingAddress || {};
     const wm = which === 'Factory Copy'
         ? `<div class="wm">${Array.from({ length: 18 }).map(() => `<span>${esc(label)}</span>`).join('')}</div>`
@@ -434,6 +470,18 @@ export function openPieceLabels(order: any, job: any) {
         </div>`;
     }).join('');
     printWindow(`${job?.challanNo || ''} piece labels`, LABEL_CSS, `<div class="grid">${labels}</div>`);
+}
+
+/**
+ * The memo pages for several orders as one complete document — for the print preview
+ * ("Invoice" / "Print invoice"), which shows it in an iframe. Always a VIEW COPY: the
+ * original memo is issued once from the order desk.
+ */
+export function memoDocumentHtml(orders: any[], origin: string): string {
+    const title = orders.length === 1 ? `${orders[0]?.orderId || 'Order'} Memo (View copy)` : `Memos - ${orders.length} orders (View copy)`;
+    return `<!doctype html><html><head><meta charset="utf-8"/><title>${esc(title)}</title><style>${MEMO_CSS}
+@media screen { body { background: #525659; padding: 16px 0; } .memo { background: #fff; width: 210mm; margin: 0 auto 16px; } }</style></head>
+<body>${orders.map((o) => memoPage(o, origin, 'view')).join('')}</body></html>`;
 }
 
 /* ─── From lists: always view copies ─────────────────────── */

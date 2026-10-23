@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { LuMessageSquareText } from 'react-icons/lu';
 import { useGetSmsLogQuery } from '@/redux/api/orderApi';
+import PageGuide from '@/components/admin/PageGuide';
 import { PageHeader, SelectPill, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows, Pager, fmtDateTime, type Tone } from '@/components/admin/ui';
 
 const PAGE_SIZE = 25;
@@ -24,7 +25,7 @@ export default function SmsLogPage() {
 
     return (
         <div>
-            <PageHeader title="SMS log" subtitle="Every SMS the order desk sent to customers, newest first." />
+            <PageHeader title="SMS log" subtitle="Every SMS the order desk sent to customers, newest first." actions={<PageGuide page="sms" />} />
 
             <FilterBar>
                 <SelectPill ariaLabel="Status" className="sm:w-52" value={status} onChange={(v) => { setStatus(v); setPage(1); }}

@@ -61,6 +61,10 @@ const siteContentSchema = new Schema({
         rocket: { number: { type: String, default: '' }, accountType: { type: String, default: 'Personal' }, active: { type: Boolean, default: true } },
         nagad:  { number: { type: String, default: '' }, accountType: { type: String, default: 'Personal' }, active: { type: Boolean, default: true } },
         cod:    { active: { type: Boolean, default: true } }, // Cash on Delivery show/hide toggle
+        bank: {
+            bankName: { type: String, default: '' }, accountName: { type: String, default: '' }, accountNumber: { type: String, default: '' },
+            branch: { type: String, default: '' }, routingNumber: { type: String, default: '' }, active: { type: Boolean, default: false },
+        },
         instructions: { type: String, default: 'Send Money to the number above, then submit your number, transaction ID and payment time below.' },
     },
 

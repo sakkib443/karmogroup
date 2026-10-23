@@ -1,139 +1,113 @@
 import { baseApi } from './baseApi';
 
-// Courier payouts — money Steadfast has sent us (admin). Backend: /api/courier-payouts
+// Courier money — what the couriers collected, charged, paid and still owe.
+// Super admin and admin only. Backend: /api/courier-payouts (modules/courier/payout.*).
 
-export type PayoutSource = 'steadfast' | 'manual';
+export type PayoutCarrier = 'pathao' | 'steadfast';
 
 export interface ICourierPayout {
     _id: string;
-    receivedAt: string;
-    source: PayoutSource;
+    carrier: PayoutCarrier;
+    source: 'api' | 'manual';
     reference: string;
-    codCollected: number;
-    deliveryBills: number;
-    codFee: number;
+    paidAt: string;
     amount: number;
-    parcelCount: number;
+    codTotal: number;
+    chargeTotal: number;
+    parcels: { orderNo: string; consignmentId: string; cod: number; charge: number; returnCharge: number; status: string }[];
     note: string;
-    createdBy?: { _id: string; firstName?: string; lastName?: string } | null;
+    createdBy?: { name?: string; role?: string };
     createdAt: string;
-    updatedAt: string;
-}
-
-export interface IPayoutSummary {
-    count: number;
-    steadfast: number;
-    manual: number;
-    received: number;
-    codCollected: number;
-    deliveryBills: number;
-    codFee: number;
-    parcels: number;
-    lastReceivedAt: string | null;
-}
-
-export interface IDeliveryEconomics {
-    shippingCharged: number;
-    deliveredOrders: number;
-    deliveredViaSteadfast: number;
-    deliveryBills: number;
-    codFee: number;
-    paidToCourier: number;
-    deliveryNet: number;
-    codCollected: number;
-    received: number;
-    /** Received over payouts that carry a breakdown — the part comparable with codCollected. */
-    receivedWithBreakdown: number;
-    /** codCollected − receivedWithBreakdown. */
-    keptByCourier: number;
-    /** Payouts recorded without a breakdown (their charges are unknown) and the money they brought. */
-    withoutBreakdown: number;
-    receivedWithoutBreakdown: number;
-    codOrders: number;
-    codExpected: number;
 }
 
 export interface IPayoutParcel {
+    orderId: string;
+    orderNo: string;
+    customer: string;
+    phone: string;
     consignmentId: string;
-    trackingCode: string;
-    invoice: string;
+    trackingNumber: string;
+    carrier: string;
+    bookedAt: string;
+    cod: number;
     status: string;
-    codCollected: number;
-    deliveryCharge: number;
-    codFee: number;
-    order: { _id: string; orderId: string; total: number; shippingCost: number; paymentMethod: string; status: string } | null;
+    courierStatus: string;
+    outcome: 'delivered' | 'partial' | 'returned' | 'progress';
+    paid: boolean;
 }
 
-export interface IPayoutListParams {
-    from?: string;   // ISO, inclusive
-    to?: string;     // ISO, exclusive
-    source?: PayoutSource;
+export interface ICourierOverview {
+    setup: { pathao: boolean; steadfast: boolean };
+    rightNow: { inReview: number; processing: number; codProcessing: { n: number; value: number }; returns30: number };
+    last30: {
+        bookedToday: number;
+        bookedYesterday: number;
+        booked: number;
+        success: { pct: number; delivered: number; finished: number };
+        notPaid: { n: number; value: number; afterCharges: number };
+    };
+    daily: { date: string; delivered: number; progress: number; partial: number; returned: number }[];
+    ended: { total: number; delivered: number; progress: number; partial: number; returned: number };
+    latest: IPayoutParcel[];
+    lastPayout: ICourierPayout | null;
+    paidAllTime: { value: number; n: number };
+    stillToCome: { value: number; n: number };
+    accounts: {
+        owes: number;
+        chargesUnknown: number;
+        paid: { value: number; n: number };
+        sent: { n: number; delivered: number; partial: number; returned: number; onTheWay: number };
+        codAsked: number;
+        codCollected: number;
+        stillWithCourier: number;
+        courierCharges: { value: number; unknown: number };
+        returnCharges: { value: number; returned: number };
+        buyersPaid: number;
+        deliveryDiff: number;
+    };
+}
+
+export type PayoutQuery = {
+    carrier?: PayoutCarrier;
+    from?: string;
+    to?: string;
     search?: string;
-    page?: number;
-    limit?: number;
-}
-
-export interface IPayoutListResponse {
-    data: { payouts: ICourierPayout[]; summary: IPayoutSummary; economics: IDeliveryEconomics };
-    meta: { page: number; limit: number; total: number; totalPages: number };
-}
-
-export interface IPayoutInput {
-    receivedAt: string;
-    amount?: number;
-    reference?: string;
-    codCollected?: number;
-    deliveryBills?: number;
-    codFee?: number;
-    note?: string;
-}
+    places?: string;
+    pay?: 'cod' | 'prepaid';
+};
 
 export const payoutApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        // GET /courier-payouts — paginated, with period totals and delivery economics
-        getCourierPayouts: builder.query<IPayoutListResponse, IPayoutListParams>({
-            query: (params) => ({ url: '/courier-payouts', params }),
-            // The economics block is built from delivered orders too (a courier sync changes it).
+        getCourierOverview: builder.query<{ data: ICourierOverview }, PayoutQuery>({
+            query: (params) => ({ url: '/courier-payouts/overview', params }),
             providesTags: ['Payouts', 'Orders'],
         }),
-
-        // GET /courier-payouts/:id — one payout with its statement's parcels matched to orders
-        getCourierPayout: builder.query<{ data: ICourierPayout & { parcels: IPayoutParcel[] } }, string>({
-            query: (id) => `/courier-payouts/${id}`,
-            providesTags: (_r, _e, id) => [{ type: 'Payouts', id }],
+        getCourierPayouts: builder.query<
+            { data: ICourierPayout[]; meta: { total: number; page: number; limit: number; totalPages: number } },
+            { carrier?: PayoutCarrier; from?: string; to?: string; page?: number; limit?: number }
+        >({
+            query: (params) => ({ url: '/courier-payouts', params }),
+            providesTags: ['Payouts'],
         }),
-
-        // POST /courier-payouts/pull — fetch a payment statement from Steadfast and store it
-        pullSteadfastPayout: builder.mutation<{ data: { payout: ICourierPayout; warnings: string[] } }, { paymentId: string; note?: string }>({
-            query: (body) => ({ url: '/courier-payouts/pull', method: 'POST', body }),
-            invalidatesTags: ['Payouts'],
+        syncCourierPayouts: builder.mutation<{ data: { added: number; parcels: number; checked: number }; message: string }, void>({
+            query: () => ({ url: '/courier-payouts/sync', method: 'POST' }),
+            invalidatesTags: ['Payouts', 'Orders'],
         }),
-
-        // POST /courier-payouts/manual — money that isn't on a Steadfast statement
-        createManualPayout: builder.mutation<{ data: ICourierPayout }, IPayoutInput & { amount: number }>({
+        addCourierPayout: builder.mutation<{ data: ICourierPayout }, { carrier: PayoutCarrier; paidAt: string; amount: number; reference?: string; parcels?: string; note?: string }>({
             query: (body) => ({ url: '/courier-payouts/manual', method: 'POST', body }),
-            invalidatesTags: ['Payouts'],
+            invalidatesTags: ['Payouts', 'Orders'],
         }),
-
-        // PATCH /courier-payouts/:id
-        updateCourierPayout: builder.mutation<{ data: ICourierPayout }, Partial<IPayoutInput> & { id: string }>({
-            query: ({ id, ...body }) => ({ url: `/courier-payouts/${id}`, method: 'PATCH', body }),
-            invalidatesTags: ['Payouts'],
-        }),
-
-        // DELETE /courier-payouts/:id
-        deleteCourierPayout: builder.mutation<unknown, string>({
+        deleteCourierPayout: builder.mutation<{ data: { removed: boolean } }, string>({
             query: (id) => ({ url: `/courier-payouts/${id}`, method: 'DELETE' }),
-            invalidatesTags: ['Payouts'],
+            invalidatesTags: ['Payouts', 'Orders'],
         }),
     }),
 });
 
 export const {
+    useGetCourierOverviewQuery,
     useGetCourierPayoutsQuery,
-    useGetCourierPayoutQuery,
-    usePullSteadfastPayoutMutation,
-    useCreateManualPayoutMutation,
-    useUpdateCourierPayoutMutation,
+    useSyncCourierPayoutsMutation,
+    useAddCourierPayoutMutation,
     useDeleteCourierPayoutMutation,
 } = payoutApi;

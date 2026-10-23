@@ -1,5 +1,13 @@
 import { baseApi } from "./baseApi";
 
+/** A buyer as Customers lists them, with their orders. */
+export interface ICustomerRow {
+    _id: string; firstName?: string; lastName?: string; email?: string; phone?: string; status: string; role: string;
+    loyaltyPoints?: number; defaultDiscount?: number; createdAt: string;
+    orders: number; placed: number; delivered: number; cancelled: number; spent: number;
+    firstOrderAt?: string; lastOrderAt?: string; joinedByOrder: boolean;
+}
+
 export const userApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // ===== User-facing endpoints =====
@@ -127,6 +135,14 @@ export const userApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ['Users', 'Roles'],
         }),
+        // Buyers with their order counts — who ordered, how often, who never did.
+        getCustomers: builder.query<
+            { data: { customers: ICustomerRow[]; stats: { total: number; ordered: number; never: number; repeat: number; fromOrders: number; newThisMonth: number } }; meta: { total: number; page: number; limit: number; totalPages: number } },
+            { page?: number; limit?: number; search?: string; status?: string; orders?: string; joined?: string; sort?: string }
+        >({
+            query: (params) => ({ url: '/users/admin/customers', method: 'GET', params }),
+            providesTags: ['Users', 'Orders'],
+        }),
         // Admin adds a buyer by hand (phone orders, walk-ins)
         createCustomer: builder.mutation({
             query: (data) => ({
@@ -158,6 +174,7 @@ export const {
     useToggleWishlistMutation,
     useMergeWishlistMutation,
     useGetSharedWishlistQuery,
+    useGetCustomersQuery,
     // Admin hooks
     useGetAdminUsersQuery,
     useLookupCustomerQuery,
