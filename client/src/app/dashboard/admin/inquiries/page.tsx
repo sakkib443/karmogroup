@@ -1,291 +1,149 @@
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+/**
+ * Inquiries — messages from the website: the contact form above the footer, the chat
+ * bubble's "Leave a message", and product pages. The desk calls back and marks each
+ * New → Called → Closed, with a note. Super admin, admin, manager, online sales.
+ */
 import React, { useState } from 'react';
-import {
-    FiMail, FiTrash2, FiSearch, FiCheckCircle, FiClock,
-    FiX, FiMessageSquare, FiPackage, FiPhone
-} from 'react-icons/fi';
-import {
-    useGetInquiriesQuery,
-    useUpdateInquiryStatusMutation,
-    useDeleteInquiryMutation
-} from '@/redux/api/inquiryApi';
+import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { LuPhone, LuMessageSquare, LuCheck, LuTrash2, LuPlus } from 'react-icons/lu';
+import { FaWhatsapp } from 'react-icons/fa';
+import PageGuide from '@/components/admin/PageGuide';
+import { useViewRole } from '@/components/admin/viewRole';
+import { PageHeader, SearchInput, Segmented, StatTile, Badge, Btn, Modal, Field, TEXTAREA, Pager, fmtDateTime, cx, type Tone } from '@/components/admin/ui';
+import { useGetInquiriesQuery, useUpdateInquiryStatusMutation, useDeleteInquiryMutation } from '@/redux/api/inquiryApi';
 
-const InquiriesPage = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    const [selectedInquiry, setSelectedInquiry] = useState<any>(null);
+type Inquiry = {
+    _id: string; name: string; phone: string; message: string; status: 'pending' | 'replied' | 'closed';
+    source?: 'contact_form' | 'chat' | 'product'; page?: string; adminReply?: string; createdAt: string;
+    product?: { name?: string; slug?: string } | null; handledBy?: { name?: string }; handledAt?: string;
+};
+
+const STATUS: Record<Inquiry['status'], { label: string; tone: Tone }> = {
+    pending: { label: 'New', tone: 'amber' },
+    replied: { label: 'Called', tone: 'blue' },
+    closed: { label: 'Closed', tone: 'green' },
+};
+const SOURCE: Record<string, string> = { contact_form: 'Contact form', chat: 'Chat', product: 'Product page' };
+const PAGE_SIZE = 20;
+
+const isMobile = (p: string) => /^01\d{9}$/.test(p);
+const waLink = (p: string) => `https://wa.me/88${p}`;
+
+export default function InquiriesPage() {
+    const [status, setStatus] = useState<'all' | Inquiry['status']>('pending');
+    const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
+    const [open, setOpen] = useState<Inquiry | null>(null);
+    const [note, setNote] = useState('');
+    const { role } = useViewRole();
 
-    const { data, isLoading, refetch } = useGetInquiriesQuery({
-        searchTerm: searchTerm || undefined,
-        status: statusFilter || undefined,
-        page,
-        limit: 15,
+    const { data, isLoading, isFetching, refetch } = useGetInquiriesQuery({
+        status: status !== 'all' ? status : undefined, searchTerm: search.trim() || undefined, page, limit: PAGE_SIZE,
     });
+    const [update, { isLoading: saving }] = useUpdateInquiryStatusMutation();
+    const [remove] = useDeleteInquiryMutation();
+    const rows: Inquiry[] = data?.data || [];
+    const meta = data?.meta || { total: 0, totalPages: 1 };
+    const sum = meta.summary || { pending: 0, replied: 0, closed: 0, total: 0 };
+    const pick = (s: typeof status) => { setStatus(s); setPage(1); };
 
-    const [updateStatus] = useUpdateInquiryStatusMutation();
-    const [deleteInquiry] = useDeleteInquiryMutation();
-
-    const inquiries = data?.data || [];
-    const meta = data?.meta || {};
-
-    const handleStatusUpdate = async (id: string, status: string) => {
+    const openOne = (q: Inquiry) => { setOpen(q); setNote(q.adminReply || ''); };
+    const save = async (next: Inquiry['status']) => {
+        if (!open) return;
         try {
-            await updateStatus({ id, data: { status } }).unwrap();
-            toast.success(`Marked as ${status}`);
+            await update({ id: open._id, data: { status: next, adminReply: note } }).unwrap();
+            toast.success(`Marked ${STATUS[next].label}`);
+            setOpen(null);
             refetch();
-            if (selectedInquiry?._id === id) {
-                setSelectedInquiry((prev: any) => ({ ...prev, status }));
-            }
-        } catch {
-            toast.error('Failed to update status');
+        } catch (e) {
+            toast.error((e as { data?: { message?: string } })?.data?.message || 'Could not save');
         }
     };
-
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Delete this inquiry?')) return;
-        try {
-            await deleteInquiry(id).unwrap();
-            toast.success('Inquiry deleted');
-            refetch();
-            if (selectedInquiry?._id === id) setSelectedInquiry(null);
-        } catch {
-            toast.error('Failed to delete');
-        }
-    };
-
-    const statusBadge = (status: string) => {
-        const map: Record<string, string> = {
-            pending: 'bg-yellow-100 text-yellow-700',
-            read: 'bg-blue-100 text-blue-700',
-            resolved: 'bg-green-100 text-green-700',
-        };
-        return map[status] || 'bg-gray-100 text-gray-600';
+    const del = async (q: Inquiry) => {
+        if (!window.confirm(`Delete the message from ${q.name}?`)) return;
+        try { await remove(q._id).unwrap(); toast.success('Deleted'); setOpen(null); refetch(); } catch { toast.error('Could not delete'); }
     };
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-md border border-gray-200 shadow-sm">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Inquiries</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage customer product inquiries</p>
-                </div>
-                <div className="flex gap-3">
-                    <div className="px-4 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm font-bold text-yellow-700">
-                        {inquiries.filter((i: any) => i.status === 'pending').length} Pending
+        <div className={cx('transition-opacity', isFetching && !isLoading && 'opacity-70')}>
+            <PageHeader title="Inquiries" subtitle="Messages from the website — call back and mark them done." actions={<PageGuide page="inquiries" />} />
+
+            <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <StatTile label="New" value={sum.pending} hint="Call these back" active={status === 'pending'} onClick={() => pick('pending')} />
+                <StatTile label="Called" value={sum.replied} active={status === 'replied'} onClick={() => pick('replied')} />
+                <StatTile label="Closed" value={sum.closed} active={status === 'closed'} onClick={() => pick('closed')} />
+                <StatTile label="All" value={sum.total} active={status === 'all'} onClick={() => pick('all')} />
+            </div>
+
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <Segmented value={status} onChange={pick} options={[{ value: 'pending', label: 'New' }, { value: 'replied', label: 'Called' }, { value: 'closed', label: 'Closed' }, { value: 'all', label: 'All' }]} />
+                <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search name, phone, message…" className="sm:w-72" />
+            </div>
+
+            <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+                {!rows.length ? (
+                    <div className="px-5 py-14 text-center text-sm text-gray-500">
+                        <LuMessageSquare size={28} className="mx-auto mb-2 text-gray-300" />
+                        {isLoading ? 'Loading…' : status === 'pending' ? 'No new messages.' : 'Nothing here.'}
                     </div>
-                    <button onClick={() => refetch()} className="px-4 py-2 border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all bg-white">
-                        Refresh
-                    </button>
-                </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
-                {[
-                    { label: 'Total', value: meta.total || inquiries.length, color: 'blue', icon: FiMessageSquare },
-                    { label: 'Pending', value: inquiries.filter((i: any) => i.status === 'pending').length, color: 'yellow', icon: FiClock },
-                    { label: 'Resolved', value: inquiries.filter((i: any) => i.status === 'resolved').length, color: 'green', icon: FiCheckCircle },
-                ].map((stat, i) => (
-                    <div key={i} className="bg-white p-4 rounded-md border border-gray-200 shadow-sm flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-lg bg-${stat.color}-50 flex items-center justify-center text-${stat.color}-600`}>
-                            <stat.icon size={22} />
-                        </div>
-                        <div>
-                            <p className="text-xs text-gray-500 uppercase font-medium">{stat.label}</p>
-                            <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-3 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
-                <div className="relative flex-1">
-                    <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                        type="text"
-                        placeholder="Search by name, product or message..."
-                        className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] transition-all"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-md text-sm outline-none focus:border-[var(--color-primary)] cursor-pointer"
-                >
-                    <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="read">Read</option>
-                    <option value="resolved">Resolved</option>
-                </select>
-            </div>
-
-            <div className="flex gap-6">
-                {/* Inquiry List */}
-                <div className="flex-1 bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden">
-                    {isLoading ? (
-                        <div className="p-20 text-center">
-                            <div className="animate-spin w-10 h-10 border-4 border-[var(--color-primary)] border-t-transparent rounded-full mx-auto mb-4"></div>
-                            <p className="text-gray-500">Loading inquiries...</p>
-                        </div>
-                    ) : inquiries.length === 0 ? (
-                        <div className="p-20 text-center">
-                            <FiMail size={40} className="text-gray-200 mx-auto mb-4" />
-                            <h3 className="font-bold text-gray-700">No inquiries found</h3>
-                            <p className="text-sm text-gray-400 mt-1">Customer inquiries will appear here</p>
-                        </div>
-                    ) : (
-                        <div>
-                            {inquiries.map((inq: any) => (
-                                <div
-                                    key={inq._id}
-                                    onClick={() => { setSelectedInquiry(inq); if (inq.status === 'pending') handleStatusUpdate(inq._id, 'read'); }}
-                                    className={`flex items-start gap-4 px-5 py-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer transition-all ${selectedInquiry?._id === inq._id ? 'bg-[var(--color-primary)]/5 border-l-4 border-l-[var(--color-primary)]' : ''}`}
-                                >
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 ${inq.status === 'pending' ? 'bg-yellow-500' : inq.status === 'resolved' ? 'bg-green-600' : 'bg-blue-500'}`}>
-                                        {(inq.name || inq.customerName || 'U')[0].toUpperCase()}
+                ) : (
+                    <ul className="divide-y divide-gray-100">
+                        {rows.map((q) => (
+                            <li key={q._id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start">
+                                <button type="button" onClick={() => openOne(q)} className="min-w-0 flex-1 text-left">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="font-semibold text-gray-900">{q.name}</span>
+                                        <span className="font-mono text-xs text-gray-500">{q.phone}</span>
+                                        <Badge tone={STATUS[q.status].tone}>{STATUS[q.status].label}</Badge>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between gap-2">
-                                            <p className={`text-sm font-bold truncate ${inq.status === 'pending' ? 'text-gray-900' : 'text-gray-600'}`}>
-                                                {inq.name || inq.customerName || 'Anonymous'}
-                                            </p>
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase flex-shrink-0 ${statusBadge(inq.status)}`}>
-                                                {inq.status}
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-[var(--color-primary)] font-medium truncate mt-0.5 flex items-center gap-1">
-                                            {inq.product ? <FiPackage size={11} /> : <FiMessageSquare size={11} />}
-                                            <span>{inq.product?.name || inq.subject || inq.productName || 'General Inquiry'}</span>
-                                        </p>
-                                        <p className="text-xs text-gray-400 mt-1 truncate">{inq.message}</p>
-                                    </div>
-                                    <p className="text-[10px] text-gray-400 flex-shrink-0">
-                                        {new Date(inq.createdAt).toLocaleDateString('en-BD', { day: '2-digit', month: 'short' })}
+                                    <p className="mt-1 line-clamp-2 text-sm text-gray-700">{q.message}</p>
+                                    <p className="mt-1 text-xs text-gray-400">
+                                        {fmtDateTime(q.createdAt)} · {SOURCE[q.source || 'contact_form']}{q.product?.name ? ` · ${q.product.name}` : q.page ? ` · ${q.page}` : ''}
+                                        {q.handledBy?.name && ` · ${STATUS[q.status].label} by ${q.handledBy.name}`}
                                     </p>
+                                    {q.adminReply && <p className="mt-1 text-xs text-sky-700">Note: {q.adminReply}</p>}
+                                </button>
+                                <div className="flex shrink-0 items-center gap-2">
+                                    {isMobile(q.phone) && <>
+                                        <a href={`tel:${q.phone}`} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gray-200 px-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"><LuPhone size={14} /> Call</a>
+                                        <a href={waLink(q.phone)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-emerald-600 hover:bg-emerald-50"><FaWhatsapp size={16} /></a>
+                                    </>}
+                                    <Btn onClick={() => openOne(q)} icon={<LuCheck size={14} />}>Update</Btn>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                {meta.totalPages > 1 && <div className="border-t border-gray-100 px-5 py-3"><Pager page={page} totalPages={meta.totalPages} total={meta.total} pageSize={PAGE_SIZE} count={rows.length} onPage={setPage} noun="messages" /></div>}
+            </section>
 
-                    {/* Pagination */}
-                    {meta.pages > 1 && (
-                        <div className="px-5 py-3 border-t border-gray-100 flex justify-between items-center bg-gray-50 text-sm">
-                            <span className="text-gray-500">Page {page} of {meta.pages}</span>
-                            <div className="flex gap-2">
-                                <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border border-gray-200 rounded-md bg-white disabled:opacity-40 hover:bg-gray-50">Prev</button>
-                                <button disabled={page === meta.pages} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border border-gray-200 rounded-md bg-white disabled:opacity-40 hover:bg-gray-50">Next</button>
+            <Modal open={!!open} onClose={() => setOpen(null)} title={open ? `${open.name} · ${open.phone}` : ''}
+                subtitle={open ? `${fmtDateTime(open.createdAt)} · ${SOURCE[open.source || 'contact_form']}${open.page ? ` · ${open.page}` : ''}` : ''}
+                footer={open && <>
+                    {(role === 'superadmin' || role === 'admin') && <Btn variant="ghost" icon={<LuTrash2 size={14} />} onClick={() => del(open)} className="mr-auto text-red-600">Delete</Btn>}
+                    {open.status !== 'pending' && <Btn onClick={() => save('pending')} disabled={saving}>Back to New</Btn>}
+                    <Btn onClick={() => save('replied')} disabled={saving}>Called</Btn>
+                    <Btn variant="primary" onClick={() => save('closed')} disabled={saving}>Close</Btn>
+                </>}>
+                {open && (
+                    <div className="space-y-4">
+                        <p className="whitespace-pre-line rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-800">{open.message}</p>
+                        {isMobile(open.phone) && (
+                            <div className="flex flex-wrap gap-2">
+                                <a href={`tel:${open.phone}`} className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-4 text-sm font-semibold text-white"><LuPhone size={14} /> Call {open.phone}</a>
+                                <a href={waLink(open.phone)} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gray-200 px-4 text-sm font-semibold text-emerald-700"><FaWhatsapp size={15} /> WhatsApp</a>
+                                <Link href={`/dashboard/admin/orders/new?phone=${open.phone}&name=${encodeURIComponent(open.name)}`} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50"><LuPlus size={14} /> New order</Link>
                             </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Detail Panel */}
-                {selectedInquiry && (
-                    <div className="w-[380px] flex-shrink-0 bg-white rounded-md border border-gray-200 shadow-sm overflow-hidden self-start sticky top-4">
-                        {/* Panel Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                            <h3 className="font-bold text-gray-800">Inquiry Detail</h3>
-                            <button onClick={() => setSelectedInquiry(null)} className="p-1.5 hover:bg-gray-100 rounded-md transition-all text-gray-400">
-                                <FiX size={18} />
-                            </button>
-                        </div>
-
-                        <div className="p-5 space-y-5">
-                            {/* Customer Info */}
-                            <div className="space-y-3">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase">Customer</h4>
-                                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
-                                    <div className="w-10 h-10 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center font-bold">
-                                        {(selectedInquiry.name || selectedInquiry.customerName || 'U')[0].toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-gray-800 text-sm">{selectedInquiry.name || selectedInquiry.customerName || 'Anonymous'}</p>
-                                        {selectedInquiry.email && <p className="text-xs text-gray-500 flex items-center gap-1"><FiMail size={10} /> {selectedInquiry.email}</p>}
-                                        {selectedInquiry.phone && <p className="text-xs text-gray-500 flex items-center gap-1"><FiPhone size={10} /> {selectedInquiry.phone}</p>}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Subject / Category */}
-                            {selectedInquiry.subject && (
-                                <div className="space-y-1">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase">Subject</h4>
-                                    <div className="p-3 bg-gray-50 rounded-md border border-gray-100 flex items-center gap-2">
-                                        <FiMessageSquare size={14} className="text-[var(--color-primary)] shrink-0" />
-                                        <span className="text-sm font-semibold text-gray-800">{selectedInquiry.subject}</span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Product (if product-specific) */}
-                            {(selectedInquiry.product || selectedInquiry.productName) && (
-                                <div className="space-y-2">
-                                    <h4 className="text-xs font-bold text-gray-400 uppercase">Product</h4>
-                                    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
-                                        {selectedInquiry.product?.thumbnail && (
-                                            <img src={selectedInquiry.product.thumbnail} className="w-10 h-10 rounded-md object-cover border border-gray-200" alt="" />
-                                        )}
-                                        <p className="text-sm font-semibold text-[var(--color-primary)]">{selectedInquiry.product?.name || selectedInquiry.productName}</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Message */}
-                            <div className="space-y-2">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase">Message</h4>
-                                <div className="p-4 bg-gray-50 rounded-md border border-gray-100">
-                                    <p className="text-sm text-gray-700 leading-relaxed">{selectedInquiry.message}</p>
-                                </div>
-                            </div>
-
-                            {/* Date */}
-                            <p className="text-xs text-gray-400">
-                                Received: {new Date(selectedInquiry.createdAt).toLocaleString('en-BD')}
-                            </p>
-
-                            {/* Actions */}
-                            <div className="space-y-2 pt-2">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase">Actions</h4>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {selectedInquiry.status !== 'resolved' && (
-                                        <button
-                                            onClick={() => handleStatusUpdate(selectedInquiry._id, 'resolved')}
-                                            className="flex items-center justify-center gap-2 py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all"
-                                        >
-                                            <FiCheckCircle size={15} /> Resolve
-                                        </button>
-                                    )}
-                                    {selectedInquiry.status === 'resolved' && (
-                                        <button
-                                            onClick={() => handleStatusUpdate(selectedInquiry._id, 'pending')}
-                                            className="flex items-center justify-center gap-2 py-2.5 bg-yellow-500 text-white rounded-md text-sm font-bold hover:bg-yellow-600 transition-all"
-                                        >
-                                            <FiClock size={15} /> Reopen
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={() => handleDelete(selectedInquiry._id)}
-                                        className="flex items-center justify-center gap-2 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-md text-sm font-bold hover:bg-red-100 transition-all"
-                                    >
-                                        <FiTrash2 size={15} /> Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        )}
+                        <Field label="Note" hint="What was said on the call — the next person sees it.">
+                            <textarea rows={3} className={TEXTAREA} value={note} onChange={(e) => setNote(e.target.value)} />
+                        </Field>
                     </div>
                 )}
-            </div>
+            </Modal>
         </div>
     );
-};
-
-export default InquiriesPage;
+}

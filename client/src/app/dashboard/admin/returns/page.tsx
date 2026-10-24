@@ -12,6 +12,9 @@ import {
 } from '@/redux/api/returnApi';
 import toast from 'react-hot-toast';
 import OrderItemsPreview from '@/components/shared/OrderItemsPreview';
+import PageGuide from '@/components/admin/PageGuide';
+import { useViewRole } from '@/components/admin/viewRole';
+import { can } from '@/components/admin/access';
 
 type ReturnStatus = 'pending' | 'approved' | 'rejected' | 'refunded';
 
@@ -91,6 +94,9 @@ function AdminReturnsPageInner() {
     const [approveReturn, { isLoading: isApproving }] = useApproveReturnMutation();
     const [rejectReturn, { isLoading: isRejecting }] = useRejectReturnMutation();
     const [refundReturn, { isLoading: isRefunding }] = useRefundReturnMutation();
+    // Money goes back only by an admin (the server checks again).
+    const { role } = useViewRole();
+    const mayRefund = can(role, 'payment');
 
     const allReturns: any[] = (data as any)?.data || [];
 
@@ -168,11 +174,14 @@ function AdminReturnsPageInner() {
     return (
         <div>
             {/* Page Header */}
-            <div className="mb-6">
-                <h1 className="text-xl font-bold text-gray-800">Returns &amp; Refunds</h1>
-                <p className="text-sm text-gray-500 mt-0.5">
-                    Review customer return requests, approve or reject, and process refunds
-                </p>
+            <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h1 className="text-xl font-bold text-gray-800">Returns &amp; Refunds</h1>
+                    <p className="text-sm text-gray-500 mt-0.5">
+                        Review customer return requests, approve or reject, and process refunds
+                    </p>
+                </div>
+                <PageGuide page="returns" />
             </div>
 
             {/* Stat Row */}
@@ -489,7 +498,10 @@ function AdminReturnsPageInner() {
                                 </div>
                             )}
 
-                            {selected.status === 'approved' && (
+                            {selected.status === 'approved' && !mayRefund && (
+                                <p className="text-xs text-gray-500">Approved — an admin processes the refund.</p>
+                            )}
+                            {selected.status === 'approved' && mayRefund && (
                                 <button
                                     onClick={() => handleRefund(selected._id)}
                                     disabled={isBusy}

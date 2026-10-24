@@ -17,6 +17,7 @@ async function runOnce(): Promise<void> {
     const orders = await Order.find({
         consignmentId: { $nin: [null, ''] },
         status: { $in: IN_TRANSIT },
+        carrier: /steadfast/i,
     })
         .sort({ updatedAt: 1 }) // oldest-synced first
         .limit(MAX_PER_RUN)

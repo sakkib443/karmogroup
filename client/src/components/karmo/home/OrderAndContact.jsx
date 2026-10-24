@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useWebsiteInquiry } from "@/components/shared/useWebsiteInquiry";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
@@ -17,8 +18,7 @@ import { orderContact, contact as contactSection, telHref } from "@/cms/pages/gl
  * sit with Home 02 rather than the old hexagon / boxy WordPress layout.
  *
  * Left: four clear steps on one vertical axis (cartoon icons).
- * Right: mail & phone, then a short message form (mailto handoff — no backend
- * on this page yet).
+ * Right: mail & phone, then a short message form — sent to the admin's Inquiries.
  */
 
 const ORANGE = "#FF9A1F";
@@ -82,16 +82,17 @@ export default function OrderAndContact({ textureSlides = false }) {
   const [name, setName] = useState("");
   const [telephone, setTelephone] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const inquiry = useWebsiteInquiry("contact_form");
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
-    const subject = encodeURIComponent(`Message from ${name || "website"}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nTelephone: ${telephone}\n\n${message}`
-    );
-    window.location.href = `mailto:${info.email || "info@karmogroup.com"}?subject=${subject}&body=${body}`;
-    setSent(true);
+    if (inquiry.state === "sending") return;
+    const ok = await inquiry.send({ name, phone: telephone, message });
+    if (ok) {
+      setName("");
+      setTelephone("");
+      setMessage("");
+    }
   }
 
   if (c.hidden) return null;
@@ -264,14 +265,19 @@ export default function OrderAndContact({ textureSlides = false }) {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2.5 bg-brand px-7 py-3.5 text-[12px] font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-brand-dark"
+                  disabled={inquiry.state === "sending"}
+                  className="inline-flex items-center gap-2.5 bg-brand px-7 py-3.5 text-[12px] font-bold uppercase tracking-[0.18em] text-white transition-colors duration-300 hover:bg-brand-dark disabled:opacity-60"
                 >
-                  {c.sendLabel || "Send message"}
+                  {inquiry.state === "sending" ? "Sending…" : c.sendLabel || "Send message"}
                   <FiArrowRight className="text-[15px]" />
                 </button>
-                {sent ? (
-                  <p className="text-[13px] text-ink/55">
-                    Opening your mail app…
+                {inquiry.state === "sent" ? (
+                  <p role="status" className="text-[13px] font-medium text-emerald-700">
+                    Thank you — we will call you soon.
+                  </p>
+                ) : inquiry.state === "error" ? (
+                  <p role="alert" className="text-[13px] text-brand">
+                    {inquiry.error}
                   </p>
                 ) : null}
               </div>

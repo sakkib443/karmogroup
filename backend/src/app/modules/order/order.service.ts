@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 import { Order, ORDER_STATUSES, ORDER_STATUS_LABEL } from './order.model';
-import PathaoService from '../courier/pathao.service';
+import CourierService from '../courier/courier.service';
 import { Product } from '../product/product.model';
 import { User } from '../user/user.model';
 import { Coupon } from '../coupon/coupon.model';
@@ -11,6 +11,7 @@ import { notifyOrderToWhatsApp } from '../../utils/whatsappNotify';
 import { emitFinanceUpdate } from '../../utils/socket';
 import { computeShippingCost } from '../shipping/shipping.service';
 import { type Viewer, actorOf, scopeFor, present, assertVisible, assertTransition, ensureJobs, dhakaDayStart } from './order.desk';
+import { divisionOf } from '../../constants/roles';
 import { type CatalogueQuote, quoteCatalogueLines } from './order.quote';
 
 /**
@@ -80,6 +81,53 @@ const NOT_SOLD = ['cancelled', 'returned', 'refunded'];
 const IN_PROCESS = ['confirmed', 'factory', 'challan_ready', 'courier_entry', 'processing'];
 const ON_THE_WAY = ['shipped', 'on_the_way', 'out_for_delivery', 'delivery_attempt'];
 
+/**
+ * Every day (or month) of the range, zero when nothing was ordered — so the chart's
+ * line runs through the quiet days instead of skipping them. For "all time" the months
+ * start at the first order.
+ */
+const fillTrend = (rows: { _id: string; orders: number; revenue: number }[], by: 'day' | 'month', days: number) => {
+    const have = new Map(rows.map((x) => [x._id, x]));
+    const today = new Date(dhakaDayStart().getTime() + 6 * 3600e3); // Dhaka midnight, read as UTC
+    const keys: string[] = [];
+    if (by === 'day') {
+        for (let i = days - 1; i >= 0; i--) keys.push(new Date(today.getTime() - i * DAY_MS).toISOString().slice(0, 10));
+    } else {
+        const first = days ? new Date(today.getTime() - (days - 1) * DAY_MS) : rows.length ? new Date(`${rows[0]._id}-01T00:00:00Z`) : today;
+        const d = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth(), 1));
+        while (d <= today) { keys.push(d.toISOString().slice(0, 7)); d.setUTCMonth(d.getUTCMonth() + 1); }
+    }
+    return keys.map((k) => ({ date: k, orders: have.get(k)?.orders || 0, revenue: have.get(k)?.revenue || 0 }));
+};
+
+/**
+ * Division / district / delivery-zone filters: the admin sends every way the place is
+ * written, '|'-separated; any one of them as a whole word in the city, area or address is
+ * a match. The word edge is built from real Bangla characters (not escapes) so MongoDB's
+ * regex engine reads it. Used by the order list and by Order insights.
+ */
+export const placeMatch = (list: unknown) => {
+    const terms = String(list || '').split('|').map((t) => t.trim()).filter(Boolean).slice(0, 400);
+    if (!terms.length) return null;
+    const escapeRx = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const EDGE = `[^a-z${'ঀ'}-${'৿'}]`;
+    const alts = terms.map((t) => escapeRx(t).replace(/\s+/g, '\\s*')).join('|');
+    const rx = new RegExp(`(?:^|${EDGE})(?:${alts})(?:$|${EDGE})`, 'i');
+    return { $or: [{ 'shippingAddress.city': rx }, { 'shippingAddress.area': rx }, { 'shippingAddress.address': rx }] };
+};
+
+/** Old lines spell a division several ways ("Mattress", "pillow", blank): add them up under one key. */
+const mergeDivisions = (rows: { _id: string; orders: number; pieces: number; value: number }[]) => {
+    const by = new Map<string, { division: string; orders: number; pieces: number; value: number }>();
+    for (const x of rows) {
+        const k = divisionOf(x._id);
+        const cur = by.get(k) || { division: k, orders: 0, pieces: 0, value: 0 };
+        cur.orders += x.orders; cur.pieces += x.pieces; cur.value += x.value;
+        by.set(k, cur);
+    }
+    return [...by.values()].sort((a, b) => b.value - a.value);
+};
+
 /** "Fiber Pillow" → "fiber_pillow" — the key the factory challans are grouped by. */
 const divisionKey = (v: unknown) => String(v || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
 
@@ -139,21 +187,10 @@ const OrderService = {
             ] });
         }
 
-        // Division / district (`places`) and delivery zone (`zonePlaces`): the admin sends
-        // every way the place is written, '|'-separated; any one of them as a whole word in
-        // the city, area or address is a match. The word edge is built from real Bangla
-        // characters (not \u escapes) so MongoDB's regex engine reads it.
-        const EDGE = `[^a-z${'ঀ'}-${'৿'}]`;
+        // Division / district (`places`) and delivery zone (`zonePlaces`) — see placeMatch.
         for (const list of [places, zonePlaces]) {
-            const terms = String(list || '').split('|').map((t) => t.trim()).filter(Boolean).slice(0, 400);
-            if (!terms.length) continue;
-            const alts = terms.map((t) => escapeRx(t).replace(/\s+/g, '\\s*')).join('|');
-            const rx = new RegExp(`(?:^|${EDGE})(?:${alts})(?:$|${EDGE})`, 'i');
-            and.push({ $or: [
-                { 'shippingAddress.city': rx },
-                { 'shippingAddress.area': rx },
-                { 'shippingAddress.address': rx },
-            ] });
+            const m = placeMatch(list);
+            if (m) and.push(m);
         }
         // What this viewer may see at all (agency: pending; factory: its divisions…).
         const scope = scopeFor(viewer);
@@ -743,40 +780,7 @@ const OrderService = {
      * and only once — a second booking would be a second parcel.
      */
     async sendWithPathao(id: string, viewer: Viewer) {
-        const order: any = await Order.findById(id);
-        if (!order) throw new AppError(404, 'Order not found');
-        if (order.status !== 'courier_entry') {
-            throw new AppError(400, 'Move the order to Courier Entry before sending it with Pathao');
-        }
-        if (order.consignmentId) {
-            throw new AppError(400, `Already booked with ${order.carrier || 'the courier'} (${order.consignmentId})`);
-        }
-
-        const a = order.shippingAddress || {};
-        const booked = await PathaoService.createOrder({
-            merchantOrderId: order.orderId || order._id.toString(),
-            recipientName: a.fullName,
-            recipientPhone: a.phone,
-            recipientAddress: [a.address, a.area, a.city].filter(Boolean).join(', '),
-            // Prepaid orders collect nothing at the door.
-            amountToCollect: order.paymentStatus === 'paid' ? 0 : order.total,
-            itemQuantity: (order.items || []).reduce((n: number, it: any) => n + (it.quantity || 0), 0) || 1,
-            itemDescription: (order.items || []).map((it: any) => `${it.quantity} x ${it.name}`).join(', '),
-            specialInstruction: order.note || '',
-        });
-
-        order.carrier = 'Pathao';
-        order.consignmentId = booked.consignmentId;
-        order.trackingNumber = booked.consignmentId;
-        order.courierStatus = booked.status;
-        order.courierFee = booked.deliveryFee;
-        order.courierBookedAt = new Date();
-        order.status = 'shipped';
-        order.timeline.push({ status: 'shipped', note: `Sent with Pathao · consignment ${booked.consignmentId}`, by: actorOf(viewer), createdAt: new Date() });
-        await order.save();
-
-        emitFinanceUpdate('order_status:shipped');
-        notifyOrderStatus(order, 'shipped');
+        const order = await CourierService.book(id, 'pathao', viewer);
         return present(order, viewer);
     },
 
@@ -991,6 +995,211 @@ const OrderService = {
                 collectedPct: p.sold ? Math.round((p.earned / p.sold) * 100) : 0,
             },
         };
+    },
+
+    /**
+     * Order insights (GET /admin/insights?days=7|30|90|365|all): who orders and how
+     * often (by phone), from where (city/area as typed — the page maps them to
+     * districts and divisions), what (product division, top products), when (hour,
+     * weekday, a trend line), how they pay, where orders come from, how they end, why
+     * they are cancelled and which coupons are used. Money counts only orders that
+     * stand (not cancelled, returned or refunded). Dhaka time throughout.
+     */
+    async getOrderInsights(viewer: Viewer, query: Record<string, unknown> = {}) {
+        const choice = String(query.days || '30');
+        const days = ['7', '30', '90', '365'].includes(choice) ? Number(choice) : choice === 'all' ? 0 : 30;
+        const least = query.order === 'asc';
+        const dir = least ? 1 : -1;
+        // Filters: place (division / district terms), delivery zone terms, product division,
+        // payment method and where the order came from.
+        const and: Record<string, any>[] = [scopeFor(viewer)];
+        for (const list of [query.places, query.zonePlaces]) {
+            const m = placeMatch(list);
+            if (m) and.push(m);
+        }
+        if (query.division) {
+            const dv = divisionOf(query.division);
+            and.push({ 'items.division': { $in: dv === 'fiber_pillow' ? ['fiber_pillow', 'pillow'] : dv === 'general' ? ['general', '', null] : [dv] } });
+        }
+        if (query.paymentMethod) and.push({ paymentMethod: String(query.paymentMethod) });
+        if (query.source) and.push(query.source === 'website' ? { source: { $in: ['website', null] } } : { source: String(query.source) });
+        const match: Record<string, any> = { $and: and };
+        if (days) match.createdAt = { $gte: new Date(dhakaDayStart().getTime() - (days - 1) * DAY_MS) };
+
+        const TZ = 'Asia/Dhaka';
+        const unsold = { $in: ['$status', NOT_SOLD] };
+        const soldValue = (field: string) => ({ $sum: { $cond: [unsold, 0, field] } });
+        // "+880 1712-345 678" → "01712345678"
+        const phone = {
+            $let: {
+                vars: { p: { $replaceAll: { input: { $replaceAll: { input: { $ifNull: ['$shippingAddress.phone', ''] }, find: ' ', replacement: '' } }, find: '-', replacement: '' } } },
+                in: {
+                    $cond: [{ $eq: [{ $substrCP: ['$$p', 0, 3] }, '+88'] }, { $substrCP: ['$$p', 3, 20] },
+                        { $cond: [{ $and: [{ $eq: [{ $substrCP: ['$$p', 0, 2] }, '88'] }, { $eq: [{ $strLenCP: '$$p' }, 13] }] }, { $substrCP: ['$$p', 2, 20] }, '$$p'] }],
+                },
+            },
+        };
+        const trendFormat = days && days <= 90 ? '%Y-%m-%d' : '%Y-%m';
+
+        const [r] = await Order.aggregate([
+            { $match: match },
+            {
+                $facet: {
+                    totals: [{
+                        $group: {
+                            _id: null, orders: { $sum: 1 }, unsold: { $sum: { $cond: [unsold, 1, 0] } }, sold: soldValue('$total'),
+                            cancelled: { $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] } },
+                            returned: { $sum: { $cond: [{ $in: ['$status', ['returned', 'refunded']] }, 1, 0] } },
+                            delivered: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] } },
+                        },
+                    }],
+                    byStatus: [{ $group: { _id: '$status', n: { $sum: 1 } } }, { $sort: { n: -1 } }],
+                    byPayment: [{ $group: { _id: '$paymentMethod', n: { $sum: 1 }, value: soldValue('$total') } }, { $sort: { n: -1 } }],
+                    bySource: [{ $group: { _id: { $ifNull: ['$source', 'website'] }, n: { $sum: 1 }, value: soldValue('$total') } }, { $sort: { n: -1 } }],
+                    byHour: [{ $group: { _id: { $hour: { date: '$createdAt', timezone: TZ } }, n: { $sum: 1 } } }],
+                    byWeekday: [{ $group: { _id: { $dayOfWeek: { date: '$createdAt', timezone: TZ } }, n: { $sum: 1 } } }],
+                    trend: [
+                        { $group: { _id: { $dateToString: { format: trendFormat, date: '$createdAt', timezone: TZ } }, orders: { $sum: 1 }, revenue: soldValue('$total') } },
+                        { $sort: { _id: 1 } },
+                    ],
+                    places: [
+                        { $group: { _id: { city: { $trim: { input: { $ifNull: ['$shippingAddress.city', ''] } } }, area: { $trim: { input: { $ifNull: ['$shippingAddress.area', ''] } } } }, n: { $sum: 1 }, value: soldValue('$total') } },
+                        { $sort: { n: -1 } }, { $limit: 1000 },
+                    ],
+                    customers: [
+                        { $group: { _id: phone, n: { $sum: 1 }, value: soldValue('$total'), name: { $last: '$shippingAddress.fullName' }, first: { $min: '$createdAt' }, last: { $max: '$createdAt' } } },
+                        { $match: { _id: { $ne: '' } } },
+                        { $sort: { n: dir, value: dir } },
+                        { $limit: 200 },
+                    ],
+                    customerCounts: [
+                        { $group: { _id: phone, n: { $sum: 1 } } },
+                        { $match: { _id: { $ne: '' } } },
+                        { $group: { _id: null, unique: { $sum: 1 }, repeat: { $sum: { $cond: [{ $gte: ['$n', 2] }, 1, 0] } } } },
+                    ],
+                    cancelReasons: [
+                        { $match: { status: 'cancelled' } },
+                        { $group: { _id: { $trim: { input: { $ifNull: ['$cancelReason', ''] } } }, n: { $sum: 1 } } },
+                        { $sort: { n: -1 } }, { $limit: 10 },
+                    ],
+                    coupons: [
+                        { $unwind: '$couponCodes' },
+                        { $group: { _id: { $toUpper: '$couponCodes' }, n: { $sum: 1 } } },
+                        { $sort: { n: -1 } }, { $limit: 10 },
+                    ],
+                    divisions: [
+                        { $match: { status: { $nin: NOT_SOLD } } },
+                        { $unwind: '$items' },
+                        { $group: { _id: { $ifNull: ['$items.division', ''] }, orders: { $addToSet: '$_id' }, pieces: { $sum: '$items.quantity' }, value: { $sum: '$items.total' } } },
+                        { $project: { orders: { $size: '$orders' }, pieces: 1, value: 1 } },
+                        { $sort: { value: -1 } },
+                    ],
+                    products: [
+                        { $match: { status: { $nin: NOT_SOLD } } },
+                        { $unwind: '$items' },
+                        { $group: { _id: '$items.name', division: { $first: '$items.division' }, pieces: { $sum: '$items.quantity' }, value: { $sum: '$items.total' }, orders: { $addToSet: '$_id' } } },
+                        { $project: { division: 1, pieces: 1, value: 1, orders: { $size: '$orders' } } },
+                        { $sort: { pieces: dir, value: dir } }, { $limit: 15 },
+                    ],
+                },
+            },
+        ]);
+
+        const t = r.totals[0] || { orders: 0, unsold: 0, sold: 0, cancelled: 0, returned: 0, delivered: 0 };
+        const soldOrders = t.orders - t.unsold;
+        const cc = r.customerCounts[0] || { unique: 0, repeat: 0 };
+        const pct = (a: number, b: number) => (b ? Math.round((a / b) * 1000) / 10 : 0);
+        const hours = Array.from({ length: 24 }, (_, h) => (r.byHour as any[]).find((x) => x._id === h)?.n || 0);
+        // Mongo's weekday: 1 = Sunday … 7 = Saturday. Shown Saturday first, as the Bangladesh week runs.
+        const weekdays = [7, 1, 2, 3, 4, 5, 6].map((d) => (r.byWeekday as any[]).find((x) => x._id === d)?.n || 0);
+
+        return {
+            days: days || 'all',
+            order: least ? 'asc' : 'desc',
+            trendBy: trendFormat === '%Y-%m' ? 'month' : 'day',
+            totals: {
+                orders: t.orders, soldOrders, sold: t.sold, average: soldOrders ? Math.round(t.sold / soldOrders) : 0,
+                customers: cc.unique, repeatCustomers: cc.repeat, repeatPct: pct(cc.repeat, cc.unique),
+                cancelled: t.cancelled, cancelPct: pct(t.cancelled, t.orders),
+                returned: t.returned, returnPct: pct(t.returned, t.orders),
+                delivered: t.delivered,
+            },
+            trend: fillTrend(r.trend as any[], trendFormat === '%Y-%m' ? 'month' : 'day', days),
+            byStatus: (r.byStatus as any[]).map((x) => ({ status: x._id, n: x.n })),
+            byPayment: (r.byPayment as any[]).map((x) => ({ method: x._id || 'unknown', n: x.n, value: x.value })),
+            bySource: (r.bySource as any[]).map((x) => ({ source: x._id, n: x.n, value: x.value })),
+            hours,
+            weekdays,
+            places: (r.places as any[]).map((x) => ({ city: x._id.city, area: x._id.area, n: x.n, value: x.value })),
+            customers: (r.customers as any[]).map((x) => ({ phone: x._id, name: x.name || '', orders: x.n, value: x.value, first: x.first, last: x.last })),
+            cancelReasons: (r.cancelReasons as any[]).map((x) => ({ reason: x._id || 'No reason given', n: x.n })),
+            coupons: (r.coupons as any[]).map((x) => ({ code: x._id, n: x.n })),
+            divisions: mergeDivisions(r.divisions as any[]),
+            products: (r.products as any[]).map((x) => ({ name: x._id, division: divisionOf(x.division), orders: x.orders, pieces: x.pieces, value: x.value })),
+        };
+    },
+
+    /**
+     * The orders behind "Print invoice" and "Print label" (POST /admin/print), in the
+     * order asked for, shaped as the print documents read them (client
+     * components/admin/print/printDocs.ts → PrintOrder). At most 100 at a time; ids that
+     * are not valid, not found or outside the viewer's scope are left out.
+     */
+    async getPrintData(viewer: Viewer, idsParam: unknown) {
+        const ids = (Array.isArray(idsParam) ? idsParam : [])
+            .map((v) => String(v || ''))
+            .filter((v) => isProductId(v))
+            .slice(0, 100);
+        if (!ids.length) throw new AppError(400, 'Pick at least one order to print');
+
+        const orders = await Order.find({ ...scopeFor(viewer), _id: { $in: ids } })
+            .populate('user', 'firstName lastName email phone')
+            .lean();
+        const byId = new Map(orders.map((o: any) => [String(o._id), o]));
+
+        return ids.map((id) => byId.get(id)).filter(Boolean).map((o: any) => {
+            const a = o.shippingAddress || {};
+            const u = o.user || {};
+            const total = Number(o.total) || 0;
+            const paid = o.paymentStatus === 'paid' ? total : 0;
+            return {
+                _id: String(o._id),
+                orderId: o.orderId,
+                createdAt: o.createdAt,
+                status: o.status,
+                paymentMethod: o.paymentMethod,
+                paymentStatus: o.paymentStatus,
+                customer: {
+                    name: a.fullName || [u.firstName, u.lastName].filter(Boolean).join(' '),
+                    phone: a.phone || u.phone || '',
+                    email: a.email || u.email || '',
+                },
+                shippingAddress: {
+                    fullName: a.fullName || '', phone: a.phone || '', address: a.address || '',
+                    area: a.area || '', city: a.city || '', postalCode: a.postalCode || '',
+                },
+                items: (o.items || []).map((it: any) => ({
+                    name: it.name || '',
+                    sku: it.slug || '',
+                    color: it.color || '',
+                    size: it.size || '',
+                    quantity: Number(it.quantity) || 0,
+                    price: Number(it.price) || 0,
+                    discount: 0,
+                    total: Number(it.total) || 0,
+                })),
+                subtotal: Number(o.subtotal) || 0,
+                discount: Number(o.discount) || 0,
+                shippingCost: Number(o.shippingCost) || 0,
+                total,
+                paid,
+                due: total - paid,
+                refunded: o.paymentStatus === 'refunded',
+                note: o.note || '',
+                consignmentId: o.consignmentId || '',
+                consignmentIds: o.consignmentId ? [o.consignmentId] : [],
+            };
+        });
     },
 
     // ════════════════════════════════════════════════════════════

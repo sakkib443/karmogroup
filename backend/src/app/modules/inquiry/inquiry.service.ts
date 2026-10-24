@@ -1,78 +1,103 @@
+import { Types } from 'mongoose';
 import { Inquiry } from './inquiry.model';
 import { Product } from '../product/product.model';
+import AppError from '../../utils/AppError';
 import { notifyInquiryToWhatsApp } from '../../utils/whatsappNotify';
 
+type Actor = { userId: string; name?: string; role: string };
+
+const SOURCES = ['contact_form', 'chat', 'product'];
+const clean = (v: unknown, max: number) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+
 const InquiryService = {
-    create: async (data: any) => {
-        const inquiry = await Inquiry.create(data);
+    /** From the website. Only these fields are taken — status and replies are the desk's. */
+    create: async (body: Record<string, unknown>) => {
+        const name = clean(body.name, 100);
+        const phone = clean(body.phone, 100);
+        const message = String(body.message ?? '').trim().slice(0, 2000);
+        if (!name) throw new AppError(400, 'Please write your name');
+        if (!message) throw new AppError(400, 'Please write a message');
+        const digits = phone.replace(/\D/g, '');
+        const local = digits.startsWith('880') ? digits.slice(2) : digits;
+        if (!/^01\d{9}$/.test(local) && !/^\S+@\S+\.\S+$/.test(phone)) throw new AppError(400, 'Please write a mobile number (01XXXXXXXXX)');
 
-        // Send WhatsApp notification to admin (fire & forget)
-        const product = await Product.findById(data.product).select('name');
+        // The same number, over and over in a few minutes, is someone pressing send again or spam.
+        const recent = await Inquiry.countDocuments({ phone: { $in: [phone, local] }, createdAt: { $gte: new Date(Date.now() - 10 * 60e3) } });
+        if (recent >= 3) throw new AppError(429, 'We already have your message — we will call you soon');
+
+        const productId = body.product && Types.ObjectId.isValid(String(body.product)) ? String(body.product) : undefined;
+        const product = productId ? await Product.findById(productId).select('name') : null;
+        const source = SOURCES.includes(String(body.source)) ? String(body.source) : product ? 'product' : 'contact_form';
+
+        const inquiry = await Inquiry.create({
+            name, phone: /^01\d{9}$/.test(local) ? local : phone, message, source,
+            page: clean(body.page, 300), product: product?._id,
+        });
+
         notifyInquiryToWhatsApp({
-            customerName: data.name || '',
-            customerPhone: data.phone || '',
-            productName: product?.name || 'Unknown Product',
-            message: data.message || '',
-            color: data.color || '',
-            size: data.size || '',
-        }).catch(() => {}); // never block inquiry flow
+            customerName: name, customerPhone: phone, productName: product?.name || 'General question', message,
+            color: '', size: '',
+        }).catch(() => {}); // never block the inquiry
 
-        // ...and the in-app bell, so it lands live even when WhatsApp isn't set up.
         try {
             const { NotificationService } = require('../notification/notification.service');
-            NotificationService.notifyAdmins({
+            NotificationService.notifyRoles(['superadmin', 'admin', 'manager', 'online_sales'], {
                 type: 'new_inquiry',
-                title: 'New customer inquiry',
-                message: `${data.name || 'A customer'} asked about "${product?.name || 'a product'}".`,
+                title: 'New inquiry',
+                message: `${name} (${phone})${product ? ` asked about "${product.name}"` : ' left a message'}.`,
                 link: '/dashboard/admin/inquiries',
-                meta: { inquiryId: inquiry._id.toString(), product: String(data.product || '') },
+                meta: { inquiryId: inquiry._id.toString() },
             }).catch(() => {});
         } catch {
-            // never block the inquiry flow
+            // never block the inquiry
         }
-
         return inquiry;
     },
 
+    /** The desk's list, newest first, with counts for each state. */
     getAll: async (query: Record<string, unknown>) => {
-        const page = Number(query.page) || 1;
-        const limit = Number(query.limit) || 20;
-        const skip = (page - 1) * limit;
-        const filter: any = {};
-        if (query.status) filter.status = query.status;
+        const page = Math.max(1, Number(query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
+        const filter: Record<string, any> = {};
+        if (query.status && query.status !== 'all') filter.status = String(query.status);
+        if (query.source && query.source !== 'all') filter.source = String(query.source);
         if (query.product) filter.product = query.product;
-
-        const [inquiries, total] = await Promise.all([
-            Inquiry.find(filter)
-                .populate('product', 'name slug thumbnail')
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit),
+        if (query.searchTerm) {
+            const rx = new RegExp(String(query.searchTerm).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            filter.$or = [{ name: rx }, { phone: rx }, { message: rx }];
+        }
+        const [inquiries, total, counts] = await Promise.all([
+            Inquiry.find(filter).populate('product', 'name slug thumbnail').sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit),
             Inquiry.countDocuments(filter),
+            Inquiry.aggregate([{ $group: { _id: '$status', n: { $sum: 1 } } }]),
         ]);
-
-        return {
-            inquiries,
-            meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-        };
+        const summary: Record<string, number> = { pending: 0, replied: 0, closed: 0, total: 0 };
+        for (const c of counts) { summary[c._id] = c.n; summary.total += c.n; }
+        return { inquiries, summary, meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
     },
 
     getByProduct: async (productId: string) => {
-        const inquiries = await Inquiry.find({ product: productId })
-            .sort({ createdAt: -1 })
-            .limit(50);
-        return inquiries;
+        return Inquiry.find({ product: productId }).sort({ createdAt: -1 }).limit(50).select('name message createdAt');
     },
 
-    updateStatus: async (id: string, data: { status: string; adminReply?: string }) => {
-        const inquiry = await Inquiry.findByIdAndUpdate(id, data, { new: true });
-        if (!inquiry) throw new Error('Inquiry not found');
+    /** Called / closed, with a note of what was said. */
+    updateStatus: async (id: string, data: Record<string, unknown>, actor: Actor) => {
+        const inquiry = await Inquiry.findById(id);
+        if (!inquiry) throw new AppError(404, 'Inquiry not found');
+        if (data.status !== undefined) {
+            if (!['pending', 'replied', 'closed'].includes(String(data.status))) throw new AppError(400, 'Unknown status');
+            inquiry.status = String(data.status) as any;
+        }
+        if (data.adminReply !== undefined) inquiry.adminReply = String(data.adminReply).slice(0, 2000);
+        inquiry.handledBy = { id: actor.userId, name: actor.name || '', role: actor.role } as any;
+        inquiry.handledAt = new Date();
+        await inquiry.save();
         return inquiry;
     },
 
     delete: async (id: string) => {
         const inquiry = await Inquiry.findByIdAndDelete(id);
-        if (!inquiry) throw new Error('Inquiry not found');
+        if (!inquiry) throw new AppError(404, 'Inquiry not found');
         return inquiry;
     },
 };

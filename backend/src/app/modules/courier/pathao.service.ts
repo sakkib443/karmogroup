@@ -107,6 +107,21 @@ const PathaoService = {
             deliveryFee: Number(booked.delivery_fee) || 0,
         };
     },
+
+    /** Where a parcel is now — GET {base}/aladdin/api/v1/orders/{consignment_id}/info */
+    async getStatus(consignmentId: string) {
+        ensureConfigured();
+        const { base_url } = cfg();
+        const res = await fetch(`${base_url}/aladdin/api/v1/orders/${encodeURIComponent(consignmentId)}/info`, {
+            headers: { Authorization: `Bearer ${await accessToken()}`, Accept: 'application/json' },
+        });
+        const data: any = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.data) {
+            if (res.status === 401) cached = null;
+            throw new AppError(502, `Pathao did not return the parcel status${data?.message ? `: ${data.message}` : ''}`);
+        }
+        return { status: String(data.data.order_status || '') };
+    },
 };
 
 export default PathaoService;

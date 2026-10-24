@@ -17,8 +17,6 @@ import {
     FiCalendar,
     FiMail,
     FiPhone,
-    FiTag,
-    FiFileText,
     FiSend,
     FiCopy,
     FiExternalLink,
@@ -43,7 +41,6 @@ import {
     courierStatusLabel,
     courierStatusBadgeClass
 } from '@/lib/orderStatus';
-import { downloadInvoicePdf } from '@/lib/downloadInvoice';
 import FraudOrderBanner from '../../fraud-check/FraudOrderBanner';
 import PrintOrdersModal, { type PrintKind } from '@/components/admin/print/PrintOrdersModal';
 import EditOrderModal from '@/components/admin/orders/EditOrderModal';
@@ -98,6 +95,7 @@ interface OrderPackage {
     courierStatus?: string;
     courierBookedAt?: string;
     courierAttemptAt?: string;
+    carrier?: string;
 }
 
 // An order may still be corrected while it is one of these and no parcel has gone to the
@@ -118,9 +116,10 @@ function editBlockedReason(order: { status?: string; packages?: OrderPackage[] }
     return null;
 }
 
-/** The order fields a Steadfast booking reads. */
+/** The order fields a courier booking reads. */
 interface CourierOrder {
     orderId?: string;
+    total?: number;
     paymentMethod?: string;
     paymentStatus?: string;
     shippingCost?: number;
@@ -133,54 +132,53 @@ interface CourierOrder {
 // Steadfast's public tracking page — the code must be pasted there; there is no verified deep-link format.
 const STEADFAST_TRACKING_URL = 'https://steadfast.com.bd/tracking';
 
-// Package statuses the API refuses to book (TERMINAL_STATUSES in Karmo_Server/src/app/modules/courier/courier.service.ts).
-const UNSENDABLE_STATUSES = ['delivered', 'cancelled', 'returned', 'refunded'];
+// The courier takes a parcel only from Courier Entry (bookCore in backend courier.service.ts).
+const SENDABLE_STATUS = 'courier_entry';
+
+type Carrier = 'pathao' | 'steadfast';
+const CARRIER_NAME: Record<Carrier, string> = { pathao: 'Pathao', steadfast: 'Steadfast' };
 
 /** The server's error message from an RTK Query failure, else the fallback. */
 const apiError = (e: unknown, fallback: string) =>
     (e as { data?: { message?: string } } | null)?.data?.message || fallback;
 
-// Mirrors codFor(order, pkg) in Karmo_Server/src/app/modules/courier/courier.service.ts —
-// change the two together. Read-only: it only shows the amount; the server works it out
-// again when it books.
-function codFor(order: CourierOrder, pkg: { _id: string; subtotal: number }): number {
-    if (order.paymentMethod !== 'cod' || order.paymentStatus === 'paid') return 0;
-    const isPrimary = !!order.packages?.[0] && String(order.packages[0]._id) === String(pkg._id);
-    const adjustment = isPrimary ? (order.shippingCost || 0) - (order.discount || 0) : 0;
-    return Math.max(0, pkg.subtotal + adjustment);
+// Mirrors codFor(order) in backend courier.service.ts — change the two together. Read-only:
+// it only shows the amount; the server works it out again when it books.
+function codFor(order: CourierOrder): number {
+    return order.paymentStatus === 'paid' ? 0 : Math.round(order.total || 0);
 }
 
-// What bookPackageCore() in courier.service.ts sends to Steadfast, rebuilt the same way,
+// What bookCore() in courier.service.ts sends to the courier, rebuilt the same way,
 // so the confirmation shows exactly what will go out.
-function steadfastPayload(order: CourierOrder, pkg: OrderPackage) {
+function courierPayload(order: CourierOrder) {
     const a = order.shippingAddress || {};
     return {
-        invoice: `${order.orderId}-${String(pkg._id).slice(-5)}`,
+        invoice: String(order.orderId || ''),
         recipientName: a.fullName || '',
         recipientPhone: (a.phone || '').replace(/\D/g, '').slice(-11),
         recipientAddress: [a.address, a.area, a.city, a.postalCode].filter(Boolean).join(', '),
-        codAmount: codFor(order, pkg),
+        codAmount: codFor(order),
         note: order.note || '',
     };
 }
 
-/** Confirmation before a real Steadfast consignment is created. */
-function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onConfirm }: {
+/** Confirmation before a real Pathao or Steadfast parcel is created. */
+function SendToCourierModal({ order, title, sending, error, onCancel, onConfirm }: {
     order: CourierOrder;
-    pkg: OrderPackage;
     title: string;
     sending: boolean;
     error: string;
     onCancel: () => void;
-    onConfirm: () => void;
+    onConfirm: (carrier: Carrier) => void;
 }) {
+    const [carrier, setCarrier] = useState<Carrier>('pathao');
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !sending) onCancel(); };
         document.addEventListener('keydown', onKey);
         return () => document.removeEventListener('keydown', onKey);
     }, [sending, onCancel]);
 
-    const p = steadfastPayload(order, pkg);
+    const p = courierPayload(order);
     const method = (order.paymentMethod || '').toLowerCase();
     const codHint = p.codAmount > 0 ? '' :
         method !== 'cod' ? `Paid by ${paymentMethodLabel(order.paymentMethod || '') || 'another method'} — nothing to collect.` :
@@ -194,7 +192,7 @@ function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onC
                     <div className="flex items-center gap-2 text-gray-800">
                         <FiSend className="text-[var(--color-primary)]" size={18} />
                         <div>
-                            <h3 id="send-steadfast-title" className="font-bold">Send to Steadfast</h3>
+                            <h3 id="send-steadfast-title" className="font-bold">Send to courier</h3>
                             <p className="text-xs text-gray-500">{title}</p>
                         </div>
                     </div>
@@ -204,6 +202,14 @@ function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onC
                 </div>
 
                 <div className="px-6 py-4 space-y-4 overflow-y-auto">
+                    <div className="grid grid-cols-2 gap-2">
+                        {(Object.keys(CARRIER_NAME) as Carrier[]).map((c) => (
+                            <button key={c} type="button" onClick={() => setCarrier(c)} disabled={sending} aria-pressed={carrier === c}
+                                className={`rounded-md border px-3 py-2.5 text-sm font-bold transition ${carrier === c ? 'border-[var(--color-primary)] bg-[var(--color-primary-lightest)] text-[var(--color-primary)]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                                {CARRIER_NAME[c]}
+                            </button>
+                        ))}
+                    </div>
                     <div className="space-y-2.5 text-sm">
                         <div className="flex gap-3">
                             <span className="w-20 shrink-0 text-xs font-bold text-gray-400 uppercase pt-0.5">Name</span>
@@ -229,13 +235,13 @@ function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onC
 
                     <div className={`rounded-md border px-4 py-3 ${p.codAmount > 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-gray-50 border-gray-200'}`}>
                         <div className="flex items-center justify-between gap-3">
-                            <span className={`text-sm font-semibold ${p.codAmount > 0 ? 'text-emerald-700' : 'text-gray-600'}`}>COD amount Steadfast will collect</span>
+                            <span className={`text-sm font-semibold ${p.codAmount > 0 ? 'text-emerald-700' : 'text-gray-600'}`}>COD amount {CARRIER_NAME[carrier]} will collect</span>
                             <span className={`text-lg font-bold ${p.codAmount > 0 ? 'text-emerald-700' : 'text-gray-500'}`}>৳{p.codAmount.toLocaleString()}</span>
                         </div>
                         {codHint && <p className="text-xs text-gray-500 mt-1">{codHint}</p>}
                     </div>
 
-                    <p className="text-xs text-gray-400">Check these details first — after sending, changes must be made in the Steadfast panel.</p>
+                    <p className="text-xs text-gray-400">Check these details first — after sending, changes must be made in the {CARRIER_NAME[carrier]} panel.</p>
 
                     {error && (
                         <div role="alert" className="flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-md px-3 py-2.5">
@@ -256,12 +262,12 @@ function SendToSteadfastModal({ order, pkg, title, sending, error, onCancel, onC
                     </button>
                     <button
                         type="button"
-                        onClick={onConfirm}
+                        onClick={() => onConfirm(carrier)}
                         disabled={sending}
                         className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 flex items-center gap-2"
                     >
                         <FiSend size={14} />
-                        {sending ? 'Sending…' : 'Confirm & send'}
+                        {sending ? 'Sending…' : `Send with ${CARRIER_NAME[carrier]}`}
                     </button>
                 </div>
             </div>
@@ -281,7 +287,7 @@ export default function OrderDetailsPage() {
     const [bookCourier, { isLoading: isSending }] = useBookCourierPackageMutation();
     const [refreshCourier] = useRefreshCourierStatusMutation();
     const [busyPkg, setBusyPkg] = useState<string | null>(null);
-    // The package waiting in the "Send to Steadfast" confirmation, and why the last send failed.
+    // The parcel waiting in the "Send to courier" confirmation, and why the last send failed.
     const [sendPkgId, setSendPkgId] = useState<string | null>(null);
     const [sendError, setSendError] = useState('');
     // What this person may do comes from their role (components/admin/access.ts); the server checks again.
@@ -289,27 +295,27 @@ export default function OrderDetailsPage() {
     const seeMoney = can(role, 'seeMoney');
     const [cancelOpen, setCancelOpen] = useState(false);
 
-    const openSendToSteadfast = (packageId: string) => {
+    const openSendToCourier = (packageId: string) => {
         setSendError('');
         setSendPkgId(packageId);
     };
 
-    const closeSendToSteadfast = () => {
+    const closeSendToCourier = () => {
         if (isSending) return;
         setSendPkgId(null);
         setSendError('');
     };
 
-    const handleSendToSteadfast = async () => {
+    const handleSendToCourier = async (carrier: Carrier) => {
         if (!order?._id || !sendPkgId) return;
         setSendError('');
         try {
-            const res = await bookCourier({ orderId: order._id, packageId: sendPkgId }).unwrap();
+            const res = await bookCourier({ orderId: order._id, packageId: sendPkgId, carrier }).unwrap();
             const code = res?.data?.trackingNumber;
-            toast.success(code ? `Sent to Steadfast — tracking code ${code}` : 'Sent to Steadfast');
+            toast.success(code ? `Sent with ${CARRIER_NAME[carrier]} — ${code}` : `Sent with ${CARRIER_NAME[carrier]}`);
             setSendPkgId(null);
         } catch (e) {
-            setSendError(apiError(e, 'Could not send to Steadfast.'));
+            setSendError(apiError(e, `Could not send with ${CARRIER_NAME[carrier]}.`));
         }
     };
 
@@ -318,12 +324,12 @@ export default function OrderDetailsPage() {
         setBusyPkg(packageId);
         try {
             const res = await refreshCourier({ orderId: order._id, packageId }).unwrap();
-            toast.success(`Steadfast status: ${res?.data?.courierStatus ? courierStatusLabel(res.data.courierStatus) : 'updated'}`);
+            toast.success(`Courier status: ${res?.data?.courierStatus ? courierStatusLabel(res.data.courierStatus) : 'updated'}`);
             if (res?.data?.needsConfirmation) {
-                toast(`Courier reports "${res.data.suggestedStatus}" — confirm via the Status control to settle earnings/stock.`, { icon: 'ℹ️', duration: 6000 });
+                toast('The courier is sending this parcel back — mark the order Returned when it arrives.', { icon: '↩️', duration: 7000 });
             }
         } catch (e) {
-            toast.error(apiError(e, 'Failed to fetch Steadfast status'));
+            toast.error(apiError(e, 'Failed to fetch the courier status'));
         } finally { setBusyPkg(null); }
     };
 
@@ -339,21 +345,8 @@ export default function OrderDetailsPage() {
     const [adminNote, setAdminNote] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedPaymentStatus, setSelectedPaymentStatus] = useState('');
-    const [isDownloadingInvoice, setIsDownloadingInvoice] = useState(false);
     const [printKind, setPrintKind] = useState<PrintKind | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-
-    const handleDownloadInvoice = async () => {
-        if (!order?._id) return;
-        setIsDownloadingInvoice(true);
-        try {
-            await downloadInvoicePdf(order._id);
-        } catch (error) {
-            toast.error((error instanceof Error && error.message) || 'Failed to download invoice');
-        } finally {
-            setIsDownloadingInvoice(false);
-        }
-    };
 
     const handleUpdateStatus = async () => {
         if (!selectedStatus) return;
@@ -402,14 +395,19 @@ export default function OrderDetailsPage() {
         return <div className="p-8 text-center text-gray-500">Order not found</div>;
     }
 
-    const packages: OrderPackage[] = Array.isArray(order.packages) ? order.packages : [];
+    // One order is one parcel; its courier booking lives on the order itself.
+    const parcelShown = order.status === SENDABLE_STATUS || !!order.consignmentId;
+    const packages: OrderPackage[] = parcelShown ? [{
+        _id: order._id, status: order.status, subtotal: order.total || 0,
+        consignmentId: order.consignmentId, trackingNumber: order.trackingNumber, courierStatus: order.courierStatus,
+        courierBookedAt: order.courierBookedAt, carrier: order.carrier,
+    }] : [];
     const sendPkg = sendPkgId ? packages.find((p) => p._id === sendPkgId) : undefined;
-    // Order-level tracking typed in by hand before the Steadfast integration. Shown read-only
-    // so older data is never hidden; tracking now comes from the Steadfast booking per package.
+    // Tracking typed in by hand (no booking here). Shown read-only so older data is never hidden.
     const editBlocked = editBlockedReason(order);
     // Only the moves this role may make from here.
     const statusChoices = nextStatuses(role, order.status || 'pending', Object.keys(ORDER_STATUS_CONFIG));
-    const legacyTracking = [order.carrier, order.trackingNumber]
+    const legacyTracking = order.consignmentId ? '' : [order.carrier, order.trackingNumber]
         .map((v: unknown) => (typeof v === 'string' ? v.trim() : ''))
         .filter(Boolean)
         .join(' · ');
@@ -443,27 +441,13 @@ export default function OrderDetailsPage() {
                         <FiEdit3 size={16} />
                         Edit order
                     </button>}
-                    {seeMoney && <button
-                        onClick={handleDownloadInvoice}
-                        disabled={isDownloadingInvoice}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm disabled:opacity-50"
-                    >
-                        <FiPrinter size={16} />
-                        {isDownloadingInvoice ? 'Preparing...' : 'Invoice'}
-                    </button>}
-                    {can(role, 'courier') && <button
-                        onClick={() => setPrintKind('labels')}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
-                    >
-                        <FiTag size={16} />
-                        Print label
-                    </button>}
+                    {/* Invoice = Karmo's memo in a print preview (Print / Save as PDF there). */}
                     {seeMoney && <button
                         onClick={() => setPrintKind('invoices')}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-md text-sm font-medium hover:bg-gray-50 transition-all text-gray-600 shadow-sm"
                     >
-                        <FiFileText size={16} />
-                        Print invoice
+                        <FiPrinter size={16} />
+                        Invoice
                     </button>}
                 </div>
             </div>
@@ -829,14 +813,14 @@ export default function OrderDetailsPage() {
                         </div>
                     </div>}
 
-                    {/* Courier — Steadfast, one block per shipment */}
+                    {/* Courier — Pathao or Steadfast */}
                     {can(role, 'courier') && (packages.length > 0 || legacyTracking) && (
                         <div className="bg-white rounded-md border border-gray-200 shadow-sm p-6">
                             <div className="flex items-center gap-2 mb-1 text-gray-800">
                                 <FiTruck className="text-[var(--color-primary)]" size={20} />
-                                <h2 className="font-bold">Courier — Steadfast</h2>
+                                <h2 className="font-bold">Courier</h2>
                             </div>
-                            <p className="text-[11px] text-gray-400 mb-4">Sending creates a real Steadfast consignment — they pick the parcel up and collect any COD. The parcel is marked as shipped.</p>
+                            <p className="text-[11px] text-gray-400 mb-4">Sending creates a real Pathao or Steadfast parcel — they pick it up and collect any COD. The order is marked shipped.</p>
                             <div className="space-y-3">
                                 {packages.map((pkg, idx) => {
                                     const booked = !!(pkg.consignmentId || pkg.trackingNumber);
@@ -845,7 +829,7 @@ export default function OrderDetailsPage() {
                                     return (
                                         <div key={pkg._id} className="border border-gray-100 rounded-md p-3 bg-gray-50/50">
                                             <div className="flex items-center justify-between mb-3 gap-2">
-                                                <span className="text-sm font-bold text-gray-700 truncate">{packages.length > 1 ? `Package ${idx + 1}` : 'Parcel'}</span>
+                                                <span className="text-sm font-bold text-gray-700 truncate">{packages.length > 1 ? `Package ${idx + 1}` : 'Parcel'}{pkg.carrier ? ` · ${pkg.carrier}` : ''}</span>
                                                 <StatusBadge status={pkg.status} />
                                             </div>
                                             {booked ? (
@@ -871,7 +855,7 @@ export default function OrderDetailsPage() {
                                                         {trackingCode ? (
                                                             <>
                                                                 <p className="font-mono text-sm font-bold text-gray-800 bg-white border border-gray-200 rounded-md px-2 py-1.5 break-all">{trackingCode}</p>
-                                                                {/* Copy first, then paste it on Steadfast's tracking page. */}
+                                                                {/* Copy first, then paste it on the courier's tracking page. */}
                                                                 <div className="flex gap-2">
                                                                     <button
                                                                         type="button"
@@ -881,7 +865,7 @@ export default function OrderDetailsPage() {
                                                                     >
                                                                         <FiCopy size={13} /> Copy
                                                                     </button>
-                                                                    <a
+                                                                    {/steadfast/i.test(pkg.carrier || '') && <a
                                                                         href={STEADFAST_TRACKING_URL}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
@@ -889,7 +873,7 @@ export default function OrderDetailsPage() {
                                                                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-all whitespace-nowrap"
                                                                     >
                                                                         Open Steadfast tracking <FiExternalLink size={13} />
-                                                                    </a>
+                                                                    </a>}
                                                                 </div>
                                                             </>
                                                         ) : (
@@ -905,19 +889,19 @@ export default function OrderDetailsPage() {
                                                         <FiRefreshCw size={13} className={busy ? 'animate-spin' : ''} />
                                                         {busy ? 'Refreshing…' : 'Refresh status'}
                                                     </button>
-                                                    <p className="text-[11px] text-gray-400">Editing after sending isn&apos;t supported — use the Steadfast panel.</p>
+                                                    <p className="text-[11px] text-gray-400">Editing after sending isn&apos;t supported — use the {pkg.carrier || 'courier'} panel.</p>
                                                 </div>
-                                            ) : UNSENDABLE_STATUSES.includes(pkg.status) ? (
-                                                <p className="text-xs text-gray-400">This parcel is {getStatusConfig(pkg.status).label.toLowerCase()}, so it can&apos;t be sent to Steadfast.</p>
+                                            ) : pkg.status !== SENDABLE_STATUS ? (
+                                                <p className="text-xs text-gray-400">Move the order to Courier Entry to send it.</p>
                                             ) : (
                                                 <button
                                                     type="button"
-                                                    onClick={() => openSendToSteadfast(pkg._id)}
+                                                    onClick={() => openSendToCourier(pkg._id)}
                                                     disabled={isSending}
                                                     className="w-full py-2.5 bg-[var(--color-primary)] text-white rounded-md text-sm font-bold hover:bg-[var(--color-primary-dark)] transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
                                                 >
                                                     <FiSend size={16} />
-                                                    Send to Steadfast
+                                                    Send to courier
                                                 </button>
                                             )}
                                         </div>
@@ -946,14 +930,13 @@ export default function OrderDetailsPage() {
             )}
 
             {sendPkg && (
-                <SendToSteadfastModal
+                <SendToCourierModal
                     order={order}
-                    pkg={sendPkg}
                     title={`Order ${order.orderId || order.orderNumber}${packages.length > 1 ? ` · Package ${packages.indexOf(sendPkg) + 1}` : ''}`}
                     sending={isSending}
                     error={sendError}
-                    onCancel={closeSendToSteadfast}
-                    onConfirm={handleSendToSteadfast}
+                    onCancel={closeSendToCourier}
+                    onConfirm={handleSendToCourier}
                 />
             )}
         </div>

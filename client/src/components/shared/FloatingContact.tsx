@@ -7,12 +7,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useGetSiteContentQuery } from '@/redux/api/siteContentApi';
 import { useAppSelector } from '@/redux';
 import { API_CONFIGURED } from '@/config/api';
+import { useWebsiteInquiry } from '@/components/shared/useWebsiteInquiry';
 
 const PRIMARY = 'var(--color-primary)';
 
 type Action = { label: string; href?: string; topic?: Topic };
 type Msg = { from: 'bot' | 'user'; text: string; actions?: Action[] };
-type Topic = 'order' | 'delivery' | 'payment' | 'track' | 'contact' | 'hi';
+type Topic = 'order' | 'delivery' | 'payment' | 'track' | 'contact' | 'hi' | 'message';
 
 const QUICK: Action[] = [
     { label: '🛒 How to order', topic: 'order' },
@@ -20,6 +21,7 @@ const QUICK: Action[] = [
     { label: '💳 Payment', topic: 'payment' },
     { label: '📦 Track order', topic: 'track' },
     { label: '📞 Contact', topic: 'contact' },
+    { label: '✉️ Leave a message', topic: 'message' },
 ];
 
 const FloatingContact: React.FC = () => {
@@ -53,6 +55,18 @@ const FloatingContact: React.FC = () => {
     const [showHint, setShowHint] = useState(false);
     const [typing, setTyping] = useState(false);
     const [input, setInput] = useState('');
+    // "Leave a message": the same name / phone / message as the contact form, to Inquiries.
+    const [askForm, setAskForm] = useState(false);
+    const [form, setForm] = useState({ name: '', phone: '', message: '' });
+    const inquiry = useWebsiteInquiry('chat');
+    const sendForm = async () => {
+        if (!form.name.trim() || !form.phone.trim() || !form.message.trim() || inquiry.state === 'sending') return;
+        if (await inquiry.send({ name: form.name.trim(), phone: form.phone.trim(), message: form.message.trim() })) {
+            setAskForm(false);
+            setForm({ name: '', phone: '', message: '' });
+            setMessages((m) => [...m, { from: 'bot', text: 'Thank you! ✅ We got your message and will call you soon.', actions: QUICK }]);
+        }
+    };
     const [messages, setMessages] = useState<Msg[]>([
         {
             from: 'bot',
@@ -142,6 +156,7 @@ const FloatingContact: React.FC = () => {
                         ? `📞 We’re here to help:\n${lines.join('\n')}`
                         : `📞 We’re here to help — please see our Contact page for the latest details.`,
                     actions: [
+                        { label: '✉️ Leave a message', topic: 'message' as Topic },
                         ...(whatsappLink ? [{ label: 'Chat on WhatsApp', href: whatsappLink }] : []),
                         { label: 'Contact page', href: '/contact' },
                     ],
@@ -173,7 +188,11 @@ const FloatingContact: React.FC = () => {
 
     const handleTopic = (topic: Topic, label?: string) => {
         setMessages((m) => [...m, { from: 'user', text: label || topic }]);
-        if (topic === 'hi') {
+        if (topic === 'message') {
+            inquiry.reset();
+            setAskForm(true);
+            pushBot({ from: 'bot', text: 'Leave your name, phone and message — we will call you back. 📞' });
+        } else if (topic === 'hi') {
             pushBot({ from: 'bot', text: "Hello! 😊 What can I help you with?", actions: QUICK });
         } else {
             pushBot(buildAnswer(topic));
@@ -278,6 +297,28 @@ const FloatingContact: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+
+                        {askForm && !typing && (
+                            <div className="rounded-[14px] border border-[#eef0f2] bg-white p-3 space-y-2">
+                                {(['name', 'phone', 'message'] as const).map((k) => k === 'message' ? (
+                                    <textarea key={k} rows={3} value={form.message} onChange={(e) => setForm((v) => ({ ...v, message: e.target.value }))}
+                                        placeholder="Message *" className="w-full resize-none rounded-lg bg-gray-100 px-3 py-2 text-[13px] outline-none focus:bg-white focus:ring-2" />
+                                ) : (
+                                    <input key={k} value={form[k]} onChange={(e) => setForm((v) => ({ ...v, [k]: e.target.value }))}
+                                        placeholder={k === 'name' ? 'Name *' : 'Phone (01XXXXXXXXX) *'} inputMode={k === 'phone' ? 'tel' : undefined}
+                                        className="w-full rounded-lg bg-gray-100 px-3 py-2 text-[13px] outline-none focus:bg-white focus:ring-2" />
+                                ))}
+                                {inquiry.state === 'error' && <p className="text-[11.5px] text-red-600">{inquiry.error}</p>}
+                                <div className="flex justify-end gap-2">
+                                    <button type="button" onClick={() => setAskForm(false)} className="rounded-full px-3 py-1.5 text-[12px] font-semibold text-gray-500 hover:bg-gray-100">Cancel</button>
+                                    <button type="button" onClick={sendForm}
+                                        disabled={inquiry.state === 'sending' || !form.name.trim() || !form.phone.trim() || !form.message.trim()}
+                                        className="rounded-full px-4 py-1.5 text-[12px] font-semibold text-white disabled:opacity-40" style={{ background: PRIMARY }}>
+                                        {inquiry.state === 'sending' ? 'Sending…' : 'Send'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {typing && (
                             <div className="flex justify-start">

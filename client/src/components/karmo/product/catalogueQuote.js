@@ -13,8 +13,9 @@ export const OFFER_PCT = 15;
 /** The size the catalogue was/now prices are quoted at (Queen, else the first preset). */
 const refSizeOf = (product) => (product.sizes || []).find((s) => s.id === "queen") || (product.sizes || [])[0];
 
-/** Poly is sold as a set at one price on a poster page, with no size to pick. */
-export const isFoamSet = (product) => product?.slug === "poly";
+/** Every furniture foam — Poly included — is sold cut-to-size through the
+ *  FoamHero buy box, so no SKU is treated as a fixed poster set any more. */
+export const isFoamSet = () => false;
 
 /**
  * The mattress buy box (ProductHero). A product with no sales-calculator rule is sold

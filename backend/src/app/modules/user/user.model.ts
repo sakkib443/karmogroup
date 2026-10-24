@@ -30,6 +30,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         lastName: { type: String, required: [true, 'Last name is required'], trim: true, maxlength: 50 },
         phone: { type: String, trim: true, default: '' },
         avatar: { type: String, default: '' },
+        coverImage: { type: String, default: '' },   // the wide photo behind My profile's header
 
         // ── Role & Status ────────────────────────────
         role: {

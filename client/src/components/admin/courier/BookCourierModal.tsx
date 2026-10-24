@@ -1,34 +1,45 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
     FiX, FiTruck, FiMapPin, FiPhone, FiUser, FiPackage,
     FiDollarSign, FiAlertTriangle, FiFileText,
 } from 'react-icons/fi';
-import type { ICourierPackage } from '@/redux/api/courierApi';
+import type { ICourierPackage, Carrier } from '@/redux/api/courierApi';
 
 interface Props {
     pkg: ICourierPackage | null;
     isBooking: boolean;
+    /** Which couriers are connected on the server. */
+    available: Record<Carrier, boolean>;
     onClose: () => void;
-    onConfirm: (pkg: ICourierPackage) => void;
+    onConfirm: (pkg: ICourierPackage, carrier: Carrier) => void;
 }
 
-// Build the exact delivery address the server sends to Steadfast:
+const CARRIERS: { key: Carrier; label: string }[] = [
+    { key: 'pathao', label: 'Pathao' },
+    { key: 'steadfast', label: 'Steadfast' },
+];
+
+// Build the exact delivery address the server sends to the courier:
 //   [address, area, city, postalCode].filter(Boolean).join(', ')
 function fullAddress(p: ICourierPackage) {
     return [p.address, p.area, p.city, p.postalCode].filter(Boolean).join(', ') || '—';
 }
 
 /**
- * BookCourierModal — one-click booking confirmation.
- * Shows exactly what will be sent to Steadfast (recipient, address, COD, parcel)
+ * BookCourierModal — pick Pathao or Steadfast and confirm.
+ * Shows exactly what will be sent to the courier (recipient, address, COD, parcel)
  * so the admin can review before creating a real consignment. The parent owns the
  * mutation; this component is purely presentational and reusable across the courier
  * board and the order-detail page.
  */
-export default function BookCourierModal({ pkg, isBooking, onClose, onConfirm }: Props) {
+export default function BookCourierModal({ pkg, isBooking, available, onClose, onConfirm }: Props) {
+    // Until someone picks, a connected courier (Pathao first).
+    const [picked, setCarrier] = useState<Carrier | null>(null);
+    const carrier: Carrier = picked ?? (available.pathao || !available.steadfast ? 'pathao' : 'steadfast');
     if (!pkg) return null;
+    const name = carrier === 'pathao' ? 'Pathao' : 'Steadfast';
     const isCod = pkg.codAmount > 0;
 
     return (
@@ -49,7 +60,7 @@ export default function BookCourierModal({ pkg, isBooking, onClose, onConfirm }:
                         </div>
                         <div>
                             <h3 className="text-lg font-bold leading-tight">Book courier</h3>
-                            <p className="text-xs text-white/80">Order {pkg.orderNo} · via Steadfast</p>
+                            <p className="text-xs text-white/80">Order {pkg.orderNo} · via {name}</p>
                         </div>
                     </div>
                     <button
@@ -64,8 +75,21 @@ export default function BookCourierModal({ pkg, isBooking, onClose, onConfirm }:
 
                 {/* Body */}
                 <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                    {/* Which courier */}
+                    <div>
+                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray-400">Courier</p>
+                        <div className="grid grid-cols-2 gap-2">
+                            {CARRIERS.map((c) => (
+                                <button key={c.key} type="button" onClick={() => setCarrier(c.key)} disabled={isBooking} aria-pressed={carrier === c.key}
+                                    className={`rounded-xl border px-4 py-3 text-left transition ${carrier === c.key ? 'border-[#4F46E5] bg-indigo-50 ring-2 ring-[#4F46E5]/15' : 'border-gray-200 hover:border-gray-300'}`}>
+                                    <span className="block text-sm font-bold text-gray-900">{c.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     <p className="text-sm text-gray-500">
-                        Review the parcel below and confirm. Steadfast will pick it up and deliver to the customer.
+                        Review the parcel below and confirm. {name} will pick it up and deliver to the customer.
                     </p>
 
                     {/* Recipient */}
@@ -134,7 +158,7 @@ export default function BookCourierModal({ pkg, isBooking, onClose, onConfirm }:
                     <div className="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5">
                         <FiAlertTriangle size={14} className="shrink-0 mt-0.5" />
                         <span>
-                            This creates a real Steadfast consignment. The parcel will be marked <b>Shipped</b>.
+                            This creates a real {name} parcel. The order will be marked <b>Shipped</b>.
                         </span>
                     </div>
                 </div>
@@ -149,12 +173,13 @@ export default function BookCourierModal({ pkg, isBooking, onClose, onConfirm }:
                         Cancel
                     </button>
                     <button
-                        onClick={() => onConfirm(pkg)}
-                        disabled={isBooking}
+                        onClick={() => onConfirm(pkg, carrier)}
+                        disabled={isBooking || !available[carrier]}
+                        title={available[carrier] ? undefined : `${name} is not connected on the server yet`}
                         className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-[#4F46E5] hover:bg-[#4338CA] flex items-center gap-2 disabled:opacity-60"
                     >
                         <FiTruck size={16} className={isBooking ? 'animate-pulse' : ''} />
-                        {isBooking ? 'Booking…' : 'Confirm & Book'}
+                        {isBooking ? 'Booking…' : `Send with ${name}`}
                     </button>
                 </div>
             </div>

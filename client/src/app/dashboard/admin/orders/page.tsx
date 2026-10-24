@@ -77,8 +77,12 @@ const DATE_PRESETS = [
     { value: '30d', label: 'Last 30 days' },
     { value: 'this_month', label: 'This month' },
     { value: 'last_month', label: 'Last month' },
+    { value: 'this_year', label: 'This year' },
     { value: 'custom', label: 'Custom range…' },
 ];
+/** Today and Yesterday sit as tabs beside the search; the rest of the dates live in the dropdown. */
+const DATE_TABS = DATE_PRESETS.filter((d) => d.value === 'today' || d.value === 'yesterday');
+const DATE_RANGES = DATE_PRESETS.filter((d) => !DATE_TABS.includes(d));
 
 const SORTS = [
     { value: '-createdAt', label: 'Newest first' },
@@ -240,11 +244,13 @@ export default function OrdersPage() {
 }
 
 function OrdersPageInner() {
-    // ?status=pending (the Dashboard's links) pre-selects the status filter.
-    const statusParam = useSearchParams().get('status');
+    // ?status=pending (the Dashboard's links) pre-selects the status filter;
+    // ?search=017… (Order insights' customer links) pre-fills the search box.
+    const params = useSearchParams();
+    const statusParam = params.get('status');
 
     // Filters
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(() => params.get('search') || '');
     const [statusFilter, setStatusFilter] = useState(
         statusParam && Object.prototype.hasOwnProperty.call(ORDER_STATUS_CONFIG, statusParam) ? statusParam : 'all',
     );
@@ -760,7 +766,6 @@ function OrdersPageInner() {
             { label: 'Add note', icon: <LuStickyNote size={15} />, hidden: !can(role, 'note'), onClick: () => { setNoteFor(o); setNoteText(''); } },
             { label: 'Memo & challans (view)', icon: <LuFileText size={15} />, hidden: !can(role, 'viewPapers') || o.status === 'pending', onClick: () => papers(o, { kind: 'all' }) },
             { label: 'Print invoice', icon: <LuReceiptText size={15} />, hidden: !seeMoney, onClick: () => setPrintJob({ kind: 'invoices', ids: [o._id] }) },
-            { label: 'Print label', icon: <LuBarcode size={15} />, hidden: !can(role, 'courier'), onClick: () => setPrintJob({ kind: 'labels', ids: [o._id] }) },
             { label: 'Cancel order', icon: <LuBan size={15} />, danger: true, hidden: !mayMove(o, 'cancelled'), onClick: () => move(o, 'cancelled') },
         ]} />
     );
@@ -863,7 +868,20 @@ function OrdersPageInner() {
             {/* Main filters */}
             <div className="mb-3 flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-center">
                 <Search className="lg:w-80" value={search} onChange={withReset(setSearch)} placeholder="Order no, customer, phone, consignment…" />
-                <Select ariaLabel="Date" className="lg:w-40" value={datePreset} onChange={withReset(setDatePreset)} options={DATE_PRESETS} />
+                <div className="inline-flex h-9 shrink-0 self-start rounded-md border border-gray-200 bg-white p-0.5 lg:self-auto" role="group" aria-label="Day">
+                    {DATE_TABS.map((t) => (
+                        <button key={t.value} type="button" aria-pressed={datePreset === t.value}
+                            onClick={() => withReset(setDatePreset)(datePreset === t.value ? 'all' : t.value)}
+                            className={cx('rounded px-4 text-sm font-semibold transition',
+                                datePreset === t.value ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-50')}>
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
+                <Select ariaLabel="Date" className="lg:w-44"
+                    value={DATE_TABS.some((t) => t.value === datePreset) ? '' : datePreset}
+                    onChange={withReset(setDatePreset)}
+                    options={DATE_TABS.some((t) => t.value === datePreset) ? [{ value: '', label: 'Other dates' }, ...DATE_RANGES] : DATE_RANGES} />
                 {datePreset === 'custom' && (
                     <div className="flex items-center gap-1.5">
                         <input type="date" aria-label="From date" className={cx(PILL_INPUT, 'lg:w-40')} value={customFrom} max={customTo || undefined}
@@ -1062,7 +1080,6 @@ function OrdersPageInner() {
                             </Dropdown>
                         )}
                         {seeMoney && <button type="button" className={DARK_BTN} onClick={() => printSelected('invoices')}><LuReceiptText size={14} /> Invoices</button>}
-                        {can(role, 'courier') && <button type="button" className={DARK_BTN} onClick={() => printSelected('labels')}><LuBarcode size={14} /> Labels</button>}
                         {can(role, 'export') && <button type="button" className={DARK_BTN} onClick={() => exportOrdersCsv(selectedOrders, 'selected')}><LuDownload size={14} /> Export</button>}
                         <button type="button" aria-label="Clear selection" onClick={clearSelection}
                             className="inline-flex h-8 w-8 items-center justify-center rounded-md text-white/70 transition hover:bg-white/10 hover:text-white">

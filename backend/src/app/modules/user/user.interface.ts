@@ -19,6 +19,7 @@ export interface IUser extends Document {
     lastName: string;
     phone: string;
     avatar: string;
+    coverImage?: string;
     role: Role;
     permissions: string[];
     /** Factory divisions this staff member works on (empty = all). */
