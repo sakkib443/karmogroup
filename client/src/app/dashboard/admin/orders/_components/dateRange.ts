@@ -13,6 +13,7 @@ export function dateRange(preset: string, from: string, to: string): { from?: st
         case '30d': a = sod(ago(29)); b = eod(now); break;
         case 'this_month': a = new Date(now.getFullYear(), now.getMonth(), 1); b = eod(now); break;
         case 'last_month': a = new Date(now.getFullYear(), now.getMonth() - 1, 1); b = eod(new Date(now.getFullYear(), now.getMonth(), 0)); break;
+        case 'this_year': a = new Date(now.getFullYear(), 0, 1); b = eod(now); break;
         case 'custom':
             if (from) a = sod(new Date(`${from}T00:00:00`));
             if (to) b = eod(new Date(`${to}T00:00:00`));

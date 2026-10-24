@@ -145,6 +145,22 @@ const SiteContentService = {
     },
 
     // Update a specific section
+    /** bKash / Nagad / Rocket / bank shown at checkout. Only the parts sent are changed. */
+    async updatePayment(data: any) {
+        const mobile = (m: any) => ({ number: String(m?.number || '').trim(), accountType: m?.accountType === 'Merchant' || m?.accountType === 'Agent' ? m.accountType : 'Personal', active: m?.active !== false });
+        const set: Record<string, unknown> = {};
+        for (const k of ['bkash', 'nagad', 'rocket']) if (data?.[k]) set[`payment.${k}`] = mobile(data[k]);
+        if (data?.bank) {
+            const b = data.bank;
+            set['payment.bank'] = {
+                bankName: String(b.bankName || '').trim(), accountName: String(b.accountName || '').trim(), accountNumber: String(b.accountNumber || '').trim(),
+                branch: String(b.branch || '').trim(), routingNumber: String(b.routingNumber || '').trim(), active: !!b.active,
+            };
+        }
+        if (data?.instructions !== undefined) set['payment.instructions'] = String(data.instructions).slice(0, 1000);
+        return SiteContent.findOneAndUpdate({ _key: 'main' }, { $set: set }, { new: true, upsert: true });
+    },
+
     async updateSection(section: string, data: any) {
         const updateObj: any = {};
         updateObj[section] = data;

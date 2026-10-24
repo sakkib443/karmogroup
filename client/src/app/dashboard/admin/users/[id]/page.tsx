@@ -73,6 +73,8 @@ export default function UserDetailPage() {
     const name = fullNameOf(u);
     const isMe = u._id === me?.id;
     const manage = canManageUser(me?.role, u.role) && !isMe;
+    // A manager corrects a customer's details and password too (not block or delete).
+    const mayEdit = manage || (me?.role === 'manager' && u.role === 'user');
     const orders: any[] = ordersData?.data || [];
     const placed = orders.filter((o) => o.status !== 'cancelled');
     const delivered = orders.filter((o) => o.status === 'delivered');
@@ -85,9 +87,9 @@ export default function UserDetailPage() {
                 back={back}
                 title={<span className="flex flex-wrap items-center gap-2">{name}{isMe && <span className="text-sm font-normal text-gray-400">(you)</span>}</span>}
                 subtitle={isStaffRole(u.role) ? 'Staff account — signs in to this dashboard.' : 'Customer account — shops on the website.'}
-                actions={(manage || isMe) && <>
+                actions={(mayEdit || isMe) && <>
                     <Btn icon={<LuPencil size={15} />} onClick={() => setEditing(true)}>Edit</Btn>
-                    {manage && <Btn icon={<LuKeyRound size={15} />} onClick={() => setEditing(true)}>Reset password</Btn>}
+                    {mayEdit && <Btn icon={<LuKeyRound size={15} />} onClick={() => setEditing(true)}>Reset password</Btn>}
                     {manage && (u.status === 'blocked'
                         ? <Btn icon={<LuCircleCheck size={15} />} onClick={() => toggleBlock(u)}>Unblock</Btn>
                         : <Btn icon={<LuBan size={15} />} onClick={() => toggleBlock(u)}>Block</Btn>)}
@@ -146,7 +148,7 @@ export default function UserDetailPage() {
                     <StatTile label="Orders placed" value={placed.length.toLocaleString('en-IN')} icon={<LuShoppingBag size={16} />} />
                     <StatTile label="Delivered" value={delivered.length.toLocaleString('en-IN')} icon={<LuPackageCheck size={16} />} />
                     <StatTile label="Spent" value={taka(spent)} icon={<LuWallet size={16} />} hint="Delivered orders" />
-                    <StatTile label="Points · discount" value={`${(u.loyaltyPoints || 0).toLocaleString('en-IN')} · ${u.defaultDiscount || 0}%`} icon={<LuGift size={16} />} />
+                    <StatTile label="Discount" value={`${u.defaultDiscount || 0}%`} icon={<LuGift size={16} />} />
                 </div>
 
                 {addresses.length > 0 && (

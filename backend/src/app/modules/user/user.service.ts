@@ -80,6 +80,83 @@ const UserService = {
         return { users, meta };
     },
 
+    /**
+     * Buyers with their orders. Everyone who orders becomes a customer (a guest or phone
+     * order makes the account from the phone number), and so does everyone who signs up —
+     * this shows who ordered, how often, and who never did.
+     *   orders: all | ordered | never | repeat     joined: all | order | signup
+     *   sort: recent | orders | spent | last
+     */
+    async getCustomers(query: Record<string, unknown>) {
+        const page = Math.max(1, Number(query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(query.limit) || 20));
+        const match: Record<string, any> = { role: 'user' };
+        if (query.status && query.status !== 'all') match.status = String(query.status);
+        if (query.search) {
+            const rx = new RegExp(String(query.search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+            // The whole name too ("Rahim Uddin"), not just each half.
+            const fullName = { $concat: [{ $ifNull: ['$firstName', ''] }, ' ', { $ifNull: ['$lastName', ''] }] };
+            match.$or = [{ firstName: rx }, { lastName: rx }, { email: rx }, { phone: rx }, { $expr: { $regexMatch: { input: fullName, regex: rx } } }];
+        }
+        const after: Record<string, any> = {};
+        if (query.orders === 'ordered') after.orders = { $gt: 0 };
+        if (query.orders === 'never') after.orders = 0;
+        if (query.orders === 'repeat') after.placed = { $gte: 2 };
+        if (query.joined === 'order') after.joinedByOrder = true;
+        if (query.joined === 'signup') after.joinedByOrder = false;
+        const SORTS: Record<string, Record<string, 1 | -1>> = {
+            recent: { createdAt: -1 }, orders: { placed: -1, spent: -1 }, spent: { spent: -1 }, last: { lastOrderAt: -1 },
+        };
+        const sort = SORTS[String(query.sort)] || SORTS.recent;
+
+        const withOrders: any[] = [
+            { $match: match },
+            {
+                $lookup: {
+                    from: 'orders', localField: '_id', foreignField: 'user', as: 'o',
+                    pipeline: [{ $project: { status: 1, total: 1, createdAt: 1 } }],
+                },
+            },
+            {
+                $addFields: {
+                    orders: { $size: '$o' },
+                    placed: { $size: { $filter: { input: '$o', cond: { $ne: ['$$this.status', 'cancelled'] } } } },
+                    delivered: { $size: { $filter: { input: '$o', cond: { $eq: ['$$this.status', 'delivered'] } } } },
+                    cancelled: { $size: { $filter: { input: '$o', cond: { $eq: ['$$this.status', 'cancelled'] } } } },
+                    spent: { $sum: { $map: { input: { $filter: { input: '$o', cond: { $eq: ['$$this.status', 'delivered'] } } }, in: '$$this.total' } } },
+                    firstOrderAt: { $min: '$o.createdAt' },
+                    lastOrderAt: { $max: '$o.createdAt' },
+                },
+            },
+            // The account was made by the first order (within ten minutes of it).
+            { $addFields: { joinedByOrder: { $and: [{ $ne: ['$firstOrderAt', null] }, { $lte: [{ $subtract: ['$firstOrderAt', '$createdAt'] }, 600000] }] } } },
+            { $project: { o: 0, password: 0, passwordResetToken: 0, passwordResetExpires: 0, emailVerificationToken: 0 } },
+        ];
+        const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+        const [r] = await User.aggregate([
+            ...withOrders,
+            {
+                $facet: {
+                    rows: [{ $match: after }, { $sort: { ...sort, _id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit }],
+                    total: [{ $match: after }, { $count: 'n' }],
+                    stats: [{
+                        $group: {
+                            _id: null, total: { $sum: 1 },
+                            ordered: { $sum: { $cond: [{ $gt: ['$orders', 0] }, 1, 0] } },
+                            never: { $sum: { $cond: [{ $eq: ['$orders', 0] }, 1, 0] } },
+                            repeat: { $sum: { $cond: [{ $gte: ['$placed', 2] }, 1, 0] } },
+                            fromOrders: { $sum: { $cond: ['$joinedByOrder', 1, 0] } },
+                            newThisMonth: { $sum: { $cond: [{ $gte: ['$createdAt', monthStart] }, 1, 0] } },
+                        },
+                    }],
+                },
+            },
+        ]);
+        const total = r?.total?.[0]?.n || 0;
+        const { _id, ...stats } = r?.stats?.[0] || { total: 0, ordered: 0, never: 0, repeat: 0, fromOrders: 0, newThisMonth: 0 };
+        return { customers: r?.rows || [], meta: { total, page, limit, totalPages: Math.max(1, Math.ceil(total / limit)) }, stats };
+    },
+
     // Admin stats
     async getAdminStats() {
         const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -198,7 +275,7 @@ const UserService = {
 
         // Normal profile update
         const allowedFields: Record<string, any> = {};
-        const allowed = ['firstName', 'lastName', 'phone', 'avatar', 'name'];
+        const allowed = ['firstName', 'lastName', 'phone', 'avatar', 'coverImage', 'name'];
         for (const key of allowed) {
             if (payload[key] !== undefined) {
                 // Map 'name' to firstName/lastName
@@ -224,7 +301,17 @@ const UserService = {
      * Nobody changes their own role or status here (no locking yourself out).
      */
     async adminUpdateUser(actor: Actor, id: string, payload: any) {
-        const user: any = await manageable(actor, id, { selfOk: true });
+        // A manager may correct a customer's details and set a new password — not their
+        // role or status, and nobody else's account.
+        if (actor.role === 'manager' && String(id) !== String(actor.userId)) {
+            const target = await User.findById(id).select('role');
+            if (!target) throw new AppError(404, 'User not found');
+            if (target.role !== 'user') throw new AppError(403, `You cannot manage a ${label(target.role)} account`);
+            if (payload.role !== undefined || payload.status !== undefined) throw new AppError(403, 'Only an admin can change a role or block an account');
+        }
+        const user: any = actor.role === 'manager' && String(id) !== String(actor.userId)
+            ? await User.findById(id)
+            : await manageable(actor, id, { selfOk: true });
         const isSelf = String(user._id) === String(actor.userId);
 
         for (const key of ['firstName', 'lastName', 'phone', 'isEmailVerified', 'defaultDiscount', 'loyaltyPoints']) {

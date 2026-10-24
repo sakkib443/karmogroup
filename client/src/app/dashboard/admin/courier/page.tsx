@@ -2,20 +2,23 @@
 "use client";
 
 /**
- * Courier — every parcel from "just ordered" to "delivered" or "came back".
+ * Courier — every parcel from "just ordered" to "delivered" or "came back", sent with
+ * Pathao or Steadfast. One order is one parcel.
  *
  * Each parcel is in exactly one tab, decided on the API (courier.service.ts,
  * TAB_EXPR) for both the list and the counts, so a tab's number always matches
  * what the tab shows. The tabs follow the parcel's life: before the courier
- * (New, Ready to ship), with the courier (Sent, In transit, On hold), finished
+ * (Not ready, Ready to ship), with the courier (Sent, In transit, On hold), finished
  * (Delivered, Returned, Cancelled).
  */
-import React, { useMemo, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import CourierTabs from '@/components/admin/courier/CourierTabs';
 import { useViewRole } from '@/components/admin/viewRole';
 import { toast } from 'react-hot-toast';
 import {
-    LuTruck, LuRefreshCw, LuPackage, LuExternalLink, LuTriangleAlert, LuX, LuPhone, LuUndo2, LuWallet,
+    LuTruck, LuRefreshCw, LuPackage, LuExternalLink, LuX, LuPhone, LuUndo2, LuWallet,
 } from 'react-icons/lu';
 import {
     useGetCourierPackagesQuery,
@@ -26,14 +29,16 @@ import {
     useBookCourierPackageMutation,
     useRefreshCourierStatusMutation,
     useGetCourierBalanceQuery,
+    type Carrier,
     type CourierTab,
     type ICourierPackage,
 } from '@/redux/api/courierApi';
 import { getStatusConfig, paymentMethodLabel } from '@/lib/orderStatus';
 import OrderItemsPreview from '@/components/shared/OrderItemsPreview';
 import BookCourierModal from '@/components/admin/courier/BookCourierModal';
+import PageGuide from '@/components/admin/PageGuide';
 import {
-    PageHeader, Btn, SearchInput, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows, Pager, cx, taka,
+    Btn, SearchInput, FilterBar, Badge, TableCard, TH, TD, TR, EmptyRow, SkeletonRows, Pager, cx, taka,
 } from '@/components/admin/ui';
 
 const PAGE_SIZE = 20;
@@ -42,10 +47,10 @@ type TabKey = CourierTab | 'all';
 
 /** The tabs, in the order a parcel moves through them. */
 const TABS: { key: TabKey; label: string; group: string; about: string }[] = [
-    { key: 'new', label: 'New', group: 'Before courier', about: 'Placed but not confirmed yet. Call the customer and confirm the order first — only confirmed orders go to the courier.' },
-    { key: 'ready', label: 'Ready to ship', group: 'Before courier', about: 'Confirmed and waiting to go out. Book them with Steadfast — the longest-waiting first.' },
-    { key: 'sent', label: 'Sent to courier', group: 'With courier', about: 'Booked with Steadfast, waiting for the courier to pick them up.' },
-    { key: 'in_transit', label: 'In transit', group: 'With courier', about: 'On the way to the customer. Parcels shipped by hand, without a Steadfast booking, are here too.' },
+    { key: 'new', label: 'Not ready', group: 'Before courier', about: 'Still with the order desk or the factory (Pending → Challan Ready). They come to Ready to ship once moved to Courier Entry.' },
+    { key: 'ready', label: 'Ready to ship', group: 'Before courier', about: 'At Courier Entry, waiting to go out. Send them with Pathao or Steadfast — the longest-waiting first.' },
+    { key: 'sent', label: 'Sent to courier', group: 'With courier', about: 'Booked with the courier, waiting for them to pick it up.' },
+    { key: 'in_transit', label: 'In transit', group: 'With courier', about: 'On the way to the customer. Parcels marked shipped by hand, without a booking here, are here too.' },
     { key: 'on_hold', label: 'On hold', group: 'With courier', about: 'The courier is holding these — usually the customer could not be reached. Call them.' },
     { key: 'delivered', label: 'Delivered', group: 'Finished', about: 'Delivered to the customer. Cash on delivery is marked paid automatically.' },
     { key: 'returned', label: 'Returned', group: 'Finished', about: 'Came back from the courier. Any marked “Confirm return” still has to be closed on its order.' },
@@ -65,8 +70,24 @@ const daysWaiting = (iso: string) => {
 
 const errMsg = (e: any, fallback: string) => e?.data?.errorMessages?.[0]?.message || e?.data?.message || fallback;
 
+// useSearchParams needs a Suspense boundary.
 export default function CourierPage() {
-    const [tab, setTab] = useState<TabKey>('ready');
+    return (
+        <Suspense fallback={null}>
+            <FromLink />
+        </Suspense>
+    );
+}
+
+/** ?tab=… (the section tabs, the Payouts page) opens that tab — again on every new link. */
+function FromLink() {
+    const tabParam = useSearchParams().get('tab');
+    const start: TabKey = TABS.some((t) => t.key === tabParam) ? tabParam as TabKey : 'ready';
+    return <CourierBoard key={start} start={start} />;
+}
+
+function CourierBoard({ start }: { start: TabKey }) {
+    const [tab, setTab] = useState<TabKey>(start);
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [selected, setSelected] = useState<Record<string, ICourierPackage>>({});
@@ -82,11 +103,12 @@ export default function CourierPage() {
     const attention = countsData?.data?.attention;
     const setup = countsData?.data?.setup;
     const connected = setup?.configured ?? true;   // assume yes until we know, so nothing flashes
+    const available: Record<Carrier, boolean> = { pathao: setup?.pathao ?? false, steadfast: setup?.steadfast ?? false };
 
     // The Steadfast balance is shop money: admins only (managers and online sales work this board too).
     const { role: staffRole } = useViewRole();
     const isEditor = staffRole !== 'superadmin' && staffRole !== 'admin';
-    const { data: balanceData } = useGetCourierBalanceQuery(undefined, { skip: !setup?.configured || isEditor });
+    const { data: balanceData } = useGetCourierBalanceQuery(undefined, { skip: !setup?.steadfast || isEditor });
     const balance = balanceData?.data?.current_balance;
 
     const [syncAll, { isLoading: syncingAll }] = useSyncActiveCourierMutation();
@@ -132,18 +154,20 @@ export default function CourierPage() {
             const res = await syncAll().unwrap();
             const r = res.data;
             if (!r.total) toast('Nothing is with the courier right now', { icon: 'ℹ️' });
-            else toast.success(`Updated ${r.ok} of ${r.total} parcel${r.total === 1 ? '' : 's'} from Steadfast`);
+            else toast.success(`Updated ${r.ok} of ${r.total} parcel${r.total === 1 ? '' : 's'} from the courier`);
             if (r.failed) toast(`${r.failed} could not be updated — ${r.results.find((x) => !x.ok)?.error || 'try again'}`, { icon: '⚠️', duration: 6000 });
         } catch (e: any) {
             toast.error(errMsg(e, 'Sync failed'));
         }
     };
 
-    const doBulkBook = async () => {
+    const doBulkBook = async (carrier: Carrier) => {
         if (!toBook.length) return;
+        const name = carrier === 'pathao' ? 'Pathao' : 'Steadfast';
+        if (!window.confirm(`Send ${toBook.length} parcel${toBook.length === 1 ? '' : 's'} with ${name}? This books real parcels.`)) return;
         try {
-            const r = (await bulkBook({ items: toBook.map((p) => ({ orderId: p.orderId, packageId: p.packageId })) }).unwrap()).data;
-            toast.success(`Booked ${r.booked} of ${r.total} with Steadfast`);
+            const r = (await bulkBook({ items: toBook.map((p) => ({ orderId: p.orderId, packageId: p.packageId })), carrier }).unwrap()).data;
+            toast.success(`Sent ${r.booked} of ${r.total} with ${name}`);
             if (r.failed) toast(`${r.failed} failed — ${r.results.find((x) => !x.ok)?.error || 'see the order'}`, { icon: '⚠️', duration: 6000 });
             clearSelection();
         } catch (e: any) {
@@ -155,7 +179,7 @@ export default function CourierPage() {
         if (!toSync.length) return;
         try {
             const r = (await bulkRefresh({ items: toSync.map((p) => ({ orderId: p.orderId, packageId: p.packageId })) }).unwrap()).data;
-            toast.success(`Updated ${r.ok} of ${r.total} from Steadfast`);
+            toast.success(`Updated ${r.ok} of ${r.total} from the courier`);
             const back = r.results.filter((x) => x.needsConfirmation).length;
             if (back) toast(`${back} coming back — confirm the return on each order`, { icon: '↩️', duration: 7000 });
             clearSelection();
@@ -164,10 +188,10 @@ export default function CourierPage() {
         }
     };
 
-    const confirmBook = async (p: ICourierPackage) => {
+    const confirmBook = async (p: ICourierPackage, carrier: Carrier) => {
         try {
-            await bookOne({ orderId: p.orderId, packageId: p.packageId }).unwrap();
-            toast.success(`${p.orderNo} booked with Steadfast`);
+            await bookOne({ orderId: p.orderId, packageId: p.packageId, carrier }).unwrap();
+            toast.success(`${p.orderNo} sent with ${carrier === 'pathao' ? 'Pathao' : 'Steadfast'}`);
             setBookTarget(null);
         } catch (e: any) {
             toast.error(errMsg(e, 'Booking failed'));
@@ -200,7 +224,7 @@ export default function CourierPage() {
         if (p.tab === 'new') {
             return (
                 <Link href={`/dashboard/admin/orders/${p.orderId}`} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">
-                    <LuPhone size={13} /> Confirm order
+                    {p.status === 'pending' ? <><LuPhone size={13} /> Confirm order</> : <><LuExternalLink size={13} /> Open order</>}
                 </Link>
             );
         }
@@ -209,10 +233,10 @@ export default function CourierPage() {
                 <Btn
                     variant="primary" icon={<LuTruck size={14} />} className="!h-8 !px-3 !text-xs"
                     disabled={!connected}
-                    title={connected ? 'Book with Steadfast' : 'Connect Steadfast first'}
+                    title={connected ? 'Send with Pathao or Steadfast' : 'Connect a courier first'}
                     onClick={() => setBookTarget(p)}
                 >
-                    Book courier
+                    Send to courier
                 </Btn>
             );
         }
@@ -221,14 +245,14 @@ export default function CourierPage() {
                 <div className="flex items-center gap-2">
                     <div className="leading-tight">
                         <p className="font-mono text-xs font-semibold text-gray-800">{p.trackingNumber || p.consignmentId}</p>
-                        <p className="text-[11px] text-gray-400">Steadfast</p>
+                        <p className="text-[11px] text-gray-400">{p.carrier || 'Courier'}</p>
                     </div>
                     {!FINISHED.includes(p.status) && (
                         <button
                             type="button"
                             onClick={() => syncOne(p)}
                             disabled={!connected || syncingId === p.packageId}
-                            title={connected ? 'Get the latest status from Steadfast' : 'Connect Steadfast first'}
+                            title={connected ? `Get the latest status from ${p.carrier || 'the courier'}` : 'Connect a courier first'}
                             className="rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 disabled:opacity-40"
                         >
                             <LuRefreshCw size={14} className={syncingId === p.packageId ? 'animate-spin' : ''} />
@@ -237,7 +261,7 @@ export default function CourierPage() {
                 </div>
             );
         }
-        if (p.tab === 'in_transit') return <span className="text-xs text-gray-400">Sent without a Steadfast booking</span>;
+        if (p.tab === 'in_transit') return <span className="text-xs text-gray-400">Marked shipped by hand</span>;
         return <span className="text-xs text-gray-300">—</span>;
     };
 
@@ -271,33 +295,24 @@ export default function CourierPage() {
 
     return (
         <div className="space-y-5">
-            <PageHeader
+            <CourierTabs
                 title="Courier"
-                subtitle="Every parcel, from a new order to delivered — book with Steadfast and follow each one."
-                actions={<>
+                subtitle="Every parcel, from a new order to delivered — send with Pathao or Steadfast and follow each one."
+                status={setup ? { pathao: setup.pathao, steadfast: setup.steadfast } : undefined}
+                right={<>
                     {connected && typeof balance === 'number' && (
                         <span className="inline-flex h-9 items-center gap-2 rounded-full bg-emerald-50 px-4 text-sm font-semibold text-emerald-700">
                             <LuWallet size={15} /> Steadfast {taka(balance)}
                         </span>
                     )}
                     <Btn icon={<LuRefreshCw size={15} className={syncingAll ? 'animate-spin' : ''} />} onClick={doSyncAll} disabled={!connected || syncingAll}
-                        title={connected ? 'Get the latest status of every parcel with the courier' : 'Connect Steadfast first'}>
+                        title={connected ? 'Get the latest status of every parcel with the courier' : 'Connect a courier first'}>
                         {syncingAll ? 'Syncing…' : 'Sync all'}
                     </Btn>
                     <Btn variant="ghost" icon={<LuRefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />} onClick={reload}>Refresh</Btn>
+                    <PageGuide page="courier" />
                 </>}
             />
-
-            {/* ── Setup: nothing can be booked or tracked without Steadfast ── */}
-            {setup && !setup.configured && (
-                <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-                    <LuTriangleAlert size={18} className="mt-0.5 shrink-0" />
-                    <p>
-                        <b>Steadfast is not connected.</b> Booking parcels and tracking deliveries will not work until the
-                        Steadfast <b>API key</b> and <b>secret key</b> are added to the server. Parcels marked shipped by hand still show here.
-                    </p>
-                </div>
-            )}
 
             {/* ── What needs someone right now ── */}
             {!!(attention?.confirmReturn || attention?.onHold) && (
@@ -356,11 +371,12 @@ export default function CourierPage() {
                         <button type="button" onClick={clearSelection} className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white"><LuX size={13} /> clear</button>
                     </div>
                     <div className="flex items-center gap-2">
-                        {toBook.length > 0 && (
-                            <Btn variant="primary" icon={<LuPackage size={15} />} onClick={doBulkBook} disabled={!connected || booking}>
-                                {booking ? 'Booking…' : `Book ${toBook.length} with Steadfast`}
+                        {toBook.length > 0 && (['pathao', 'steadfast'] as Carrier[]).map((c) => (
+                            <Btn key={c} variant="primary" icon={<LuPackage size={15} />} onClick={() => doBulkBook(c)} disabled={!available[c] || booking}
+                                title={available[c] ? undefined : `${c === 'pathao' ? 'Pathao' : 'Steadfast'} is not connected yet`}>
+                                {booking ? 'Sending…' : `Send ${toBook.length} with ${c === 'pathao' ? 'Pathao' : 'Steadfast'}`}
                             </Btn>
-                        )}
+                        ))}
                         {toSync.length > 0 && (
                             <Btn icon={<LuRefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />} onClick={doBulkSync} disabled={!connected || refreshing} className="!bg-white/10 !text-white !border-white/20 hover:!bg-white/20">
                                 {refreshing ? 'Syncing…' : `Sync ${toSync.length}`}
@@ -462,7 +478,7 @@ export default function CourierPage() {
                 </div>
             </TableCard>
 
-            <BookCourierModal pkg={bookTarget} isBooking={bookingOne} onClose={() => setBookTarget(null)} onConfirm={confirmBook} />
+            <BookCourierModal key={bookTarget?.packageId || 'none'} pkg={bookTarget} isBooking={bookingOne} available={available} onClose={() => setBookTarget(null)} onConfirm={confirmBook} />
         </div>
     );
 }

@@ -47,6 +47,6 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 export const baseApi = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithAuth,
-    tagTypes: ['Stats', 'Orders', 'Products', 'Users', 'Analytics', 'PageContent', 'SiteContent', 'Categories', 'Payments', 'Shipping', 'Coupons', 'Reviews', 'Shops', 'Offers', 'Roles', 'Invoices', 'Returns', 'Chat', 'Notifications', 'Dashboard', 'Attributes', 'Inventory', 'Payouts', 'Units', 'Fraud', 'Suppliers', 'Purchases', 'Warehouses', 'Transfers', 'Expenses', 'Investors', 'Accounts', 'Newsletter', 'Jobs', 'Applications'],
+    tagTypes: ['Stats', 'Orders', 'Products', 'Users', 'Analytics', 'PageContent', 'SiteContent', 'Categories', 'Payments', 'Shipping', 'Coupons', 'Reviews', 'Shops', 'Offers', 'Roles', 'Invoices', 'Returns', 'Chat', 'Notifications', 'Dashboard', 'Attributes', 'Inventory', 'Payouts', 'Units', 'Fraud', 'Suppliers', 'Purchases', 'Warehouses', 'Transfers', 'Expenses', 'Investors', 'Accounts', 'Jobs', 'Applications'],
     endpoints: () => ({}),
 });

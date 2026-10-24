@@ -38,9 +38,11 @@ router.get('/admin/stats', authMiddleware, authorizeRoles(...R.ops), UserControl
 // Phone lookup for "Add order" — everyone who takes manual orders.
 router.get('/admin/lookup', authMiddleware, authorizeRoles(...R.orderDesk), UserController.lookupCustomer);
 router.post('/admin', authMiddleware, authorizeRoles(...R.admin), validateRequest(adminCreateUserValidation), UserController.adminCreateUser);
+router.get('/admin/customers', authMiddleware, authorizeRoles(...R.ops), UserController.getCustomers);
 router.post('/admin/customers', authMiddleware, authorizeRoles(...R.ops), validateRequest(adminCreateCustomerValidation), UserController.adminCreateCustomer);
 router.get('/admin/:id', authMiddleware, authorizeRoles(...R.ops), UserController.getUserById);
-router.patch('/admin/:id', authMiddleware, authorizeRoles(...R.admin), validateRequest(adminUpdateUserValidation), UserController.adminUpdateUser);
+// Admins change anyone below them; a manager only a customer's details and password (see the service).
+router.patch('/admin/:id', authMiddleware, authorizeRoles(...R.ops), validateRequest(adminUpdateUserValidation), UserController.adminUpdateUser);
 router.patch('/admin/:id/status', authMiddleware, authorizeRoles(...R.admin), validateRequest(updateStatusValidation), UserController.updateUserStatus);
 router.delete('/admin/:id', authMiddleware, authorizeRoles(...R.admin), UserController.deleteUser);
 

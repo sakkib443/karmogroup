@@ -19,6 +19,10 @@ const ReturnService = {
         if (order.status !== 'delivered') {
             throw new AppError(400, 'Returns can only be requested for delivered orders');
         }
+        // One open request per order — a second one waits until the first is settled.
+        if (await ReturnRequest.exists({ order: order._id, status: { $in: ['pending', 'approved'] } })) {
+            throw new AppError(400, 'A return request for this order is already open');
+        }
 
         // Snapshot the selected items from the order + compute refund amount
         const orderItems = (order as any).items || [];
@@ -52,26 +56,16 @@ const ReturnService = {
             timeline: [{ status: 'pending', note: 'Return request submitted', createdAt: new Date() }],
         });
 
-        // ── Notify all admins of the new return request ──
+        // ── Tell everyone who works the returns desk ──
         try {
             const { NotificationService } = require('../notification/notification.service');
-            const { User } = require('../user/user.model');
-            const returnIdStr = doc._id.toString();
-
-            const fanOut = async () => {
-                const admins = await User.find({ role: { $in: ['admin', 'superadmin'] } }).select('_id');
-                for (const admin of admins) {
-                    await NotificationService.notify({
-                        user: admin._id,
-                        type: 'return_request',
-                        title: 'New return request',
-                        message: `A return was requested on order ${doc.orderId}.`,
-                        link: '/dashboard/admin/returns',
-                        meta: { returnId: returnIdStr, orderId: doc.orderId },
-                    });
-                }
-            };
-            fanOut().catch(() => {});
+            NotificationService.notifyRoles(['superadmin', 'admin', 'manager', 'online_sales'], {
+                type: 'return_request',
+                title: 'New return request',
+                message: `A return was requested on order ${doc.orderId}.`,
+                link: '/dashboard/admin/returns',
+                meta: { returnId: doc._id.toString(), orderId: doc.orderId },
+            }).catch(() => {});
         } catch {
             // never block return creation
         }

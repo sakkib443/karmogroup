@@ -8,8 +8,8 @@
  * priced by size exactly as on the website (karmoCatalogue.ts); any line's price can
  * be changed for this order. Save it as Pending, or Confirm it straight away.
  */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {
     LuPlus, LuMinus, LuX, LuSearch, LuUserCheck, LuUserPlus, LuPackagePlus, LuCheck, LuPenLine, LuChevronDown,
@@ -317,7 +317,18 @@ function Choice({ on, onClick, children }: { on: boolean; onClick: () => void; c
 
 /* ─── Page ───────────────────────────────────────────────── */
 
+// useSearchParams needs a Suspense boundary.
 export default function AddOrderPage() {
+    return (
+        <Suspense fallback={null}>
+            <AddOrder />
+        </Suspense>
+    );
+}
+
+function AddOrder() {
+    // ?phone=…&name=… (from an inquiry) starts the form with that customer.
+    const params = useSearchParams();
     const router = useRouter();
     const { role } = useViewRole();
     const mayMarkPaid = can(role, 'payment');
@@ -325,7 +336,7 @@ export default function AddOrderPage() {
     const [savingAs, setSavingAs] = useState<'pending' | 'confirmed' | null>(null);
 
     /* Customer */
-    const [cust, setCust] = useState({ phone: '', fullName: '', email: '', address: '', city: '', area: '' });
+    const [cust, setCust] = useState({ phone: params.get('phone') || '', fullName: params.get('name') || '', email: '', address: '', city: '', area: '' });
     const phone = normalisePhone(cust.phone);
     const phoneOk = /^01\d{9}$/.test(phone);
     const { currentData: lookup, isFetching: lookingUp } = useLookupCustomerQuery(phone, { skip: !phoneOk });

@@ -18,6 +18,7 @@ import { useGetFactoryQueueQuery, useFactoryScanMutation, useIssueChallanMutatio
 import { PageHeader, Btn, Card, Badge, Segmented, cx } from '@/components/admin/ui';
 import { can } from '@/components/admin/access';
 import { openChallan, openPieceLabels } from '@/components/admin/orders/orderPapers';
+import PageGuide from '@/components/admin/PageGuide';
 
 const apiError = (e: unknown, fallback: string) =>
     (e as { data?: { message?: string } })?.data?.message || fallback;
@@ -132,7 +133,10 @@ function FactoryStation() {
             <PageHeader
                 title="Factory scan station"
                 subtitle="Scan each product once. When a challan's pieces are all scanned, issue it — the original prints only once."
-                actions={<Btn icon={<LuHistory size={15} />} onClick={() => refetch()}>Refresh</Btn>}
+                actions={<>
+                    <Btn icon={<LuHistory size={15} />} onClick={() => refetch()}>Refresh</Btn>
+                    <PageGuide page="factory" />
+                </>}
             />
 
             {/* Scanner */}
