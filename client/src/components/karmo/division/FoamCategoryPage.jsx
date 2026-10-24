@@ -96,9 +96,11 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
       body: "Firm, resilient foam in seats and interiors absorbs road vibration — comfortable for the whole ride.",
     },
   ],
-  film: "/pages/foam/videos/shorts/v1-tisa-trim.mp4",
-  still: "/pages/foam/mosaic/tisha-film-still-hq.webp",
-  filmAlt: "Tanzin Tisha for Karmo Foam",
+  /* Right banner is now a still showcase image (the brand film was dropped at
+     the client's ask) — the two banners share the width 50/50. */
+  rightImage: "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.png",
+  rightAlt:
+    "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
 };
 
 export function buildFoamCategoryData(key) {
@@ -135,8 +137,8 @@ export function buildFoamCategoryData(key) {
         },
         {
           id: "support",
-          image: "/pages/foam/bed-automotive/karmo_sofa_633x421.png",
-          alt: "Karmo Sofa Foam Support",
+          image: "/pages/foam/bed-automotive/karmo-tuktuk-under-the-lens.png",
+          alt: "A green Karmo auto-rickshaw under a magnifying glass, revealing the foam in its seats",
           caption: "Support for beds and beyond",
           fit: "object-cover",
         },
