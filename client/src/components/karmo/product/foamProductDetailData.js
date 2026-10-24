@@ -21,7 +21,6 @@ export {
 } from "@/components/karmo/product/foamPricing";
 
 const PDP = "/products/foam/detail";
-const PROD = "/products/foam/catalog";
 
 export const foamColorOptions = [
   { id: "coral", label: "Coral 280", image: `${PDP}/swatches/coral.webp` },
@@ -73,40 +72,6 @@ export const FOAM_LETTER_GALLERY = [
   "/products/foam/gallery/gallery-2.webp",
 ];
 
-const REAL_BY_ID = {
-  "combo-280": [
-    `${PROD}/combo-280-room-hq.webp`,
-    `${PROD}/combo-280-hover-hq.webp`,
-    `${PROD}/combo-280-angle-hq.webp`,
-    `${PROD}/combo-280-detail-hq.webp`,
-  ],
-  "combo-2001": [
-    `${PROD}/combo-2001-room-hq.webp`,
-    `${PROD}/foam-grades-hover-hq.webp`,
-    `${PROD}/combo-280-angle-hq.webp`,
-  ],
-  "combo-4g": [
-    `${PROD}/combo-4g-room-hq.webp`,
-    `${PROD}/foam-grades-hover-hq.webp`,
-    `${PROD}/combo-280-detail-hq.webp`,
-  ],
-  "combo-1965": [
-    `${PROD}/combo-1965-room-hq.webp`,
-    `${PROD}/foam-grades-hover-hq.webp`,
-    `${PROD}/combo-280-hover-hq.webp`,
-  ],
-  "combo-signature": [
-    `${PROD}/combo-signature-room-hq.webp`,
-    `${PROD}/foam-grades-hover-hq.webp`,
-    `${PROD}/combo-280-angle-hq.webp`,
-  ],
-  "rebonded-set": [
-    `${PROD}/rebonded-set-room-hq.webp`,
-    `${PROD}/foam-grades-hover-hq.webp`,
-    `${PROD}/combo-280-detail-hq.webp`,
-  ],
-};
-
 function parseTaka(label) {
   if (!label) return 0;
   const n = Number(String(label).replace(/[^\d]/g, ""));
@@ -119,12 +84,9 @@ export function getFoamProductSlugs() {
   return catalog.map((p) => p.id);
 }
 
+/* The detail page shows the cover alone — the other shots didn't belong to the product. */
 function buildRealGallery(item) {
-  if (REAL_BY_ID[item.id]) return REAL_BY_ID[item.id];
-  const shots = [item.image, item.imageHover, `${PROD}/combo-280-hover-hq.webp`].filter(
-    Boolean
-  );
-  return [...new Set(shots)];
+  return [item.image].filter(Boolean);
 }
 
 function densityFromSpecs(item) {
@@ -272,7 +234,7 @@ function toDetail(item) {
     firmness: densityValue || densityFromSpecs(item),
     density: densityValue || densityFromSpecs(item),
     cover,
-    letterGallery: FOAM_LETTER_GALLERY,
+    letterGallery: [],
     realGallery,
     gallery: realGallery,
     fabrics: foamColorOptions,
@@ -302,6 +264,24 @@ function toDetail(item) {
     pricingFamily: "foam",
   };
 }
+
+/** Every furniture grade with a density, lightest first — the scale on the detail page. */
+export const FOAM_GRADE_SCALE = catalog
+  .map((item) => {
+    const c = FOAM_CATALOGUE[item.id];
+    const density = parseFloat(c?.technical?.[0]?.value);
+    if (!Number.isFinite(density)) return null;
+    return {
+      slug: item.id,
+      name: String(item.name).replace(/\s*Foam Combo Offer$/i, ""),
+      grade: c.grade,
+      color: c.color,
+      density,
+      image: item.image,
+    };
+  })
+  .filter(Boolean)
+  .sort((a, b) => a.density - b.density);
 
 export function getFoamProductDetail(productId) {
   if (!productId) return null;

@@ -85,7 +85,8 @@ function ThumbButton({ src, active, onClick, label, className = "" }) {
  * When there are more than fit, the row scrolls sideways (swipe or wheel) and
  * a square arrow shows at whichever end still has pictures to reveal.
  */
-function ThumbStrip({ items, mainSrc, onPick, labelFor, film, className = "", itemClassName = "w-[68px] xl:w-[76px]" }) {
+/** `fill`: a fixed short set (the five K-A-R-M-O letters) — equal tiles that share the full width, no scrolling. */
+function ThumbStrip({ items, mainSrc, onPick, labelFor, film, className = "", itemClassName = "w-[68px] xl:w-[76px]", fill = false }) {
   const ref = useRef(null);
   const [edges, setEdges] = useState({ prev: false, next: false });
 
@@ -114,7 +115,11 @@ function ThumbStrip({ items, mainSrc, onPick, labelFor, film, className = "", it
 
   return (
     <div className={`relative mt-3 ${className}`}>
-      <ul ref={ref} className="scrollbar-hide flex snap-x gap-2 overflow-x-auto">
+      <ul
+        ref={ref}
+        className={fill ? "grid gap-2" : "scrollbar-hide flex snap-x gap-2 overflow-x-auto"}
+        style={fill ? { gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` } : undefined}
+      >
         {film ? (
           <li className={`shrink-0 snap-start ${itemClassName}`}>
             <button
@@ -202,8 +207,10 @@ export default function ProductHero({ product }) {
     product.textureSrc ||
     "/products/mattress/mosaic/karmo-pattern-texture.webp";
 
+  const openingFabric =
+    product.fabrics?.find((f) => f.scene === cover)?.id || product.fabrics?.[0]?.id || "";
   const [mainSrc, setMainSrc] = useState(cover);
-  const [fabric, setFabric] = useState(product.fabrics?.[0]?.id || "");
+  const [fabric, setFabric] = useState(openingFabric);
   const [sizeId, setSizeId] = useState(defaultSize?.id || "queen");
   const [width, setWidth] = useState(String(defaultSize?.w || 60));
   const [length, setLength] = useState(String(defaultSize?.l || 80));
@@ -214,8 +221,11 @@ export default function ProductHero({ product }) {
 
   useEffect(() => {
     const next = product.sizes?.find((s) => s.id === "queen") || product.sizes?.[0];
-    setMainSrc(product.cover || product.realGallery?.[0] || cover);
-    setFabric(product.fabrics?.[0]?.id || "");
+    const nextCover = product.cover || product.realGallery?.[0] || cover;
+    setMainSrc(nextCover);
+    setFabric(
+      product.fabrics?.find((f) => f.scene === nextCover)?.id || product.fabrics?.[0]?.id || ""
+    );
     setSizeId(next?.id || "queen");
     setWidth(String(next?.w || 60));
     setLength(String(next?.l || 80));
@@ -376,8 +386,10 @@ export default function ProductHero({ product }) {
 
                 <div className="min-w-0 flex-1">
                   {/* Picture and its thumbnails share one width, so the row starts at the picture's left edge. */}
+                  {/* On a phone the rows under the picture run: fabrics, K-A-R-M-O, product photos
+                      (order-*). From lg up the fabrics live in the buy box and the old order returns. */}
                   <div
-                    className="mx-auto"
+                    className="mx-auto flex flex-col"
                     style={{
                       width: "min(100%, calc(100svh - 14rem))",
                       maxWidth: "100%",
@@ -422,6 +434,37 @@ export default function ProductHero({ product }) {
                   </div>
                   </div>
 
+                  {product.fabrics?.length ? (
+                    <ul
+                      className="order-1 mt-3 grid gap-2 lg:hidden"
+                      style={{ gridTemplateColumns: `repeat(${product.fabrics.length}, minmax(0, 1fr))` }}
+                      aria-label={fabricTitle}
+                    >
+                      {product.fabrics.map((f) => {
+                        const on = fabric === f.id;
+                        return (
+                          <li key={f.id}>
+                            <button
+                              type="button"
+                              title={f.label}
+                              aria-label={f.label}
+                              aria-pressed={on}
+                              onClick={() => {
+                                setFabric(f.id);
+                                if (f.scene) setMainSrc(f.scene);
+                              }}
+                              className={`relative block aspect-square w-full overflow-hidden border transition-colors ${
+                                on ? "border-brand" : "border-ink/15 hover:border-ink/35"
+                              }`}
+                            >
+                              <Image src={f.image} alt="" fill sizes="(min-width: 640px) 12vw, 16vw" className="object-cover" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+
                   {realGallery.length ? (
                     <ThumbStrip
                       items={realGallery}
@@ -429,6 +472,7 @@ export default function ProductHero({ product }) {
                       mainSrc={mainSrc}
                       onPick={setMainSrc}
                       labelFor={(i) => (i === 0 ? "Cover photo" : `Product photo ${i + 1}`)}
+                      className="order-3 lg:order-2"
                     />
                   ) : null}
 
@@ -438,8 +482,9 @@ export default function ProductHero({ product }) {
                       mainSrc={mainSrc}
                       onPick={setMainSrc}
                       labelFor={(i) => `KARMO letter view ${i + 1}`}
-                      className="xl:hidden"
-                      itemClassName="w-[64px]"
+                      className="order-2 lg:order-3 xl:hidden"
+                      fill
+                      itemClassName="w-full"
                     />
                   ) : null}
                   </div>
@@ -502,7 +547,7 @@ export default function ProductHero({ product }) {
               </ul>
             ) : null}
 
-            <div className="mt-1">
+            <div className="mt-1 hidden lg:block">
               {product.fabrics?.length ? (
                 <OptionBlock title={fabricTitle}>
                   <ul className="flex flex-wrap gap-1.5">
@@ -515,7 +560,10 @@ export default function ProductHero({ product }) {
                             title={f.label}
                             aria-label={f.label}
                             aria-pressed={on}
-                            onClick={() => setFabric(f.id)}
+                            onClick={() => {
+                              setFabric(f.id);
+                              if (f.scene) setMainSrc(f.scene);
+                            }}
                             className={`relative block h-12 w-12 overflow-hidden border transition-colors sm:h-14 sm:w-14 ${
                               on
                                 ? "border-brand"

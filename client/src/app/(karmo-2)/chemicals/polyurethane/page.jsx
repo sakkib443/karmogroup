@@ -1,4 +1,5 @@
-import ChemicalSectionWireframe from "@/components/karmo/division/ChemicalSectionWireframe";
+import ChemicalBanner from "@/components/karmo/division/ChemicalBanner";
+import StandardStrip from "@/components/karmo/home/StandardStrip";
 
 export const metadata = {
   title: "Polyurethane / Solvent — Karmo Chemicals",
@@ -6,35 +7,20 @@ export const metadata = {
     "Karmo polyurethane and solvent range — TDI, PPG and copolymer grades for foam and industrial use. Made in Bangladesh since 1965.",
 };
 
-/* Mirrors the Navbar's "Polyurethane / Solvent" sub-rows (TDI, PPG,
-   CoPolymer) — placeholder copy, real grade names/specs come from the
-   catalogue once this section leaves wireframe. */
-const PRODUCTS = [
-  { id: "tdi", name: "TDI", note: "Toluene diisocyanate — foam-grade isocyanate." },
-  { id: "ppg", name: "PPG", note: "Polypropylene glycol — polyol base for PU systems." },
-  { id: "copolymer", name: "CoPolymer", note: "Copolymer polyol for tuned foam performance." },
-];
-
-const FEATURES = [
-  { id: "quality", title: "Tested Quality" },
-  { id: "bulk", title: "Bulk Supply" },
-  { id: "consistent", title: "Consistent Grades" },
-  { id: "delivery", title: "Nationwide Delivery" },
-];
-
-/** `/chemicals/polyurethane` — Polyurethane / Solvent section page (wireframe). */
+/** `/chemicals/polyurethane` — the banner and the site-wide trust icons for now; the rest comes later. */
 export default function ChemicalsPolyurethaneRoute() {
   return (
-    <ChemicalSectionWireframe
-      eyebrow="Karmo Chemicals"
-      heading="Polyurethane / Solvent"
-      subline="TDI, PPG and copolymer grades for foam and industrial use — made in Bangladesh since 1965."
-      intro={{
-        heading: "About Karmo Polyurethane",
-        body: "Karmo supplies the raw polyurethane chemistry behind its own foam lines and for industrial buyers — isocyanates, polyols and copolymer grades held to consistent, tested specifications batch after batch.",
-      }}
-      products={PRODUCTS}
-      features={FEATURES}
-    />
+    <>
+      <ChemicalBanner
+        src="/pages/chemicals/camicels.png"
+        alt="Blue chemical drums racked in a Karmo warehouse"
+        line1="Polyurethane"
+        line2="& solvent"
+        body="TDI, PPG and copolymer grades for foam and industrial use — made in Bangladesh since 1965."
+        items={["TDI", "PPG", "CoPolymer"]}
+        position="object-right"
+      />
+      <StandardStrip />
+    </>
   );
 }

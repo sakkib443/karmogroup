@@ -338,8 +338,11 @@ const foamFurniture = {
       },
     ],
     spotlight: {
-      image: `${IMG}/mosaic/spotlight-emerald-left-hq.webp`,
-      alt: "Emerald armchair and oak dresser on the left of a sunlit living room",
+      // 50/50 with the film on the right; the Karmo armchair from Bed & Automotive on the left.
+      even: true,
+      align: "left",
+      image: "/pages/foam/bed-automotive/karmo_sofa_633x421.png",
+      alt: "Karmo foam armchair with a magnifying glass on the KARMO label",
       headingLead: "Designed",
       headingAccent: "to",
       headingEnd: "endure",
