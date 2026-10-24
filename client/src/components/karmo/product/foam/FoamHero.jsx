@@ -6,12 +6,12 @@
  * square corners, one quiet texture behind every product), with the foam's
  * specs and a cut-to-size calculator. Pricing is the catalogue's sales calculator.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FiChevronDown, FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
+import { FiChevronDown, FiChevronLeft, FiChevronRight, FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 
 import { useAppDispatch } from "@/redux";
@@ -21,6 +21,17 @@ import { getFoamPricingRule } from "@/components/karmo/product/foamPricing";
 import { quoteFoamUnit } from "@/components/karmo/product/catalogueQuote";
 
 const EASE = [0.22, 1, 0.36, 1];
+
+/* Catalogue colour names → a dot beside the grade. */
+export const FOAM_COLOR_HEX = {
+  Ash: "#b9b6b0",
+  Pink: "#f2a7b8",
+  Purple: "#8e6bb8",
+  "Lime green": "#a6cf4a",
+  Olive: "#8a8d3f",
+  "Bright yellow": "#f5d13b",
+};
+
 const MAX_QTY = 99;
 
 function ThumbButton({ src, active, onClick, label, className = "" }) {
@@ -44,9 +55,9 @@ export default function FoamHero({ product }) {
 
   const rule = getFoamPricingRule(product.slug);
   const fixedPrice = !rule;
-  const letterGallery = product.letterGallery || [];
   const realGallery = product.realGallery?.length ? product.realGallery : product.gallery || [];
-  const cover = product.cover || realGallery[0] || letterGallery[0];
+  const cover = product.cover || realGallery[0];
+  const catalogue = product.catalogue;
   const ref = (product.sizes || []).find((s) => s.id === "queen") || (product.sizes || [])[0];
   const textureSrc = product.textureSrc || "/products/foam/foam-texture-bg.webp";
   const buyboxIcons = product.buyboxIcons || [];
@@ -56,6 +67,25 @@ export default function FoamHero({ product }) {
   const [width, setWidth] = useState(String(ref?.w || 48));
   const [height, setHeight] = useState(String(ref?.h || product.defaultHeight || 4));
   const [qty, setQty] = useState(1);
+
+  /* Thumbnail row scrolls with arrows, never a scrollbar. */
+  const thumbsRef = useRef(null);
+  const [edges, setEdges] = useState({ left: false, right: false });
+  useEffect(() => {
+    const el = thumbsRef.current;
+    if (!el) return undefined;
+    const read = () => setEdges({ left: el.scrollLeft > 2, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    el.addEventListener("scroll", read, { passive: true });
+    return () => { ro.disconnect(); el.removeEventListener("scroll", read); };
+  }, []);
+  const slideThumbs = (dir) => thumbsRef.current?.scrollBy({ left: dir * thumbsRef.current.clientWidth * 0.8, behavior: "smooth" });
+
+  const step = (dir) => {
+    const at = Math.max(0, realGallery.indexOf(mainSrc));
+    setMainSrc(realGallery[(at + dir + realGallery.length) % realGallery.length]);
+  };
 
   // Cheap to work out on every render. The same quote the order server checks against.
   const quote = quoteFoamUnit(product, { length, width, height });
@@ -123,19 +153,9 @@ export default function FoamHero({ product }) {
           {/* 1 — Gallery (same frame as the mattress page) */}
           <div className="h-fit lg:sticky lg:top-[128px] lg:col-span-6 lg:z-[1]">
             <motion.div {...fadeIn}>
-              <div className="flex items-start gap-3">
-                {letterGallery.length ? (
-                  <ul className="hidden w-[68px] shrink-0 flex-col gap-2 xl:flex xl:w-[76px]">
-                    {letterGallery.map((src, i) => (
-                      <li key={`letter-${i}`}>
-                        <ThumbButton src={src} active={mainSrc === src} onClick={() => setMainSrc(src)} label={`KARMO letter view ${i + 1}`} className="aspect-square w-full" />
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                <div className="min-w-0 flex-1">
-                  <div className="relative mx-auto overflow-hidden bg-[#f3f1ec]" style={{ width: "min(100%, calc(100svh - 14rem))", maxWidth: "100%" }}>
+              <div className="mx-auto" style={{ width: "min(100%, calc(100svh - 14rem))", maxWidth: "100%" }}>
+                <div className="min-w-0">
+                  <div className="group/main relative overflow-hidden bg-[#f3f1ec]">
                     <div className="relative w-full" style={{ paddingTop: "100%" }}>
                       <AnimatePresence mode="wait">
                         <motion.div
@@ -156,17 +176,46 @@ export default function FoamHero({ product }) {
                           {savePct}% off
                         </span>
                       ) : null}
+                      {realGallery.length > 1 ? (
+                        <>
+                          <button type="button" aria-label="Previous photo" onClick={() => step(-1)}
+                            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-white/90 text-ink shadow-sm transition-opacity hover:bg-white lg:opacity-0 lg:group-hover/main:opacity-100">
+                            <FiChevronLeft size={18} />
+                          </button>
+                          <button type="button" aria-label="Next photo" onClick={() => step(1)}
+                            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center bg-white/90 text-ink shadow-sm transition-opacity hover:bg-white lg:opacity-0 lg:group-hover/main:opacity-100">
+                            <FiChevronRight size={18} />
+                          </button>
+                          <span className="absolute bottom-3 right-3 bg-ink/75 px-2.5 py-1 text-[11px] font-semibold tabular-nums tracking-[0.08em] text-white">
+                            {Math.max(0, realGallery.indexOf(mainSrc)) + 1} / {realGallery.length}
+                          </span>
+                        </>
+                      ) : null}
                     </div>
                   </div>
 
-                  {realGallery.length ? (
-                    <ul className="mt-3 flex justify-center gap-2 overflow-x-auto">
-                      {realGallery.map((src, i) => (
-                        <li key={`real-${src}`} className="w-[68px] shrink-0 xl:w-[76px]">
-                          <ThumbButton src={src} active={mainSrc === src} onClick={() => setMainSrc(src)} label={i === 0 ? "Cover photo" : `Product photo ${i + 1}`} className="aspect-square w-full" />
-                        </li>
-                      ))}
-                    </ul>
+                  {realGallery.length > 1 ? (
+                    <div className="relative mt-3">
+                      <ul ref={thumbsRef} className="flex justify-start gap-2 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        {realGallery.map((src, i) => (
+                          <li key={`real-${src}`} className="w-[64px] shrink-0 sm:w-[72px] xl:w-[80px]">
+                            <ThumbButton src={src} active={mainSrc === src} onClick={() => setMainSrc(src)} label={i === 0 ? "Cover photo" : `Product photo ${i + 1}`} className="aspect-square w-full" />
+                          </li>
+                        ))}
+                      </ul>
+                      {edges.left ? (
+                        <button type="button" aria-label="Earlier photos" onClick={() => slideThumbs(-1)}
+                          className="absolute left-0 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.18)] hover:text-brand">
+                          <FiChevronLeft size={16} />
+                        </button>
+                      ) : null}
+                      {edges.right ? (
+                        <button type="button" aria-label="More photos" onClick={() => slideThumbs(1)}
+                          className="absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.18)] hover:text-brand">
+                          <FiChevronRight size={16} />
+                        </button>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -175,59 +224,49 @@ export default function FoamHero({ product }) {
 
           {/* 2 — Buy box */}
           <motion.div {...fade} className="lg:col-span-6">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="text-[13px] font-semibold uppercase tracking-[0.3em] text-brand">{product.brand || "Karmo Foam"}</span>
-              {product.sku ? <span className="text-[13px] font-medium tracking-[0.06em] text-ink/55">SKU {product.sku}</span> : null}
+            {/* Brand · grade on one line, SKU at the end */}
+            <div className="flex items-center justify-between gap-3">
+              <p className="flex min-w-0 items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.22em] text-brand">
+                {catalogue?.color ? (
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full border border-ink/15" style={{ background: FOAM_COLOR_HEX[catalogue.color] || "#ccc" }} aria-hidden />
+                ) : null}
+                <span className="truncate">{product.brand || "Karmo Foam"}{catalogue?.grade ? <span className="text-ink/50"> · {catalogue.grade}</span> : null}</span>
+              </p>
+              {product.sku ? <span className="shrink-0 text-[12px] font-medium tracking-[0.06em] text-ink/45">SKU {product.sku}</span> : null}
             </div>
 
-            <h1 className="display mt-2.5 text-[1.7rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-ink sm:text-[2rem]">
+            <h1 className="display mt-2 text-[1.7rem] font-light uppercase leading-[1.08] tracking-[0.01em] text-ink sm:text-[2.1rem]">
               {product.name}
             </h1>
 
-            {product.rating ? (
-              <div className="mt-2 flex items-center gap-2 text-[13px] text-ink/55">
-                <span className="flex items-center gap-0.5" aria-hidden>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} width="13" height="13" viewBox="0 0 24 24">
-                      <path d="M12 2.6 14.9 9l6.9.6-5.2 4.5 1.6 6.7L12 17.8 5.8 20.8l1.6-6.7L2.2 9.6 9.1 9 12 2.6Z" fill={i < Math.round(product.rating) ? "#FF9A1F" : "#D6D3CE"} />
-                    </svg>
-                  ))}
+            <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-ink/55">
+              {product.rating ? (
+                <span className="flex items-center gap-2">
+                  <span className="flex items-center gap-0.5" aria-hidden>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <svg key={i} width="13" height="13" viewBox="0 0 24 24">
+                        <path d="M12 2.6 14.9 9l6.9.6-5.2 4.5 1.6 6.7L12 17.8 5.8 20.8l1.6-6.7L2.2 9.6 9.1 9 12 2.6Z" fill={i < Math.round(product.rating) ? "#FF9A1F" : "#D6D3CE"} />
+                      </svg>
+                    ))}
+                  </span>
+                  <span className="font-semibold text-ink/80">{product.rating.toFixed(1)}</span>
+                  {product.reviews ? <span>({product.reviews})</span> : null}
                 </span>
-                <span className="font-semibold text-ink/80">{product.rating.toFixed(1)}</span>
-                {product.reviews ? <span>({product.reviews} reviews)</span> : null}
+              ) : null}
+              {catalogue?.noFiller ? <span className="font-semibold text-[#15803d]">✓ No filler</span> : null}
+            </div>
+
+            {/* Three facts, one hairline row */}
+            {product.specs?.length ? (
+              <div className="mt-5 grid border-y border-ink/10 py-3.5" style={{ gridTemplateColumns: `repeat(${Math.min(3, product.specs.length)}, minmax(0, 1fr))` }}>
+                {product.specs.slice(0, 3).map((s, i) => (
+                  <div key={s} className={`px-3 ${i > 0 ? "border-l border-ink/10" : "pl-0"}`}>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">{product.specLabels?.[i] || "Spec"}</p>
+                    <p className="display mt-1 text-[15px] font-semibold text-ink">{s}</p>
+                  </div>
+                ))}
               </div>
             ) : null}
-
-            {product.description || product.line ? (
-              <p className="body-copy mt-2.5 line-clamp-2 text-[15px] leading-[1.65] text-ink/65">{product.description || product.line}</p>
-            ) : null}
-
-            {buyboxIcons.length ? (
-              <ul className="mt-4 grid grid-cols-4 gap-1 border border-ink/10 bg-white px-1.5 py-2 sm:gap-1.5 sm:px-2 sm:py-2" aria-label="Product highlights">
-                {buyboxIcons.map((item) => (
-                  <li key={item.label} className="flex min-w-0 flex-col items-center text-center">
-                    <span className="relative flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">
-                      <Image src={item.src} alt="" width={36} height={36} className="h-full w-full object-contain" />
-                    </span>
-                    <span className="mt-1 text-[10px] font-semibold leading-[1.2] text-brand sm:text-[11px]">{item.label}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-
-            <div className="mt-1">
-              {/* Specs */}
-              {product.specs?.length ? (
-                <div className="grid border-b border-ink/10 py-3" style={{ gridTemplateColumns: `repeat(${Math.min(3, product.specs.length)}, minmax(0, 1fr))` }}>
-                  {product.specs.slice(0, 3).map((s, i) => (
-                    <div key={s} className={`px-3 text-center ${i > 0 ? "border-l border-ink/10" : ""}`}>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-ink/45">{product.specLabels?.[i] || "Spec"}</p>
-                      <p className="mt-1 text-[14px] font-semibold text-ink/85">{s}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
 
             {/* Calculator — same box as the mattress page */}
             <div className="mt-4 border border-[#e5e7eb] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:p-5">
@@ -310,6 +349,19 @@ export default function FoamHero({ product }) {
                 Add to cart
               </button>
             </div>
+
+            {buyboxIcons.length ? (
+              <ul className="mt-5 grid grid-cols-4 gap-2" aria-label="Product highlights">
+                {buyboxIcons.map((item) => (
+                  <li key={item.label} className="flex min-w-0 flex-col items-center text-center">
+                    <span className="relative flex h-9 w-9 items-center justify-center">
+                      <Image src={item.src} alt="" width={36} height={36} className="h-full w-full object-contain" />
+                    </span>
+                    <span className="mt-1.5 text-[11px] font-semibold leading-[1.2] text-ink/70">{item.label}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </motion.div>
         </div>
       </div>

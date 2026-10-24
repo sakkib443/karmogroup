@@ -34,6 +34,8 @@ const LOGO_EASE = "duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 
 /* Cartoon menu icons — same language as trust / order strips. */
 const MENU = "/shared/header/menu";
+/* The Matrexx damask — the mega panel texture for every menu that doesn't name its own. */
+const MEGA_TEXTURE = "/shared/header/mattress-side-texture.webp";
 
 /*
  * Header menu — client sheet (Website Menu revised, Sep 2026):
@@ -506,33 +508,27 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                       ? "right-0"
                       : "left-1/2 -translate-x-1/2"
                 } ${
-                  entry.textureSrc
-                    ? "header-mega-textured bg-[#fffefb]"
-                    : "bg-white"
+                  "header-mega-textured bg-[#fffefb]"
                 } ${
                   panel === entry.name
                     ? "visible translate-y-0 opacity-100 pointer-events-auto"
                     : "invisible translate-y-1 opacity-0 pointer-events-none"
                 }`}
               >
-                {entry.textureSrc ? (
-                  <>
-                    {/* Solid cream under the damask — without this the panel is
-                        see-through and the hero navy reads as a dark overlay. */}
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 z-0 bg-[#fffefb]"
-                    />
-                    <Image
-                      src={entry.textureSrc}
-                      alt=""
-                      aria-hidden
-                      fill
-                      sizes="(min-width: 1024px) 60vw, 100vw"
-                      className="pointer-events-none z-0 object-cover object-center opacity-[0.16]"
-                    />
-                  </>
-                ) : null}
+                {/* Solid cream under the damask — without this the panel is
+                    see-through and the hero navy reads as a dark overlay. */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 z-0 bg-[#fffefb]"
+                />
+                <Image
+                  src={entry.textureSrc || MEGA_TEXTURE}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="(min-width: 1024px) 60vw, 100vw"
+                  className="pointer-events-none z-0 object-cover object-center opacity-[0.16]"
+                />
                 <div
                   className={`relative z-[1] grid w-full min-w-0 divide-x divide-ink/6 px-5 py-5 ${
                     entry.columns.length >= 5

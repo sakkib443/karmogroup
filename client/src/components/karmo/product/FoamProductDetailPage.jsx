@@ -6,7 +6,7 @@ import FoamCatalogueSheet from "@/components/karmo/product/foam/FoamCatalogueShe
 import FoamRelated from "@/components/karmo/product/foam/FoamRelated";
 import ProductPromiseStrip, { FOAM_PROMISES } from "@/components/karmo/product/ProductPromiseStrip";
 import ProductFoamFeatureSlides from "@/components/karmo/product/ProductFoamFeatureSlides";
-import ProductFoamBuildAside from "@/components/karmo/product/ProductFoamBuildAside";
+import FoamDetailSections from "@/components/karmo/product/foam/FoamDetailSections";
 import FoamStaticDetail from "@/components/karmo/product/foam/FoamStaticDetail";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 import { isFoamSet } from "@/components/karmo/product/catalogueQuote";
@@ -42,10 +42,9 @@ export default function FoamProductDetailPage({ product }) {
   return (
     <>
       <FoamHero product={product} />
-      <FoamCatalogueSheet catalogue={product.catalogue} />
       <ProductPromiseStrip items={FOAM_PROMISES} />
+      <FoamDetailSections product={product} />
       <ProductFoamFeatureSlides />
-      <ProductFoamBuildAside />
       <FoamRelated current={product.slug} />
       <OrderAndContact />
     </>

@@ -121,6 +121,18 @@ export const fabricOptions = [
   { id: "fabric-6", label: "Damask 6", image: "/products/common/fabrics/fabric6.webp" },
 ];
 
+/**
+ * A swatch on the buy box shows the shared bedroom render in that cloth (d-01…d-09,
+ * also in the gallery). Every mattress but the topper. A swatch with no render of its
+ * own (Alpona, Green-Leaf) goes back to the product's cover.
+ */
+const FABRIC_RENDERS = {
+  "fabric-2": "/products/mattress/d-03.png", // Red-WF
+  "fabric-3": "/products/mattress/d-04.png", // L. White leaves
+  "fabric-4": "/products/mattress/d-08.png", // Blue-3
+  "fabric-5": "/products/mattress/d-07.png", // Yellow rose
+};
+
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
 export const sizePresets = sizePresetsFor("euro-top-pocket-spring");
 
@@ -173,23 +185,24 @@ const REAL_BY_ID = {
   king: KING_REAL_GALLERY,
 };
 
-/** Shared detail renders (d-01…d-09) added to every mattress product's gallery. */
+/** Shared detail renders (d-01…d-09) for the gallery row. The four a swatch shows
+    (FABRIC_RENDERS) are left out — they appear only when that fabric is clicked. */
 export const SHARED_DETAIL_SHOTS = Array.from(
   { length: 9 },
   (_, i) => `/products/mattress/d-${String(i + 1).padStart(2, "0")}.png`
-);
+).filter((src) => !Object.values(FABRIC_RENDERS).includes(src));
 
 export function getMattressProductSlugs() {
   return catalog.map((p) => p.id);
 }
 
 function buildRealGallery(item) {
-  /* The product's own shots first (cover, hover, or its curated set), then the
-     shared d-01…d-09 detail renders on every mattress detail page. */
+  /* The product's own shots only. The d-01…d-09 detail renders are not in this row —
+     the fabric swatches show them (FABRIC_RENDERS). */
   const base = REAL_BY_ID[item.id]
     ? REAL_BY_ID[item.id]
     : [item.image, item.imageHover, "/products/mattress/matrex-p1.webp"].filter(Boolean);
-  return [...new Set([...base, ...SHARED_DETAIL_SHOTS])];
+  return [...new Set(base)];
 }
 
 function toDetail(item) {
@@ -224,7 +237,10 @@ function toDetail(item) {
     realGallery,
     /** Legacy combined list (buy-box still works if anything reads `gallery`). */
     gallery: realGallery,
-    fabrics: fabricOptions,
+    fabrics:
+      item.id === "topper"
+        ? fabricOptions
+        : fabricOptions.map((fabric) => ({ ...fabric, scene: FABRIC_RENDERS[fabric.id] || cover })),
     densities: null,
     colors: null,
     sizes: sizePresetsFor(item.id),

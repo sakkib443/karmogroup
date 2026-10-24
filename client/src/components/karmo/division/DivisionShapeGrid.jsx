@@ -568,6 +568,8 @@ function OrganizedPair({ items = [], reveal }) {
 
 function OrganizedSpotlight({ data, reveal }) {
   if (!data?.image) return null;
+  // `align: "left"` puts the words on the left (Furniture); right by default.
+  const left = data.align === "left";
 
   return (
     <motion.article
@@ -589,8 +591,8 @@ function OrganizedSpotlight({ data, reveal }) {
       {/* Nudged up from true middle, right-aligned as before — was bottom-
           right, sitting low. Right alignment stays; only the vertical
           position moved. */}
-      <div className="relative z-[1] flex h-full items-center justify-end px-7 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10 lg:pb-24 lg:pt-10">
-        <div className="max-w-[22rem] text-right">
+      <div className={`relative z-[1] flex h-full items-center px-7 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10 lg:pb-24 lg:pt-10 ${left ? "justify-start" : "justify-end"}`}>
+        <div className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}>
           <h3
             className="display title-card-line uppercase text-white"
             style={{
@@ -604,7 +606,7 @@ function OrganizedSpotlight({ data, reveal }) {
           {data.subline ? (
             <p
               className="body-copy mt-3 max-w-[22rem] text-[13px] leading-[1.6] sm:text-[14px]"
-              style={{ color: "rgba(255,255,255,0.8)", marginLeft: "auto" }}
+              style={{ color: "rgba(255,255,255,0.8)", marginLeft: left ? 0 : "auto" }}
             >
               {data.subline}
             </p>
@@ -747,7 +749,7 @@ function OrganizedGrid({ highlights, spotlight, inside, reveal, stage }) {
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className="grid h-[calc(100svh-112px)] w-full grid-cols-1 grid-rows-2 gap-[6px] md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] md:grid-rows-1"
+          className={`grid h-[calc(100svh-112px)] w-full grid-cols-1 grid-rows-2 gap-[6px] md:grid-rows-1 ${spotlight?.even ? "md:grid-cols-2" : "md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"}`}
         >
           <OrganizedSpotlight data={spotlight} reveal={reveal} />
           <InsidePhotoCard photo={inside?.photo} />
