@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 
 /**
  * Dedicated full-width two-banner component for Bed & Automotive Foam.
- * Removes the top feature claims cards and presents the spotlight image
- * and brand film side-by-side in a responsive edge-to-edge layout,
- * matching the HomeTex and Pillow designs.
+ * Two equal (50/50) banners side by side: the spotlight image with its
+ * heading on the left, a showcase image on the right.
+ *
+ * The right panel used to carry the brand film (Tanzin Tisha short); the
+ * client asked for the video to go and a still showcase image to sit there
+ * instead, with both banners sharing the width equally.
  */
 export default function BedAutomotiveTwoBanners({
   className = "mb-1.5",
@@ -23,28 +25,12 @@ export default function BedAutomotiveTwoBanners({
     subline: "High-density cores and open airflow for everyday living rooms.",
     brand: "Karmo Foam",
   },
-  film = "/pages/foam/videos/shorts/v1-tisa-trim.mp4",
-  still = "/pages/foam/mosaic/tisha-film-still-hq.webp",
-  filmAlt = "Tanzin Tisha for Karmo Foam",
-  filmOverlay = true,
+  rightImage = "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.png",
+  rightAlt = "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
+  rightOverlay = false,
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
-
-  const videoRef = useRef(null);
-  const wrapRef = useRef(null);
-  const inView = useInView(wrapRef, { amount: 0.2 });
-
-  useEffect(() => {
-    const node = videoRef.current;
-    if (!node || reduceMotion || !film) return undefined;
-    if (inView) {
-      node.play().catch(() => {});
-    } else {
-      node.pause();
-    }
-    return undefined;
-  }, [inView, reduceMotion, film]);
 
   return (
     <section className={`relative w-full overflow-hidden ${className}`}>
@@ -53,7 +39,7 @@ export default function BedAutomotiveTwoBanners({
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className="grid w-full grid-cols-1 gap-[6px] md:h-[min(49svh,535px)] md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"
+          className="grid w-full grid-cols-1 gap-[6px] md:h-[min(49svh,535px)] md:grid-cols-2"
         >
           {/* Left Banner: Spotlight (Man on cloud / designed to endure) */}
           <motion.article
@@ -65,7 +51,7 @@ export default function BedAutomotiveTwoBanners({
                 src={spotlight.image}
                 alt={spotlight.alt || ""}
                 fill
-                sizes="(min-width: 768px) 65vw, 100vw"
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-cover object-[center_40%] transition-transform duration-700 ease-out group-hover:scale-[1.02]"
                 priority={false}
               />
@@ -103,36 +89,22 @@ export default function BedAutomotiveTwoBanners({
             </div>
           </motion.article>
 
-          {/* Right Banner: Film / Video Panel */}
+          {/* Right Banner: showcase image (was the brand film) */}
           <motion.div
-            ref={wrapRef}
             variants={fade}
             className="group relative h-full min-h-[220px] sm:min-h-[280px] md:min-h-0 overflow-hidden bg-[#0b1a33]"
           >
-            {still ? (
+            {rightImage ? (
               <Image
-                src={still}
-                alt={filmAlt}
+                src={rightImage}
+                alt={rightAlt}
                 fill
-                sizes="(min-width: 768px) 35vw, 100vw"
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
               />
             ) : null}
 
-            {!reduceMotion && film ? (
-              <video
-                ref={videoRef}
-                src={film}
-                muted
-                playsInline
-                loop
-                preload="auto"
-                aria-label={filmAlt || "Karmo foam film"}
-                className="absolute inset-0 h-full w-full object-cover object-center"
-              />
-            ) : null}
-
-            {filmOverlay ? (
+            {rightOverlay ? (
               <div className="pointer-events-none absolute inset-0 bg-black/20" />
             ) : null}
           </motion.div>
