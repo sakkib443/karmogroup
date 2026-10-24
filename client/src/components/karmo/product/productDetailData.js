@@ -173,19 +173,23 @@ const REAL_BY_ID = {
   king: KING_REAL_GALLERY,
 };
 
+/** Shared detail renders (d-01…d-09) added to every mattress product's gallery. */
+export const SHARED_DETAIL_SHOTS = Array.from(
+  { length: 9 },
+  (_, i) => `/products/mattress/d-${String(i + 1).padStart(2, "0")}.png`
+);
+
 export function getMattressProductSlugs() {
   return catalog.map((p) => p.id);
 }
 
 function buildRealGallery(item) {
-  if (REAL_BY_ID[item.id]) return REAL_BY_ID[item.id];
-  /* Cover (room) first, then studio/web packshot, then a shared Matrexx still. */
-  const shots = [
-    item.image,
-    item.imageHover,
-    "/products/mattress/matrex-p1.webp",
-  ].filter(Boolean);
-  return [...new Set(shots)];
+  /* The product's own shots first (cover, hover, or its curated set), then the
+     shared d-01…d-09 detail renders on every mattress detail page. */
+  const base = REAL_BY_ID[item.id]
+    ? REAL_BY_ID[item.id]
+    : [item.image, item.imageHover, "/products/mattress/matrex-p1.webp"].filter(Boolean);
+  return [...new Set([...base, ...SHARED_DETAIL_SHOTS])];
 }
 
 function toDetail(item) {
