@@ -8,7 +8,6 @@
  */
 
 const veil = { color: "#000000", opacity: 32 };
-const clear = { color: "#000000", opacity: 0 };
 
 const slide = (id, src, alt, headingLead, align = "center", overlay = veil) => ({
   id,
@@ -32,20 +31,20 @@ export const mediaPages = {
     title: "News & Blogs",
     lead:
       "Stories from the floor, the showroom and the craft — how Karmo foam, mattresses and HomeTex move through Bangladesh.",
+    /* Single banner (not a slider): one image, heading on the left over the
+       empty wall. */
     slides: [
-      slide("news-foam", "/pages/foam/hero/home-hero-slide-foam-grades-v2-hq.webp", "Karmo foam grades stacked in a sunlit room", "News & Blogs"),
-      slide("news-mattress", "/pages/mattress/hero/mattress-by-the-serene-shore-v1.webp", "A Karmo mattress in a calm room by the sea", "Stories from the floor"),
-      slide("news-hometex", "/pages/home/hero/home-hero-slide-hometex-quilts-v2-hq.webp", "Stacked Karmo HomeTex floral quilts on a sunlit bed", "Comfort, made in Bangladesh", "left", clear),
+      slide("news-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "News & Blogs", "left"),
     ],
     layout: "cards",
     items: [
       {
         id: "n1",
-        tag: "Mattress",
-        title: "Quilt that holds — reading the damask",
-        excerpt: "How the euro-top surface is built for airflow and lasting loft.",
-        src: "/shared/divisions/karmo-damask-quilted-v3.webp",
-        alt: "Close-up of a quilted Karmo damask mattress",
+        tag: "Foam",
+        title: "The foam behind great seating",
+        excerpt: "How Karmo rubber-grade foam keeps sofas firm, breathable and comfortable for years.",
+        src: "/pages/news-blog/feature-foam-seating-bion-shadow.webp",
+        alt: "A Karmo foam sofa with a plush cushion and tan leather side, warm light casting a plant shadow on a dark wall",
         date: "Sep 2026",
       },
       {
@@ -83,10 +82,10 @@ export const mediaPages = {
     title: "Karmo Memory",
     lead:
       "Stills from the craft — the foam, the quilting and the materials that built Bangladesh’s first polyurethane house.",
+    /* Same fixed banner as News & Blogs — only the heading changes between the
+       Media Center tabs, the picture stays put. */
     slides: [
-      slide("memory-grades", "/pages/foam/hero/craft-karmo-grades-v9-hq.webp", "Karmo foam grades in warm light", "Karmo Memory"),
-      slide("memory-showroom", "/pages/mattress/bands/mattress-showroom-interior.webp", "Karmo mattress showroom interior", "The Journey Since 1965"),
-      slide("memory-warehouse", "/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue drums", "Sixty years of craft", "left", clear),
+      slide("memory-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Memory", "left"),
     ],
     layout: "cards",
     items: [
@@ -134,10 +133,10 @@ export const mediaPages = {
     title: "Karmo Ads",
     lead:
       "Campaign films and commercial frames — the reels that put Karmo foam, mattresses and HomeTex on screen.",
+    /* Same fixed banner as News & Blogs — only the heading changes between the
+       Media Center tabs, the picture stays put. */
     slides: [
-      slide("ads-cat", "/shared/hero/cooling-cat-karmo-handle-hq.webp", "Karmo mattress in a calm bedroom with a sleeping cat", "Karmo Ads", "right", clear),
-      slide("ads-navy", "/pages/mattress/hero/about-lifestyle-woman-cat-navy-room-hq.webp", "A woman and her cat on a Karmo mattress in a navy room", "Crafted for nights that last"),
-      slide("ads-living", "/pages/home/promo-band/promo-living-room-hq.webp", "A living room furnished with Karmo comfort pieces", "Foam crafted for living"),
+      slide("ads-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Ads", "left"),
     ],
     layout: "reels",
   },
