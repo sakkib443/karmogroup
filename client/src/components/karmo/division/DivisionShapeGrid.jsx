@@ -592,7 +592,12 @@ function OrganizedSpotlight({ data, reveal }) {
           right, sitting low. Right alignment stays; only the vertical
           position moved. */}
       <div className={`relative z-[1] flex h-full items-center px-7 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10 lg:pb-24 lg:pt-10 ${left ? "justify-start" : "justify-end"}`}>
-        <div className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}>
+        {/* Furniture puts the line on the left of the armchair. A small lift
+            keeps it in the grey wall, clear of the arm — it was sitting on it. */}
+        <div
+          className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}
+          style={left ? { transform: "translateY(-6rem)" } : undefined}
+        >
           <h3
             className="display title-card-line uppercase text-white"
             style={{
