@@ -38,7 +38,13 @@ export default function RootLayout({
       <body>
         <ReduxProvider>
           <ThemeProvider>
-            <Toaster position="top-center" reverseOrder={false} />
+            {/* Header is fixed and 112px tall at z-10000. Toasts sit just
+                under it, above that layer, so a message is never covered. */}
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              containerStyle={{ top: 128, zIndex: 10050 }}
+            />
             {children}
             <FloatingContact />
           </ThemeProvider>
