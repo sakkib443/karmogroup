@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getMattressProductDetail } from '@/components/karmo/product/productDetailData';
 import { getFoamProductDetail } from '@/components/karmo/product/foamProductDetailData';
+import { getPillowProductDetail, quotePillowUnit } from '@/components/karmo/product/pillow/pillowDetailData';
 import { isFoamSet, quoteFoamSetUnit, quoteFoamUnit, quoteMattressUnit } from '@/components/karmo/product/catalogueQuote';
 
 /**
@@ -40,6 +41,13 @@ function quoteLine(line: Line) {
         if (product) {
             const q = quoteMattressUnit(product, sized('wlh'));
             return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division };
+        }
+    }
+    if (!division || division === 'hometex' || division === 'fiber_pillow' || division === 'pillow') {
+        const pillow = getPillowProductDetail(slug);
+        if (pillow) {
+            const q = quotePillowUnit(pillow);
+            return { ok: q.ok, unit: q.total, mrp: q.base, name: q.name, division: q.division };
         }
     }
     if (!division || division === 'foam') {

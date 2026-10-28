@@ -266,7 +266,7 @@ export default function PillowRoute() {
         headingAccent="for you"
         offersId="pillow-offers"
         body=""
-        items={pillowCatalogue}
+        items={pillowCatalogue.map((item) => ({ ...item, href: `/hometex/pillow/${item.id}` }))}
         categoryId="all"
         hoverOverlay
       />
