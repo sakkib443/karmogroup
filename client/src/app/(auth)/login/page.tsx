@@ -8,13 +8,13 @@ import { loginSuccess } from "@/redux/slices/authSlice";
 import { clearWishlist } from "@/redux/slices/wishlistSlice";
 import { useLoginMutation } from "@/redux/api/authApi";
 import { useMergeWishlistMutation } from "@/redux/api/userApi";
-import { toast } from "react-hot-toast";
 import {
   LuLock,
   LuEye,
   LuEyeOff,
   LuArrowRight,
   LuCircleAlert,
+  LuCircleCheck,
   LuUser,
 } from "react-icons/lu";
 import GoogleSignInButton from "@/components/shared/GoogleSignInButton";
@@ -31,6 +31,7 @@ const LoginPageInner = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [notice, setNotice] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,6 +59,7 @@ const LoginPageInner = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setNotice(null);
     const isPhone = /^[0-9+\-\s()]{7,}$/.test(identifier.trim());
     const credentials = isPhone
       ? { phone: identifier.trim(), password }
@@ -81,14 +83,7 @@ const LoginPageInner = () => {
 
       dispatch(loginSuccess({ user, token }));
       localStorage.setItem("token", token);
-      toast.success("Welcome back! Login successful.", {
-        style: {
-          borderRadius: "0",
-          background: "var(--color-brand)",
-          color: "#fff",
-        },
-        icon: "✅",
-      });
+      setNotice({ type: "success", text: "Welcome back. Taking you to your account." });
 
       try {
         const productIds = guestWishlistItems
@@ -126,8 +121,9 @@ const LoginPageInner = () => {
         }
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Invalid email/phone or password.", {
-        duration: 4000,
+      setNotice({
+        type: "error",
+        text: err?.data?.message || "That email or password is not right. Please try again.",
       });
     }
   };
@@ -159,6 +155,26 @@ const LoginPageInner = () => {
           Sign in to continue to your account.
         </p>
       </div>
+
+      {notice && (
+        <div
+          role={notice.type === "error" ? "alert" : "status"}
+          className={`mb-6 flex items-start gap-2.5 border px-4 py-3 ${
+            notice.type === "error"
+              ? "border-brand/30 bg-brand/[0.06]"
+              : "border-emerald-700/20 bg-emerald-50"
+          }`}
+        >
+          {notice.type === "error" ? (
+            <LuCircleAlert size={18} className="mt-0.5 shrink-0 text-brand" />
+          ) : (
+            <LuCircleCheck size={18} className="mt-0.5 shrink-0 text-emerald-700" />
+          )}
+          <p className={`m-0 text-[13px] leading-5 ${notice.type === "error" ? "text-ink" : "text-emerald-950"}`}>
+            {notice.text}
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
