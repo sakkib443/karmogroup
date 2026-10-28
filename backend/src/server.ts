@@ -4,6 +4,7 @@ import config from './app/config';
 import { initSocket } from './app/utils/socket';
 import { startCourierAutoSync } from './app/modules/courier/courier.cron';
 import { ensureStaffAccounts } from './app/modules/user/ensureStaffAccounts';
+import { ensureDeskSamples } from './app/modules/demo/ensureDeskSamples';
 
 process.on('uncaughtException', (error) => {
     console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
@@ -57,6 +58,7 @@ export async function connectDB(): Promise<typeof mongoose> {
 // ── Connect immediately ───────────────────────────────────────────
 connectDB()
     .then(() => ensureStaffAccounts())
+    .then(() => ensureDeskSamples())
     .catch((err) => console.error('❌ Initial MongoDB connection failed:', err));
 
 // ── Start Server ─────────────────────────────────────────────────
