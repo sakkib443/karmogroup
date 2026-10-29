@@ -15,7 +15,7 @@ const chemicals = {
   slug: "chemicals",
 
   banner: {
-    bg: "/pages/chemicals/camicels.png",
+    bg: "/pages/chemicals/camicels.webp",
     style: "simple",
     headline: "The world of polyurethane",
     slides: [],
@@ -64,9 +64,9 @@ const chemicals = {
     ],
     images: [
       "/pages/chemicals/chemicals-karmo-adhesive-tins.webp",
-      "/pages/chemicals/camicels-3.png",
-      "/pages/chemicals/atha-3.png",
-      "/pages/chemicals/atha-2.png",
+      "/pages/chemicals/camicels-3.webp",
+      "/pages/chemicals/atha-3.webp",
+      "/pages/chemicals/atha-2.webp",
     ],
   },
 
@@ -105,7 +105,7 @@ const chemicals = {
 
   mattressFilm: {
     src: "/shared/videos/product-film.mp4",
-    still: "/pages/chemicals/divisions/chemicals-bench.jpg",
+    still: "/pages/chemicals/divisions/chemicals-bench.webp",
     alt: "Karmo Chemicals Film",
     /* Shorter than the mattress full-screen band so the whole section sits
        inside a normal large-device viewport. */
@@ -122,7 +122,7 @@ const chemicals = {
     highlights: [
       {
         id: "no-filler",
-        background: "/pages/chemicals/atha.png",
+        background: "/pages/chemicals/atha.webp",
         overlay: "bg-[#0b1a33]/20",
       },
       {
@@ -143,11 +143,11 @@ const chemicals = {
       },
     ],
     spotlight: {
-      image: "/pages/chemicals/dds.png",
+      image: "/pages/chemicals/dds.webp",
       alt: "Karmo Chemicals adhesive products",
       overlay: "bg-[#0b1a33]/20",
     },
-    topImage: "/pages/chemicals/hdfdk.png",
+    topImage: "/pages/chemicals/hdfdk.webp",
     topImageOverlay: "bg-[#0b1a33]/20",
     faqs: [
       {
@@ -175,7 +175,7 @@ const chemicals = {
           "Keep foam dry, avoid direct heat and sharp folds, and cover finished pieces. For cut sheets, store flat and away from prolonged sun.",
       },
     ],
-    still: "/pages/chemicals/atha-5.png",
+    still: "/pages/chemicals/atha-5.webp",
     filmAlt: "Karmo Chemicals",
     filmOverlay: "bg-[#0b1a33]/20",
   },

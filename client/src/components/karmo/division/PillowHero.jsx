@@ -15,7 +15,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * overlay every other hero on the site uses.
  */
 const HERO = {
-  src: "/pages/hometex/pillow/pillow-banner.png",
+  src: "/pages/hometex/pillow/pillow-banner.webp",
   alt: "A sunlit living room with a grey sofa piled with white Karmo pillows and a knit throw, soft feathers drifting in the air, framed by panelled walls, potted plants and a bright window",
   title: "PREMIUM COMFORT",
 };

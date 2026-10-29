@@ -34,7 +34,7 @@ export const mediaPages = {
     /* Single banner (not a slider): one image, heading on the left over the
        empty wall. */
     slides: [
-      slide("news-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "News & Blogs", "left"),
+      slide("news-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.webp", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "News & Blogs", "left"),
     ],
     layout: "cards",
     items: [
@@ -85,7 +85,7 @@ export const mediaPages = {
     /* Same fixed banner as News & Blogs — only the heading changes between the
        Media Center tabs, the picture stays put. */
     slides: [
-      slide("memory-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Memory", "left"),
+      slide("memory-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.webp", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Memory", "left"),
     ],
     layout: "cards",
     items: [
@@ -136,7 +136,7 @@ export const mediaPages = {
     /* Same fixed banner as News & Blogs — only the heading changes between the
        Media Center tabs, the picture stays put. */
     slides: [
-      slide("ads-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.png", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Ads", "left"),
+      slide("ads-hero", "/pages/news-blog/karmo-mattress-sunlit-bedroom.webp", "A Karmo quilted mattress on a bed in a bright, sunlit bedroom", "Karmo Ads", "left"),
     ],
     layout: "reels",
   },

@@ -359,7 +359,7 @@ function InsidePhotoCard({ photo }) {
           muted
           playsInline
           loop={startAt <= 0}
-          preload="auto"
+          preload="metadata"
           aria-label={photo.alt || ""}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
@@ -414,7 +414,7 @@ function FilmPanel({ film, still, filmAlt = "", overlay }) {
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           aria-label={filmAlt || "Karmo mattress film"}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />

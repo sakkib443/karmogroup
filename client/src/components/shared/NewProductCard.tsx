@@ -325,7 +325,7 @@ const CommentsPopup: React.FC<{
                 {/* ── Product image — full view ── */}
                 <div className='shrink-0 border-b border-gray-200'>
                     <div className='w-full bg-gray-50 flex items-center justify-center' style={{ maxHeight: '280px' }}>
-                        <img
+                        <img loading="lazy" decoding="async"
                             src={productImage}
                             alt={productName}
                             className='w-full object-contain'

@@ -177,7 +177,7 @@ function Know({ product }) {
   return (
     <section className={`mb-1.5 grid bg-white lg:grid-cols-2 ${BAND}`} aria-label="Know your pillow">
       <div className="relative aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-full">
-        <Image src={product.kind === "cushion" ? `${P}/card-02.png` : `${P}/KARMO Plush Pillow Comfort.png`} alt={product.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+        <Image src={product.kind === "cushion" ? `${P}/card-02.webp` : `${P}/KARMO Plush Pillow Comfort.webp`} alt={product.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
       </div>
       <div className={`relative flex items-center bg-[#f6f3ee] px-6 py-14 md:px-14 lg:py-10 lg:pl-14 xl:pl-20 ${SHELL_R}`}>
         <div className="w-full">
@@ -200,7 +200,7 @@ function Know({ product }) {
 function RestBanner() {
   return (
     <section className={`relative mb-1.5 flex min-h-[78svh] items-center overflow-hidden ${BAND}`} aria-label="Made to rest">
-      <Image src={`${P}/why-choose/why-choose-1.png`} alt="A couple with Karmo Plush pillows in a bright bedroom" fill sizes="100vw" className="object-cover object-center" />
+      <Image src={`${P}/why-choose/why-choose-1.webp`} alt="A couple with Karmo Plush pillows in a bright bedroom" fill sizes="100vw" className="object-cover object-center" />
       <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
       <div className={`relative z-[1] w-full px-6 py-16 md:px-14 ${SHELL_L}`}>
         <div className="max-w-2xl">
@@ -216,8 +216,8 @@ function RestBanner() {
 
 function PhotoPair() {
   const shots = [
-    { src: `${P}/card-01.png`, alt: "Side sleep on a Karmo Plush pillow", line1: "Quiet", line2: "through the night", note: "The head pillow stays put when you turn." },
-    { src: `${P}/card-02.png`, alt: "A hand pressing a Karmo pillow", line1: "Soft", line2: "then it holds", note: "Press it. It gives, then comes back." },
+    { src: `${P}/card-01.webp`, alt: "Side sleep on a Karmo Plush pillow", line1: "Quiet", line2: "through the night", note: "The head pillow stays put when you turn." },
+    { src: `${P}/card-02.webp`, alt: "A hand pressing a Karmo pillow", line1: "Soft", line2: "then it holds", note: "Press it. It gives, then comes back." },
   ];
   return (
     <section className="mb-1.5 grid gap-1.5 md:grid-cols-2" aria-label="The pillow up close">
@@ -243,7 +243,7 @@ function Softness({ product }) {
   const feel = PILLOW_FEELS[index];
   return (
     <section className={`relative mb-1.5 flex min-h-[78svh] items-end overflow-hidden ${BAND}`} aria-label="Softness">
-      <Image src={`${P}/pillow-banner.png`} alt="White Karmo pillows arranged on a sofa" fill sizes="100vw" className="object-cover object-center" />
+      <Image src={`${P}/pillow-banner.webp`} alt="White Karmo pillows arranged on a sofa" fill sizes="100vw" className="object-cover object-center" />
       <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
       <div className={`relative z-[1] w-full px-6 pb-10 pt-24 md:px-14 md:pb-14 ${SHELL_L} ${SHELL_R}`}>
         <Heading light kicker="Softness scale" line1="This one sits" line2={feel.label} />
@@ -269,7 +269,7 @@ function Insert({ product }) {
   const facts = product.kind === "cushion"
     ? [["50 cm", "Insert"], ["45 cm", "Cover"], ["500 g", "PP cotton"], ["Zip", "Adjustable"]]
     : [["Full", "Through the middle"], [product.across || product.size, "Across"], [product.down || product.line, "Down"], [feelOf(product.feel).label, "Feel"]];
-  const photo = product.kind === "cushion" ? product.image : `${P}/KARMO Plush Pillow Comfort.png`;
+  const photo = product.kind === "cushion" ? product.image : `${P}/KARMO Plush Pillow Comfort.webp`;
   return (
     <section className={`mb-1.5 grid bg-white lg:grid-cols-2 ${BAND}`} aria-label="How it is filled">
       <div className={`flex items-center bg-[#0b1a33] px-6 py-14 text-white md:px-14 lg:py-10 ${SHELL_L}`}>

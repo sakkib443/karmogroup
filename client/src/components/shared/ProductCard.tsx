@@ -94,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                     )}
 
                     {/* Product Image */}
-                    <img
+                    <img loading="lazy" decoding="async"
                         src={product.image || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=800'}
                         alt={product.name}
                         className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-700'

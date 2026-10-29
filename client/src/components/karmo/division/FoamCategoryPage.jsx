@@ -98,7 +98,7 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
   ],
   /* Right banner is now a still showcase image (the brand film was dropped at
      the client's ask) — the two banners share the width 50/50. */
-  rightImage: "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.png",
+  rightImage: "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.webp",
   rightAlt:
     "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
 };
@@ -137,7 +137,7 @@ export function buildFoamCategoryData(key) {
         },
         {
           id: "support",
-          image: "/pages/foam/bed-automotive/karmo-tuktuk-under-the-lens.png",
+          image: "/pages/foam/bed-automotive/karmo-tuktuk-under-the-lens.webp",
           alt: "A green Karmo auto-rickshaw under a magnifying glass, revealing the foam in its seats",
           caption: "Support for beds and beyond",
           fit: "object-cover",
@@ -156,7 +156,7 @@ export function buildFoamCategoryData(key) {
       ...foam.lounge,
       image: {
         ...foam.lounge.image,
-        src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.png",
+        src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.webp",
         position: "object-center"
       },
       slides: [{
@@ -167,7 +167,7 @@ export function buildFoamCategoryData(key) {
         kicker: "",
         cta: null,
         image: { 
-          src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.png", 
+          src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.webp", 
           alt: "A brown Karmo leather executive office chair beside a wooden desk in a sunlit modern office",
           position: "object-center"
         },

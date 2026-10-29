@@ -61,7 +61,7 @@ export default function MattressFilmStage({
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           aria-label={alt || "Karmo mattress film"}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
