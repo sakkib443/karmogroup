@@ -341,7 +341,7 @@ const foamFurniture = {
       // 50/50 with the film on the right; the Karmo armchair from Bed & Automotive on the left.
       even: true,
       align: "left",
-      image: "/pages/foam/bed-automotive/karmo_sofa_633x421.png",
+      image: "/pages/foam/bed-automotive/karmo_sofa_633x421.webp",
       alt: "Karmo foam armchair with a magnifying glass on the KARMO label",
       headingLead: "Designed",
       headingAccent: "to",

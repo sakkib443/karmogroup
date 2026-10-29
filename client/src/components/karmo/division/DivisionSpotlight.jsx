@@ -135,7 +135,7 @@ export default function DivisionSpotlight({
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               aria-hidden
             />
           )}

@@ -200,7 +200,7 @@ function VideoPanel({ panel }) {
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           aria-hidden
           tabIndex={-1}
           className="absolute inset-0 h-full w-full object-cover"

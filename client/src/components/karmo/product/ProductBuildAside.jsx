@@ -196,7 +196,7 @@ function VideoTile({ src, label }) {
   return (
     <div className="group relative min-h-0 overflow-hidden bg-ink">
       {gif ? (
-        <img src={src} alt={label} className={mediaClass} />
+        <img loading="lazy" decoding="async" src={src} alt={label} className={mediaClass} />
       ) : (
         <video
           className={mediaClass}

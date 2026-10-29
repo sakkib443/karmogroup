@@ -69,7 +69,7 @@ const CategoryPage: React.FC<{ slug: string }> = ({ slug }) => {
                     {(category.icon || category.image) && (
                         <span className="shrink-0 w-11 h-11 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden text-2xl">
                             {category.image
-                                ? <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                                ? <img loading="lazy" decoding="async" src={category.image} alt={category.name} className="w-full h-full object-cover" />
                                 : category.icon}
                         </span>
                     )}

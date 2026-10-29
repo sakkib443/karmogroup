@@ -10,7 +10,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * and the bottom-left placement are specific to this page.
  */
 const SLIDE = {
-  image: "/pages/foam/bed-automotive/sunlit-bedroom-karmo-foam-detail.png",
+  image: "/pages/foam/bed-automotive/sunlit-bedroom-karmo-foam-detail.webp",
   alt: "A sunlit modern bedroom with a wooden platform bed and white quilted Karmo mattress, with a magnifier revealing the Karmo foam layers inside",
   title: "THE COMFORT BEHIND YOUR SLEEP",
   objectPosition: "center",

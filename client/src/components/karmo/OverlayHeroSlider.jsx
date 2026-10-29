@@ -67,7 +67,7 @@ function SlideVideo({ video, on }) {
       muted
       playsInline
       loop={Boolean(video.loop)}
-      preload="auto"
+      preload="metadata"
       aria-hidden
       className={`absolute inset-0 h-full w-full object-cover ${video.position || "object-center"}`}
       style={video.style}

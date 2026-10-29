@@ -42,7 +42,7 @@ const OrderItemsPreview: React.FC<Props> = ({
     const Thumb = ({ item, idx }: { item?: PreviewItem; idx: number }) =>
         item?.thumbnail ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <img loading="lazy" decoding="async"
                 src={item.thumbnail}
                 alt={item?.name || 'product'}
                 title={item?.name || ''}

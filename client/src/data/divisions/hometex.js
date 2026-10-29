@@ -18,13 +18,13 @@ const hometex = {
     slides: [
       {
         id: "comforter-1",
-        bg: "/pages/hometex/comforter.png",
+        bg: "/pages/hometex/comforter.webp",
         headline: "Moments that make a house",
         align: "left",
       },
       {
         id: "comforter-2",
-        bg: "/pages/hometex/hometex-first-sub/bed.png",
+        bg: "/pages/hometex/hometex-first-sub/bed.webp",
         headline: "BREATHABLE WARMTH",
         align: "right",
         contentClassName: "pt-[18vh]",
@@ -79,19 +79,19 @@ const hometex = {
     columns: [
       {
         id: "comfort",
-        image: "/pages/hometex/hometex-first-sub/comforter-6.png",
+        image: "/pages/hometex/hometex-first-sub/comforter-6.webp",
         caption: "Unmatched Everyday Comfort",
         alt: "Karmo HomeTex bedding set",
       },
       {
         id: "cotton",
-        image: "/pages/hometex/hometex-first-sub/sleep.png",
+        image: "/pages/hometex/hometex-first-sub/sleep.webp",
         caption: "Premium Cotton Weave",
         alt: "Karmo HomeTex studio bedding",
       },
       {
         id: "everyone",
-        image: "/pages/hometex/hometex-first-sub/rounded.png",
+        image: "/pages/hometex/hometex-first-sub/rounded.webp",
         caption: "Pure Comfort For Everyone",
         alt: "Karmo HomeTex bedroom linen",
       },
@@ -115,11 +115,11 @@ const hometex = {
         hideIcon: true,
         hideLine: true,
         lightText: true,
-        background: "/pages/hometex/hometex-first-sub/comforter-6.png",
+        background: "/pages/hometex/hometex-first-sub/comforter-6.webp",
       },
       {
         id: "why-choose-us",
-        background: "/pages/hometex/hometex-first-sub/hometex-why-chose-us.png",
+        background: "/pages/hometex/hometex-first-sub/hometex-why-chose-us.webp",
         imageOnly: true,
         hideOverlay: true,
       },
@@ -128,7 +128,7 @@ const hometex = {
       align: "left",
       valign: "center",
       offsetY: "8rem",
-      image: "/pages/hometex/comfort-6.png",
+      image: "/pages/hometex/comfort-6.webp",
       alt: "Teal foam sofa in a bright contemporary living room",
       headingLead: "Designed",
       headingAccent: "to",
@@ -140,7 +140,7 @@ const hometex = {
       heading: "Inside every",
       accent: "set",
       body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
-      background: "/pages/hometex/hometex-first-sub/dog.png",
+      background: "/pages/hometex/hometex-first-sub/dog.webp",
       layers: [
         {
           id: "open-cell",
@@ -174,7 +174,7 @@ const hometex = {
         },
       ],
       photo: {
-        src: "/pages/hometex/comfort-5.png",
+        src: "/pages/hometex/comfort-5.webp",
         alt: "Sofa cushion peeled back to show Karmo set foam inside",
         lightOverlay: true,
       },
@@ -213,7 +213,7 @@ const hometex = {
     sliderVariant: "hometex-floating",
     headingLead: "The comfort you feel every day",
     image: {
-      src: "/pages/hometex/comforter-3.png",
+      src: "/pages/hometex/comforter-3.webp",
       alt: "Karmo HomeTex luxury bedroom bedding collection",
       width: 1920,
       height: 1080,
@@ -233,7 +233,7 @@ const hometex = {
         },
         headingLead: "The comfort you feel every day",
         image: {
-          src: "/pages/hometex/comforter-3.png",
+          src: "/pages/hometex/comforter-3.webp",
           alt: "Karmo HomeTex golden comfort bed set",
           width: 1920,
           height: 1080,
@@ -253,7 +253,7 @@ const hometex = {
         },
         headingLead: "Elegance woven for peaceful nights",
         image: {
-          src: "/pages/hometex/hometex-slide-red.jpeg",
+          src: "/pages/hometex/hometex-slide-red.webp",
           alt: "Karmo HomeTex floral luxury duvet and bedding",
           width: 2880,
           height: 1235,
@@ -273,7 +273,7 @@ const hometex = {
         },
         headingLead: "Bespoke patterns, pure warmth",
         image: {
-          src: "/pages/hometex/hometex-slide-blue.jpeg",
+          src: "/pages/hometex/hometex-slide-blue.webp",
           alt: "Karmo HomeTex royal blue duvet bedroom setup",
           width: 2880,
           height: 1235,
@@ -364,7 +364,7 @@ const hometex = {
         id: "pillow-pair",
         category: "pillows",
         name: "Cotton Pillow Pair",
-        image: "/pages/hometex/divisions/hometex-bed-linen.jpg",
+        image: "/pages/hometex/divisions/hometex-bed-linen.webp",
         alt: "Karmo cotton pillow pair",
         was: "৳ 1,600",
         now: "৳ 1,360",

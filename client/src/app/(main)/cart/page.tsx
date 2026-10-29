@@ -383,7 +383,7 @@ const CartPage = () => {
                 {savedItems.map((item) => (
                     <li key={item.id} className="flex items-center gap-4 px-5 py-4">
                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec]">
-                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
+                            <img loading="lazy" decoding="async" src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="display line-clamp-1 text-[13px] font-semibold uppercase tracking-[0.04em] text-ink">{item.name}</p>
@@ -485,7 +485,7 @@ const CartPage = () => {
                                         </button>
 
                                         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec] sm:h-32 sm:w-32">
-                                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
+                                            <img loading="lazy" decoding="async" src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
                                             {save > 0 ? (
                                                 <span className="absolute left-0 top-0 bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">−{save}%</span>
                                             ) : null}

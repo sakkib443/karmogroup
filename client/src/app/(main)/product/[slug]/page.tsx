@@ -338,7 +338,7 @@ export default function ProductDetailsPage() {
                                     {allImages.map((img, idx) => (
                                         <button key={idx} onClick={(e) => { e.stopPropagation(); handleImageSelect(idx); setZoomLevel(1); setPanOffset({ x: 0, y: 0 }); }}
                                             style={{ width: '56px', height: '56px', borderRadius: '6px', overflow: 'hidden', border: selectedImage === idx ? '2px solid #fff' : '2px solid rgba(255,255,255,0.2)', opacity: selectedImage === idx ? 1 : 0.6, cursor: 'pointer', background: 'transparent', padding: 0, transform: selectedImage === idx ? 'scale(1.1)' : 'scale(1)', transition: 'all 0.2s ease' }}>
-                                            <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img loading="lazy" decoding="async" src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </button>
                                     ))}
                                 </div>
@@ -353,7 +353,7 @@ export default function ProductDetailsPage() {
                                     onMouseMove={(e) => { if (isDraggingRef.current && zoomLevel > 1) { hasDraggedRef.current = true; const o = { x: e.clientX - dragStartRef.current.x, y: e.clientY - dragStartRef.current.y }; panOffsetRef.current = o; setPanOffset({ ...o }); } }}
                                     onMouseUp={() => { isDraggingRef.current = false; }}
                                     onMouseLeave={() => { isDraggingRef.current = false; }}>
-                                    <img src={allImages[selectedImage] || allImages[0]} alt={product.name} draggable={false}
+                                    <img loading="lazy" decoding="async" src={allImages[selectedImage] || allImages[0]} alt={product.name} draggable={false}
                                         style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '6px', transition: 'transform 0.1s ease', transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})`, cursor: zoomLevel > 1 ? 'grab' : 'zoom-in', background: '#111', userSelect: 'none', transformOrigin: 'center center' }}
                                         onClick={(e) => { if (hasDraggedRef.current) { hasDraggedRef.current = false; return; } e.stopPropagation(); if (zoomLevel > 1) { setZoomLevel(1); const r = { x: 0, y: 0 }; panOffsetRef.current = r; setPanOffset(r); } else { setZoomLevel(1.8); } }}
                                         onWheel={(e) => { e.stopPropagation(); setZoomLevel(prev => { const n = Math.max(1, Math.min(2.5, prev + (e.deltaY < 0 ? 0.15 : -0.15))); if (n <= 1) { const r = { x: 0, y: 0 }; panOffsetRef.current = r; setPanOffset(r); } return n; }); }}
@@ -397,7 +397,7 @@ export default function ProductDetailsPage() {
                                     <LuChevronRight size={15} color="#333" />
                                 </button>
                                 <div className="pd-main-image-box" style={{ width: '100%', aspectRatio: '1/1', background: '#f8f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', borderRadius: '6px', border: '1px solid #f0f0f0' }} onClick={() => setIsFullscreen(true)}>
-                                    <img src={allImages[selectedImage] || allImages[0]} alt={product.name}
+                                    <img loading="lazy" decoding="async" src={allImages[selectedImage] || allImages[0]} alt={product.name}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
                                         onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=No+Image'; }}
                                     />
@@ -424,7 +424,7 @@ export default function ProductDetailsPage() {
                                     {allImages.map((img: string, idx: number) => (
                                         <button key={idx} onClick={() => handleImageSelect(idx)} onMouseEnter={() => handleImageSelect(idx)}
                                             style={{ width: '60px', height: '60px', flexShrink: 0, border: selectedImage === idx ? '2px solid var(--color-primary)' : '2px solid #e5e7eb', borderRadius: '6px', cursor: 'pointer', transition: 'all 0.2s ease', overflow: 'hidden', padding: 0, background: '#f5f5f5', boxShadow: selectedImage === idx ? '0 0 0 2px rgba(var(--color-primary-rgb),0.15)' : 'none' }}>
-                                            <img src={img} alt={`Product ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img loading="lazy" decoding="async" src={img} alt={`Product ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         </button>
                                     ))}
                                 </div>
@@ -821,7 +821,7 @@ export default function ProductDetailsPage() {
                                             {r.images?.length > 0 && (
                                                 <div style={{ display: 'flex', gap: '8px', marginTop: '8px', paddingLeft: '44px', flexWrap: 'wrap' }}>
                                                     {r.images.map((img: string, ii: number) => (
-                                                        <img key={ii} src={img} alt="review" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e5e7eb' }} />
+                                                        <img loading="lazy" decoding="async" key={ii} src={img} alt="review" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e5e7eb' }} />
                                                     ))}
                                                 </div>
                                             )}
@@ -968,7 +968,7 @@ export default function ProductDetailsPage() {
                                     </div>
                                     <div className='shrink-0 border-b border-gray-200'>
                                         <div className='w-full bg-gray-50 flex items-center justify-center' style={{ maxHeight: '240px' }}>
-                                            <img src={allImages[0]} alt={product.name} className='w-full object-contain' style={{ maxHeight: '240px' }} onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x200/f3f4f6/9ca3af?text=No+Image'; }} />
+                                            <img loading="lazy" decoding="async" src={allImages[0]} alt={product.name} className='w-full object-contain' style={{ maxHeight: '240px' }} onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x200/f3f4f6/9ca3af?text=No+Image'; }} />
                                         </div>
                                     </div>
                                     <div className='px-4 pt-3 pb-1'><p className='text-[13px] font-bold text-gray-900'>Share With</p></div>
@@ -1018,7 +1018,7 @@ export default function ProductDetailsPage() {
                                             style={{ aspectRatio: '1/1', borderRadius: '6px', overflow: 'hidden', cursor: 'pointer', border: '2px solid #e5e7eb', position: 'relative', transition: 'all 0.2s' }}
                                             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-primary)'; (e.currentTarget.querySelector('.dl-overlay') as HTMLElement).style.opacity = '1'; }}
                                             onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e5e7eb'; (e.currentTarget.querySelector('.dl-overlay') as HTMLElement).style.opacity = '0'; }}>
-                                            <img src={img} alt={`Image ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img loading="lazy" decoding="async" src={img} alt={`Image ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             <div className="dl-overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(var(--color-primary-rgb),0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}>
                                                 <LuDownload size={22} color="#fff" />
                                             </div>
@@ -1038,7 +1038,7 @@ export default function ProductDetailsPage() {
                                     <button onClick={() => { setShowInquiryModal(false); setInquirySuccess(false); }} style={{ background: '#f3f4f6', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><LuX size={15} /></button>
                                 </div>
                                 <div style={{ display: 'flex', gap: '10px', padding: '10px', background: '#f9fafb', borderRadius: '6px', marginBottom: '14px' }}>
-                                    <img src={product.thumbnail} alt={product.name} style={{ width: '52px', height: '52px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
+                                    <img loading="lazy" decoding="async" src={product.thumbnail} alt={product.name} style={{ width: '52px', height: '52px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
                                     <div>
                                         <p style={{ fontSize: '13px', fontWeight: 600, color: '#111', margin: '0 0 3px', lineHeight: 1.3 }}>{product.name}</p>
                                         <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-primary)', margin: 0 }}>৳{discountedPrice.toLocaleString()}</p>

@@ -12,7 +12,7 @@ export default function ChemicalsPolyurethaneRoute() {
   return (
     <>
       <ChemicalBanner
-        src="/pages/chemicals/camicels.png"
+        src="/pages/chemicals/camicels.webp"
         alt="Blue chemical drums racked in a Karmo warehouse"
         line1="Polyurethane"
         line2="& solvent"

@@ -11,9 +11,9 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
  */
 export default function PillowTwoBanners({
   className = "mb-1.5",
-  leftImage = "/pages/hometex/pillow/banner-02.png",
+  leftImage = "/pages/hometex/pillow/banner-02.webp",
   leftAlt = "Karmo Relax Time Sleeping Pill pillows",
-  rightImage = "/pages/hometex/pillow/KARMO Plush Pillow Comfort.png",
+  rightImage = "/pages/hometex/pillow/KARMO Plush Pillow Comfort.webp",
   rightAlt = "Karmo Plush pillows with plush fiber fill on cozy bed",
 }) {
   const reduceMotion = useReducedMotion();

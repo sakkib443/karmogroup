@@ -12,7 +12,7 @@ export default function ChemicalsEvergainRoute() {
   return (
     <>
       <ChemicalBanner
-        src="/pages/chemicals/hdfdk.png"
+        src="/pages/chemicals/hdfdk.webp"
         alt="Evergain PVC adhesive tin with pipes and panels"
         line1="Evergain"
         line2="chemical"
