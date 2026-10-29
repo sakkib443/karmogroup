@@ -24,11 +24,11 @@ interface LegalPageProps {
    the pillow catalogue (client/src/app/(karmo-2)/hometex/pillow/page.jsx). */
 const PILLOW_IMG = "/products/hometex/pillow";
 const PRODUCTS = [
-    { name: "Plush Pillow Combo Offer", image: `${PILLOW_IMG}/plush-combo.jpg`, price: "৳ 2,599" },
-    { name: "RelaxTime Pillow Combo Offer", image: `${PILLOW_IMG}/relax-combo.jpg`, price: "৳ 1,599" },
-    { name: "RelaxTime Pillow Combo Offer", image: `${PILLOW_IMG}/relax-combo-999.jpg`, price: "৳ 999" },
-    { name: "6 RelaxTime Cushion Offer", image: `${PILLOW_IMG}/6-cushion.jpg`, price: "৳ 1,240" },
-    { name: "4 RelaxTime Cushion Offer", image: `${PILLOW_IMG}/4-cushion.jpg`, price: "৳ 850" },
+    { name: "Plush Pillow Combo Offer", image: `${PILLOW_IMG}/plush-combo.webp`, price: "৳ 2,599" },
+    { name: "RelaxTime Pillow Combo Offer", image: `${PILLOW_IMG}/relax-combo.webp`, price: "৳ 1,599" },
+    { name: "RelaxTime Pillow Combo Offer", image: `${PILLOW_IMG}/relax-combo-999.webp`, price: "৳ 999" },
+    { name: "6 RelaxTime Cushion Offer", image: `${PILLOW_IMG}/6-cushion.webp`, price: "৳ 1,240" },
+    { name: "4 RelaxTime Cushion Offer", image: `${PILLOW_IMG}/4-cushion.webp`, price: "৳ 850" },
 ];
 const PRODUCTS_HREF = "/hometex/pillow";
 

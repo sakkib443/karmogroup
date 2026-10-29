@@ -12,7 +12,7 @@ export default function ChemicalsKarmoAdhesiveRoute() {
   return (
     <>
       <ChemicalBanner
-        src="/pages/chemicals/dds.png"
+        src="/pages/chemicals/dds.webp"
         alt="Karmo Light Adhesive and Ocean tins beside sneakers and foam"
         line1="Karmo"
         line2="adhesive"

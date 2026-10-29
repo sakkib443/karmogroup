@@ -25,7 +25,7 @@ export default function BedAutomotiveTwoBanners({
     subline: "High-density cores and open airflow for everyday living rooms.",
     brand: "Karmo Foam",
   },
-  rightImage = "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.png",
+  rightImage = "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.webp",
   rightAlt = "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
   rightOverlay = false,
 }) {
