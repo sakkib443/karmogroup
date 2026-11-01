@@ -427,8 +427,11 @@ const CheckoutPage = () => {
                             </p>
                         ) : null}
                         <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-ink/60">
-                            Our team will call you shortly to confirm the order and the delivery date.
+                            Your order has been placed. Our team will call you shortly to confirm the order and the delivery date.
                             {selectedPayment === 'cod' ? ' Pay in cash when it arrives.' : ''}
+                        </p>
+                        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-ink/60">
+                            Once it is confirmed, you will get an SMS on your mobile number with the order details.
                         </p>
                         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                             <button onClick={() => router.push('/dashboard/user/orders')}
