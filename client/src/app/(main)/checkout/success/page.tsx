@@ -14,7 +14,7 @@ const SuccessPage = () => {
 
                 <h1 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Order Successful!</h1>
                 <p className="text-gray-500 font-medium mb-10 leading-relaxed">
-                    Thank you for your purchase. Your order has been placed and is being processed. You will receive an email confirmation shortly.
+                    Thank you for your purchase. Your order has been placed. Our team will call you shortly to confirm it, and you will get an SMS on your mobile number once it is confirmed.
                 </p>
 
                 <div className="space-y-4">

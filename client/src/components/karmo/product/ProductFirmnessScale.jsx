@@ -45,7 +45,7 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
       </motion.div>
 
       <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
-        <div className="relative h-[min(50svh,520px)] w-full min-h-[280px] sm:min-h-[340px] lg:h-[min(52svh,580px)]">
+        <div className="relative aspect-[1280/360] w-full min-h-[300px] sm:min-h-[340px]">
           <video
             className="absolute inset-0 h-full w-full object-cover object-center"
             autoPlay
