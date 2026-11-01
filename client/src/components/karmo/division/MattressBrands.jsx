@@ -16,6 +16,9 @@ export default function MattressBrands({
   background,
   backgroundAspect = "1916 / 821",
   composed = false,
+  /* Composed photo fills a screen-tall band; wide banners with logos at the
+     edges leave this off so nothing is cropped away. */
+  screenTall = false,
   items = [],
 }) {
   if (!items.length && !background) return null;
@@ -28,7 +31,12 @@ export default function MattressBrands({
         className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0c1c33]"
         style={{ ["--mattress-brands-h"]: "auto" }}
       >
-        <div className="relative w-full" style={{ aspectRatio: backgroundAspect }}>
+        <div
+          className={`relative w-full aspect-[var(--brands-aspect)] ${
+            screenTall ? "lg:aspect-auto lg:h-[calc(100svh-32px)]" : ""
+          }`}
+          style={{ ["--brands-aspect"]: backgroundAspect.replace(/\s/g, "") }}
+        >
           <Image
             src={background}
             alt={imageAlt || heading || "Our mattress brands"}

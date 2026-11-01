@@ -144,8 +144,8 @@ const mattress = {
     imageAlt: "Karmo luxury mattress showroom interior",
     /* One full-width photograph, shown whole at its own proportions. */
     composed: true,
-    background: "/pages/mattress/bands/mattress-showroom-interior.webp",
-    backgroundAspect: "1774 / 887",
+    background: "/pages/mattress/bands/karmo-mattress-brands-split-scene.webp",
+    backgroundAspect: "1916 / 821",
     items: [
       {
         id: "imperial",
@@ -431,6 +431,18 @@ const mattress = {
           /* Anchor to the bottom: when the frame crops the photo on a short
              or narrow screen, the top is cut, never the bottom. */
           position: "object-bottom",
+        },
+      },
+      {
+        id: "transformation",
+        align: "center",
+        titleCard: true,
+        headingLead: "The Karmo Mattress Transformation",
+        image: {
+          src: "/pages/mattress/hero/karmo-style-mattress-transformation.webp",
+          alt: "A tired old bed beside a fresh Karmo mattress in a bright city bedroom",
+          width: 1774,
+          height: 887,
         },
       },
       {
