@@ -66,7 +66,7 @@ const FLAGSHIP_SHOTS = [
   },
   {
     id: "sunlit",
-    src: "/pages/home/explore/foam-flagship-3d-living-room.webp",
+    src: "/pages/home/explore/foam-flagship-living-room-v2.webp",
     alt: "Cream armchair in a sunlit living room, a magnifier on the Karmo 3D label, and Karmo foam blocks along the bottom",
     position: "object-bottom",
     tone: "bg-white",

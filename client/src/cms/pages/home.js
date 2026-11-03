@@ -150,7 +150,7 @@ export const explore = {
     ],
     flagship: {
       shots: [
-        { image: img("/pages/home/explore/foam-flagship-3d-living-room.webp", "Cream armchair in a sunlit living room, a magnifier on the Karmo 3D label, and Karmo foam blocks along the bottom", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
+        { image: img("/pages/home/explore/foam-flagship-living-room-v2.webp", "Cream armchair in a sunlit living room, a magnifier on the Karmo 3D label, and Karmo foam blocks along the bottom", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
         { image: img("/shared/banners/magnific-3zztfkcrey.webp", "A Karmo Magnific lifestyle scene"), overlay: { color: SHADE, opacity: 0 } },
       ],
       line1: "Foam crafted",
