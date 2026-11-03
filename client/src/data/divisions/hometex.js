@@ -1,11 +1,10 @@
+import { comforterShopItems } from "@/components/karmo/product/comforter/comforterDetailData";
+
 /**
  * HomeTex division — same template as the mattress (ideal) page.
  *
- * SCAFFOLD: images use the existing HomeTex artwork; product names and prices
- * are placeholders. Swap in the real catalogue when ready:
- *   · banner.slides — cutout HomeTex PNGs (bedding sets on transparent bg)
- *   · products[] — real SKUs, prices and images
- *   · features[].icon — proper HomeTex trust badges
+ * Banner and feature art are the existing HomeTex set. The product grid is
+ * the live comforter catalogue (karmogroup.com/comforter).
  * `promise` is left empty on purpose: the shared band's default copy already
  * covers bedding, so it reads correctly here.
  */
@@ -322,81 +321,10 @@ const hometex = {
     headingLead: "Hot offer",
     headingAccent: "for you",
     offersId: "hometex-offers",
-    /* TODO: placeholder SKUs and prices — replace with the real HomeTex catalogue. */
-    items: [
-      {
-        id: "cotton-bedsheet-set",
-        category: "bed-sheets",
-        name: "Cotton Bed Sheet Set",
-        image: "/shared/divisions/hometex-karmo-bedding-set.webp",
-        alt: "Karmo cotton bed sheet set",
-        was: "৳ 3,200",
-        now: "৳ 2,720",
-      },
-      {
-        id: "premium-comforter",
-        category: "comforters",
-        name: "Premium Comforter",
-        image: "/shared/divisions/hometex-karmo-bedding-studio.webp",
-        alt: "Karmo premium comforter",
-        was: "৳ 4,500",
-        now: "৳ 3,825",
-      },
-      {
-        id: "complete-bedding",
-        category: "linen",
-        name: "Complete Bedding Set",
-        image: "/pages/hometex/divisions/hometex-bedding-set.webp",
-        alt: "Karmo complete bedding set",
-        was: "৳ 6,900",
-        now: "৳ 5,865",
-      },
-      {
-        id: "bedroom-linen",
-        category: "linen",
-        name: "Bedroom Linen Set",
-        image: "/shared/divisions/hometex-karmo-bedding-room.webp",
-        alt: "Karmo bedroom linen set",
-        was: null,
-        now: "৳ 4,200",
-      },
-      {
-        id: "pillow-pair",
-        category: "pillows",
-        name: "Cotton Pillow Pair",
-        image: "/pages/hometex/divisions/hometex-bed-linen.webp",
-        alt: "Karmo cotton pillow pair",
-        was: "৳ 1,600",
-        now: "৳ 1,360",
-      },
-      {
-        id: "studio-duvet",
-        category: "comforters",
-        name: "Studio Duvet",
-        image: "/shared/divisions/hometex-karmo-bedding-studio.webp",
-        alt: "Karmo studio duvet",
-        was: "৳ 5,200",
-        now: "৳ 4,420",
-      },
-      {
-        id: "everyday-sheet",
-        category: "bed-sheets",
-        name: "Everyday Sheet Set",
-        image: "/shared/divisions/hometex-karmo-bedding-set.webp",
-        alt: "Karmo everyday sheet set",
-        was: null,
-        now: "৳ 2,100",
-      },
-      {
-        id: "luxury-linen",
-        category: "linen",
-        name: "Luxury Linen Collection",
-        image: "/pages/hometex/divisions/hometex-bedding-set.webp",
-        alt: "Karmo luxury linen collection",
-        was: "৳ 8,900",
-        now: "৳ 7,565",
-      },
-    ],
+    /* Same 18 prints as karmogroup.com/comforter, in the three-column offer cards. */
+    body: "",
+    variant: "comforter",
+    items: comforterShopItems,
   },
 };
 
