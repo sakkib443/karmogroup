@@ -12,7 +12,7 @@ import { emitFinanceUpdate } from '../../utils/socket';
 import { computeShippingCost } from '../shipping/shipping.service';
 import { type Viewer, actorOf, scopeFor, present, assertVisible, assertTransition, ensureJobs, dhakaDayStart } from './order.desk';
 import { divisionOf } from '../../constants/roles';
-import { type CatalogueQuote, quoteCatalogueLines } from './order.quote';
+import { type CatalogueQuote, addProductToParcel, addToParcel, isProductId, parcelOfLines, quoteCatalogueLines } from './order.quote';
 
 /**
  * Tell the customer their payment status changed. Shared by the admin's manual
@@ -71,9 +71,6 @@ const notifyOrderStatus = (order: any, status: string): void => {
         // never block status update
     }
 };
-
-/** A Mongo _id. Slugs are never 24 hex characters, so this tells the two kinds of line apart. */
-const isProductId = (v: unknown) => /^[a-f0-9]{24}$/i.test(String(v || ''));
 
 /* Dashboard groups. The older courier steps (processing, on_the_way…) still sit on some orders. */
 const DAY_MS = 24 * 3600e3;
@@ -277,7 +274,7 @@ const OrderService = {
     },
 
     async createOrder(userId: string, payload: any) {
-        const { items, shippingAddress, paymentMethod, paymentDetails, couponCode, couponCodes, note } = payload;
+        const { items, shippingAddress, deliveryArea, paymentMethod, paymentDetails, couponCode, couponCodes, note } = payload;
 
         // Guard: an order must contain at least one item (defense-in-depth —
         // the guest-checkout route also validates, but any caller is protected here).
@@ -311,14 +308,18 @@ const OrderService = {
             division: item.division,
             dims: item.dims,
             size: item.size,
+            option: item.option,
         })));
+        const parcel = { weightKg: 0, mattresses: 0 };
 
         for (const item of items) {
             if (!isProductId(item.product)) {
-                const line = catalogueLine(item, quotes[catalogueItems.indexOf(item)]);
+                const quote = quotes[catalogueItems.indexOf(item)];
+                const line = catalogueLine(item, quote);
                 subtotal += line.total;
                 orderItems.push(line);
                 stagedItems.push({ product: null });
+                addToParcel(parcel, quote, line.quantity);
                 continue;
             }
 
@@ -329,6 +330,7 @@ const OrderService = {
             const unitPrice = resolveEffectivePrice(product);
             const itemTotal = unitPrice * item.quantity;
             subtotal += itemTotal;
+            addProductToParcel(parcel, product, item.quantity);
 
             orderItems.push({
                 product: product._id,
@@ -393,9 +395,11 @@ const OrderService = {
 
         // Authoritative server-side shipping charge (never trust a client-sent value).
         // Free shipping resolves via: all-items-free-delivery → coupon → subtotal
-        // threshold → quantity → zone rate.
+        // threshold → quantity → the weight table.
         const { shippingCost, freeReason } = await computeShippingCost({
             city: shippingAddress?.city || '',
+            area: deliveryArea,
+            parcel,
             subtotal,
             items: stagedItems.map((s: any) => ({ freeShipping: Boolean(s.product?.shippingConfig?.freeShipping) })),
             totalQuantity: orderItems.reduce((n: number, oi: any) => n + (oi.quantity || 0), 0),
@@ -655,8 +659,12 @@ const OrderService = {
             const city = area === 'inside_dhaka' ? 'dhaka'
                 : area === 'outside_dhaka' ? (/dhaka/i.test(shippingAddress.city || '') ? '' : shippingAddress.city || '')
                     : shippingAddress.city || '';
+            // Free-text desk lines count as one piece each; with the website down, the flat rate.
+            const parcel = await parcelOfLines(items).then((r) => r.parcel).catch(() => undefined);
             const quote = await computeShippingCost({
                 city,
+                area,
+                parcel,
                 subtotal,
                 items: orderItems.map(() => ({ freeShipping: false })),
                 totalQuantity: orderItems.reduce((n, oi) => n + oi.quantity, 0),

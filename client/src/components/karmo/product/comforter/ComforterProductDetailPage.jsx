@@ -10,6 +10,8 @@ import { toast } from "react-hot-toast";
 import { useAppDispatch } from "@/redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
+import ProductDescription from "@/components/karmo/product/ProductDescription";
+import { comforterDescription } from "@/components/karmo/product/productDescriptions";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -24,7 +26,7 @@ const HIGHLIGHTS = [
   { src: "/shared/trust/cartoon-v3/feat-comfort-v2.webp", label: "Soft loft" },
   { src: "/shared/trust/cartoon-v3/feat-breathable-v2.webp", label: "All season" },
   { src: "/shared/trust/cartoon-v3/feat-durability-v2.webp", label: "Quilted through" },
-  { src: "/shared/trust/cartoon-v3/delivery-v2.webp", label: "Free delivery" },
+  { src: "/shared/trust/cartoon-v3/delivery-fast-v1.webp", label: "Fast delivery" },
 ];
 
 function Panel({ tone = "light", className = "", children }) {
@@ -38,7 +40,7 @@ function Panel({ tone = "light", className = "", children }) {
 
 const PROMISES = [
   { src: "/shared/trust/cartoon-v3/superbrand-v3.webp", scale: 0.92, title: "Quality checked", note: "Each comforter is finished and checked before it leaves" },
-  { src: "/shared/trust/cartoon-v3/delivery-v2.webp", scale: 1, title: "Free delivery", note: "Doorstep delivery across Bangladesh on this range" },
+  { src: "/shared/trust/cartoon-v3/delivery-fast-v1.webp", scale: 1, title: "Fast delivery", note: "Quick, careful doorstep delivery across Bangladesh" },
   { src: "/shared/trust/cartoon-v3/natural-v2.webp", scale: 0.92, title: "Microfiber fill", note: "100% polyester microfiber, made for every season" },
   { src: "/shared/trust/cartoon-v3/legacy-60-v2.webp", scale: 1, title: "Trusted since 1965", note: "Six decades of comfort from Bangladesh's first foam maker" },
 ];
@@ -117,7 +119,7 @@ function Buy({ product }) {
               </p>
               <p className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-[0.1em] text-ink/55">
                 <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#2F9E44]" />
-                In stock · {product.size} · free delivery
+                In stock · {product.size}
               </p>
             </div>
 
@@ -350,6 +352,7 @@ export default function ComforterProductDetailPage({ product }) {
   return (
     <>
       <Buy product={product} />
+      <ProductDescription description={comforterDescription(product)} />
       <ProductPromiseStrip items={PROMISES} />
       <Know product={product} />
       <RoomBanner />

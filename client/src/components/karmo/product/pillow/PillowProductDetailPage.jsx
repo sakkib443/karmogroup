@@ -11,6 +11,8 @@ import { useAppDispatch } from "@/redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
 import { PILLOW_FEELS } from "@/components/karmo/product/pillow/pillowDetailData";
+import ProductDescription from "@/components/karmo/product/ProductDescription";
+import { pillowDescription } from "@/components/karmo/product/productDescriptions";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -21,7 +23,7 @@ const SHELL_R = "lg:pr-[max(4rem,calc((100vw-1600px)/2+4rem))]";
 
 const PROMISES = [
   { src: "/shared/trust/cartoon-v3/superbrand-v3.webp", scale: 0.92, title: "Quality checked", note: "Every pillow is finished and checked before it leaves" },
-  { src: "/shared/trust/cartoon-v3/delivery-v2.webp", scale: 1, title: "Free delivery", note: "Doorstep delivery across Bangladesh on this range" },
+  { src: "/shared/trust/cartoon-v3/delivery-fast-v1.webp", scale: 1, title: "Fast delivery", note: "Quick, careful doorstep delivery across Bangladesh" },
   { src: "/shared/trust/cartoon-v3/trusted-v3.webp", scale: 0.92, title: "Soft fibre fill", note: "Filled to feel full in the cover, not flat in the middle" },
   { src: "/shared/trust/cartoon-v3/legacy-60-v2.webp", scale: 1, title: "Trusted since 1965", note: "Six decades of comfort from Bangladesh's first foam maker" },
 ];
@@ -334,6 +336,7 @@ export default function PillowProductDetailPage({ product }) {
   return (
     <>
       <Buy product={product} />
+      <ProductDescription description={pillowDescription(product, feelOf(product.feel).label)} />
       <ProductPromiseStrip items={PROMISES} />
       <Know product={product} />
       <RestBanner />

@@ -17,6 +17,8 @@ export interface CartItem {
     discount?: number;
     /** Karmo catalogue lines priced by size (inch): the order server re-quotes from these. */
     dims?: { width: number; length: number; height: number };
+    /** Foam set bought in part: only the sit or back half. */
+    option?: 'sit' | 'back';
 }
 
 interface CartState {

@@ -58,9 +58,9 @@ const hometex = {
     },
     {
       id: "delivery",
-      title: "Free Delivery",
-      note: "Available",
-      icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
+      title: "Fast Delivery",
+      note: "Across Bangladesh",
+      icon: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
     },
     {
       id: "stores",

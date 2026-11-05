@@ -60,9 +60,9 @@ const foam = {
     },
     {
       id: "delivery",
-      icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
-      title: "Free Delivery",
-      note: "Available",
+      icon: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
+      title: "Fast Delivery",
+      note: "Across Bangladesh",
     },
     {
       id: "stores",

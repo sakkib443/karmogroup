@@ -51,10 +51,10 @@ export const FOAM_PROMISES = [
     note: "Sheets and blocks cut clean to the inch for makers",
   },
   {
-    src: "/shared/trust/cartoon-v3/delivery-v2.webp",
+    src: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
     scale: 1,
-    title: "Free Delivery",
-    note: "Doorstep delivery across Bangladesh on this range",
+    title: "Fast Delivery",
+    note: "Quick, careful doorstep delivery across Bangladesh",
   },
   {
     src: "/shared/trust/cartoon-v3/legacy-60-v2.webp",

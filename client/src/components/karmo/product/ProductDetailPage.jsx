@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import ProductHero from "@/components/karmo/product/ProductHero";
+import ProductDescription from "@/components/karmo/product/ProductDescription";
+import { mattressDescription } from "@/components/karmo/product/productDescriptions";
 import ProductPromiseStrip from "@/components/karmo/product/ProductPromiseStrip";
 import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlides";
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
@@ -33,6 +35,7 @@ export default function ProductDetailPage({ product }) {
   return (
     <>
       <ProductHero product={product} />
+      <ProductDescription description={mattressDescription(product)} />
       <ProductPromiseStrip />
       <ProductInside product={product} />
       <ProductFeatureSlides />

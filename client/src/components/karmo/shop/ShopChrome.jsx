@@ -180,7 +180,7 @@ export function ShopHeader({ eyebrow, title, accent, sub, step = 1, aside }) {
 /* ─── Trust row — the homepage's cartoon icons ──────────────────────────── */
 
 const TRUST = [
-  { icon: "/shared/trust/cartoon-v3/delivery-v2.webp", title: "Nationwide delivery", note: "To your door, anywhere in Bangladesh" },
+  { icon: "/shared/trust/cartoon-v3/delivery-fast-v1.webp", title: "Nationwide delivery", note: "To your door, anywhere in Bangladesh" },
   { icon: "/shared/trust/cartoon-v3/legacy-60-v5.webp", title: "Since 1965", note: "Six decades of trusted comfort" },
   { icon: "/shared/trust/cartoon-v3/cartoon-globe-v4.webp", title: "Certified quality", note: "ISO 9001 · UKAS · Moody" },
 ];

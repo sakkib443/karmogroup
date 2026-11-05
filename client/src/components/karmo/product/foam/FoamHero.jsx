@@ -18,7 +18,7 @@ import { useAppDispatch } from "@/redux";
 import { addToCart, removeFromCart } from "@/redux/slices/cartSlice";
 import { formatTaka } from "@/components/karmo/product/productDetailData";
 import { getFoamPricingRule } from "@/components/karmo/product/foamPricing";
-import { quoteFoamUnit } from "@/components/karmo/product/catalogueQuote";
+import { FOAM_SET_PARTS, hasFoamParts, quoteFoamPart, quoteFoamUnit } from "@/components/karmo/product/catalogueQuote";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -33,6 +33,12 @@ export const FOAM_COLOR_HEX = {
 };
 
 const MAX_QTY = 99;
+
+const BUY_OPTIONS = [
+  { id: "set", label: "1 Set Foam" },
+  { id: "sit", label: FOAM_SET_PARTS.sit.label },
+  { id: "back", label: FOAM_SET_PARTS.back.label },
+];
 
 function ThumbButton({ src, active, onClick, label, className = "" }) {
   return (
@@ -67,6 +73,9 @@ export default function FoamHero({ product }) {
   const [width, setWidth] = useState(String(ref?.w || 48));
   const [height, setHeight] = useState(String(ref?.h || product.defaultHeight || 4));
   const [qty, setQty] = useState(1);
+  const [option, setOption] = useState("set");
+  const showOptions = hasFoamParts(product);
+  const part = showOptions ? FOAM_SET_PARTS[option] : null;
 
   /* Thumbnail row scrolls with arrows, never a scrollbar. */
   const thumbsRef = useRef(null);
@@ -88,16 +97,19 @@ export default function FoamHero({ product }) {
   };
 
   // Cheap to work out on every render. The same quote the order server checks against.
-  const quote = quoteFoamUnit(product, { length, width, height });
+  const quote = part ? quoteFoamPart(product, option) : quoteFoamUnit(product, { length, width, height });
 
   const unitPrice = quote.total || 0;
   const mrpUnit = quote.base || unitPrice;
   const lineTotal = unitPrice * qty;
   const lineMrp = mrpUnit * qty;
   const savePct = quote.ok && mrpUnit > unitPrice ? Math.round(((mrpUnit - unitPrice) / mrpUnit) * 100) : 0;
-  const sizeLabel = fixedPrice ? product.pack || "Standard" : `${length} × ${width} × ${height} inch`;
-  const cft = !fixedPrice && quote.ok ? ((Number(length) * Number(width) * Number(height)) / 1728).toFixed(2) : null;
-  const cartId = `${product.slug}_${fixedPrice ? "std" : `${width}x${length}x${height}`}`;
+  const partSize = part ? `${part.length}″ × ${part.width}″ × ${part.height}″` : "";
+  const sizeLabel = part
+    ? `${part.label} · ${part.pieces} pcs · ${partSize}`
+    : fixedPrice ? product.pack || "Standard" : `${length} × ${width} × ${height} inch`;
+  const cft = !fixedPrice && !part && quote.ok ? ((Number(length) * Number(width) * Number(height)) / 1728).toFixed(2) : null;
+  const cartId = `${product.slug}_${part ? option : fixedPrice ? "std" : `${width}x${length}x${height}`}`;
 
   const cartItem = () => ({
     id: cartId,
@@ -110,7 +122,8 @@ export default function FoamHero({ product }) {
     quantity: qty,
     size: sizeLabel,
     /* The order server re-quotes the price from these (see catalogueQuote). */
-    dims: fixedPrice ? undefined : { width: Number(width), length: Number(length), height: Number(height) },
+    dims: fixedPrice || part ? undefined : { width: Number(width), length: Number(length), height: Number(height) },
+    option: part ? option : undefined,
   });
 
   const onAdd = () => {
@@ -270,15 +283,37 @@ export default function FoamHero({ product }) {
 
             {/* Calculator — same box as the mattress page */}
             <div className="mt-4 border border-[#e5e7eb] bg-white p-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:p-5">
+              {showOptions ? (
+                <div className="mb-4" role="radiogroup" aria-label="Option">
+                  <span className="mb-1.5 block text-[14px] font-medium text-[#555]">Option</span>
+                  <div className="grid grid-cols-3 gap-2">
+                    {BUY_OPTIONS.map((o) => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={option === o.id}
+                        onClick={() => setOption(o.id)}
+                        className={`min-h-11 border px-2 py-2 text-[13px] font-semibold leading-tight transition-colors sm:text-[14px] ${option === o.id ? "border-brand bg-brand text-white" : "border-[#d1d5db] bg-white text-[#444] hover:border-ink/40"}`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
               <div className="mb-3 flex items-center justify-between gap-2">
                 <span className="flex items-center gap-1.5">
                   <FiChevronDown className="shrink-0 text-[#555]" size={15} />
-                  <span className="text-[16px] font-semibold text-[#444]">{fixedPrice ? "Price" : "Cut to size (inch)"}</span>
+                  <span className="text-[16px] font-semibold text-[#444]">{part ? `${part.pieces} pieces` : fixedPrice ? "Price" : "Cut to size (inch)"}</span>
                 </span>
                 {cft ? <span className="text-[13px] font-medium tabular-nums text-[#555]">≈ {cft} CFT</span> : null}
               </div>
 
-              {!fixedPrice ? (
+              {part ? (
+                <p className="text-[15px] font-medium text-[#444]">{partSize} each</p>
+              ) : !fixedPrice ? (
                 <>
                   <div className="grid grid-cols-3 gap-2.5">
                     {[
@@ -317,11 +352,11 @@ export default function FoamHero({ product }) {
                   {savePct > 0 ? <span className="text-[15px] font-bold text-[#16a34a]">({savePct}% OFF)</span> : null}
                 </div>
                 <p className="mt-1 text-[13px] text-[#555]">
-                  {quote.ok ? <>{formatTaka(unitPrice)} {fixedPrice ? "per piece" : "each"} · {sizeLabel}</> : "Enter length, width and height to see the price"}
+                  {quote.ok ? <>{formatTaka(unitPrice)} {fixedPrice ? "per piece" : part ? "for 5 pieces" : "each"} · {part ? partSize : sizeLabel}</> : "Enter length, width and height to see the price"}
                 </p>
               </div>
 
-              {rule?.notes?.length ? (
+              {!part && rule?.notes?.length ? (
                 <ul className="mt-3 space-y-1 border-t border-[#eee] pt-3">
                   {rule.notes.map((note) => <li key={note} className="text-[13px] leading-[1.45] text-[#333]">{note}</li>)}
                 </ul>

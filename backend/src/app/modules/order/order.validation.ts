@@ -17,6 +17,8 @@ const orderItemValidation = z.object({
         length: z.number().nullable().optional(),
         height: z.number().nullable().optional(),
     }).optional(),
+    /** Foam set: only the sit or only the back half (else the whole set). */
+    option: z.enum(['sit', 'back']).optional(),
 });
 
 const shippingAddressValidation = z.object({
@@ -39,6 +41,7 @@ export const createOrderValidation = z.object({
     body: z.object({
         items: z.array(orderItemValidation).min(1, 'At least one item required'),
         shippingAddress: shippingAddressValidation,
+        deliveryArea: z.enum(['inside_dhaka', 'outside_dhaka']).optional(),
         paymentMethod: z.enum(['cod', 'bkash', 'rocket', 'nagad', 'sslcommerz']).default('bkash'),
         paymentDetails: paymentDetailsValidation,
         couponCode: z.string().optional(),

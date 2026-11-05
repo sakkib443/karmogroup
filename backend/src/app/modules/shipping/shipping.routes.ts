@@ -7,6 +7,7 @@ const router = express.Router();
 // ── PUBLIC ─────────────────────────────────────────
 // Shipping quote + live settings for checkout — MUST stay above the admin guard.
 router.get('/quote', ShippingController.getQuote);
+router.post('/quote', ShippingController.quoteCart);
 router.get('/settings', ShippingController.getSettings);
 
 // All shipping routes below require admin auth

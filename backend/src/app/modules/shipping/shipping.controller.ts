@@ -5,7 +5,8 @@ import { ShippingZone, ShippingRate } from './shipping.model';
 import { Order } from '../order/order.model';
 import QueryBuilder from '../../utils/QueryBuilder';
 import AppError from '../../utils/AppError';
-import { computeShippingCost, getSettings, updateSettings } from './shipping.service';
+import { computeShippingCost, getSettings, parcelCharge, updateSettings } from './shipping.service';
+import { parcelOfLines } from '../order/order.quote';
 
 const ShippingController = {
     // ═══════════════════ PUBLIC QUOTE ═══════════════════
@@ -15,6 +16,27 @@ const ShippingController = {
         const subtotal = Number(req.query.subtotal) || 0;
         const quote = await computeShippingCost({ city, subtotal });
         sendResponse(res, { statusCode: 200, success: true, message: 'Shipping quote', data: quote });
+    }),
+
+    // POST /shipping/quote  (no auth) — what this cart costs to deliver, by weight.
+    // { lines: [{ product, quantity, division, dims?, size?, option? }], area?, city?, subtotal? }
+    quoteCart: catchAsync(async (req: Request, res: Response) => {
+        const { lines, area, city, subtotal } = req.body || {};
+        if (!Array.isArray(lines) || !lines.length || lines.length > 100) throw new AppError(400, 'Send 1 to 100 lines');
+        const { parcel, items } = await parcelOfLines(lines);
+        const quote = await computeShippingCost({ area, city, parcel, items, subtotal: Number(subtotal) || 0 });
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: 'Shipping quote',
+            data: {
+                ...quote,
+                areaRates: {
+                    inside_dhaka: parcelCharge('inside_dhaka', parcel),
+                    outside_dhaka: parcelCharge('outside_dhaka', parcel),
+                },
+            },
+        });
     }),
 
     // ═══════════════════ SETTINGS (singleton) ═══════════════════

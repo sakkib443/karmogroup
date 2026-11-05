@@ -344,6 +344,13 @@ export function getPillowProductDetail(slug) {
   return { ...product, gallery, sizes, related };
 }
 
+/** Shipping weight of one offer. Estimates until the packed weights are confirmed. */
+export function pillowWeightKg(product) {
+  if (product?.kind === "cushion") return 0.5 * (product.pieces || 1);
+  if (product?.kind === "combo") return 2;
+  return product?.family === "side" ? 1.5 : 1;
+}
+
 /** Fixed catalogue price. The order server asks for this at checkout. */
 export function quotePillowUnit(product) {
   const total = Number(product?.price) || 0;
