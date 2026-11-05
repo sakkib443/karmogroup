@@ -67,7 +67,7 @@ export const trust = {
       { title: "Largest Raw Material", note: "Stock", badge: "", icon: img("/shared/trust/cartoon-v3/chem-stock-v3.webp", "", { fit: "contain" }) },
       { title: "International Quality", note: "Certification", badge: "", icon: img("/shared/trust/cartoon-v3/cartoon-globe-v4.webp", "", { fit: "contain", zoom: 92 }) },
       { title: "Natural and", note: "Sustainable Products", badge: "", icon: img("/shared/trust/cartoon-v3/natural-v5.webp", "", { fit: "contain" }) },
-      { title: "Free Delivery", note: "Available", badge: "", icon: img("/shared/trust/cartoon-v3/delivery-v2.webp", "", { fit: "contain" }) },
+      { title: "Fast Delivery", note: "Across Bangladesh", badge: "", icon: img("/shared/trust/cartoon-v3/delivery-fast-v1.webp", "", { fit: "contain" }) },
       { title: "5k+ Stores", note: "Pan Bangladesh", badge: "5K+", icon: img("/shared/trust/cartoon-v3/stores-v5.webp", "", { fit: "contain" }) },
     ],
   },

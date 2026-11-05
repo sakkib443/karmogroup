@@ -8,7 +8,7 @@ import { removeFromCart } from '@/redux/slices/cartSlice';
 import { loginSuccess } from '@/redux/slices/authSlice';
 import { useCreateOrderMutation, useGuestCheckoutMutation } from '@/redux/api/orderApi';
 import { useInitPaymentMutation, useGetPaymentMethodsQuery } from '@/redux/api/paymentApi';
-import { useGetShippingQuoteQuery } from '@/redux/api/shippingApi';
+import { useGetCartDeliveryQuoteQuery, type DeliveryArea } from '@/redux/api/shippingApi';
 import { useGetMyAddressesQuery, useAddAddressMutation } from '@/redux/api/userApi';
 import { LuChevronLeft, LuInfo, LuCheck, LuCopy, LuCreditCard, LuUser, LuPhone, LuMapPin, LuBuilding2, LuNavigation, LuMail } from 'react-icons/lu';
 import { ShopHeader, LeafRule, TrustRow, SealIcon, LockIcon, TruckIcon, TagIcon, tk } from '@/components/karmo/shop/ShopChrome';
@@ -138,15 +138,20 @@ const CheckoutPage = () => {
         return () => clearTimeout(t);
     }, [formData.city]);
 
-    const { data: shippingQuote } = useGetShippingQuoteQuery(
-        { city: debouncedCity || undefined, subtotal: totalPrice },
-        { skip: totalPrice <= 0 },
+    // Inside / outside Dhaka: what the customer picks, else read from the city typed.
+    const [pickedArea, setPickedArea] = useState<DeliveryArea | ''>('');
+    const typedCity = debouncedCity.toLowerCase();
+    const cityArea: DeliveryArea | '' = !typedCity ? '' : (typedCity.includes('dhaka') || typedCity.includes('ঢাকা')) ? 'inside_dhaka' : 'outside_dhaka';
+    const deliveryArea = pickedArea || cityArea;
+
+    const { data: shippingQuote } = useGetCartDeliveryQuoteQuery(
+        { items, subtotal: totalPrice, area: deliveryArea || undefined },
+        { skip: totalPrice <= 0 || items.length === 0 },
     );
 
-    // Fall back to a sensible default so a number always shows while the quote loads.
     // A free-shipping coupon overrides the quote (the server applies the same rule).
-    const freeShipping = couponFreeShipping || (shippingQuote?.freeShipping ?? (totalPrice >= 5000));
-    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? (totalPrice >= 5000 ? 0 : 120));
+    const freeShipping = couponFreeShipping || Boolean(shippingQuote?.freeShipping);
+    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? 0);
     const estimatedDays = shippingQuote?.estimatedDays ?? '3-5 days';
     const FREE_REASON_LABEL: Record<string, string> = {
         threshold: 'Order qualifies', coupon: 'Coupon applied', product: 'Free-delivery items', quantity: 'Bulk order',
@@ -286,6 +291,7 @@ const CheckoutPage = () => {
                 image: item.image,
                 division: item.category,
                 dims: item.dims,
+                option: item.option,
             })),
             shippingAddress: {
                 fullName: formData.fullName,
@@ -296,6 +302,7 @@ const CheckoutPage = () => {
                 city: formData.city,
                 postalCode: formData.postalCode,
             },
+            deliveryArea: deliveryArea || undefined,
             paymentMethod: selectedPayment,
             // Receipt details exist only for a manual send-money method.
             paymentDetails: isManualMethod ? {
@@ -537,6 +544,29 @@ const CheckoutPage = () => {
                                     )}
                                 </div>
                             )}
+
+                            <fieldset className={manualForm || savedAddresses.length > 0 ? 'mt-5' : ''}>
+                                <legend className="mb-2 text-[13px] font-semibold text-ink/70">Delivery area</legend>
+                                <div className="grid grid-cols-2 gap-2.5">
+                                    {([['inside_dhaka', 'Inside Dhaka'], ['outside_dhaka', 'Outside Dhaka']] as const).map(([id, label]) => {
+                                        const active = deliveryArea === id;
+                                        const rate = shippingQuote?.areaRates?.[id];
+                                        return (
+                                            <label key={id}
+                                                className={`flex cursor-pointer items-center gap-3 rounded-sm border px-4 py-3 transition-colors ${active ? 'border-brand bg-brand/[0.04]' : 'border-ink/12 hover:border-ink/25'}`}>
+                                                <input type="radio" name="deliveryArea" className="sr-only" checked={active} onChange={() => setPickedArea(id)} />
+                                                <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${active ? 'border-brand' : 'border-ink/25'}`}>
+                                                    {active && <span className="h-2 w-2 rounded-full bg-brand" />}
+                                                </span>
+                                                <span className="min-w-0">
+                                                    <span className="block text-sm font-semibold text-ink">{label}</span>
+                                                    {rate != null && <span className="block text-xs tabular-nums text-ink/50">{tk(rate)}</span>}
+                                                </span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </fieldset>
                         </StepCard>
 
                         {/* 02 — Payment */}
@@ -697,7 +727,7 @@ const CheckoutPage = () => {
                                     <span className="text-[13px] font-bold uppercase tracking-[0.12em] text-ink/70">Total</span>
                                     <span className="text-right">
                                         {(couponDiscount > 0 || couponFreeShipping) && (
-                                            <span className="block text-[14px] text-[#9ca3af] line-through">{tk(totalPrice + (couponFreeShipping ? (shippingQuote?.shippingCost ?? (totalPrice >= 5000 ? 0 : 120)) : shippingCost))}</span>
+                                            <span className="block text-[14px] text-[#9ca3af] line-through">{tk(totalPrice + (couponFreeShipping ? (shippingQuote?.shippingCost ?? 0) : shippingCost))}</span>
                                         )}
                                         <span className="text-[1.65rem] font-bold leading-none tabular-nums tracking-tight text-brand sm:text-[1.85rem]">{tk(orderTotal)}</span>
                                     </span>

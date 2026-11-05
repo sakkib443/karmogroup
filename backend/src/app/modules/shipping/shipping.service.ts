@@ -1,9 +1,47 @@
 import { ShippingZone, ShippingRate, ShippingSettings, IShippingSettings } from './shipping.model';
 
 export type FreeReason = 'product' | 'coupon' | 'threshold' | 'quantity' | null;
+export type DeliveryArea = 'inside_dhaka' | 'outside_dhaka';
+
+/** What is being sent: the weighed goods, and the mattresses that go at a flat rate. */
+export interface Parcel {
+    weightKg: number;
+    mattresses: number;
+}
+
+/** Pathao's quoted rates (BDT). Only two areas are offered: inside and outside Dhaka. */
+const WEIGHT_RATES: Record<DeliveryArea, { to500g: number; to1kg: number; to2kg: number; perExtraKg: number }> = {
+    inside_dhaka: { to500g: 60, to1kg: 70, to2kg: 90, perExtraKg: 15 },
+    outside_dhaka: { to500g: 110, to1kg: 130, to2kg: 150, perExtraKg: 20 },
+};
+/** Each mattress, anywhere in Bangladesh. */
+const MATTRESS_RATE = 1000;
+
+/** The delivery charge of a parcel. A part of a kilo over 2 kg counts as a full kilo. */
+export function parcelCharge(area: DeliveryArea, { weightKg, mattresses }: Parcel): number {
+    const r = WEIGHT_RATES[area];
+    const kg = Math.max(0, weightKg);
+    let byWeight = 0;
+    if (kg > 2) byWeight = r.to2kg + Math.ceil(kg - 2) * r.perExtraKg;
+    else if (kg > 1) byWeight = r.to2kg;
+    else if (kg > 0.5) byWeight = r.to1kg;
+    else if (kg > 0) byWeight = r.to500g;
+    return byWeight + mattresses * MATTRESS_RATE;
+}
+
+/** The picked area, else read from the city typed; nothing typed yet counts as inside Dhaka. */
+export function resolveArea(area?: string, city?: string): DeliveryArea {
+    if (area === 'inside_dhaka' || area === 'outside_dhaka') return area;
+    const c = (city || '').trim().toLowerCase();
+    return !c || c.includes('dhaka') || c.includes('ঢাকা') ? 'inside_dhaka' : 'outside_dhaka';
+}
 
 export interface ShippingQuoteInput {
     city?: string;
+    /** Inside / outside Dhaka, picked at checkout. */
+    area?: string;
+    /** When given, the charge comes from the weight table, not the zones. */
+    parcel?: Parcel;
     subtotal?: number;
     // Per-item free-delivery flags (from Product.shippingConfig.freeShipping).
     items?: { freeShipping?: boolean }[];
@@ -54,11 +92,12 @@ export async function updateSettings(payload: Partial<IShippingSettings>): Promi
  *   2. Free-shipping coupon — couponFreeShipping passed in.
  *   3. Subtotal threshold — enabled AND subtotal >= threshold.
  *   4. Quantity threshold — enabled AND totalQuantity >= minItems.
- * Otherwise: zone match by city → rate.price (honoring the rate's
- * freeShippingMinimum); else default flat (inside/outside Dhaka) from settings.
+ * Otherwise: with a parcel, the weight table; without one, zone match by city →
+ * rate.price (honoring the rate's freeShippingMinimum); else default flat
+ * (inside/outside Dhaka) from settings.
  */
 export async function computeShippingCost(
-    { city, subtotal, items, totalQuantity, couponFreeShipping }: ShippingQuoteInput,
+    { city, area, parcel, subtotal, items, totalQuantity, couponFreeShipping }: ShippingQuoteInput,
 ): Promise<ShippingQuoteResult> {
     const sub = Number(subtotal) || 0;
     const cityStr = (city || '').toString().trim().toLowerCase();
@@ -94,7 +133,17 @@ export async function computeShippingCost(
     // 4) Quantity threshold.
     if (qtyEnabled && minItems > 0 && Number(totalQuantity || 0) >= minItems) return free('quantity');
 
-    // 5) Zone match → paid rate (with optional per-zone free minimum).
+    // 5) The weight table.
+    if (parcel) {
+        return {
+            shippingCost: parcelCharge(resolveArea(area, city), parcel),
+            estimatedDays: defaultDays,
+            freeShipping: false,
+            freeReason: null,
+        };
+    }
+
+    // 6) Zone match → paid rate (with optional per-zone free minimum).
     if (cityStr) {
         try {
             const zones = await ShippingZone.find({ isActive: true });
@@ -128,7 +177,7 @@ export async function computeShippingCost(
         }
     }
 
-    // 6) Default flat rate.
+    // 7) Default flat rate.
     // "Dhaka" typed in English or Bangla.
     const isDhaka = cityStr.includes('dhaka') || cityStr.includes('ঢাকা');
     return {

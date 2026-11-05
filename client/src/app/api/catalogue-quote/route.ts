@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getMattressProductDetail } from '@/components/karmo/product/productDetailData';
 import { getFoamProductDetail } from '@/components/karmo/product/foamProductDetailData';
-import { getPillowProductDetail, quotePillowUnit } from '@/components/karmo/product/pillow/pillowDetailData';
-import { getComforterProductDetail, quoteComforterUnit } from '@/components/karmo/product/comforter/comforterDetailData';
-import { isFoamSet, quoteFoamSetUnit, quoteFoamUnit, quoteMattressUnit } from '@/components/karmo/product/catalogueQuote';
+import { getPillowProductDetail, pillowWeightKg, quotePillowUnit } from '@/components/karmo/product/pillow/pillowDetailData';
+import { COMFORTER_WEIGHT_KG, getComforterProductDetail, quoteComforterUnit } from '@/components/karmo/product/comforter/comforterDetailData';
+import { FOAM_SET_PARTS, foamWeightKg, isFoamSet, quoteFoamPart, quoteFoamSetUnit, quoteFoamUnit, quoteMattressUnit } from '@/components/karmo/product/catalogueQuote';
 
 /**
  * The price of Karmo catalogue lines (mattress, foam), asked by the order server at
@@ -11,13 +11,15 @@ import { isFoamSet, quoteFoamSetUnit, quoteFoamUnit, quoteMattressUnit } from '@
  * server never keeps a second copy of the price lists. Public and read-only: it only
  * says what the website already shows anyone.
  *
- * POST { lines: [{ slug, division, dims?: { width, length, height }, size? }] }
- *   → { lines: [{ ok, unit, mrp, name, division }] }   (same order)
+ * POST { lines: [{ slug, division, dims?: { width, length, height }, size?, option? }] }
+ *   → { lines: [{ ok, unit, mrp, name, division, weightKg, mattress? }] }   (same order)
+ *
+ * weightKg is one unit's shipping weight; a mattress goes at a flat rate instead.
  */
 export const dynamic = 'force-dynamic';
 
 type Dims = { width?: unknown; length?: unknown; height?: unknown };
-type Line = { slug?: unknown; division?: unknown; dims?: Dims; size?: unknown };
+type Line = { slug?: unknown; division?: unknown; dims?: Dims; size?: unknown; option?: unknown };
 
 const NOT_FOUND = { ok: false, unit: 0, mrp: 0, name: '', division: '' };
 
@@ -41,29 +43,33 @@ function quoteLine(line: Line) {
         const product = getMattressProductDetail(slug);
         if (product) {
             const q = quoteMattressUnit(product, sized('wlh'));
-            return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division };
+            return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division, mattress: true };
         }
     }
     if (!division || division === 'hometex' || division === 'fiber_pillow' || division === 'pillow' || division === 'comforter') {
         const pillow = getPillowProductDetail(slug);
         if (pillow && division !== 'comforter') {
             const q = quotePillowUnit(pillow);
-            return { ok: q.ok, unit: q.total, mrp: q.base, name: q.name, division: q.division };
+            return { ok: q.ok, unit: q.total, mrp: q.base, name: q.name, division: q.division, weightKg: pillowWeightKg(pillow) };
         }
         if (!division || division === 'hometex' || division === 'comforter') {
             const comforter = getComforterProductDetail(slug);
             if (comforter) {
                 const q = quoteComforterUnit(comforter);
-                return { ok: q.ok, unit: q.total, mrp: q.base, name: q.name, division: q.division };
+                return { ok: q.ok, unit: q.total, mrp: q.base, name: q.name, division: q.division, weightKg: COMFORTER_WEIGHT_KG };
             }
         }
     }
     if (!division || division === 'foam') {
         const product = getFoamProductDetail(slug);
         if (product) {
+            const option = String(line.option || '');
+            const part = option in FOAM_SET_PARTS ? option : '';
+            const dims = sized('lwh');
             // Every foam is cut to size now (isFoamSet() is always false); the set branch stays for when one returns.
-            const q = isFoamSet() ? quoteFoamSetUnit(product) : quoteFoamUnit(product, sized('lwh'));
-            return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division };
+            const q = part ? quoteFoamPart(product, part) : isFoamSet() ? quoteFoamSetUnit(product) : quoteFoamUnit(product, dims);
+            const weightKg = foamWeightKg(product, part ? { option: part } : dims);
+            return { ok: !!q.ok, unit: q.total || 0, mrp: q.base || q.total || 0, name: product.name, division: product.division, weightKg };
         }
     }
     return NOT_FOUND;

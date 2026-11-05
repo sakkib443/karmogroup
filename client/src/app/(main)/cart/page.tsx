@@ -10,7 +10,7 @@ import { LuTrash2, LuChevronLeft, LuTriangleAlert, LuMinus, LuPlus, LuX, LuCheck
 import { ShopHeader, LeafRule, TrustRow, BagIcon, LockIcon, TruckIcon, TagIcon, ORANGE, tk } from '@/components/karmo/shop/ShopChrome';
 import { toast } from 'react-hot-toast';
 import { useValidateCouponMutation } from '@/redux/api/couponApi';
-import { useGetShippingQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
+import { useGetCartDeliveryQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
 import { useGetProductByIdQuery } from '@/redux/api/productApi';
 import {
     type AppliedCoupon,
@@ -339,15 +339,15 @@ const CartPage = () => {
         setCouponError('');
     };
 
-    // ─── Estimated shipping (no city yet → backend returns the default flat rate) ──
-    const { data: shippingQuote } = useGetShippingQuoteQuery(
-        { subtotal: selectedSubtotal },
+    // ─── Estimated delivery by weight (no address yet → the inside-Dhaka rate) ──
+    const { data: shippingQuote } = useGetCartDeliveryQuoteQuery(
+        { items: selectedItems, subtotal: selectedSubtotal },
         { skip: selectedSubtotal <= 0 },
     );
     const couponFreeShipping = couponHasFreeShipping(appliedCoupons);
     const couponDiscount = couponDiscountTotal(appliedCoupons);
-    const freeShipping = couponFreeShipping || (shippingQuote?.freeShipping ?? (selectedSubtotal >= 5000));
-    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? (selectedSubtotal >= 5000 ? 0 : 120));
+    const freeShipping = couponFreeShipping || Boolean(shippingQuote?.freeShipping);
+    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? 0);
 
     // Live free-shipping threshold → "add ৳X more for free shipping" nudge.
     const { data: shipSettings } = useGetShippingSettingsQuery();
@@ -359,7 +359,7 @@ const CartPage = () => {
     const finalTotal = baseAmount + shippingCost;
     // What the order would cost with no coupons — shown struck-through when any coupon applies.
     const originalShipping = couponFreeShipping
-        ? (shippingQuote?.shippingCost ?? (selectedSubtotal >= 5000 ? 0 : 120))
+        ? (shippingQuote?.shippingCost ?? 0)
         : shippingCost;
     const preDiscountTotal = selectedSubtotal + originalShipping;
 
@@ -612,7 +612,7 @@ const CartPage = () => {
                                         <div className="flex justify-between text-[#15803d]"><dt>Coupon discount</dt><dd className="tabular-nums">−{tk(couponDiscount)}</dd></div>
                                     )}
                                     <div className="flex justify-between">
-                                        <dt className="text-ink/60">Delivery <span className="block text-[11px] text-ink/35">Exact charge at checkout</span></dt>
+                                        <dt className="text-ink/60">Delivery <span className="block text-[11px] text-ink/35">Inside Dhaka rate · exact charge at checkout</span></dt>
                                         <dd className={freeShipping ? 'font-semibold text-[#15803d]' : 'tabular-nums'}>{freeShipping ? 'Free' : tk(shippingCost)}</dd>
                                     </div>
                                 </dl>

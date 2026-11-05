@@ -87,6 +87,9 @@ export function getComforterProductDetail(slug) {
   return { ...product, gallery: [product.image], related };
 }
 
+/** Shipping weight of one comforter. An estimate until the packed weight is confirmed. */
+export const COMFORTER_WEIGHT_KG = 2.5;
+
 /** Fixed catalogue price. The order server asks for this at checkout. */
 export function quoteComforterUnit(product) {
   const total = Number(product?.price) || 0;
