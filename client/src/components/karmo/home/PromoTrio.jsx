@@ -92,7 +92,6 @@ export default function PromoTrio() {
               sizes="(max-width: 1024px) 100vw, 66vw"
               className="object-cover"
               style={imageStyle(fImage)}
-              priority
             />
           ) : null}
           <span

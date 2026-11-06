@@ -135,7 +135,6 @@ export default function ProductFeatureSlides() {
                     fill
                     sizes="(min-width: 1024px) 50vw, 100vw"
                     quality={82}
-                    priority={i === 0}
                     className="object-cover object-[center_42%]"
                   />
                 </motion.div>

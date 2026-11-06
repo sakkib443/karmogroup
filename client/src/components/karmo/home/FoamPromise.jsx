@@ -439,9 +439,9 @@ export default function FoamPromise({
           background, and `stillFixed` is what gives it the "stays put while the
           section slides over it" look the client asked for. */}
       {stillFixed ? (
-        /* A CSS background rather than `next/image`'s `<img>`: pinning to the
+        /* A CSS background rather than `next/image`'s `<img loading="lazy" decoding="async">`: pinning to the
            viewport is `background-attachment: fixed`, and that property has no
-           effect on a replaced element like an `<img>` — it only does anything
+           effect on a replaced element like an `<img loading="lazy" decoding="async">` — it only does anything
            on something painted as a background. `bg-scroll` under `md` opts
            small screens back out; see the `stillFixed` prop note for why. */
         <div
