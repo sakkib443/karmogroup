@@ -118,7 +118,6 @@ export default function ProductFoamFeatureSlides() {
                         fill
                         sizes="(min-width: 1024px) 42vw, 90vw"
                         quality={85}
-                        priority={i === 0}
                         className="object-cover object-[center_40%]"
                       />
                     </motion.div>

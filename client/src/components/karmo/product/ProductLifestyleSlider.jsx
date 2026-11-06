@@ -64,7 +64,6 @@ export default function ProductLifestyleSlider({ slides = DEFAULT_SLIDES }) {
               alt={slide.alt}
               fill
               sizes="100vw"
-              priority={index === 0}
               className="object-cover object-center"
             />
           </motion.div>

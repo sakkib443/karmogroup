@@ -177,7 +177,6 @@ function TallMorph() {
                 fill
                 sizes="(min-width: 1024px) 32vw, 60vw"
                 quality={85}
-                priority={i === 0}
                 className="object-cover object-[center_18%]"
               />
             </motion.div>

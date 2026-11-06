@@ -98,8 +98,8 @@ export default function PartnerPromoBand() {
         <div
           className={`col-span-full grid min-h-0 ${GAP} md:min-h-[460px] md:grid-cols-2 lg:col-span-2 lg:min-h-[460px] xl:min-h-[500px]`}
         >
-          <ImagePane pane={c.left} priority offer={c.offer} />
-          <ImagePane pane={c.right} priority hoverLabel={c.right?.hoverLabel} />
+          <ImagePane pane={c.left} offer={c.offer} />
+          <ImagePane pane={c.right} hoverLabel={c.right?.hoverLabel} />
         </div>
 
         {/* EMI bank partners — original logo artwork, fully visible. */}

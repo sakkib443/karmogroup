@@ -225,7 +225,6 @@ function MattressFloatCard({ item }) {
               src={src}
               alt={item.alt || item.name}
               fill
-              priority
               unoptimized
               sizes="(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 92vw"
               className="object-contain object-bottom transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"

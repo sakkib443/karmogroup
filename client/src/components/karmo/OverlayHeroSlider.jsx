@@ -181,7 +181,7 @@ export default function OverlayHeroSlider({
                   sizes="100vw"
                   quality={90}
                   priority={i === 0}
-                  loading="eager"
+                  loading={i === 0 ? undefined : "lazy"}
                   unoptimized={Boolean(s.image.unoptimized)}
                   className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"
