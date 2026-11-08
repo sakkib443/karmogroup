@@ -10,6 +10,7 @@ import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScal
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
 import ProductInside from "@/components/karmo/product/ProductInside";
+import ProductInsideFilm from "@/components/karmo/product/ProductInsideFilm";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -37,6 +38,7 @@ export default function ProductDetailPage({ product }) {
       <ProductHero product={product} />
       <ProductDescription description={mattressDescription(product)} />
       <ProductPromiseStrip />
+      <ProductInsideFilm product={product} />
       <ProductInside product={product} />
       <ProductFeatureSlides />
       {product.film ? (

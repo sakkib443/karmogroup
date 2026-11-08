@@ -20,7 +20,7 @@ import Image from "next/image";
  */
 
 /** Right edge of each layer in the picture (x %, y %), top layer first. */
-const PINS = [
+export const PINS = [
   [53.4, 33.4],
   [53.8, 41.0],
   [53.6, 47.6],
