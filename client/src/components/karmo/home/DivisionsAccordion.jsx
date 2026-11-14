@@ -43,7 +43,10 @@ const LOOK = {
    still sits inside a narrow panel. */
 const NAME_SIZE = "min(8rem, 14.5cqw)";
 /* How big the name settles when its panel is open, against its full width there. */
-const OPEN_SCALE = 0.68;
+const OPEN_SCALE = 0.72;
+/* The outline word over the name when open, poster style ("FLORAL" over "REVERIE"). */
+const OUTLINE_WORD = "Karmo";
+const OUTLINE_SIZE = "18cqw";
 
 const EASE = "cubic-bezier(0.22,1,0.36,1)";
 const TITLE = { fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 0.9 };
@@ -68,29 +71,47 @@ function Panel({ division, look, active, onOpen }) {
       className="@container relative block min-h-0 min-w-0 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
       style={{ backgroundColor: look.bg, flexGrow: active ? 3.2 : 1, flexBasis: 0, transition: `flex-grow 900ms ${EASE}` }}
     >
+      {/* Open: poster light — a soft glow at the top, the floor fading to white */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%), linear-gradient(0deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 24%)",
+          opacity: active ? 1 : 0,
+          transition: `opacity 900ms ${EASE}`,
+        }}
+      />
+
       {/* The name: centred at the top when closed, moving left and settling a little
           smaller as the panel opens. One element the whole way, so it never blinks.
-          Closed it has a short rule and "Karmo Group" under it; open, "Karmo Group"
-          sits on a line above it and the tagline on a line below. */}
+          Closed it has a short rule and "Karmo Group" under it; open, it reads like the
+          poster: a huge outline word above it and the tagline on a line below. */}
       <span
         className="pointer-events-none absolute w-max text-white"
         style={{
-          top: active ? "11%" : "7%",
+          top: active ? `calc(6% + ${OUTLINE_SIZE} * 0.86)` : "7%",
           left: active ? "7%" : "50%",
           transform: `translateX(${active ? "0%" : "-50%"})`,
           transition: `top 900ms ${EASE}, left 900ms ${EASE}, transform 900ms ${EASE}`,
         }}
       >
-        {/* Open: the line above */}
+        {/* Open: the huge outline word above */}
         <span
-          className="absolute bottom-full left-0 mb-3 block whitespace-nowrap text-[12px] font-extrabold uppercase tracking-[0.3em] text-white md:text-[13px]"
+          aria-hidden
+          className="division-outline absolute bottom-full left-[-0.04em] block whitespace-nowrap uppercase"
           style={{
+            fontWeight: 700,
+            lineHeight: 0.86,
+            letterSpacing: "-0.01em",
+            fontSize: OUTLINE_SIZE,
+            color: "transparent",
+            WebkitTextStroke: "2px rgba(255,255,255,0.95)",
             opacity: active ? 1 : 0,
-            transform: `translateY(${active ? 0 : 8}px)`,
-            transition: active ? `opacity 500ms ${EASE} 350ms, transform 700ms ${EASE} 300ms` : "opacity 150ms ease-out, transform 200ms ease-out",
+            transform: `translateY(${active ? 0 : 14}px)`,
+            transition: active ? `opacity 700ms ${EASE} 250ms, transform 900ms ${EASE} 200ms` : "opacity 150ms ease-out, transform 200ms ease-out",
           }}
         >
-          Karmo Group
+          {OUTLINE_WORD}
         </span>
 
         <span
@@ -132,40 +153,44 @@ function Panel({ division, look, active, onOpen }) {
         ) : null}
       </span>
 
-      {/* Open: the name again, as a large outline behind the product */}
-      <span
-        aria-hidden
-        className="division-outline pointer-events-none absolute bottom-[9%] left-0 whitespace-nowrap uppercase"
-        style={{
-          fontWeight: 700,
-          lineHeight: 0.9,
-          letterSpacing: "-0.01em",
-          fontSize: "16cqw",
-          color: "transparent",
-          WebkitTextStroke: "1.5px rgba(255,255,255,0.32)",
-          opacity: active ? 1 : 0,
-          transform: `translateX(${active ? "4%" : "18%"})`,
-          transition: active ? `opacity 800ms ${EASE} 200ms, transform 1400ms ${EASE} 100ms` : `opacity 200ms ease-out, transform 400ms ease-out`,
-        }}
-      >
-        {division.name}
-      </span>
 
       {/* The product, standing at the bottom with a soft shadow */}
       <span
         className="pointer-events-none absolute inset-x-[8%] bottom-[12%] top-[42%] flex items-end justify-center"
-        style={{ transform: `scale(${active ? 1.14 : 0.92})`, transformOrigin: "50% 100%", transition: `transform 1000ms ${EASE}` }}
+        style={{
+          transform: `translateX(${active ? "5%" : "0%"}) scale(${active ? 1.22 : 0.92})`,
+          transformOrigin: "50% 100%",
+          transition: `transform 1000ms ${EASE}`,
+        }}
       >
-        <span aria-hidden className="absolute bottom-[-3%] left-1/2 h-[8%] w-[80%] -translate-x-1/2 rounded-[50%] bg-black/25 blur-md" />
-        <Image
-          src={look.src}
-          alt={division.image?.alt || division.name}
-          width={look.w}
-          height={look.h}
-          sizes="(min-width: 768px) 45vw, 90vw"
-          className="relative h-auto max-h-full object-contain object-bottom"
-          style={{ width: `${look.size}%` }}
-        />
+        <span aria-hidden className="absolute bottom-[-2%] left-1/2 h-[6%] w-[78%] -translate-x-1/2 rounded-[50%] bg-black/20 blur-md" />
+        <span className="relative block max-h-full" style={{ width: `${look.size}%` }}>
+          <Image
+            src={look.src}
+            alt={division.image?.alt || division.name}
+            width={look.w}
+            height={look.h}
+            sizes="(min-width: 768px) 45vw, 90vw"
+            className="relative block h-auto w-full object-contain object-bottom"
+          />
+          {/* Open: its reflection on the floor */}
+          <Image
+            src={look.src}
+            alt=""
+            aria-hidden
+            width={look.w}
+            height={look.h}
+            sizes="(min-width: 768px) 45vw, 90vw"
+            className="absolute left-0 top-full block h-auto w-full"
+            style={{
+              transform: "scaleY(-1)",
+              opacity: active ? 0.28 : 0,
+              transition: `opacity 900ms ${EASE}`,
+              WebkitMaskImage: "linear-gradient(to top, black 0%, transparent 45%)",
+              maskImage: "linear-gradient(to top, black 0%, transparent 45%)",
+            }}
+          />
+        </span>
       </span>
 
       {/* Open: the link along the bottom */}
