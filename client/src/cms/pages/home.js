@@ -231,7 +231,7 @@ export const promo = {
   ],
   defaults: {
     feature: {
-      image: img("/pages/home/promo-trio/taupe-sofa-quilted-armrest.webp", "Taupe Sofa with Quilted Armrest in living room setting", { x: 40, y: 50 }),
+      image: img("/pages/home/promo-trio/taupe-sofa-quilted-armrest.webp", "Taupe Sofa with Quilted Armrest in living room setting", { x: 40, y: 100 }),
       overlay: { color: SHADE, opacity: 28 },
       eyebrow: "Our popular products",
       line1: "Foam seating",
@@ -240,8 +240,8 @@ export const promo = {
       button: { label: "Shop the collection", href: "/foam" },
     },
     side: [
-      { title: "HomeTex bedding", titleSize: 100, cta: "Shop now", href: "/hometex", image: img("/pages/home/promo-trio/side-top-nvv867gyqd.webp", "Karmo HomeTex bedding"), overlay: { color: SHADE, opacity: 22 } },
-      { title: "Mattress range", titleSize: 100, cta: "Shop now", href: "/mattress", image: img("/pages/home/promo-trio/side-bottom-bxxj1zj5y2.webp", "Karmo mattress range"), overlay: { color: SHADE, opacity: 22 } },
+      { title: "HomeTex bedding", titleSize: 100, cta: "Shop now", href: "/hometex", image: img("/pages/home/promo-trio/side-top-nvv867gyqd.webp", "Karmo HomeTex bedding", { x: 50, y: 100 }), overlay: { color: SHADE, opacity: 22 } },
+      { title: "Mattress range", titleSize: 100, cta: "Shop now", href: "/mattress", image: img("/pages/home/promo-trio/side-bottom-bxxj1zj5y2.webp", "Karmo mattress range", { x: 50, y: 100 }), overlay: { color: SHADE, opacity: 22 } },
     ],
   },
 };
