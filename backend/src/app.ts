@@ -37,6 +37,7 @@ import { ReportRoutes } from './app/modules/report/report.routes';
 import { ImageSearchRoutes } from './app/modules/imageSearch/imageSearch.routes';
 import { MediaRoutes } from './app/modules/media/media.routes';
 import { PageContentRoutes } from './app/modules/pageContent/pageContent.routes';
+import { CounterRoutes } from './app/modules/counter/counter.routes';
 
 const app: Application = express();
 
@@ -116,6 +117,7 @@ app.use('/api/courier', CourierRoutes);
 app.use('/api/image-search', ImageSearchRoutes);
 app.use('/api/media', MediaRoutes);            // Site content images & videos (GridFS)
 app.use('/api/page-content', PageContentRoutes); // Site content: each page's editable content
+app.use('/api/counters', CounterRoutes);         // Homepage counters (dynamic stats)
 
 // ── Error Handlers ────────────────────────────────────────────────
 app.use(notFoundHandler);

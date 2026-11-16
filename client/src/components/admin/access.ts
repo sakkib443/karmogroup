@@ -87,7 +87,7 @@ const SUPERADMIN_ONLY = ['/accounts', '/investors', '/suppliers', '/purchases', 
 
 /** Everything each role below admin may open (and nothing else). '/' is the Dashboard. */
 const ROLE_PAGES: Record<string, string[]> = {
-    manager: ['/', '/orders', '/order-insights', '/returns', '/courier', '/fraud-check', '/sms', '/products', '/reviews', '/customers', '/inquiries', '/analytics', '/staff-activity', '/payments', '/notifications', '/profile'],
+    manager: ['/', '/counters', '/orders', '/order-insights', '/returns', '/courier', '/fraud-check', '/sms', '/products', '/reviews', '/customers', '/inquiries', '/analytics', '/staff-activity', '/payments', '/notifications', '/profile'],
     online_sales: ['/', '/orders', '/returns', '/courier', '/fraud-check', '/sms', '/inquiries', '/notifications', '/profile'],
     agency: ['/', '/orders', '/sms', '/notifications', '/profile'],
     factory: ['/', '/orders', '/factory', '/notifications', '/profile'],
