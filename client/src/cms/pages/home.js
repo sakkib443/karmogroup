@@ -150,7 +150,7 @@ export const explore = {
     ],
     flagship: {
       shots: [
-        { image: img("/pages/home/explore/foam-flagship-living-room-v2.webp", "Cream armchair in a sunlit living room, a magnifier on the Karmo 3D label, and Karmo foam blocks along the bottom", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
+        { image: img("/pages/home/explore/Image 01 New Final.jpg.jpeg", "Karmo foam living room showcase", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
         { image: img("/shared/banners/magnific-3zztfkcrey.webp", "A Karmo Magnific lifestyle scene"), overlay: { color: SHADE, opacity: 0 } },
       ],
       line1: "Foam crafted",
@@ -231,8 +231,8 @@ export const promo = {
   ],
   defaults: {
     feature: {
-      image: img("/pages/home/promo-trio/feature-foam-seating-bion-shadow.webp", "Taupe velvet sofa with tan leather arm, window light and plant shadow", { x: 0, y: 50 }),
-      overlay: { color: SHADE, opacity: 35 },
+      image: img("/pages/home/explore/Taupe Sofa with Quilted Armrest V3.jpg.jpeg", "Taupe Sofa with Quilted Armrest in living room setting", { x: 40, y: 50 }),
+      overlay: { color: SHADE, opacity: 28 },
       eyebrow: "Our popular products",
       line1: "Foam seating",
       line1Size: 100,
@@ -270,7 +270,7 @@ export const sizes = {
     titleAccent: "right mattress size",
     note: "Measure your bed from inside edge to inside edge, in inches, and pick the size that matches.",
     length: '72" / 75" / 78"',
-    edge: img("/pages/home/sizes/mattress-side-edge-tile.webp", "Side view of a Karmo pillow-top mattress showing its thickness", { fit: "contain" }),
+    edge: img("/pages/home/sizes/mattress-pertten.png", "Side view of a Karmo mattress showing its thickness", { fit: "contain" }),
     sizes: [
       { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-floral-v1.webp", "One person sleeping on a Karmo floral quilted single mattress", { fit: "contain" }) },
       { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-floral-v1.webp", "A couple sleeping on a Karmo floral quilted double mattress", { fit: "contain" }) },
