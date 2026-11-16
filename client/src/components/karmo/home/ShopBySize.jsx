@@ -44,7 +44,7 @@ export default function ShopBySize() {
   return (
     <section
       aria-label="Choose your mattress size"
-      className="relative overflow-hidden bg-white py-[clamp(24px,4svh,48px)]"
+      className="relative overflow-hidden bg-white pt-[clamp(24px,4svh,48px)] pb-0"
     >
       <TextureSlides lighter />
 
@@ -78,7 +78,7 @@ export default function ShopBySize() {
             {/* Phones and tablets: the shared length as one line above the cards. */}
             {c.length ? (
               <p className="flex items-center gap-2.5 text-[13px] font-semibold text-ink/70 lg:hidden">
-                <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white" style={{ backgroundColor: NAVY }}>
+                <span className="border border-brand bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
                   Length
                 </span>
                 {c.length}
@@ -96,18 +96,17 @@ export default function ShopBySize() {
 
           </div>
 
-          {/* Side view of a mattress — its thickness is the height. A seamless middle
-              cut repeated side by side, so the band stays low and never shows an end. */}
+          {/* Side view of a mattress — full border showing top quilted pillowtop, navy piping band, and base. */}
           {c.edge?.src ? (
             <div
               role="img"
-              aria-label={c.edge.alt || ""}
-              className="mt-4 h-[50px] w-full opacity-70 sm:h-[66px] lg:mt-[clamp(12px,2svh,20px)] lg:h-[clamp(44px,7.5svh,82px)]"
+              aria-label={c.edge.alt || "Karmo mattress full border profile"}
+              className="mt-8 h-[95px] w-full sm:mt-10 sm:h-[120px] md:mt-12 md:h-[140px] lg:mt-16 lg:h-[165px] xl:h-[180px]"
               style={{
-                backgroundImage: `url(${c.edge.src})`,
+                backgroundImage: `url(${c.edge.src}${c.edge.src.includes("?") ? "&" : "?"}v=flush4)`,
                 backgroundRepeat: "repeat-x",
                 backgroundSize: "auto 100%",
-                backgroundPosition: "center",
+                backgroundPosition: "center top",
               }}
             />
           ) : null}
@@ -152,24 +151,25 @@ function SizeCard({ size, plain }) {
       </div>
 
       <div
-        className={`px-3 pb-4 pt-1 transition-transform duration-500 ease-out sm:px-4 ${
+        className={`px-3 pb-3 pt-1 transition-transform duration-500 ease-out sm:px-4 ${
           plain ? "translate-y-[calc(var(--pic)*-0.075)]" : ""
         }`}
       >
         {size.width ? (
-          <div className="relative flex items-center justify-center">
-            <span aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-ink/25" />
-            <span aria-hidden className="absolute left-0 top-1/2 h-3 w-px -translate-y-1/2 bg-ink/40" />
-            <span aria-hidden className="absolute right-0 top-1/2 h-3 w-px -translate-y-1/2 bg-ink/40" />
-            <span
-              className="relative px-2.5 py-1 text-[11.5px] font-bold tabular-nums text-white sm:text-[12.5px]"
-              style={{ backgroundColor: NAVY }}
-            >
+          <div className="flex flex-col items-center">
+            {/* The horizontal width dimension line spanning edge-to-edge with end ticks */}
+            <div className="relative flex h-[27px] w-full items-center">
+              <span aria-hidden className="h-px w-full bg-ink/30" />
+              <span aria-hidden className="absolute left-0 top-1/2 h-3.5 w-px -translate-y-1/2 bg-ink/50" />
+              <span aria-hidden className="absolute right-0 top-1/2 h-3.5 w-px -translate-y-1/2 bg-ink/50" />
+            </div>
+            {/* Size measurement below the line */}
+            <p className="pb-1 text-center text-[12px] font-bold tabular-nums tracking-wide text-ink sm:text-[13px]">
               {size.width}
-            </span>
+            </p>
           </div>
         ) : null}
-        <p className="mt-1.5 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/45 lg:hidden">Width</p>
+        <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-ink/45 lg:hidden">Width</p>
       </div>
     </Link>
   );
@@ -187,10 +187,10 @@ function LengthRule({ value }) {
         <span className="h-px w-3 bg-ink/40" />
       </div>
       <div className="absolute inset-y-0 left-0 right-7 flex flex-col items-center justify-center gap-2 text-center">
-        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white" style={{ backgroundColor: NAVY }}>
+        <span className="border border-brand bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
           Length
         </span>
-        <span className="text-[12px] font-semibold leading-relaxed tabular-nums text-ink/70">
+        <span className="text-[12.5px] font-bold leading-relaxed tabular-nums text-ink">
           {lines.map((l, i) => (
             <span key={i} className="block">{l}</span>
           ))}
@@ -209,7 +209,7 @@ function WidthKey({ plain }) {
           plain ? "translate-y-[calc(var(--pic)*-0.075)]" : ""
         }`}
       >
-        <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white" style={{ backgroundColor: NAVY }}>
+        <span className="border border-brand bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
           Width
         </span>
         <span aria-hidden className="h-px flex-1 bg-ink/30" />

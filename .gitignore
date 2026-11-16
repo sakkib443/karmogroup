@@ -5,7 +5,6 @@ out/
 build/
 
 # env
-.env
 .env*.local
 
 # Reference material only — the extracted static site, blueprint PDF and
@@ -98,3 +97,4 @@ temp_interactive_push.bat
 __pycache__/
 *.pyc
 
+config.bat

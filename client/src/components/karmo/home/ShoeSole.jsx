@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
@@ -41,7 +42,102 @@ const TITLE_STYLE = {
 const CLAIM_ICONS = [IconClaimCushion, IconClaimLoad, IconClaimLight];
 const SERVICE_ICONS = [IconServiceDensity, IconServiceFormula, IconServiceLight, IconServiceScale];
 
+/**
+ * Technical dogleg callout leader line connecting the shoe's white foam insole/heel cushion
+ * to the circular microstructure magnifying badge with an arrowhead, matching the client's specification.
+ */
+function FootwearMicroCallout({ parentRef, heelRef, circleRef }) {
+  const [coords, setCoords] = useState(null);
+
+  useEffect(() => {
+    const update = () => {
+      if (!parentRef.current || !heelRef.current || !circleRef.current) return;
+      const p = parentRef.current.getBoundingClientRect();
+      const h = heelRef.current.getBoundingClientRect();
+      const c = circleRef.current.getBoundingClientRect();
+
+      const startX = h.left + h.width / 2 - p.left;
+      const startY = h.top + h.height / 2 - p.top;
+
+      const cCenterX = c.left + c.width / 2 - p.left;
+      const cCenterY = c.top + c.height / 2 - p.top;
+      const radius = c.width / 2;
+
+      // Contact point on circle: upper-left rim (~212° in SVG coords)
+      const angleRad = (212 * Math.PI) / 180;
+      const endX = cCenterX + radius * Math.cos(angleRad);
+      const endY = cCenterY + radius * Math.sin(angleRad);
+
+      // Elbow point: rises from heel to exact horizontal landing level of the circle contact
+      const elbowX = Math.min(startX + (endX - startX) * 0.42, endX - 28);
+      const elbowY = endY;
+
+      setCoords({ startX, startY, elbowX, elbowY, endX, endY });
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    const ro = new ResizeObserver(update);
+    if (parentRef.current) ro.observe(parentRef.current);
+    return () => {
+      window.removeEventListener("resize", update);
+      ro.disconnect();
+    };
+  }, [parentRef, heelRef, circleRef]);
+
+  if (!coords) return null;
+
+  const { startX, startY, elbowX, elbowY, endX, endY } = coords;
+
+  // Clean, elegant two-segment leader line directly touching the circle (no arrowhead, as requested)
+  const pathD = `M ${startX.toFixed(1)} ${startY.toFixed(1)} L ${elbowX.toFixed(1)} ${elbowY.toFixed(1)} L ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 z-10 hidden h-full w-full overflow-visible lg:block"
+      aria-hidden
+    >
+      <defs>
+        <filter id="callout-shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000000" floodOpacity="0.85" />
+        </filter>
+      </defs>
+
+      {/* Two-segment angled leader line with smooth elbow and horizontal landing */}
+      <motion.path
+        d={pathD}
+        fill="none"
+        stroke="rgba(255, 255, 255, 0.95)"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        whileInView={{ pathLength: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+        filter="url(#callout-shadow)"
+      />
+
+      {/* Origin hotspot on white foam insole heel pad */}
+      <circle cx={startX} cy={startY} r="3" fill="#ffffff" filter="url(#callout-shadow)" />
+      <circle
+        cx={startX}
+        cy={startY}
+        r="7"
+        fill="none"
+        stroke="rgba(255, 255, 255, 0.45)"
+        strokeWidth="1.2"
+        strokeDasharray="2.5 2"
+      />
+    </svg>
+  );
+}
+
 function FoamSpecLayout({ reveal, c }) {
+  const parentRef = useRef(null);
+  const heelRef = useRef(null);
+  const circleRef = useRef(null);
+
   return (
     <motion.div
       variants={group}
@@ -106,11 +202,14 @@ function FoamSpecLayout({ reveal, c }) {
           ) : null}
         </motion.div>
 
-        {/* Right — exploded shoe + foam microstructure card */}
+        {/* Right — exploded shoe + foam microstructure card with callout pointer line */}
         <motion.div
+          ref={parentRef}
           variants={fade}
           className="relative flex flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-end"
         >
+          <FootwearMicroCallout parentRef={parentRef} heelRef={heelRef} circleRef={circleRef} />
+
           <div className="relative h-[min(46svh,28rem)] w-full max-w-[44rem] lg:h-[min(52svh,34rem)]">
             {c.shoe?.src ? (
               <Image
@@ -123,9 +222,18 @@ function FoamSpecLayout({ reveal, c }) {
                 style={imageStyle(c.shoe)}
               />
             ) : null}
+            {/* Precise anchor pin on the white foam insole heel cushion */}
+            <span
+              ref={heelRef}
+              className="pointer-events-none absolute left-[80%] top-[54%] h-0 w-0 -translate-x-1/2 -translate-y-1/2"
+              aria-hidden
+            />
           </div>
           <div className="w-full max-w-[15rem] shrink-0">
-            <div className="relative mx-auto aspect-square w-[8.5rem] overflow-hidden rounded-full ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45)] lg:mx-0">
+            <div
+              ref={circleRef}
+              className="relative mx-auto aspect-square w-[8.5rem] overflow-hidden rounded-full ring-1 ring-white/30 shadow-[0_8px_24px_rgba(0,0,0,0.45)] lg:mx-0"
+            >
               {c.micro?.src ? (
                 <Image
                   src={c.micro.src}
