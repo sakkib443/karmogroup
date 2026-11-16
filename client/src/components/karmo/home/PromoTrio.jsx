@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { FiArrowRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
@@ -101,22 +100,16 @@ export default function PromoTrio() {
           />
           <Link
             href={feature.button?.href || "#"}
-            className="group absolute inset-0 z-20 flex flex-col items-end justify-start pt-16 pl-6 pr-10 text-right sm:pt-20 sm:pl-8 sm:pr-14 lg:pt-24 lg:pl-10 lg:pr-20 xl:pt-28 xl:pr-24"
+            className="group absolute inset-0 z-20 flex flex-col items-end justify-start pt-8 pl-6 pr-6 text-right sm:pt-10 sm:pl-8 sm:pr-8 lg:pt-12 lg:pl-10 lg:pr-10 xl:pt-14 xl:pr-12"
           >
-            <div className="relative z-20 w-[min(22rem,42%)]">
+            <div className="relative z-20 w-[min(22rem,40%)]">
               <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
                 {feature.eyebrow}
               </span>
-              <h2 className="display section-heading title-card-line mt-3 uppercase text-white">
+              <h2 className="display section-heading title-card-line mt-2.5 uppercase text-white">
                 <CmsText as="span" className="block" value={feature.line1} size={feature.line1Size} />
                 <CmsText as="span" className="block" value={feature.line2} size={feature.line1Size} />
               </h2>
-              {feature.button?.label ? (
-                <span className="mt-6 inline-flex h-11 w-fit items-center gap-2 bg-brand px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand sm:h-12 sm:px-7 sm:text-[12px]">
-                  {feature.button.label}
-                  <FiArrowRight className="text-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
-                </span>
-              ) : null}
             </div>
           </Link>
         </motion.div>

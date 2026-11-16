@@ -6,6 +6,7 @@ import { startCourierAutoSync } from './app/modules/courier/courier.cron';
 import { ensureStaffAccounts } from './app/modules/user/ensureStaffAccounts';
 import { ensureDeskSamples } from './app/modules/demo/ensureDeskSamples';
 import { ensureBulkSamples } from './app/modules/demo/ensureBulkSamples';
+import { ensureDefaultCounters } from './app/modules/counter/counter.seed';
 
 process.on('uncaughtException', (error) => {
     console.error('💥 UNCAUGHT EXCEPTION! Shutting down...');
@@ -61,6 +62,7 @@ connectDB()
     .then(() => ensureStaffAccounts())
     .then(() => ensureDeskSamples())
     .then(() => ensureBulkSamples())
+    .then(() => ensureDefaultCounters())
     .catch((err) => console.error('❌ Initial MongoDB connection failed:', err));
 
 // ── Start Server ─────────────────────────────────────────────────

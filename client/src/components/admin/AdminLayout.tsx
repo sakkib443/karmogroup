@@ -11,7 +11,7 @@ import {
     LuStore, LuTruck, LuWallet, LuCreditCard, LuLayoutTemplate, LuUser, LuUserCog,
     LuMessageSquare, LuBriefcase, LuFileText,
     LuScanBarcode, LuMessageSquareText, LuHouse, LuPalette, LuFiles, LuSlidersHorizontal, LuGlobe,
-    LuPanelLeft, LuChevronRight, LuChevronDown, LuLogOut, LuX, LuEye, LuArrowLeft,
+    LuPanelLeft, LuChevronRight, LuChevronDown, LuLogOut, LuX, LuEye, LuArrowLeft, LuGauge,
 } from 'react-icons/lu';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { SiteMark } from '@/components/shared/SiteLogo';
@@ -107,8 +107,15 @@ const menuSections: { label: string; items: MenuItem[]; icon?: IconType; dropdow
         items: [
             { name: 'All pages', href: '/dashboard/admin/site-content', icon: LuFiles },
             { name: 'Home page', href: '/dashboard/admin/site-content/home', icon: LuHouse },
+            { name: 'Counters', href: '/dashboard/admin/counters', icon: LuGauge },
             { name: 'Brand & contact', href: '/dashboard/admin/site-content/global', icon: LuPalette },
             { name: 'More settings', href: '/dashboard/admin/site-content/settings', icon: LuSlidersHorizontal },
+        ],
+    },
+    {
+        label: 'Counters',
+        items: [
+            { name: 'Counters', href: '/dashboard/admin/counters', icon: LuGauge },
         ],
     },
     // Finance (Accounts overview) is hidden for now — the page stays in the code. Payments
