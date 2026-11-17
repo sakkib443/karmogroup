@@ -97,4 +97,6 @@ temp_interactive_push.bat
 __pycache__/
 *.pyc
 
-config.bat
+# local environment files
+.env
+.env.local
