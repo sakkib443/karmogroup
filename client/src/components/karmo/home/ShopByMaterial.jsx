@@ -8,6 +8,8 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { imageStyle } from "@/cms/core";
 import { materials } from "@/cms/pages/home";
+import TextureSlides from "@/components/karmo/home/TextureSlides";
+import SectionHeading from "@/components/karmo/home/SectionHeading";
 
 /**
  * Shop by material — the four core materials a Karmo mattress is built from,
@@ -102,7 +104,11 @@ export default function ShopByMaterial() {
   if (c.hidden) return null;
 
   return (
-    <section className="bg-white pt-4 pb-0 md:pt-5 lg:pt-6">
+    <section className="relative overflow-hidden bg-white pt-8 pb-0 md:pt-10">
+      <TextureSlides lighter />
+
+      <SectionHeading eyebrow={c.eyebrow} title={c.title} titleAccent={c.titleAccent} titleSize={c.titleSize} reveal={reveal} />
+
       {/* Uneven columns and rows — the asymmetry the client asked for. The
           grid takes a height at lg so the two tall cards and the stacked pair
           end on the same line; below lg each card falls back to its own ratio
@@ -111,7 +117,7 @@ export default function ShopByMaterial() {
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="grid gap-1 px-0 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
+        className="relative z-[1] mt-6 grid gap-1 px-0 md:mt-8 md:gap-1.5 md:px-0 lg:aspect-[16/7.6] lg:grid-cols-[1.18fr_1.1fr_0.82fr] lg:grid-rows-[1fr_1fr]"
       >
         {(c.cards || []).slice(0, SLOTS.length).map((item, i) => (
           <MaterialCard key={`${i}-${item.name}`} item={item} slot={SLOTS[i]} />

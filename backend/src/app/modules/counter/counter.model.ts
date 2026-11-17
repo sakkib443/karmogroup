@@ -31,4 +31,5 @@ const counterSchema = new Schema<ICounter>(
 
 counterSchema.index({ order: 1, isActive: 1 });
 
-export const Counter = model<ICounter>('Counter', counterSchema);
+// Its own model and collection: 'Counter' / 'counters' already hold the order-number sequence (order.model.ts).
+export const Counter = model<ICounter>('HomeCounter', counterSchema, 'homecounters');

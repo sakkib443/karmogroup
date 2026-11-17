@@ -2,11 +2,11 @@
  * The gold leaf between two orange rules — the ornament under every centred
  * heading on Home 02.
  *
- * It is drawn inline in four homepage components (`DivisionsStrip`,
+ * It is drawn inline in three homepage components (
  * `CertifiedBy`, `OrderAndContact`, `FoamPromise`) because it predates having
  * anywhere to put it. The About page needs it in three places, so this folder
  * keeps one copy rather than adding three more. Same path data and same
- * colours as those four, so the mark is identical wherever it lands.
+ * colours as those three, so the mark is identical wherever it lands.
  */
 
 const ORANGE = "#FF9A1F";

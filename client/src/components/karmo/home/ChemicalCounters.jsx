@@ -87,7 +87,7 @@ function CounterCard({ item, index, isContainerInView }) {
         duration: 0.75,
         ease: [0.22, 1, 0.36, 1], // gentle, graceful settle into place
       }}
-      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.07] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:bg-white/[0.12] hover:shadow-[0_12px_36px_0_rgba(228,82,92,0.25),inset_0_1px_1px_0_rgba(255,255,255,0.35)] sm:p-6 lg:px-4 lg:py-5 xl:px-5 2xl:px-6"
+      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.07] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:bg-white/[0.12] hover:shadow-[0_12px_36px_0_rgba(228,82,92,0.25),inset_0_1px_1px_0_rgba(255,255,255,0.35)] sm:p-6 lg:px-7 lg:py-7"
     >
       {/* Top delicate frosted glass highlight */}
       <div
@@ -104,25 +104,25 @@ function CounterCard({ item, index, isContainerInView }) {
       {/* Number + Suffix on one line (never wraps) */}
       <div className="relative flex items-baseline whitespace-nowrap leading-none">
         {item.prefix ? (
-          <span className="mr-1 text-2xl font-black text-brand sm:text-3xl lg:text-[1.15rem] xl:text-[1.35rem] 2xl:text-[1.6rem]">
+          <span className="mr-1 text-2xl font-black text-brand sm:text-3xl">
             {item.prefix}
           </span>
         ) : null}
         <span
           ref={numberRef}
-          className="tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl lg:text-[1.65rem] xl:text-[2rem] 2xl:text-[2.4rem]"
+          className="tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl xl:text-[2.75rem]"
         >
           0
         </span>
         {item.suffix ? (
-          <span className="ml-1 text-xl font-bold tracking-tight text-brand sm:text-2xl lg:text-[1.05rem] xl:text-[1.25rem] 2xl:text-[1.5rem]">
+          <span className="ml-1 text-xl font-bold tracking-tight text-brand sm:text-2xl xl:text-[1.75rem]">
             {item.suffix}
           </span>
         ) : null}
       </div>
 
       {/* Clean Stat Title */}
-      <h3 className="relative mt-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white/90 transition-colors group-hover:text-white sm:text-[13px] lg:text-[11px] xl:text-xs">
+      <h3 className="relative mt-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white/90 transition-colors group-hover:text-white sm:text-[13px] xl:text-[14px]">
         {item.title}
       </h3>
     </motion.div>
@@ -147,10 +147,10 @@ export default function ChemicalCounters() {
   return (
     <div
       ref={containerRef}
-      className="relative order-1 flex w-full items-center justify-end px-4 py-8 sm:px-6 lg:order-2 lg:h-full lg:items-end lg:pb-20 lg:pl-6 lg:pr-6 lg:pt-10 xl:pr-10 2xl:pb-24 2xl:pr-14"
+      className="relative order-1 flex w-full items-center justify-center px-4 py-8 sm:px-6 lg:order-2 lg:h-full lg:p-10"
     >
-      {/* Glassmorphism cards: 2x2 on phones/tablets, one row of four along the bottom on desktop */}
-      <div className="grid w-full max-w-[36rem] grid-cols-2 gap-4 sm:gap-5 lg:max-w-[64rem] lg:grid-cols-4 lg:gap-4 xl:gap-5">
+      {/* Glassmorphism cards: two by two, dead centre of the photo side at every size */}
+      <div className="grid w-full max-w-[36rem] grid-cols-2 gap-4 sm:gap-5 lg:gap-6 xl:max-w-[40rem]">
         {activeCounters.map((item, index) => (
           <CounterCard
             key={item._id || index}

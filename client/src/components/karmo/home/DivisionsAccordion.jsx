@@ -94,13 +94,15 @@ function Panel({ division, look, active, onOpen, posterGrow }) {
       className="@container relative block min-h-0 min-w-0 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white"
       style={{ backgroundColor: look.bg, flexGrow: active ? posterGrow || 3.2 : 1, flexBasis: 0, transition: `flex-grow 900ms ${EASE}` }}
     >
-      {/* Open: poster light — a soft glow at the top, the floor fading to white */}
+      {/* Open: poster light — a soft glow at the top, the floor fading to white. The floor eases
+          out over many stops (a cosine curve) so it melts into even the deep red and teal
+          without a visible band. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background: look.poster
-            ? "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 40%), linear-gradient(0deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.9) 20%, rgba(255,255,255,0.4) 29%, rgba(255,255,255,0) 37%)"
+            ? "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 40%), linear-gradient(0deg, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.97) 14%, rgba(255,255,255,0.961) 16.1%, rgba(255,255,255,0.933) 18.3%, rgba(255,255,255,0.888) 20.4%, rgba(255,255,255,0.828) 22.5%, rgba(255,255,255,0.754) 24.6%, rgba(255,255,255,0.671) 26.8%, rgba(255,255,255,0.580) 28.9%, rgba(255,255,255,0.485) 31.0%, rgba(255,255,255,0.390) 33.1%, rgba(255,255,255,0.299) 35.3%, rgba(255,255,255,0.216) 37.4%, rgba(255,255,255,0.142) 39.5%, rgba(255,255,255,0.082) 41.6%, rgba(255,255,255,0.037) 43.8%, rgba(255,255,255,0.009) 45.9%, rgba(255,255,255,0.000) 48.0%)"
             : "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%), linear-gradient(0deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0) 24%)",
           opacity: active ? 1 : 0,
           transition: `opacity 900ms ${EASE}`,

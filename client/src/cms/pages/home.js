@@ -39,11 +39,6 @@ export const hero = {
   defaults: {
     autoplaySec: 4.5,
     slides: [
-      { id: "home-video-assemble", media: video("/pages/home/videos/hero-video-1.mp4", "/pages/home/videos/hero-video-1-poster.webp"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 6 },
-      { id: "home-video-living", media: video("/pages/home/videos/hero-video-a.mp4", "/pages/home/videos/hero-video-a-poster.webp", { rate: 1.25, y: 68 }), heading: "Foam crafted for living", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 14.8 },
-      { id: "home-video-dining", media: video("/pages/home/videos/hero-video-b.mp4", "/pages/home/videos/hero-video-b-poster.webp", { rate: 1.25 }), heading: "Moments that make a house", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 10.4 },
-      { id: "home-video-lounge", media: video("/pages/home/videos/hero-video-c.mp4", "/pages/home/videos/hero-video-c-poster.webp", { rate: 1.25 }), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 12.2 },
-      { id: "home-room-tour-trial", media: video("/pages/home/videos/hero-room-tour-trial.mp4"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 10 },
       { id: "home-journey-1965", media: photo("/pages/home/hero/home-hero-slide-01-mustard-room-hq.webp", "Mustard sofa in a blue-walled living room with plants and wood shelves"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-living-scandi", media: photo("/pages/home/hero/home-hero-slide-living-scandi-v3-hq.webp", "Warm living room with a cream sofa, wood shelves and round coffee table"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-chemicals-warehouse", media: photo("/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue drums in cinematic light"), heading: "Industrial chemistry built to last", headingSize: 100, align: "left", overlay: noOverlay },
@@ -188,8 +183,11 @@ export const divisions = {
 export const materials = {
   key: "materials",
   label: "Shop by material",
-  description: "Four material cards in an uneven grid.",
+  description: "The heading and four material cards in an uneven grid.",
   fields: [
+    f.text("eyebrow", "Small red title"),
+    f.text("title", "Heading", { size: true }),
+    f.text("titleAccent", "Heading — red part"),
     f.list("cards", "Cards", [
       f.image("image", "Photo"),
       f.overlay("overlay", "Darkness"),
@@ -199,6 +197,10 @@ export const materials = {
     ], { fixed: true, itemLabel: (c) => c.name }),
   ],
   defaults: {
+    eyebrow: "Our Materials",
+    title: "Shop by",
+    titleSize: 100,
+    titleAccent: "material",
     cards: [
       { name: "Rebonded Foam", line: "Support that lasts", lineSize: 100, href: "/mattress", image: img("/pages/home/materials/rebonded-foam-v15.webp", "Speckled terrazzo rebonded foam slab"), overlay: { color: "#000000", opacity: 0 } },
       { name: "Polyethylene Foam", line: "Hi-density core", lineSize: 100, href: "/mattress", image: img("/pages/home/materials/pe-foam-v2.webp", "Close-up of charcoal egg-crate contour foam"), overlay: { color: "#000000", opacity: 40 } },
