@@ -274,10 +274,10 @@ export const sizes = {
     length: '72" / 75" / 78"',
     edge: img("/pages/home/sizes/mattress-border-profile.webp", "Side view of a Karmo mattress showing its thickness", { fit: "contain" }),
     sizes: [
-      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-floral-v1.webp", "One person sleeping on a Karmo floral quilted single mattress", { fit: "contain" }) },
-      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-floral-v1.webp", "A couple sleeping on a Karmo floral quilted double mattress", { fit: "contain" }) },
-      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-floral-v1.webp", "A couple sleeping side by side on a Karmo floral quilted queen mattress", { fit: "contain" }) },
-      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-floral-v1.webp", "A family with a small child sleeping on a Karmo floral quilted king mattress", { fit: "contain" }) },
+      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-teal-leaf-v1.webp", "One person sleeping on a thick Karmo teal-leaf single mattress", { fit: "contain" }) },
+      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-teal-leaf-v1.webp", "A couple napping on a Karmo teal-leaf double mattress", { fit: "contain" }) },
+      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-teal-leaf-v1.webp", "A couple sleeping side by side on a Karmo teal-leaf queen mattress", { fit: "contain" }) },
+      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-teal-leaf-v1.webp", "A family with a small child sleeping on a Karmo teal-leaf king mattress", { fit: "contain" }) },
     ],
   },
 };
