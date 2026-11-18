@@ -41,12 +41,23 @@ export default function PictureSlotsPage({ page, data, content: initial }) {
   const overlayCss = useMemo(() => {
     const rules = [];
     for (const s of slots) {
-      const o = Number(content?.slots?.[s.key]?.overlay || 0);
-      if (!o) continue;
+      const v = content?.slots?.[s.key] || {};
+      const o = Number(v.overlay || 0);
+      const zoom = Number(v.zoom || 100);
+      const hasPos = v.x != null || v.y != null;
+      if (!o && zoom === 100 && !hasPos) continue;
       const src = cssStr(currentSrc(s, content));
-      rules.push(
-        `img[src=${src}],video[src=${src}],video[poster=${src}],video:has(source[src=${src}]){filter:brightness(${(1 - o / 100).toFixed(2)})}`
-      );
+      const sel = `img[src=${src}],video[src=${src}],video[poster=${src}],video:has(source[src=${src}])`;
+      const x = v.x ?? 50;
+      const y = v.y ?? 50;
+      const decl = [];
+      if (o) decl.push(`filter:brightness(${(1 - o / 100).toFixed(2)})`);
+      /* Framing chosen in the editor: which part shows, and how close. */
+      if (hasPos) decl.push(`object-position:${x}% ${y}% !important`);
+      if (zoom !== 100) decl.push(`transform:scale(${(zoom / 100).toFixed(3)}) !important`, `transform-origin:${x}% ${y}% !important`);
+      rules.push(`${sel}{${decl.join(";")}}`);
+      // Pictures drawn as a CSS background (e.g. the mattress edge strip) move the same way.
+      if (hasPos) rules.push(`[style*=${cssStr(currentSrc(s, content))}]{background-position:${x}% ${y}% !important}`);
     }
     return rules.join("\n");
   }, [slots, content]);
@@ -219,10 +230,12 @@ function SlotPanel({ slot, content, setContent, save, onClose }) {
   const history = (content?.history?.[slot.key] || []).filter((x) => x !== s.src || true);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
-  const [overlay, setOverlay] = useState(Number(s.overlay || 0));
+  const fromSlot = (v) => ({ overlay: Number(v.overlay || 0), zoom: Number(v.zoom || 100), x: v.x ?? 50, y: v.y ?? 50 });
+  const [vals, setVals] = useState(fromSlot(s));
+  const overlay = vals.overlay;
   const fileRef = useRef(null);
 
-  useEffect(() => setOverlay(Number(s.overlay || 0)), [slot.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => setVals(fromSlot(s)), [slot.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const run = async (what, fn) => {
     setBusy(what);
@@ -243,18 +256,22 @@ function SlotPanel({ slot, content, setContent, save, onClose }) {
 
   const pick = (src) => run("Saving…", () => save(slot.key, { src }));
 
-  /* The slider shows the veil at once on the page; it is saved when let go. */
-  const preview = (v) => {
-    setOverlay(v);
-    setContent((c) => ({ ...c, slots: { ...(c?.slots || {}), [slot.key]: { ...(c?.slots?.[slot.key] || {}), overlay: v } } }));
+  /* Sliders change the page at once; the value is saved when the slider is let go. */
+  const preview = (field, v) => {
+    setVals((o) => ({ ...o, [field]: v }));
+    setContent((c) => ({ ...c, slots: { ...(c?.slots || {}), [slot.key]: { ...(c?.slots?.[slot.key] || {}), [field]: v } } }));
   };
-  const commitOverlay = () => run("Saving…", () => save(slot.key, { overlay }));
+  const commit = (field) => () => run("Saving…", () => save(slot.key, { [field]: vals[field] }));
+  const resetFrame = () => {
+    setVals((o) => ({ ...o, zoom: 100, x: 50, y: 50 }));
+    run("Saving…", () => save(slot.key, { zoom: 100, x: null, y: null }));
+  };
 
   const inUse = s.src || "";
   const uploads = history.filter((x) => x && x !== slot.src);
 
   return (
-    <div data-slot-editor className="fixed inset-0 z-[2147483000] flex justify-end bg-black/30" onClick={onClose}>
+    <div data-slot-editor className="fixed inset-0 z-[2147483000] flex justify-end bg-black/10" onClick={onClose}>
       <aside
         className="flex h-full w-full max-w-[400px] flex-col overflow-y-auto bg-white p-5 text-[#111] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -287,23 +304,18 @@ function SlotPanel({ slot, content, setContent, save, onClose }) {
         </button>
         {error ? <p className="mt-2 text-[12px] text-[#d9444c]">{error}</p> : null}
 
-        <div className="mt-6">
-          <div className="flex items-center justify-between text-[12px] font-semibold">
-            <span>Dark overlay</span>
-            <span className="tabular-nums text-black/60">{overlay}%</span>
+        <div className="mt-6 rounded-lg border border-black/10 p-3.5">
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-bold uppercase tracking-[0.14em]">Framing</p>
+            <button type="button" onClick={resetFrame} disabled={!!busy} className="text-[11px] font-semibold text-[#d9444c] hover:underline">Reset</button>
           </div>
-          <input
-            type="range"
-            min={0}
-            max={80}
-            step={1}
-            value={overlay}
-            disabled={!!busy}
-            onChange={(e) => preview(Number(e.target.value))}
-            onPointerUp={commitOverlay}
-            onKeyUp={commitOverlay}
-            className="mt-2 w-full accent-[#d9444c]"
-          />
+          <Slider label="Zoom" unit="%" min={30} max={300} value={vals.zoom} busy={busy} onChange={(v) => preview("zoom", v)} onDone={commit("zoom")} hint="Below 100% shows more of the picture; above 100% goes closer." />
+          <Slider label="Move left ↔ right" unit="%" min={0} max={100} value={vals.x} busy={busy} onChange={(v) => preview("x", v)} onDone={commit("x")} />
+          <Slider label="Move up ↕ down" unit="%" min={0} max={100} value={vals.y} busy={busy} onChange={(v) => preview("y", v)} onDone={commit("y")} />
+        </div>
+
+        <div className="mt-4 rounded-lg border border-black/10 p-3.5">
+          <Slider label="Dark overlay" unit="%" min={0} max={80} value={vals.overlay} busy={busy} onChange={(v) => preview("overlay", v)} onDone={commit("overlay")} />
         </div>
 
         <div className="mt-6">
@@ -320,6 +332,30 @@ function SlotPanel({ slot, content, setContent, save, onClose }) {
           Changes go live at once for everyone. Only signed-in admins see these buttons.
         </p>
       </aside>
+    </div>
+  );
+}
+
+function Slider({ label: text, unit, min, max, value, busy, onChange, onDone, hint }) {
+  return (
+    <div className="mt-3">
+      <div className="flex items-center justify-between text-[12px] font-semibold">
+        <span>{text}</span>
+        <span className="tabular-nums text-black/60">{value}{unit}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={1}
+        value={value}
+        disabled={!!busy}
+        onChange={(e) => onChange(Number(e.target.value))}
+        onPointerUp={onDone}
+        onKeyUp={onDone}
+        className="mt-1.5 w-full accent-[#d9444c]"
+      />
+      {hint ? <p className="mt-0.5 text-[10.5px] text-black/45">{hint}</p> : null}
     </div>
   );
 }

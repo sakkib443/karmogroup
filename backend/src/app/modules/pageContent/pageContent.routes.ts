@@ -143,11 +143,11 @@ router.post('/:page/restore', ...admin, catchAsync(async (req: Request, res: Res
 
 /**
  * POST /api/page-content/:page/slot   change ONE picture straight on the live page (admin)
- *   body { key, src?, overlay? }
+ *   body { key, src?, overlay?, zoom?, x?, y? }
  * Used by the edit buttons on the public page itself (e.g. /mattress). It writes the
  * live content at once — no draft — and remembers every picture a slot has shown in
  * `history[key]` (newest first) so an older one can be picked again.
- *   published.slots[key]   = { src, overlay }   (src "" = the design's own picture)
+ *   published.slots[key]   = { src, overlay, zoom, x, y }   (src "" = the design's own picture)
  *   published.history[key] = [src, …]
  */
 const KEEP_HISTORY = 30;
@@ -166,6 +166,16 @@ router.post('/:page/slot', ...admin, catchAsync(async (req: Request, res: Respon
         if (src && !/^\/api\/media\/[a-f0-9]{24}$/i.test(src) && !/^\/[A-Za-z0-9_./-]+$/.test(src)) throw new AppError(400, 'Bad picture address');
         current.src = src;
         if (src) history[key] = [src, ...(history[key] || []).filter((s: string) => s !== src)].slice(0, KEEP_HISTORY);
+    }
+    // Framing: zoom in % (100 = as designed), x / y = which part shows, in % (null = as designed).
+    if (req.body.zoom !== undefined) {
+        const z = Number(req.body.zoom);
+        current.zoom = Number.isFinite(z) ? Math.max(30, Math.min(400, Math.round(z))) : 100;
+    }
+    for (const axis of ['x', 'y'] as const) {
+        if (req.body[axis] === undefined) continue;
+        const v = req.body[axis];
+        current[axis] = v === null || v === '' ? null : Math.max(0, Math.min(100, Math.round(Number(v)) || 0));
     }
     if (req.body.overlay !== undefined) {
         const o = Number(req.body.overlay);

@@ -122,7 +122,7 @@ const mattress = {
         /* Wide picture (17 Nov): fills the cell (cover), held to its left edge —
            the right side is what gets trimmed. Before it: …-v3.webp (square). */
         src: "/pages/mattress/bands/sleep-comfort-floral-bedroom-v4.webp",
-        position: "left center",
+        position: "55% center", /* nudged a little left (client's ask) */
         alt: "Karmo red floral mattress in a bedroom — support for side, back and stomach sleepers",
         width: 1672,
         height: 941,
@@ -162,7 +162,7 @@ const mattress = {
        "/pages/mattress/bands/mattress-showroom-interior.webp" (aspect "1774 / 887"). */
     shaded: true,
     eyebrow: "Karmo Mattress",
-    background: "/pages/mattress/bands/mattress-brands-golden-medallion-bedroom.webp",
+    background: "/pages/mattress/bands/mattress-brands-warm-modern-bedroom.webp",
     backgroundAspect: "1983 / 793",
     items: [
       {
