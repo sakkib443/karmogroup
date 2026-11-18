@@ -9,7 +9,7 @@ import Image from "next/image";
  * (flex-grow = width / height), so a square and a wide picture line up edge
  * to edge. Stacks on phones. Same 6px rhythm as the bands around it.
  */
-export default function DivisionImagePair({ id, label, images = [], split, cellAspect, screenTall = false }) {
+export default function DivisionImagePair({ id, label, images = [], split, cellAspect, screenTall = false, overlay }) {
   if (!images.length) return null;
 
   /* Fixed shares (e.g. split: [50, 50]). Without `cellAspect` the first
@@ -87,6 +87,8 @@ export default function DivisionImagePair({ id, label, images = [], split, cellA
                 style={{ objectPosition: img.position || "center", transform: img.nudge }}
               />
             )}
+            {/* Optional soft shade over every picture (e.g. "rgba(0,0,0,.14)"). */}
+            {overlay ? <span aria-hidden className="pointer-events-none absolute inset-0" style={{ background: overlay }} /> : null}
           </div>
         ))}
       </section>

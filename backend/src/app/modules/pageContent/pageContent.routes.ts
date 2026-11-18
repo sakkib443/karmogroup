@@ -141,4 +141,43 @@ router.post('/:page/restore', ...admin, catchAsync(async (req: Request, res: Res
     sendResponse(res, { statusCode: 200, success: true, message: 'Version loaded as a draft — publish to make it live', data: forEditor(doc) });
 }));
 
+/**
+ * POST /api/page-content/:page/slot   change ONE picture straight on the live page (admin)
+ *   body { key, src?, overlay? }
+ * Used by the edit buttons on the public page itself (e.g. /mattress). It writes the
+ * live content at once — no draft — and remembers every picture a slot has shown in
+ * `history[key]` (newest first) so an older one can be picked again.
+ *   published.slots[key]   = { src, overlay }   (src "" = the design's own picture)
+ *   published.history[key] = [src, …]
+ */
+const KEEP_HISTORY = 30;
+router.post('/:page/slot', ...admin, catchAsync(async (req: Request, res: Response) => {
+    const page = pageKey(req.params.page);
+    const key = String(req.body?.key || '');
+    if (!/^[A-Za-z0-9_.-]{1,160}$/.test(key)) throw new AppError(400, 'Unknown picture');
+    const doc: any = await findOrCreate(page);
+    const published = doc.published && typeof doc.published === 'object' ? doc.published : {};
+    const slots = published.slots || {};
+    const history = published.history || {};
+    const current = slots[key] || { src: '', overlay: 0 };
+
+    if (req.body.src !== undefined) {
+        const src = String(req.body.src || '');
+        if (src && !/^\/api\/media\/[a-f0-9]{24}$/i.test(src) && !/^\/[A-Za-z0-9_./-]+$/.test(src)) throw new AppError(400, 'Bad picture address');
+        current.src = src;
+        if (src) history[key] = [src, ...(history[key] || []).filter((s: string) => s !== src)].slice(0, KEEP_HISTORY);
+    }
+    if (req.body.overlay !== undefined) {
+        const o = Number(req.body.overlay);
+        current.overlay = Number.isFinite(o) ? Math.max(0, Math.min(90, Math.round(o))) : 0;
+    }
+    slots[key] = current;
+    doc.published = { ...published, slots, history };
+    doc.publishedAt = new Date();
+    doc.publishedBy = actor(req);
+    doc.markModified('published');
+    await doc.save();
+    sendResponse(res, { statusCode: 200, success: true, message: 'Saved', data: { page, content: doc.published } });
+}));
+
 export const PageContentRoutes = router;

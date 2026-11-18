@@ -1,4 +1,5 @@
-import DivisionPage from "@/components/karmo/division/DivisionPage";
+import PictureSlotsPage from "@/components/karmo/cms/PictureSlotsPage";
+import { getPageContent } from "@/cms/server";
 import mattress from "@/data/divisions/mattress";
 
 export const metadata = {
@@ -12,6 +13,9 @@ export const metadata = {
  * Renders the shared `DivisionPage` template with the mattress data.
  * Lives in (karmo-2) so it shares HeaderTwo + Footer with the homepage.
  */
-export default function MattressRoute() {
-  return <DivisionPage data={mattress} />;
+export default async function MattressRoute() {
+  /* Every picture comes from the database (page-content/mattress → slots); the files
+     in public/ are only the fallback. Admins change them from the page itself. */
+  const content = await getPageContent("mattress");
+  return <PictureSlotsPage page="mattress" data={mattress} content={content} />;
 }

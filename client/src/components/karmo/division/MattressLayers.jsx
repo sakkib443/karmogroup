@@ -44,6 +44,8 @@ export default function MattressLayers({
   icons = [],
   cta,
   callouts = [],
+  /* The mattress-side strip under the band (data: zones.edge); falls back to the homepage one. */
+  edge = EDGE_SRC,
 }) {
   return (
     <section
@@ -187,7 +189,7 @@ export default function MattressLayers({
           aria-label="Side view of a Karmo pillow-top mattress showing its thickness"
           className="h-[95px] w-full sm:h-[120px] md:h-[140px] lg:h-[165px] xl:h-[180px]"
           style={{
-            backgroundImage: `url(${EDGE_SRC})`,
+            backgroundImage: `url(${edge})`,
             backgroundRepeat: "repeat-x",
             backgroundSize: "auto 100%",
             backgroundPosition: "center top",

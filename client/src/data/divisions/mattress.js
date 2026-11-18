@@ -114,6 +114,8 @@ const mattress = {
     cellAspect: 1,
     /* Desktop: the row is one screen tall under the 112px header (client's ask). */
     screenTall: true,
+    /* A light shade over both pictures (client's ask). */
+    overlay: "rgba(0,0,0,.14)",
     images: [
       {
         /* Client's new picture (17 Nov); the earlier sleep-positions-premium-floral.webp stays in public/. */
@@ -352,6 +354,8 @@ const mattress = {
        callouts on the photo and the homepage mattress-edge strip underneath.
        Only the mattress division uses it; foam keeps the plain rail. */
     layout: "editorial",
+    /* Mattress-side strip under the band — changeable from the page like every picture. */
+    edge: "/pages/home/sizes/mattress-border-profile.webp?v=flush4",
     eyebrow: "Karmo Mattress",
     heading: "Built layer by layer",
     headingLead: "Built layer by",
