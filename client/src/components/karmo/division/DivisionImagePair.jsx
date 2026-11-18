@@ -9,7 +9,7 @@ import Image from "next/image";
  * (flex-grow = width / height), so a square and a wide picture line up edge
  * to edge. Stacks on phones. Same 6px rhythm as the bands around it.
  */
-export default function DivisionImagePair({ id, label, images = [], split, cellAspect }) {
+export default function DivisionImagePair({ id, label, images = [], split, cellAspect, screenTall = false }) {
   if (!images.length) return null;
 
   /* Fixed shares (e.g. split: [50, 50]). Without `cellAspect` the first
@@ -29,18 +29,64 @@ export default function DivisionImagePair({ id, label, images = [], split, cellA
           <div
             key={img.src}
             className={`relative aspect-[var(--nat)] w-full overflow-hidden ${
-              cellAspect ? "md:aspect-[var(--cell)]" : i > 0 ? "md:aspect-auto" : ""
+              screenTall
+                ? "md:aspect-auto md:h-[min(calc(100svh-112px),50vw)]"
+                : cellAspect ? "md:aspect-[var(--cell)]" : i > 0 ? "md:aspect-auto" : ""
             }`}
             style={{ ["--nat"]: `${img.width} / ${img.height}`, ["--cell"]: cellAspect }}
           >
-            <Image
-              src={img.src}
-              alt={img.alt}
-              fill
-              sizes={`(min-width: 768px) ${split[i]}vw, 100vw`}
-              className="object-cover"
-              style={{ objectPosition: img.position || "center" }}
-            />
+            {img.zoomOut ? (
+              /* Close-cropped picture shown smaller (zoomOut = 0.8 → 80%) on a soft,
+                 blurred copy of itself, so the cell stays filled. */
+              <>
+                <Image
+                  src={img.src}
+                  alt=""
+                  aria-hidden
+                  fill
+                  sizes="10vw"
+                  className="scale-110 object-cover blur-xl"
+                />
+
+                {/* Edges fade into the blurred copy — strongest left and right — so
+                    there is no frame line, just the picture melting into its room. */}
+                <span
+                  className="absolute inset-0"
+                  style={{
+                    transform: `scale(${img.zoomOut})`,
+                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%)",
+                    maskImage: "linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%)",
+                  }}
+                >
+                  <span
+                    className="absolute inset-0"
+                    style={{
+                      WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 4%, #000 96%, transparent 100%)",
+                      maskImage: "linear-gradient(to bottom, transparent 0%, #000 4%, #000 96%, transparent 100%)",
+                    }}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes={`(min-width: 768px) ${split[i]}vw, 100vw`}
+                      className="object-contain"
+                    />
+                  </span>
+                </span>
+              </>
+            ) : (
+              <Image
+                src={img.src}
+                alt={img.alt}
+                fill
+                sizes={`(min-width: 768px) ${split[i]}vw, 100vw`}
+                className="object-cover"
+                /* `nudge` moves the picture inside its cell (e.g. "translateX(-4%) scale(1.08)");
+                   the scale keeps the edges covered while it shifts. */
+                style={{ objectPosition: img.position || "center", transform: img.nudge }}
+              />
+            )}
           </div>
         ))}
       </section>

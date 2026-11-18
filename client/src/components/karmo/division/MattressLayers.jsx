@@ -15,8 +15,9 @@ import { FeatureIcon } from "@/components/karmo/division/mattressFeatureIcons";
  * Driven by `zones` on the mattress division only (layout: "editorial").
  */
 
-/* Same tile as ShopBySize — a seamless middle cut, repeated side by side. */
-const EDGE_SRC = "/pages/home/sizes/mattress-side-edge-tile.webp";
+/* The same thick side view that closes the homepage size band (ShopBySize), at the
+   same heights, repeated side by side. */
+const EDGE_SRC = "/pages/home/sizes/mattress-border-profile.webp?v=flush4";
 
 /**
  * Navy → transparent over the photo: solid to FADE_FROM %, then an eased fade
@@ -184,12 +185,12 @@ export default function MattressLayers({
         <div
           role="img"
           aria-label="Side view of a Karmo pillow-top mattress showing its thickness"
-          className="h-[50px] w-full opacity-70 sm:h-[66px] lg:h-[clamp(44px,7.5svh,82px)]"
+          className="h-[95px] w-full sm:h-[120px] md:h-[140px] lg:h-[165px] xl:h-[180px]"
           style={{
             backgroundImage: `url(${EDGE_SRC})`,
             backgroundRepeat: "repeat-x",
             backgroundSize: "auto 100%",
-            backgroundPosition: "center",
+            backgroundPosition: "center top",
           }}
         />
       </div>

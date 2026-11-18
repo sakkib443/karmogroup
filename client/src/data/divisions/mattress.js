@@ -110,19 +110,32 @@ const mattress = {
        strip of wall / rug top and bottom, the wide infographic only its plain
        sides; every sleeper card, the bed and the icons stay whole. */
     split: [50, 50],
-    cellAspect: 1.15,
+    /* Both pictures are square now, so a square cell shows each one whole — no zoom, no crop. */
+    cellAspect: 1,
+    /* Desktop: the row is one screen tall under the 112px header (client's ask). */
+    screenTall: true,
     images: [
       {
-        src: "/pages/mattress/bands/sleep-positions-premium-floral.webp",
+        /* Client's new picture (17 Nov); the earlier sleep-positions-premium-floral.webp stays in public/. */
+        /* Wide picture (17 Nov): fills the cell (cover), held to its left edge —
+           the right side is what gets trimmed. Before it: …-v3.webp (square). */
+        src: "/pages/mattress/bands/sleep-comfort-floral-bedroom-v4.webp",
+        position: "left center",
         alt: "Karmo red floral mattress in a bedroom — support for side, back and stomach sleepers",
-        width: 1254,
-        height: 1254,
+        width: 1672,
+        height: 941,
       },
       {
-        src: "/pages/mattress/bands/sleep-support-minimal-ad.webp",
+        /* Client's new picture (17 Nov); the earlier wide one,
+           sleep-support-minimal-ad.webp (1915×821), stays in public/. */
+        /* Breathable-comfort bedroom photo (17 Nov). Tried before it: floral-mattress-bedroom-showcase.webp,
+           sleep-positions-spinal-alignment.webp (1366×1151). */
+        src: "/pages/mattress/bands/breathable-comfort-mattress-bedroom.webp",
+        /* No zoom; if the cell ever crops it, keep the left edge whole. */
+        position: "left center",
         alt: "Karmo mattress sleep support — side, back and stomach sleepers with breathable comfort, pressure relief, spinal alignment and motion isolation",
-        width: 1915,
-        height: 821,
+        width: 1254,
+        height: 1254,
       },
     ],
   },
@@ -133,7 +146,6 @@ const mattress = {
      try that again. */
   brochureBrands: {
     heading: "Our mattress brands",
-    eyebrow: "Karmo",
     eyebrowNote: "Mattress brands",
     titleLine1: "Our mattress",
     titleLine2: "brands",
@@ -142,57 +154,61 @@ const mattress = {
     link: { label: "Find your mattress", href: "#mattress-offers" },
     image: "/pages/mattress/brochure/page-03-brands.webp",
     imageAlt: "Karmo luxury mattress showroom interior",
-    /* One full-width photograph, shown whole at its own proportions. */
-    composed: true,
-    background: "/pages/mattress/bands/karmo-mattress-brands-split-scene.webp",
-    backgroundAspect: "1916 / 821",
+    /* Bedroom photo, a soft dark shade on its left quarter, words on top and the
+       logos below in two columns (client's ask, 17 Nov). The earlier showroom photo
+       with logos baked in: set composed: true, shaded: false and background back to
+       "/pages/mattress/bands/mattress-showroom-interior.webp" (aspect "1774 / 887"). */
+    shaded: true,
+    eyebrow: "Karmo Mattress",
+    background: "/pages/mattress/bands/mattress-brands-golden-medallion-bedroom.webp",
+    backgroundAspect: "1983 / 793",
     items: [
       {
         id: "imperial",
         href: "/mattress/imperial-eurotop",
-        src: "/pages/mattress/brochure/logos/logo-imperial-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-imperial-v2.webp",
         alt: "Karmo Imperial Mattress",
         video: "/shared/videos/shorts/fb-karmo-mattress-offer.mp4",
       },
       {
         id: "king",
         href: "/mattress/king",
-        src: "/pages/mattress/brochure/logos/logo-king-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-king-v2.webp",
         alt: "Karmo King Mattress",
         video: "/shared/videos/shorts/fb-reel-921228060438784.mp4",
       },
       {
         id: "prestige",
         href: "/mattress/prestige",
-        src: "/pages/mattress/brochure/logos/logo-prestige-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-prestige-v2.webp",
         alt: "Karmo Prestige Mattress",
         video: "/shared/videos/shorts/fb-reel-845505688502810.mp4",
       },
       {
         id: "orthopedic",
         href: "/mattress/orthopedic",
-        src: "/pages/mattress/brochure/logos/logo-orthopedic-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-orthopedic-v2.webp",
         alt: "Karmo Orthopaedic Mattress",
         video: "/shared/videos/shorts/fb-reel-785013297942063.mp4",
       },
       {
         id: "bonnell",
         href: "/mattress/bonnell-spring",
-        src: "/pages/mattress/brochure/logos/logo-bonnell-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-bonnell-v2.webp",
         alt: "Karmo Bonnell Spring Mattress",
         video: "/shared/videos/shorts/fb-reel-747210751746270.mp4",
       },
       {
         id: "natural",
         href: "/mattress",
-        src: "/pages/mattress/brochure/logos/logo-natural-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-natural-v2.webp",
         alt: "Karmo Natural Mattress",
         video: "/shared/videos/shorts/fb-reel-3242808395880988.mp4",
       },
       {
         id: "pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        src: "/pages/mattress/brochure/logos/logo-pocket-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-pocket-v2.webp",
         alt: "Karmo Pocket Spring Mattress",
         video: "/shared/videos/shorts/fb-reel-1822025445099889.mp4",
         wide: true,
@@ -435,6 +451,8 @@ const mattress = {
       },
       {
         id: "transformation",
+        /* Off at the client's ask — only the first slide shows. */
+        paused: true,
         align: "center",
         titleCard: true,
         headingLead: "The Karmo Mattress Transformation",
