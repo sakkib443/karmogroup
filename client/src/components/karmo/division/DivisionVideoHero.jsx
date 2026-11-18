@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * A full-viewport video banner for the top of a division page — the video
@@ -19,7 +20,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * Two stacked copies of one clip, cross-faded at the seam — `FoamPromise`'s
  * loop rig, copied rather than imported (that component is a whole section
  * with its own heading and claims; there is nothing to import without taking
- * all of it). A plain `<video loop>` restarts on a hard cut, which is exactly
+ * all of it). A plain `<LazyVideo loop>` restarts on a hard cut, which is exactly
  * what the client asked to smooth over: when the playing copy is within
  * `CROSSFADE` of its end, the other starts from zero and the two swap
  * opacity, so the seam reads as a dissolve instead of a jump.
@@ -128,8 +129,8 @@ export default function DivisionVideoHero({
         )
       ) : (
         <>
-          <video {...layerProps(0)} autoPlay />
-          <video {...layerProps(1)} />
+          <LazyVideo {...layerProps(0)} autoPlay />
+          <LazyVideo {...layerProps(1)} />
         </>
       )}
       {/* Footage, or a still with the heading centred: the same flat dark

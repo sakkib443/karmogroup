@@ -8,6 +8,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { productFeatures } from "@/components/karmo/product/productDetailData";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * PDP band — short left copy + asymmetric media flush right:
@@ -197,7 +198,7 @@ function VideoTile({ src, label }) {
       {gif ? (
         <img loading="lazy" decoding="async" src={src} alt={label} className={mediaClass} />
       ) : (
-        <video
+        <LazyVideo
           className={mediaClass}
           autoPlay
           muted
@@ -207,7 +208,7 @@ function VideoTile({ src, label }) {
           aria-label={label}
         >
           <source src={src} type="video/mp4" />
-        </video>
+        </LazyVideo>
       )}
       <HoverChrome label={label} />
     </div>

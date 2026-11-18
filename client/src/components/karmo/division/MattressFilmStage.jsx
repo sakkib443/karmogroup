@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { useInView, useReducedMotion } from "framer-motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Sleep Well film — full-bleed, full-viewport, overlay + one white line.
@@ -55,7 +56,7 @@ export default function MattressFilmStage({
         />
       ) : null}
       {!reduceMotion && src ? (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={src}
           muted

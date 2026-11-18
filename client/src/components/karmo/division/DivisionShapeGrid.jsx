@@ -12,6 +12,7 @@ import {
 } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Mattress feature mosaic — Sleep Well claims (short) on top-left,
@@ -386,7 +387,7 @@ function InsidePhotoCard({ photo }) {
         />
       ) : null}
       {!reduceMotion && film ? (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={film}
           muted
@@ -441,7 +442,7 @@ function FilmPanel({ film, still, filmAlt = "", overlay }) {
         />
       ) : null}
       {!reduceMotion && film ? (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={film}
           muted

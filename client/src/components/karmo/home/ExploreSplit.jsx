@@ -10,6 +10,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { imageStyle, overlayStyle } from "@/cms/core";
 import { explore } from "@/cms/pages/home";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Home Two — three-image explore gallery.
@@ -194,7 +195,7 @@ function VideoPanel({ panel }) {
         />
       )}
       {!reduceMotion && panel.film && (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={panel.film}
           muted

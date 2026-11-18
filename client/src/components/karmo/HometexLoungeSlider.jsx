@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { mattressTitleOverlay } from "@/components/karmo/chrome/mattressHeroVeil";
 import { overlayStyle } from "@/cms/core";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
@@ -60,7 +61,7 @@ function SlideVideo({ video, on }) {
     }
   }, [on, video.rate]);
   return (
-    <video
+    <LazyVideo
       ref={ref}
       src={video.src}
       poster={video.poster}

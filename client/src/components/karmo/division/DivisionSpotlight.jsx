@@ -14,6 +14,7 @@ import {
 } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Split under the About band. `#ECE5DE` fill so the block reads as its own
@@ -127,7 +128,7 @@ export default function DivisionSpotlight({
               />
             )
           ) : (
-            <video
+            <LazyVideo
               ref={videoRef}
               src={film}
               className="absolute inset-0 h-full w-full object-cover"

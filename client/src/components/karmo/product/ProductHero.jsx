@@ -22,6 +22,7 @@ import { formatTaka } from "@/components/karmo/product/productDetailData";
 import { getPricingRule } from "@/components/karmo/product/mattressPricing";
 import { getFoamPricingRule } from "@/components/karmo/product/foamPricing";
 import { OFFER_PCT, quoteMattressUnit } from "@/components/karmo/product/catalogueQuote";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 const DEFAULT_BUYBOX_ICONS = [
   {
@@ -407,7 +408,7 @@ export default function ProductHero({ product }) {
                         className="absolute inset-0"
                       >
                         {product.film && mainSrc === product.film.src ? (
-                          <video
+                          <LazyVideo
                             src={product.film.src}
                             poster={product.film.poster}
                             autoPlay
