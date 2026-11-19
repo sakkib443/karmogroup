@@ -183,11 +183,22 @@ export default function MattressLayers({
         </div>
       </div>
 
-      <div className="bg-white">
+      {/* Strip sits a little lower, on the same quilted mattress texture as the offers below. */}
+      <div className="relative overflow-hidden bg-white pt-3 sm:pt-5 lg:pt-7">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <Image
+            src="/products/mattress/mosaic/karmo-pattern-texture.webp"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center opacity-[0.38]"
+          />
+          <span className="absolute inset-0 bg-white/55" />
+        </div>
         <div
           role="img"
           aria-label="Side view of a Karmo pillow-top mattress showing its thickness"
-          className="h-[95px] w-full sm:h-[120px] md:h-[140px] lg:h-[165px] xl:h-[180px]"
+          className="relative h-[95px] w-full sm:h-[120px] md:h-[140px] lg:h-[165px] xl:h-[180px]"
           style={{
             backgroundImage: `url(${edge})`,
             backgroundRepeat: "repeat-x",
