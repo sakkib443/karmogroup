@@ -38,7 +38,7 @@ export default function MattressBrands({
       <section
         id="our-mattress-brands"
         aria-label={heading || "Our mattress brands"}
-        className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0B1A33] lg:h-[calc(100svh-112px)]"
+        className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0B1A33] lg:h-[calc(100svh-40px)]"
       >
         <Image
           src={background}
@@ -84,7 +84,7 @@ export default function MattressBrands({
                     <Link
                       href={item.href}
                       title={item.alt}
-                      className="group flex items-center justify-center rounded-lg border border-white/60 bg-gradient-to-b from-white/95 to-[#f3eee8]/90 px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-white"
+                      className="group flex items-center justify-center rounded-lg border border-white/40 bg-gradient-to-b from-white/40 to-[#f3eee8]/30 backdrop-blur-[2px] px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-white"
                     >
                       <span
                         className={`relative block w-full ${

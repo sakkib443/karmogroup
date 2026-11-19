@@ -30,10 +30,15 @@ export default function DivisionImagePair({ id, label, images = [], split, cellA
             key={img.src}
             className={`relative aspect-[var(--nat)] w-full overflow-hidden ${
               screenTall
-                ? "md:aspect-auto md:h-[min(calc(100svh-112px),50vw)]"
+                ? "md:aspect-auto md:h-[var(--tall)]"
                 : cellAspect ? "md:aspect-[var(--cell)]" : i > 0 ? "md:aspect-auto" : ""
             }`}
-            style={{ ["--nat"]: `${img.width} / ${img.height}`, ["--cell"]: cellAspect }}
+            style={{
+              ["--nat"]: `${img.width} / ${img.height}`,
+              ["--cell"]: cellAspect,
+              /* Screen height (a little more than the view under the header), capped on very wide screens. */
+              ["--tall"]: "min(calc(100svh - 40px), 56vw)",
+            }}
           >
             {img.zoomOut ? (
               /* Close-cropped picture shown smaller (zoomOut = 0.8 → 80%) on a soft,
