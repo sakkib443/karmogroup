@@ -183,18 +183,9 @@ export default function MattressLayers({
         </div>
       </div>
 
-      {/* Strip sits a little lower, on the same quilted mattress texture as the offers below. */}
-      <div className="relative overflow-hidden bg-white pt-3 sm:pt-5 lg:pt-7">
-        <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <Image
-            src="/products/mattress/mosaic/karmo-pattern-texture.webp"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover object-center opacity-[0.38]"
-          />
-          <span className="absolute inset-0 bg-white/55" />
-        </div>
+      {/* The strip rides up over the band's bottom edge, so the band's own
+          background shows through the mattress's quilted top — no white gap. */}
+      <div className="relative z-10 -mt-3 sm:-mt-4 lg:-mt-6">
         <div
           role="img"
           aria-label="Side view of a Karmo pillow-top mattress showing its thickness"
