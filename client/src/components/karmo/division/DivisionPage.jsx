@@ -142,7 +142,7 @@ export default function DivisionPage({ data }) {
           <MattressBrands {...data.brochureBrands} />
         ))}
       {data.imagePair && <DivisionImagePair {...data.imagePair} />}
-      {data.mattressFilm && <MattressFilmStage {...data.mattressFilm} />}
+      {data.mattressFilm && !data.mattressFilm.afterProducts && <MattressFilmStage {...data.mattressFilm} />}
       {data.recommended?.columns && (
         <DivisionRecommended {...data.recommended} />
       )}
@@ -273,6 +273,8 @@ export default function DivisionPage({ data }) {
       {data.products && !data.products.hidden ? (
         <DivisionProducts {...data.products} categoryId={categoryId} />
       ) : null}
+      {/* Mattress: the film sits right under the products (afterProducts). */}
+      {data.mattressFilm?.afterProducts && <MattressFilmStage {...data.mattressFilm} />}
       {data.reviews?.items?.length > 0 && <MattressReviews {...data.reviews} />}
       <OrderAndContact />
     </>

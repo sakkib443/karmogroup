@@ -100,47 +100,8 @@ const mattress = {
     },
   ],
 
-  /* Two pictures side by side, full width — under Our mattress brands, above
-     the film: sleeper positions on the red floral mattress + the sleep-support
-     infographic. (Its place in the page is set in DivisionPage.) */
-  imagePair: {
-    id: "mattress-sleep-support",
-    label: "Karmo mattress support for every sleeping position",
-    /* Half and half. Each cell is 1.15 : 1 — the square photo loses only a
-       strip of wall / rug top and bottom, the wide infographic only its plain
-       sides; every sleeper card, the bed and the icons stay whole. */
-    split: [50, 50],
-    /* Both pictures are square now, so a square cell shows each one whole — no zoom, no crop. */
-    cellAspect: 1,
-    /* Desktop: the row is one screen tall under the 112px header (client's ask). */
-    screenTall: true,
-    /* A light shade over both pictures (client's ask). */
-    overlay: "rgba(0,0,0,.14)",
-    images: [
-      {
-        /* Client's new picture (17 Nov); the earlier sleep-positions-premium-floral.webp stays in public/. */
-        /* Wide picture (17 Nov): fills the cell (cover), held to its left edge —
-           the right side is what gets trimmed. Before it: …-v3.webp (square). */
-        src: "/pages/mattress/bands/sleep-comfort-floral-bedroom-v4.webp",
-        position: "55% center", /* nudged a little left (client's ask) */
-        alt: "Karmo red floral mattress in a bedroom — support for side, back and stomach sleepers",
-        width: 1672,
-        height: 941,
-      },
-      {
-        /* Client's new picture (17 Nov); the earlier wide one,
-           sleep-support-minimal-ad.webp (1915×821), stays in public/. */
-        /* Breathable-comfort bedroom photo (17 Nov). Tried before it: floral-mattress-bedroom-showcase.webp,
-           sleep-positions-spinal-alignment.webp (1366×1151). */
-        src: "/pages/mattress/bands/breathable-comfort-mattress-bedroom.webp",
-        /* No zoom; if the cell ever crops it, keep the left edge whole. */
-        position: "left center",
-        alt: "Karmo mattress sleep support — side, back and stomach sleepers with breathable comfort, pressure relief, spinal alignment and motion isolation",
-        width: 1254,
-        height: 1254,
-      },
-    ],
-  },
+  /* The side-by-side sleep pictures (imagePair) were taken off the page on 22 Nov 2026;
+     the two pictures are kept in karmo-library/05-originals-masters/mattress/unused-but-important/. */
 
   /* Showroom photo with the brand marks — the image pair follows right under
      it, then the film. The copy, link and per-brand `video` fields are only
@@ -162,7 +123,11 @@ const mattress = {
        "/pages/mattress/bands/mattress-showroom-interior.webp" (aspect "1774 / 887"). */
     shaded: true,
     eyebrow: "Karmo Mattress",
-    background: "/pages/mattress/bands/mattress-brands-warm-modern-bedroom.webp",
+    background: "/pages/mattress/bands/mattress-brands-bedroom-bg.webp",
+    backgroundPosition: "0% 65%",
+    /* Picture lifted a little (client's ask): moved up 2.5% of the band, zoomed 5% so no edge shows. */
+    backgroundShiftY: -2.5,
+    backgroundZoom: 1.05,
     backgroundAspect: "1983 / 793",
     items: [
       {
@@ -336,6 +301,8 @@ const mattress = {
 
   /* Sleep Well film — own full-viewport stage, under Inside every Karmo. */
   mattressFilm: {
+    /* Shown right under the products section (client, 22 Nov 2026). */
+    afterProducts: true,
     /* "Mattress 5" film — 1080p, no audio (plays muted), web-compressed. */
     src: "/shared/videos/mattress-film-5.mp4",
     still: "/products/mattress/bands/mattress-film-5-still.webp",
@@ -451,6 +418,24 @@ const mattress = {
           /* Anchor to the bottom: when the frame crops the photo on a short
              or narrow screen, the top is cut, never the bottom. */
           position: "object-bottom",
+        },
+      },
+      {
+        /* Second slide (22 Nov 2026, FINAL): Summer Comfort Retreat — shown as it is, light shade, no words.
+           Tried before it (in karmo-library/05-originals-masters/mattress): mattress-red-floral-comfort-bedroom,
+           mattress-serene-sleep-floral, mattress-serene-summer-bedroom, mattress-calm-bedroom-comfort,
+           mattress-sunlit-floral-bedroom-petals. */
+        id: "summer-comfort-retreat",
+        align: "center",
+        titleCard: true,
+        titleOverlay:
+          "linear-gradient(to top, rgba(11,21,40,0.32) 0%, rgba(11,21,40,0.18) 50%, rgba(11,21,40,0.14) 100%)",
+        headingLead: "",
+        image: {
+          src: "/pages/mattress/hero/mattress-summer-comfort-retreat.webp",
+          alt: "Karmo mattress summer comfort retreat",
+          width: 1983,
+          height: 793,
         },
       },
       {

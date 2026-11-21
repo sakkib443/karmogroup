@@ -15,6 +15,9 @@ export default function MattressBrands({
   imageAlt,
   background,
   backgroundAspect = "1916 / 821",
+  backgroundPosition,
+  backgroundZoom,
+  backgroundShiftY,
   composed = false,
   /* Composed photo fills a screen-tall band; wide banners with logos at the
      edges leave this off so nothing is cropped away. */
@@ -38,14 +41,35 @@ export default function MattressBrands({
       <section
         id="our-mattress-brands"
         aria-label={heading || "Our mattress brands"}
-        className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0B1A33] lg:h-[calc(100svh-40px)]"
+        className="mattress-brands-band relative mb-1.5 overflow-hidden bg-[#0B1A33] lg:h-[calc(100svh+110px)]"
       >
+        {/* Zoomed out (backgroundZoom < 1): a soft blurred copy fills the edges, so
+            the smaller photo never leaves a gap. */}
+        {backgroundZoom && backgroundZoom < 1 ? (
+          <Image
+            src={background}
+            alt=""
+            aria-hidden
+            fill
+            sizes="20vw"
+            className="scale-110 object-cover blur-2xl"
+          />
+        ) : null}
         <Image
           src={background}
           alt={imageAlt || heading || "Our mattress brands"}
           fill
           sizes="100vw"
           className="object-cover object-[70%_center]"
+          style={backgroundPosition || backgroundZoom || backgroundShiftY ? {
+            objectPosition: backgroundPosition,
+            transform: backgroundZoom || backgroundShiftY ? `translateY(${backgroundShiftY || 0}%) scale(${backgroundZoom || 1})` : undefined,
+            /* Zoomed out: the photo's edges melt into the blurred copy — no frame line. */
+            ...(backgroundZoom && backgroundZoom < 1 ? {
+              WebkitMaskImage: "radial-gradient(ellipse 75% 75% at 50% 50%, #000 70%, transparent 100%)",
+              maskImage: "radial-gradient(ellipse 75% 75% at 50% 50%, #000 70%, transparent 100%)",
+            } : {}),
+          } : undefined}
         />
         <span aria-hidden className="absolute inset-0 bg-gradient-to-l from-black/30 via-black/10 to-black/5" />
 

@@ -107,9 +107,24 @@ const FILM_HEADINGS = {
 const FILM_BY_ID = Object.fromEntries(
   Object.entries(FILM_HEADINGS).map(([id, heading]) => [
     id,
-    { src: `${VID}/film-${id}.mp4`, poster: `${FILMS}/${id}.webp`, heading },
+    /* Every film is cut to four shots (shots 1, 2, 3 + the quilting close-up; euro top: corner, pattern, hand press, quilting). ?v= makes browsers fetch the new file after a re-cut. */
+    { src: `${VID}/film-${id}.mp4?v=cut4`, poster: `${FILMS}/${id}.webp`, heading },
   ])
 );
+
+/**
+ * The "Inside every Karmo mattress" band and the three-part comfort band under it are FIXED:
+ * the same clips on every mattress page (client's rule, 22 Nov 2026). Clips are cut from the
+ * king film and the red mattress film (public/products/videos/inside/):
+ *   pan   — red floral cloth, camera moving across it      (left, top)
+ *   press — a hand pressing the red floral cloth           (three-part band, left)
+ *   feet  — feet and water bottle on the same navy cloth    (right, top)
+ */
+export const INSIDE_CLIPS = {
+  pan: { src: `${VID}/inside/pan-red.mp4`, label: "Cover in motion" },
+  press: { src: `${VID}/inside/press-for-king.mp4`, label: "Soft to the touch" },
+  feet: { src: `${VID}/inside/feet-for-king.mp4`, label: "Tested by weight" },
+};
 
 /** Cover / damask swatches — same fabric set as the buy box. */
 export const fabricOptions = [
@@ -254,6 +269,8 @@ function toDetail(item) {
     features: productFeatures,
     /** Own product film (or null) — first thumb in the gallery row. */
     film: FILM_BY_ID[item.id] || null,
+    /** Fixed clips for the Inside-every-Karmo-mattress band — identical on every mattress page. */
+    insideClips: INSIDE_CLIPS,
     /** Cross-section band — the same picture and layers on every page. */
     build: buildFor(),
     shortName: item.shortName || item.name,
