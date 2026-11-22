@@ -52,15 +52,18 @@ function CounterCard({ item, index, isContainerInView }) {
     if (!isContainerInView || !numberRef.current) return;
 
     // Card smoothly floats up and settles first (0.75s + stagger), THEN the counter starts
-    const startDelayMs = (0.7 + index * 0.12) * 1000;
+    /* Counts as the card arrives (client, 23 Nov 2026) — no long wait first. */
+    const startDelayMs = (0.25 + index * 0.08) * 1000;
     let controls = null;
     let lastShown = -1;
 
     const timer = setTimeout(() => {
       // Slower, graceful luxury count-up animation (~3.2s)
       controls = animate(0, targetValue, {
-        duration: 3.2,
-        ease: [0.12, 0.96, 0.24, 1], // ultra-smooth luxury curve: steady build, silky gliding deceleration
+        /* An even run that eases gently into the final number and stops — the old curve
+           crawled through the last digits for over a second, which read as a glitch. */
+        duration: 1.8,
+        ease: [0.25, 0.6, 0.3, 1],
         onUpdate: (latest) => {
           const next = Math.round(latest);
           if (numberRef.current && next !== lastShown) {
