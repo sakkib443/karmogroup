@@ -54,6 +54,7 @@ function CounterCard({ item, index, isContainerInView }) {
     // Card smoothly floats up and settles first (0.75s + stagger), THEN the counter starts
     const startDelayMs = (0.7 + index * 0.12) * 1000;
     let controls = null;
+    let lastShown = -1;
 
     const timer = setTimeout(() => {
       // Slower, graceful luxury count-up animation (~3.2s)
@@ -61,8 +62,10 @@ function CounterCard({ item, index, isContainerInView }) {
         duration: 3.2,
         ease: [0.12, 0.96, 0.24, 1], // ultra-smooth luxury curve: steady build, silky gliding deceleration
         onUpdate: (latest) => {
-          if (numberRef.current) {
-            numberRef.current.textContent = Math.round(latest).toLocaleString();
+          const next = Math.round(latest);
+          if (numberRef.current && next !== lastShown) {
+            lastShown = next;
+            numberRef.current.textContent = next.toLocaleString();
           }
         },
       });
@@ -76,18 +79,19 @@ function CounterCard({ item, index, isContainerInView }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 48, scale: 0.96 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={
         isContainerInView
-          ? { opacity: 1, y: 0, scale: 1 }
-          : { opacity: 0, y: 48, scale: 0.96 }
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 40 }
       }
       transition={{
         delay: index * 0.12,
         duration: 0.75,
         ease: [0.22, 1, 0.36, 1], // gentle, graceful settle into place
       }}
-      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.07] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:bg-white/[0.12] hover:shadow-[0_12px_36px_0_rgba(228,82,92,0.25),inset_0_1px_1px_0_rgba(255,255,255,0.35)] sm:p-6 lg:px-7 lg:py-7"
+      style={{ willChange: "transform, opacity" }}
+      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-gradient-to-b from-[#0b1a33]/55 to-[#0b1a33]/40 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-colors duration-300 hover:border-white/40 hover:from-[#0b1a33]/65 sm:p-6 lg:px-7 lg:py-7"
     >
       {/* Top delicate frosted glass highlight */}
       <div
@@ -98,7 +102,8 @@ function CounterCard({ item, index, isContainerInView }) {
       {/* Subtle brand red ambient glow in the top-right corner */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-brand/15 blur-xl transition-all duration-300 group-hover:bg-brand/25 group-hover:opacity-100 opacity-40"
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-60"
+        style={{ background: "radial-gradient(circle, rgba(228,82,92,0.28) 0%, rgba(228,82,92,0) 70%)" }}
       />
 
       {/* Number + Suffix on one line (never wraps) */}
@@ -108,11 +113,10 @@ function CounterCard({ item, index, isContainerInView }) {
             {item.prefix}
           </span>
         ) : null}
-        <span
-          ref={numberRef}
-          className="tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl xl:text-[2.75rem]"
-        >
-          0
+        <span className="relative inline-grid tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl xl:text-[2.75rem]">
+          {/* Final number held invisible, so the box is its full width from the first frame. */}
+          <span aria-hidden className="invisible col-start-1 row-start-1">{targetValue.toLocaleString()}</span>
+          <span ref={numberRef} className="col-start-1 row-start-1 text-left">0</span>
         </span>
         {item.suffix ? (
           <span className="ml-1 text-xl font-bold tracking-tight text-brand sm:text-2xl xl:text-[1.75rem]">

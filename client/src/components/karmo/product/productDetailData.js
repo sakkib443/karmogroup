@@ -190,7 +190,7 @@ export const KARMO_LETTER_GALLERY = ["K", "A", "R", "M", "O"].map(
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/products/mattress/king-cover-luxury-floral-v2.webp",
+  "/products/mattress/king-cover-navy-bedroom-v3.webp",
   "/products/mattress/king-gallery/angle-front-v4.webp",
   "/products/mattress/king-gallery/angle-side-v4.webp",
   "/products/mattress/king-gallery/angle-detail-v4.webp",

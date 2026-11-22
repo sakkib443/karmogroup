@@ -392,7 +392,7 @@ export default function ProductHero({ product }) {
                   <div
                     className="mx-auto flex flex-col"
                     style={{
-                      width: "min(100%, calc(100svh - 14rem))",
+                      width: "100%",
                       maxWidth: "100%",
                     }}
                   >
@@ -427,7 +427,7 @@ export default function ProductHero({ product }) {
                             priority
                             quality={90}
                             sizes="(min-width: 1024px) 48vw, 100vw"
-                            className="object-contain object-center"
+                            className="object-contain object-center scale-[1.12]"
                           />
                         ) : null}
                       </motion.div>

@@ -89,20 +89,21 @@ export default function MattressBrands({
             <h2
               className="relative display title-card-line mt-3 uppercase text-white"
               style={{
-                fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
+                fontSize: "clamp(1rem, calc(2.1vw - 4px), 2.1rem)",
+                whiteSpace: "nowrap",
                 fontWeight: 350,
                 fontVariationSettings: '"wght" 350',
                 lineHeight: 1.08,
                 letterSpacing: "-0.015em",
               }}
             >
-              <span className="block text-white/90">{titleLine1}</span>
-              <span className="block text-white">{titleLine2}</span>
+              <span className="text-white/90">{titleLine1}{" "}</span>
+              <span className="text-white">{titleLine2}</span>
               <span aria-hidden className="mx-auto mt-4 block h-[2px] w-12 rounded-full bg-brand" />
             </h2>
 
             {items.length ? (
-              <ul className="relative mt-8 grid w-full max-w-[27rem] grid-cols-2 gap-3 sm:mt-10 xl:gap-3.5">
+              <ul className="relative mt-5 grid w-full max-w-[27rem] grid-cols-2 gap-2 sm:mt-6 xl:gap-2.5">
                 {items.map((item) => (
                   <li key={item.id} className={item.wide ? "col-span-2" : undefined}>
                     <Link
@@ -112,7 +113,9 @@ export default function MattressBrands({
                     >
                       <span
                         className={`relative block w-full ${
-                          item.wide ? "h-[40px] sm:h-[44px] xl:h-[50px]" : "h-[58px] sm:h-[64px] xl:h-[72px]"
+                          item.wide
+                            ? "h-[29px] sm:h-[31px] xl:h-[36px]"
+                            : "h-[43px] sm:h-[47px] xl:h-[52px]"
                         }`}
                       >
                         <Image

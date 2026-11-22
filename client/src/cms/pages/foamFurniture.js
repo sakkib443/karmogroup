@@ -68,22 +68,6 @@ export const FOAM_FURNITURE_SECTIONS = [
     }),
   },
   {
-    key: "three",
-    label: "Three photos",
-    description: "The row of three pictures.",
-    fields: [f.list("items", "Photos", [f.image("image", "Photo")], { fixed: true, itemLabel: (_i, n) => `Photo ${n + 1}` })],
-    defaults: {
-      items: (d.recommended?.columns || []).map((c) => ({ image: img(c.image, c.alt || c.title || "") })),
-    },
-    apply: (data, v) => ({
-      ...data,
-      recommended: {
-        ...data.recommended,
-        columns: (data.recommended?.columns || []).map((c, i) => ({ ...c, image: srcOf(v.items?.[i]?.image, c.image) })),
-      },
-    }),
-  },
-  {
     key: "spotlight",
     label: "Photo and video side by side",
     description: "The picture on the left and the video on the right.",

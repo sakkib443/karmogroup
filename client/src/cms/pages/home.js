@@ -39,7 +39,7 @@ export const hero = {
   defaults: {
     autoplaySec: 4.5,
     slides: [
-      { id: "home-journey-1965", media: photo("/pages/home/hero/home-hero-slide-01-mustard-room-hq.webp", "Mustard sofa in a blue-walled living room with plants and wood shelves"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
+      { id: "home-journey-1965", media: photo("/pages/home/hero/home-hero-slide-01-teal-mustard-v2-hq.webp", "Mustard sofa in a blue-walled living room with plants and wood shelves", pos("object-bottom")), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-living-scandi", media: photo("/pages/home/hero/home-hero-slide-living-scandi-v3-hq.webp", "Warm living room with a cream sofa, wood shelves and round coffee table"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-chemicals-warehouse", media: photo("/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue drums in cinematic light"), heading: "Industrial chemistry built to last", headingSize: 100, align: "left", overlay: noOverlay },
       { id: "home-hometex-quilts", media: photo("/pages/home/hero/home-hero-slide-hometex-quilts-v2-hq.webp", "Stacked Karmo HomeTex floral quilts on a sunlit bed"), heading: "Moments that make a house", headingSize: 100, align: "left", overlay: noOverlay },
@@ -99,7 +99,7 @@ export const chemicals = {
     f.link("button", "Button"),
   ],
   defaults: {
-    background: img("/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue industrial drums"),
+    background: img("/pages/home/hero/home-hero-slide-chemicals-hero-v2.webp", "Organized Karmo chemicals warehouse with blue industrial drums"),
     panelOverlay: { color: "#000000", opacity: 70 },
     eyebrow: "Karmo Chemicals",
     titleLine1: "The world of",
@@ -145,7 +145,7 @@ export const explore = {
     ],
     flagship: {
       shots: [
-        { image: img("/pages/home/explore/foam-living-room-showcase.webp", "Karmo foam living room showcase", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
+        { image: img("/pages/home/explore/foam-living-room-showcase-v2.webp", "Karmo foam living room showcase", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
         { image: img("/shared/banners/magnific-3zztfkcrey.webp", "A Karmo Magnific lifestyle scene"), overlay: { color: SHADE, opacity: 0 } },
       ],
       line1: "Foam crafted",
@@ -274,10 +274,10 @@ export const sizes = {
     length: '72" / 75" / 78"',
     edge: img("/pages/home/sizes/mattress-border-profile.webp", "Side view of a Karmo mattress showing its thickness", { fit: "contain" }),
     sizes: [
-      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-teal-leaf-v1.webp", "One person sleeping on a thick Karmo teal-leaf single mattress", { fit: "contain" }) },
-      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-teal-leaf-v1.webp", "A couple napping on a Karmo teal-leaf double mattress", { fit: "contain" }) },
-      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-teal-leaf-v1.webp", "A couple sleeping side by side on a Karmo teal-leaf queen mattress", { fit: "contain" }) },
-      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-teal-leaf-v1.webp", "A family with a small child sleeping on a Karmo teal-leaf king mattress", { fit: "contain" }) },
+      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-teal-leaf-v2.webp", "One person sleeping on a thick Karmo teal-leaf single mattress", { fit: "contain" }) },
+      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-teal-leaf-v2.webp", "A couple napping on a Karmo teal-leaf double mattress", { fit: "contain" }) },
+      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-teal-leaf-v2.webp", "A couple sleeping side by side on a Karmo teal-leaf queen mattress", { fit: "contain" }) },
+      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-teal-leaf-v2.webp", "A family with a small child sleeping on a Karmo teal-leaf king mattress", { fit: "contain" }) },
     ],
   },
 };

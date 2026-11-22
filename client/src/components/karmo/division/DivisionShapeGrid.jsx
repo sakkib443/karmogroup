@@ -588,7 +588,10 @@ function OrganizedSpotlight({ data, reveal }) {
         className="object-cover object-left"
         priority={false}
       />
-      <span aria-hidden className="absolute inset-0 bg-black/40" />
+      {/* `bare`: the photo alone — no shade, no words (Furniture, client 23 Nov 2026). */}
+      {data.bare ? null : <span aria-hidden className="absolute inset-0 bg-black/40" />}
+      {data.bare ? null : (
+      <>
       {/* Nudged up from true middle, right-aligned as before — was bottom-
           right, sitting low. Right alignment stays; only the vertical
           position moved. */}
@@ -597,7 +600,7 @@ function OrganizedSpotlight({ data, reveal }) {
             keeps it in the grey wall, clear of the arm — it was sitting on it. */}
         <div
           className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}
-          style={left ? { transform: "translateY(-6rem)" } : undefined}
+          style={left ? { transform: `translateY(-${data.lift || "6rem"})` } : undefined}
         >
           <h3
             className="display title-card-line uppercase text-white"
@@ -607,7 +610,9 @@ function OrganizedSpotlight({ data, reveal }) {
               fontSize: "clamp(1.28rem, 0.96rem + 1.1vw, 1.85rem)",
             }}
           >
-            Designed to {data.headingEnd}
+            {/* "Designed to" on the first line, "endure" under it (client, 23 Nov 2026). */}
+            <span className="block">Designed to</span>
+            <span className="block">{data.headingEnd}</span>
           </h3>
           {data.subline ? (
             <p
@@ -627,6 +632,8 @@ function OrganizedSpotlight({ data, reveal }) {
           ) : null}
         </div>
       </div>
+      </>
+      )}
     </motion.article>
   );
 }

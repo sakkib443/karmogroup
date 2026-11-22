@@ -27,6 +27,8 @@ import DivisionImagePair from "@/components/karmo/division/DivisionImagePair";
 import MattressLayers from "@/components/karmo/division/MattressLayers";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
+import FoamFloorOverlay from "@/components/karmo/division/FoamFloorOverlay";
+import FoamGradesAccordion from "@/components/karmo/division/FoamGradesAccordion";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import MattressReviews from "@/components/karmo/division/MattressReviews";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
@@ -132,7 +134,8 @@ export default function DivisionPage({ data }) {
         <DivisionFeatures items={data.features} />
       )}
       {data.furnitureBrands && <FurnitureBrands {...data.furnitureBrands} />}
-      {data.furnitureGrades && (
+      {data.furnitureGrades?.accordion && <FoamGradesAccordion />}
+      {data.furnitureGrades && !data.furnitureGrades.accordion && (
         <FurnitureGradesLineup {...data.furnitureGrades} />
       )}
       {data.brochureBrands && !data.brochureBrands.hidden &&
@@ -162,7 +165,15 @@ export default function DivisionPage({ data }) {
         ))}
       {data.footwearEndureBand && <FootwearEndureBand />}
       {data.explore && <ExploreSplit {...data.explore} />}
-      {data.lounge && <DivisionAbout {...data.lounge} />}
+      {data.lounge &&
+        (data.lounge.floorStage ? (
+          <div className="relative">
+            <DivisionAbout {...data.lounge} />
+            <FoamFloorOverlay {...data.lounge.floorStage} />
+          </div>
+        ) : (
+          <DivisionAbout {...data.lounge} />
+        ))}
       {data.about && !data.about.asHero && !data.about.beforeShapeGrid && (
         <DivisionAbout {...data.about} />
       )}

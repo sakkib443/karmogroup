@@ -67,7 +67,7 @@ const FLAGSHIP_SHOTS = [
   },
   {
     id: "sunlit",
-    src: "/pages/home/explore/foam-living-room-showcase.webp",
+    src: "/pages/home/explore/foam-living-room-showcase-v2.webp",
     alt: "Karmo foam living room showcase",
     position: "object-bottom",
     tone: "bg-white",
