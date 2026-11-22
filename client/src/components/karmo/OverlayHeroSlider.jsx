@@ -376,7 +376,7 @@ export default function OverlayHeroSlider({
                         }}
                       >
                         <Heading
-                          className={`display hero-heading title-card-line whitespace-nowrap uppercase text-white ${
+                          className={`display hero-heading title-card-line whitespace-normal [text-wrap:balance] uppercase text-white sm:whitespace-nowrap ${
                             right ? "text-right" : middle || center ? "text-center" : ""
                           } ${s.headingClassName || ""}`}
                           style={{

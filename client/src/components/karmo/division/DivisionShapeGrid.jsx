@@ -599,8 +599,10 @@ function OrganizedSpotlight({ data, reveal }) {
         {/* Furniture puts the line on the left of the armchair. A small lift
             keeps it in the grey wall, clear of the arm — it was sitting on it. */}
         <div
-          className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}
-          style={left ? { transform: `translateY(-${data.lift || "6rem"})` } : undefined}
+          /* The lift only from tablet up — on a phone the photo is short and the words
+             were pushed off the top (client, 23 Nov 2026). */
+          className={`max-w-[22rem] ${left ? "text-left md:[transform:var(--lift)]" : "text-right"}`}
+          style={left ? { ["--lift"]: `translateY(-${data.lift || "6rem"})` } : undefined}
         >
           <h3
             className="display title-card-line uppercase text-white"

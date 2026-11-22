@@ -44,12 +44,16 @@ const DEFAULT_COUNTERS = [
 ];
 
 /** Single counter card with choreographed rise & smooth slow count animation */
-function CounterCard({ item, index, isContainerInView }) {
+function CounterCard({ item, index, isContainerInView, ready }) {
   const numberRef = useRef(null);
   const targetValue = Number(item.value || 0);
+  /* The number on screen, so a late change in the target carries on from it, never from 0. */
+  const shownRef = useRef(0);
 
   useEffect(() => {
-    if (!isContainerInView || !numberRef.current) return;
+    /* Wait until the real figures are in (ready), so the count runs once and never restarts. */
+    if (!isContainerInView || !ready || !numberRef.current) return;
+    if (shownRef.current === targetValue) return;
 
     // Card smoothly floats up and settles first (0.75s + stagger), THEN the counter starts
     /* Counts as the card arrives (client, 23 Nov 2026) — no long wait first. */
@@ -59,7 +63,7 @@ function CounterCard({ item, index, isContainerInView }) {
 
     const timer = setTimeout(() => {
       // Slower, graceful luxury count-up animation (~3.2s)
-      controls = animate(0, targetValue, {
+      controls = animate(shownRef.current, targetValue, {
         /* An even run that eases gently into the final number and stops — the old curve
            crawled through the last digits for over a second, which read as a glitch. */
         duration: 1.8,
@@ -68,6 +72,7 @@ function CounterCard({ item, index, isContainerInView }) {
           const next = Math.round(latest);
           if (numberRef.current && next !== lastShown) {
             lastShown = next;
+            shownRef.current = next;
             numberRef.current.textContent = next.toLocaleString();
           }
         },
@@ -78,7 +83,7 @@ function CounterCard({ item, index, isContainerInView }) {
       clearTimeout(timer);
       if (controls) controls.stop();
     };
-  }, [isContainerInView, targetValue, index]);
+  }, [isContainerInView, targetValue, index, ready]);
 
   return (
     <motion.div
@@ -137,7 +142,10 @@ function CounterCard({ item, index, isContainerInView }) {
 }
 
 export default function ChemicalCounters() {
-  const { data: serverCounters } = useGetCountersQuery();
+  const { data: serverCounters, isLoading } = useGetCountersQuery();
+  /* Count only once the server's figures have arrived (or failed): reloading on this band
+     used to count the built-in figures, then wipe them and count again a second later. */
+  const ready = !isLoading;
   const containerRef = useRef(null);
 
   // Trigger when user scrolls and the section is nicely in front of them
@@ -160,10 +168,12 @@ export default function ChemicalCounters() {
       <div className="grid w-full max-w-[36rem] grid-cols-2 gap-4 sm:gap-5 lg:gap-6 xl:max-w-[40rem]">
         {activeCounters.map((item, index) => (
           <CounterCard
-            key={item._id || index}
+            /* keyed by place, so the cards stay put when the server's figures replace the defaults */
+            key={index}
             item={item}
             index={index}
             isContainerInView={isContainerInView}
+            ready={ready}
           />
         ))}
       </div>

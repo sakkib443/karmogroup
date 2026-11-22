@@ -458,6 +458,8 @@ const foamFurniture = {
       /* Same build as the hero, but the glossy mirror starts strong right under the stack and
          fades away quickly downward (client, 23 Nov 2026). */
       place: { width: "18.5vw", left: "auto", right: "15vw", bottom: "5%", mirrorOpacity: 0.7, mirrorFade: 30, mirrorSkew: 1.8 },
+      /* Phone: a bigger stack, still on the right. */
+      mobilePlace: { width: "40vw", left: "auto", right: "5vw", bottom: "5%", mirrorOpacity: 0.7, mirrorFade: 30, mirrorSkew: 1.8 },
       /* Just the green HD stack, standing still (client, 23 Nov 2026). */
       products: [{ src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 }],
     },
@@ -467,7 +469,8 @@ const foamFurniture = {
       width: 1280,
       height: 720,
       unoptimized: true,
-      position: "object-[center_58%]",
+      /* Phone: framed further left in the photo, so the chair sits more to the right. */
+      position: "object-[0%_58%] md:object-[center_58%]",
     },
     slides: [
       {
@@ -487,7 +490,8 @@ const foamFurniture = {
           width: 1280,
           height: 720,
           unoptimized: true,
-          position: "object-[center_58%]",
+          /* Phone: framed further left in the photo, so the chair sits more to the right. */
+      position: "object-[0%_58%] md:object-[center_58%]",
         },
       },
     ],

@@ -384,7 +384,7 @@ function MattressCatalogueCard({ item }) {
           src={item.image}
           alt={item.alt || item.name}
           fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 33vw, 50vw"
           className={`object-cover object-center scale-[1.08] transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.1] ${
             hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
           }`}
@@ -394,7 +394,7 @@ function MattressCatalogueCard({ item }) {
             src={hoverSrc}
             alt=""
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 33vw, 50vw"
             aria-hidden
             className="object-cover object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
           />
@@ -406,15 +406,15 @@ function MattressCatalogueCard({ item }) {
         ) : null}
       </Link>
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3.5 pt-3 sm:px-3.5">
-        <h3 className="text-[16px] font-bold leading-snug text-ink sm:text-[17px]">
+      <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 pt-2.5 sm:px-3.5 sm:pb-3.5 sm:pt-3">
+        <h3 className="text-[14px] font-bold leading-snug text-ink sm:text-[17px]">
           <Link href={href} className="transition-colors hover:text-brand">
             Karmo {item.name}
           </Link>
         </h3>
 
-        <div className="mt-2 flex items-end justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-[12px] text-ink/70">
+        <div className="mt-1.5 flex flex-col items-start gap-1 sm:mt-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+          <div className="flex items-center gap-1.5 text-[11px] text-ink/70 sm:text-[12px]">
             <Stars value={rating} />
             <span className="font-semibold tabular-nums text-ink">{rating.toFixed(1)}</span>
           </div>
@@ -422,7 +422,7 @@ function MattressCatalogueCard({ item }) {
             {price.was ? (
               <s className="text-[12px] tabular-nums text-ink/35">{price.was}</s>
             ) : null}
-            <span className="text-[18px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
+            <span className="text-[17px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
               {price.now}
             </span>
           </div>
@@ -469,7 +469,7 @@ function MattressCatalogueCard({ item }) {
         <div className="mt-auto pt-3.5">
           <Link
             href={href}
-            className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
+            className="group/cta inline-flex h-10 w-full items-center justify-center gap-1.5 bg-brand text-[11px] font-bold uppercase tracking-[0.06em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-11 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.12em]"
           >
             <Image
               src="/shared/trust/order-cartoon/cart-v2.webp"
@@ -477,7 +477,7 @@ function MattressCatalogueCard({ item }) {
               aria-hidden
               width={22}
               height={22}
-              className="h-[22px] w-[22px] object-contain transition-transform duration-300 group-hover/cta:scale-110"
+              className="h-[18px] w-[18px] object-contain transition-transform duration-300 group-hover/cta:scale-110 sm:h-[22px] sm:w-[22px]"
             />
             <span>Order Now</span>
           </Link>
@@ -791,7 +791,9 @@ export default function DivisionProducts({
           viewport={VIEWPORT}
           className={
             threeCol
-              ? `relative z-[1] mx-auto grid w-full items-stretch grid-cols-1 gap-5 px-5 sm:grid-cols-2 sm:gap-6 md:px-8 lg:grid-cols-3 lg:px-10 ${
+              ? /* Mattress catalogue: two cards a row on phones too (client, 23 Nov 2026); tablet and
+                   desktop unchanged. */
+                `relative z-[1] mx-auto grid w-full items-stretch ${catalogue ? "grid-cols-2 gap-3 px-3 sm:px-5" : "grid-cols-1 gap-5 px-5"} sm:grid-cols-2 sm:gap-6 md:px-8 lg:grid-cols-3 lg:px-10 ${
                   comforterGrid
                     ? "max-w-[1540px] lg:gap-8 pt-4 sm:pt-6"
                     : `max-w-[1680px] lg:gap-7 ${catalogue ? "pt-2 sm:pt-3 lg:pt-3" : "pt-6 sm:pt-8 lg:pt-10"}`
