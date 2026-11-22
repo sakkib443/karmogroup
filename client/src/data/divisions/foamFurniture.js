@@ -199,12 +199,12 @@ const foamFurniture = {
         floor: { clip: "polygon(0% 62%, 61% 100%, 0% 100%)" },
         /* A light dark veil over the photo (client, 23 Nov 2026). */
         shade: "rgba(0,0,0,0.16)",
-        /* Four stacks taking turns on that floor (glossy shadow under each): Poly, 280, HD, 1965. */
+        /* Four stacks taking turns on that floor (glossy shadow under each): HD, Poly, 280, 1965. */
         productPlace: { width: "21vw", left: "13vw", bottom: "7%", eager: true },
         products: [
+          { src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 },
           { src: `${IMG}/hero/foam-poly-hero-1200.webp`, w: 800, h: 605 },
           { src: `${IMG}/hero/foam-280-hero-1200.webp`, w: 800, h: 608 },
-          { src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 },
           { src: `${IMG}/hero/foam-1965-hero-1200.webp`, w: 800, h: 607 },
         ],
       },
