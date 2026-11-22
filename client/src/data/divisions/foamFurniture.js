@@ -213,7 +213,9 @@ const foamFurniture = {
        3.6 s each) — then the KARMO POLY slide with the heading for 6 s, then round again. */
     firstSlideOff: false,
     extraFirst: true,
-    productMs: 3600,
+    productMs: 2900, /* 20% quicker (client, 23 Nov 2026); was 3600 */
+    /* The first stack shows only about a second before the next glides in (client). */
+    firstProductMs: 1000,
     slideMs: 6000,
     video: "/pages/foam/videos/acoustic-foam-wall-pan.mp4",
     heading: "All your upholstery needs",
@@ -447,7 +449,9 @@ const foamFurniture = {
     floorStage: {
       /* No white wedge any more (client): the stacks stand straight on the room's own floor. */
       /* Moved a little left (client): the room photo has no spare width to slide right. */
-      place: { width: "17vw", left: "auto", right: "15vw", bottom: "5%" }, /* same shadow and mirror as the hero */
+      /* Same build as the hero, but the glossy mirror starts strong right under the stack and
+         fades away quickly downward (client, 23 Nov 2026). */
+      place: { width: "17vw", left: "auto", right: "15vw", bottom: "5%", mirrorOpacity: 0.7, mirrorFade: 30, mirrorSkew: 1.8 },
       /* Just the green HD stack, standing still (client, 23 Nov 2026). */
       products: [{ src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 }],
     },

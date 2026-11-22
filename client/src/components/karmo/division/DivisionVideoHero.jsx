@@ -49,6 +49,8 @@ export default function DivisionVideoHero({
   extraFirst = false,
   /* How long each foam stack stays on a slide that cycles stacks (ms). */
   productMs = 3600,
+  /* The first stack's (shorter) turn, ms. */
+  firstProductMs,
   heading,
   /* "center" (the video default) or "left" — over a picture with an empty
      dark left side, the heading sits there. */
@@ -77,7 +79,7 @@ export default function DivisionVideoHero({
   const holdFor = (i) => {
     const sl = i > 0 ? moreSlides[i - 1] : null;
     const n = sl?.products?.length || 0;
-    return n > 1 ? n * productMs : slideMs;
+    return n > 1 ? (firstProductMs || productMs) + (n - 1) * productMs : slideMs;
   };
   useEffect(() => {
     if (order.length < 2 || reduceMotion) return undefined;
@@ -230,7 +232,7 @@ export default function DivisionVideoHero({
                     foam stays clear of it */}
                 {sl.shade ? <div className="absolute inset-0" style={{ background: sl.shade }} /> : null}
                 {sl.products?.length || sl.product ? (
-                  <ProductCycler items={sl.products || [sl.product]} place={sl.productPlace || sl.product} active={slide === i + 1} every={productMs} />
+                  <ProductCycler items={sl.products || [sl.product]} place={sl.productPlace || sl.product} active={slide === i + 1} every={productMs} firstMs={firstProductMs} />
                 ) : null}
               </div>
             ) : null,
@@ -355,7 +357,7 @@ export default function DivisionVideoHero({
 /* Foam stacks standing on the white floor, taking turns: each glides in from the right and
    fades up while the one before glides out to the left. Every stack keeps its own glossy
    shadow and mirror. */
-export function ProductCycler({ items, place, active, every = 3600 }) {
+export function ProductCycler({ items, place, active, every = 3600, firstMs }) {
   /* place.shadow: 1 = the hero's shadow; higher = a deeper one. */
   const k = place.shadow || 1;
   const [cur, setCur] = useState(0);
@@ -365,9 +367,11 @@ export function ProductCycler({ items, place, active, every = 3600 }) {
   }, [active]);
   useEffect(() => {
     if (!active || items.length < 2) return undefined;
-    const id = window.setInterval(() => setCur((c) => (c + 1) % items.length), every);
-    return () => window.clearInterval(id);
-  }, [active, items.length, every]);
+    /* the first stack can have a shorter turn (firstMs) */
+    const wait = cur === 0 && firstMs ? firstMs : every;
+    const id = window.setTimeout(() => setCur((c) => (c + 1) % items.length), wait);
+    return () => window.clearTimeout(id);
+  }, [active, items.length, every, firstMs, cur]);
   return (
     <div className="absolute" style={{ left: place.left, right: place.right, bottom: place.bottom, width: place.width }}>
       {/* sizer so the box has the first stack's height */}
@@ -383,7 +387,7 @@ export function ProductCycler({ items, place, active, every = 3600 }) {
             style={{
               opacity: on ? 1 : 0,
               transform: `translateX(${on ? 0 : before ? -14 : 14}%)`,
-              transition: "opacity 900ms ease-in-out, transform 1100ms cubic-bezier(0.22,1,0.36,1)",
+              transition: "opacity 720ms ease-in-out, transform 880ms cubic-bezier(0.22,1,0.36,1)",
             }}
           >
             <Image
@@ -409,11 +413,15 @@ export function ProductCycler({ items, place, active, every = 3600 }) {
             <div
               className="pointer-events-none absolute left-0 top-full w-full"
               style={{
-                transform: `scaleY(${place.mirror || 1})`,
-                transformOrigin: "50% 0%",
-                opacity: Math.min(0.6, 0.35 * k),
-                WebkitMaskImage: `linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent ${place.mirror ? 85 : Math.min(60, 35 * k)}%)`,
-                maskImage: `linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent ${place.mirror ? 85 : Math.min(60, 35 * k)}%)`,
+                /* mirrorSkew (deg) tilts the mirror about its top-right corner so its left side
+                   rises to meet a stack whose bottom edge is not quite level */
+                transform: `${place.mirrorSkew ? `skewY(${place.mirrorSkew}deg) ` : ""}scaleY(${place.mirror || 1})`,
+                transformOrigin: place.mirrorSkew ? "100% 0%" : "50% 0%",
+                /* strongest right under the stack, fading to nothing further down
+                   (mirrorOpacity / mirrorFade tune it per placement) */
+                opacity: place.mirrorOpacity ?? Math.min(0.6, 0.35 * k),
+                WebkitMaskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.55) ${(place.mirrorFade ?? (place.mirror ? 85 : Math.min(60, 35 * k))) * 0.35}%, transparent ${place.mirrorFade ?? (place.mirror ? 85 : Math.min(60, 35 * k))}%)`,
+                maskImage: `linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.55) ${(place.mirrorFade ?? (place.mirror ? 85 : Math.min(60, 35 * k))) * 0.35}%, transparent ${place.mirrorFade ?? (place.mirror ? 85 : Math.min(60, 35 * k))}%)`,
               }}
             >
               <Image
