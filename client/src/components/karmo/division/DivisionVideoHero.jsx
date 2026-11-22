@@ -51,6 +51,10 @@ export default function DivisionVideoHero({
   productMs = 3600,
   /* The first stack's (shorter) turn, ms. */
   firstProductMs,
+  /* Slide 1's own white floor + foam stacks (same shape as a moreSlides entry's). */
+  mainStage,
+  /* Nudge for the heading, e.g. "translate(12vw, -14vh)". */
+  headingShift,
   heading,
   /* "center" (the video default) or "left" — over a picture with an empty
      dark left side, the heading sits there. */
@@ -77,7 +81,7 @@ export default function DivisionVideoHero({
   const [slide, setSlide] = useState(order[0] ?? 0);
   /* A slide that cycles foam stacks stays up until every stack has had its turn. */
   const holdFor = (i) => {
-    const sl = i > 0 ? moreSlides[i - 1] : null;
+    const sl = i > 0 ? moreSlides[i - 1] : mainStage;
     const n = sl?.products?.length || 0;
     return n > 1 ? (firstProductMs || productMs) + (n - 1) * productMs : slideMs;
   };
@@ -90,6 +94,16 @@ export default function DivisionVideoHero({
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slide, order.length, slideMs, productMs, reduceMotion]);
+  /* Phones get their own framing for the extra slides (mobilePosition / mobileFloor /
+     mobileProductPlace on a slide). */
+  const [isPhone, setIsPhone] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const on = () => setIsPhone(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const step = (dir) => setSlide((cur) => order[(order.indexOf(cur) + dir + order.length) % order.length]);
   const onFirst = slide === 0;
 
@@ -207,7 +221,11 @@ export default function DivisionVideoHero({
               priority={extraFirst && i === 0}
               sizes="100vw"
               className="z-[1] object-cover transition-opacity duration-1000 ease-in-out"
-              style={{ objectPosition: sl.position || "center", ...(sl.style || {}), opacity: slide === i + 1 ? 1 : 0 }}
+              style={{
+                objectPosition: (isPhone && sl.mobilePosition) || sl.position || "center",
+                ...((isPhone && sl.mobileStyle) || sl.style || {}),
+                opacity: slide === i + 1 ? 1 : 0,
+              }}
             />,
             /* Optional white floor wedge and a product standing on it (glossy shadow + mirror). */
             sl.floor || sl.product || sl.products || sl.shade ? (
@@ -222,8 +240,8 @@ export default function DivisionVideoHero({
                     <div
                       className="absolute inset-0"
                       style={{
-                        clipPath: sl.floor.clip,
-                        background: "linear-gradient(180deg, #ffffff 0%, #f6f4f1 100%)",
+                        clipPath: (isPhone && sl.mobileFloor?.clip) || sl.floor.clip,
+                        background: sl.floor.background || "linear-gradient(180deg, #ffffff 0%, #f6f4f1 100%)",
                       }}
                     />
                   </>
@@ -232,7 +250,7 @@ export default function DivisionVideoHero({
                     foam stays clear of it */}
                 {sl.shade ? <div className="absolute inset-0" style={{ background: sl.shade }} /> : null}
                 {sl.products?.length || sl.product ? (
-                  <ProductCycler items={sl.products || [sl.product]} place={sl.productPlace || sl.product} active={slide === i + 1} every={productMs} firstMs={firstProductMs} />
+                  <ProductCycler items={sl.products || [sl.product]} place={(isPhone && sl.mobileProductPlace) || sl.productPlace || sl.product} active={slide === i + 1} every={productMs} firstMs={firstProductMs} />
                 ) : null}
               </div>
             ) : null,
@@ -267,6 +285,23 @@ export default function DivisionVideoHero({
         />
       )}
 
+      {/* Slide 1's white floor and foam stacks (over its shade, under the heading). */}
+      {mainStage && image ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-1000 ease-in-out"
+          style={{ opacity: onFirst ? 1 : 0 }}
+        >
+          {mainStage.floor ? (
+            <div className="absolute inset-0" style={{ clipPath: mainStage.floor.clip, background: mainStage.floor.background || "linear-gradient(180deg, #ffffff 0%, #f6f4f1 100%)" }} />
+          ) : null}
+          {mainStage.shade ? <div className="absolute inset-0" style={{ background: mainStage.shade }} /> : null}
+          {mainStage.products?.length ? (
+            <ProductCycler items={mainStage.products} place={mainStage.productPlace} active={onFirst} every={productMs} firstMs={firstProductMs} />
+          ) : null}
+        </div>
+      ) : null}
+
       {product?.src && !product.cover ? (
         <div
           className="pointer-events-none absolute z-[1]"
@@ -295,7 +330,7 @@ export default function DivisionVideoHero({
 
       {heading && (
         <div
-          style={{ opacity: onFirst ? 1 : 0, transition: "opacity 1000ms ease-in-out" }}
+          style={{ opacity: onFirst ? 1 : 0, transition: "opacity 1000ms ease-in-out", transform: headingShift }}
           className={`absolute inset-0 z-[2] flex flex-col justify-center px-4 sm:px-8 lg:px-14 xl:px-20 ${
             align === "left"
               ? "items-start text-left lg:pl-[max(3.5rem,calc((100vw-1600px)/2+4rem))]"

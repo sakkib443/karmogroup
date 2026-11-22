@@ -93,7 +93,7 @@ function foamTarget(item, pw, H, vw) {
   return { width, right };
 }
 
-function Panel({ item, active, mode, geo, wide, onOpen }) {
+function Panel({ item, active, mode, geo, wide, onOpen, onClose }) {
   const { textRef, blockRef } = useFitToHeight(active);
 
   /* Target column width for this state (the flex-grow shares). */
@@ -115,8 +115,8 @@ function Panel({ item, active, mode, geo, wide, onOpen }) {
     /* Phone: a card in a two-column grid. The foam stands centred at the bottom and swells a
        little when the card is tapped open. */
     foamStyle = {
-      left: wide ? "48%" : "6%",
-      width: wide ? "48%" : "88%",
+      left: wide && !active ? "48%" : "6%",
+      width: wide && !active ? "48%" : "88%",
       transform: `${fitT} scale(${active ? 1.08 : 1})`.trim(),
       transformOrigin: "50% 100%",
       transition: `transform 600ms ${EASE}`,
@@ -126,11 +126,17 @@ function Panel({ item, active, mode, geo, wide, onOpen }) {
   }
 
   /* Touch screens have no hover: the first tap opens the column, the next one follows the link. */
+  /* Phones / touch: a tap never leaves the page — it opens the card big (full row, taller)
+     and a second tap closes it again (client, 23 Nov 2026). */
   const onClick = (e) => {
-    if (active) return;
     if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches) {
       e.preventDefault();
-      onOpen();
+      if (active) onClose?.();
+      else {
+        onOpen();
+        const el = e.currentTarget;
+        window.setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
+      }
     }
   };
 
@@ -145,7 +151,7 @@ function Panel({ item, active, mode, geo, wide, onOpen }) {
       onFocus={onOpen}
       onClick={onClick}
       aria-label={`Karmo ${item.name} foam — ${item.grade}, ${item.colour}, ${item.density} kg/m³`}
-      className={`@container relative block min-w-0 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white md:col-span-1 md:aspect-auto md:h-auto md:min-h-0 md:[flex-basis:0%] md:[flex-grow:var(--fg)] ${wide ? "col-span-2 aspect-[16/10]" : "aspect-[3/4]"}`}
+      className={`@container relative block min-w-0 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white md:col-span-1 md:aspect-auto md:h-auto md:min-h-0 md:[flex-basis:0%] md:[flex-grow:var(--fg)] ${active ? "col-span-2 aspect-[4/5]" : wide ? "col-span-2 aspect-[16/10]" : "aspect-[3/4]"}`}
       style={{
         background: `linear-gradient(180deg, ${item.top} 0%, ${item.bottom} 30%, color-mix(in srgb, ${item.bottom} 18%, #ffffff) 78%, #fbf9f6 100%)`,
         /* Desktop only (md:): the open column swells, the rest narrow. */
@@ -155,7 +161,7 @@ function Panel({ item, active, mode, geo, wide, onOpen }) {
     >
       {/* On a phone the last (wide) card keeps its title to the left half, sized to that half,
           so the foam can stand on the right. */}
-      <span className={wide ? "pointer-events-none absolute inset-y-0 left-0 z-[1] block w-1/2 @container md:w-full" : "contents"}>
+      <span className={wide && !active ? "pointer-events-none absolute inset-y-0 left-0 z-[1] block w-1/2 @container md:w-full" : "contents"}>
       {/* Title, top-left, behind the foam. Sizes are shares of the column width (cqw), so they
           grow and shrink in step with it. */}
       <span
@@ -332,7 +338,7 @@ function useSnapBand() {
    site already counts; a visitor who lands here directly hears it after their first click while
    the band is on screen. A small speaker button turns it off (remembered on this device). */
 const MUSIC_SRC = "/pages/foam/furniture/audio/foam-grades-theme-v3.m4a";
-const MUSIC_VOL = 0.35;
+const MUSIC_VOL = 0.22; /* softer again (client, 23 Nov 2026); was 0.35 */
 function useSectionMusic(sectionRef) {
   const [muted, setMuted] = useState(false);
   const mutedRef = useRef(false);
@@ -462,7 +468,7 @@ export default function FoamGradesAccordion() {
       className="relative mb-1.5 grid w-full grid-cols-2 gap-1.5 overflow-hidden bg-white md:flex md:h-[calc(100svh-112px)] md:min-h-[480px] md:flex-row md:gap-0"
     >
       {GRADES.map((item, i) => (
-        <Panel key={item.id} item={item} active={i === active} mode={mode} geo={geo} wide={i === GRADES.length - 1 && GRADES.length % 2 === 1} onOpen={() => setActive(i)} />
+        <Panel key={item.id} item={item} active={i === active} mode={mode} geo={geo} wide={i === GRADES.length - 1 && GRADES.length % 2 === 1} onOpen={() => setActive(i)} onClose={() => setActive(null)} />
       ))}
       {/* Speaker: turns the music cue off / on. */}
       <button

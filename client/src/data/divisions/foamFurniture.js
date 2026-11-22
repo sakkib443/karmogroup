@@ -201,6 +201,12 @@ const foamFurniture = {
         shade: "rgba(0,0,0,0.16)",
         /* Four stacks taking turns on that floor (glossy shadow under each): HD, Poly, 280, 1965. */
         productPlace: { width: "21vw", left: "13vw", bottom: "7%", eager: true },
+        /* Phone framing (client, 23 Nov 2026): the model centred, a wider white floor along the
+           bottom and bigger stacks on it. */
+        mobilePosition: "74% center",
+        mobileStyle: {},
+        mobileFloor: { clip: "polygon(0% 70%, 100% 86%, 100% 100%, 0% 100%)" },
+        mobileProductPlace: { width: "52vw", left: "4vw", bottom: "10%", eager: true },
         products: [
           { src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 },
           { src: `${IMG}/hero/foam-poly-hero-1200.webp`, w: 800, h: 605 },
