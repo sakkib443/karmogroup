@@ -42,7 +42,7 @@ export default function Header() {
             backgroundSize: "100% auto",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            opacity: scrolled ? 0.1 : 0.16,
+            opacity: scrolled ? 0.05 : 0.08,
             transition: "opacity 500ms cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         />

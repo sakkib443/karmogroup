@@ -8,6 +8,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { productFeatures } from "@/components/karmo/product/productDetailData";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * PDP band — short left copy + asymmetric media flush right:
@@ -15,8 +16,11 @@ import { productFeatures } from "@/components/karmo/product/productDetailData";
  * Hover = home DivisionEditorials frame + label. 6px gap to neighbours.
  */
 
-const ORANGE = "#FF9A1F";
-const BAND_H = "calc(100svh - 140px)";
+/* Taller than before, and sized only in screen fractions (no fixed px), so browser zoom in/out never changes how the band looks. */
+/* screenFit: exactly one screen under the 112px header; the middle column is as wide as the
+   picture's own shape (2:3) needs at that height, so the middle picture shows whole. */
+const SCREEN_H = "calc(100svh - 40px)";
+const BAND_H = "min(86vw, 112svh, 1536px)";
 const GAP = "gap-1.5";
 
 const EASE = [0.33, 1, 0.68, 1];
@@ -50,28 +54,9 @@ const SLIDES = [
   },
 ];
 
-function LeafRule() {
-  return (
-    <span className="mt-4 flex items-center gap-3" aria-hidden>
-      <span className="h-px w-10 bg-brand" />
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0">
-        <path
-          d="M20.5 3.5C20.5 3.5 8.8 2.2 5.4 8.2c-2.6 4.6.6 9.4 4.6 10.3 4.6 1 8.6-2.4 9.6-7.3.6-3.1.9-7.7.9-7.7Z"
-          fill={ORANGE}
-        />
-        <path
-          d="M18.6 5.6C14.4 8.4 9.9 12.6 6.7 19.8"
-          stroke="#B4651A"
-          strokeWidth="1.3"
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-ink/45">
-        Crafted to last
-      </span>
-    </span>
-  );
-}
+/* Fallback clips; each mattress page passes its own (product.insideClips). Left column: feet-and-water-bottle shot over the press test; right column: the red-cloth clip over the ball drop (the hand-press clip lives in the three-part band, ProductFeatureSlides). */
+const DEFAULT_PAN = { src: "/products/videos/inside/pan-red.mp4", label: "Cover in motion" };
+const DEFAULT_FEET = { src: "/products/videos/inside/feet-for-king.mp4", label: "Tested by weight" };
 
 function HoverChrome({ label }) {
   return (
@@ -93,7 +78,8 @@ function HoverChrome({ label }) {
   );
 }
 
-function TallMorph() {
+/* focusY: which part of the tall pictures stays in view when the tile crops them (higher % = pictures sit a little higher). */
+function TallMorph({ focusY = "18%" }) {
   const reduceMotion = useReducedMotion();
   const rootRef = useRef(null);
   const firstSwapDone = useRef(false);
@@ -134,7 +120,7 @@ function TallMorph() {
   return (
     <div
       ref={rootRef}
-      className="group relative row-span-2 min-h-0 overflow-hidden bg-[#ebe7e1]"
+      className="group absolute inset-0 overflow-hidden bg-[#ebe7e1]"
     >
       <motion.div
         className="absolute inset-0 origin-[50%_40%] will-change-transform"
@@ -177,7 +163,8 @@ function TallMorph() {
                 fill
                 sizes="(min-width: 1024px) 32vw, 60vw"
                 quality={85}
-                className="object-cover object-[center_18%]"
+                className="object-cover"
+                style={{ objectPosition: `center ${focusY}` }}
               />
             </motion.div>
           );
@@ -188,17 +175,36 @@ function TallMorph() {
   );
 }
 
-function VideoTile({ src, label }) {
+/* lift (% of the tile): moves the picture up inside its tile — e.g. so the surface under the bouncing ball shows. The strip it uncovers at the bottom is the same pale colour, and the picture's lower edge fades into it. */
+function VideoTile({ src, label, lift, drop, position }) { // always fills its relative wrapper
   const gif = typeof src === "string" && src.split("?")[0].endsWith(".gif");
   const mediaClass =
     "absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]";
+  const posStyle = position ? { objectPosition: position } : {};
+  const liftStyle = lift
+    ? {
+        transform: `translateY(-${lift}%)`,
+        WebkitMaskImage: "linear-gradient(to bottom, #000 86%, transparent 100%)",
+        maskImage: "linear-gradient(to bottom, #000 86%, transparent 100%)",
+      }
+    : undefined;
+  /* drop (% of the tile): moves the picture down so more of the top shows (feet jumping); the strip uncovered at the top is the pale wall colour and the picture's upper edge fades into it. */
+  const dropStyle = drop
+    ? {
+        transform: `translateY(${drop}%)`,
+        WebkitMaskImage: "linear-gradient(to top, #000 86%, transparent 100%)",
+        maskImage: "linear-gradient(to top, #000 86%, transparent 100%)",
+      }
+    : undefined;
+  const mediaStyle = { ...posStyle, ...liftStyle, ...dropStyle };
   return (
-    <div className="group relative min-h-0 overflow-hidden bg-ink">
+    <div className={`group absolute inset-0 overflow-hidden ${lift || drop ? "bg-[#e9e8ea]" : "bg-ink"}`}>
       {gif ? (
-        <img loading="lazy" decoding="async" src={src} alt={label} className={mediaClass} />
+        <img loading="lazy" decoding="async" src={src} alt={label} className={mediaClass} style={mediaStyle} />
       ) : (
-        <video
+        <LazyVideo
           className={mediaClass}
+          style={mediaStyle}
           autoPlay
           muted
           loop
@@ -207,21 +213,25 @@ function VideoTile({ src, label }) {
           aria-label={label}
         >
           <source src={src} type="video/mp4" />
-        </video>
+        </LazyVideo>
       )}
       <HoverChrome label={label} />
     </div>
   );
 }
 
-export default function ProductBuildAside() {
+/* cols = the three column widths on desktop (default equal). A second copy of the band under the first uses a narrower middle. */
+export default function ProductBuildAside({ product, cols = "1fr 1fr 1fr", screenFit = false }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
+  const clips = product?.insideClips;
+  const SHOT_4 = clips?.pan || DEFAULT_PAN;
+  const SHOT_5 = { ...(clips?.feet || DEFAULT_FEET), position: "90% center" }; /* right side of the picture, so the bottle is in view (the setting before the last two tweaks) */
 
   return (
     <section
-      className="relative my-[6px] overflow-x-clip py-12 lg:overflow-visible lg:py-0"
-      style={{ ["--build-h"]: BAND_H }}
+      className="relative my-[6px] overflow-x-clip pt-10 lg:overflow-visible lg:pt-0"
+      style={{ ["--build-h"]: screenFit ? SCREEN_H : BAND_H }}
       aria-label="Inside every Karmo mattress"
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
@@ -236,72 +246,69 @@ export default function ProductBuildAside() {
         <span className="absolute inset-0 bg-white/58" />
       </div>
 
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="relative z-[1] grid items-center gap-8 px-6 md:px-14 lg:h-[var(--build-h)] lg:min-h-[var(--build-h)] lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.65fr)] lg:gap-8 lg:px-0 lg:pl-[max(4rem,calc((100vw-1600px)/2+4rem))] lg:pr-0 xl:gap-10"
-      >
-        <motion.div variants={fade} className="min-w-0 max-w-md self-center lg:max-w-[28rem]">
-          <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="display text-[1.15rem] font-bold leading-none tracking-[-0.01em] text-brand sm:text-[1.3rem]">
-              Build 5 layer
-            </span>
-            <span className="text-[11px] font-semibold uppercase tracking-[0.3em] text-ink/45">
-              Inside the mattress
-            </span>
-          </p>
-
-          <h2 className="display section-heading mt-3 uppercase text-ink">
-            <span className="block">Inside every</span>
-            <span className="block text-brand">Karmo mattress</span>
-          </h2>
-
-          <LeafRule />
-
-          <p className="body-copy mt-4 text-[15px] leading-[1.7] text-ink/55 sm:text-[16px] lg:text-[17px]">
-            Five layered construction — quilted cover to motion-isolation base —
-            with spine-aware support and a cover made for Bangladesh homes.
-          </p>
-
-          <div className="relative mt-5 w-full max-w-[24rem]">
+      {/* Heading on top, then one full-width row of three columns. */}
+      <motion.div variants={group} {...reveal} viewport={VIEWPORT} className="relative z-[1]">
+        <motion.div
+          variants={fade}
+          className="relative mx-auto flex max-w-[1600px] flex-col items-center px-6 pb-10 pt-2 text-center md:px-14 lg:px-16 lg:pb-12 lg:pt-10"
+        >
+          {/* The cutaway picture sits behind the heading like a faint sketch: bigger, grey, low opacity. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 flex w-full items-center justify-end overflow-hidden lg:w-[62%]"
+          >
             <Image
               src="/products/mattress/brochure/inside/pocket-cutaway-cutout.webp"
-              alt="Karmo pocket-spring mattress with the pillow top peeled back to show foam wadding and coils"
+              alt=""
               width={1280}
               height={720}
-              sizes="(min-width: 1024px) 24rem, 80vw"
-              className="h-auto w-full object-contain object-left"
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="h-auto w-[min(46rem,100%)] object-contain opacity-[0.16] mix-blend-multiply grayscale contrast-125"
               priority={false}
             />
           </div>
 
-          <Link href="/contact" className="group mt-1.5 inline-flex items-center gap-3 sm:mt-2">
-            <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
-              Talk to us
-            </span>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
-              <FiArrowUpRight />
-            </span>
-          </Link>
+          <div className="relative min-w-0 max-w-2xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand">Inside every Karmo mattress</p>
+            <h2 className="display mt-3 text-[1.6rem] font-bold uppercase leading-[1.08] tracking-[0.01em] text-ink sm:text-[1.95rem] lg:text-[2.3rem]">
+              Five layers. <span className="text-brand">Built to last.</span>
+            </h2>
+
+            <Link href="/contact" className="group mt-5 inline-flex items-center gap-3">
+              <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-ink underline decoration-ink/20 underline-offset-4 transition-colors group-hover:decoration-brand">
+                Talk to us
+              </span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ink/20 text-ink transition-colors duration-300 group-hover:border-brand group-hover:bg-brand group-hover:text-white">
+                <FiArrowUpRight />
+              </span>
+            </Link>
+          </div>
         </motion.div>
 
-        <motion.div
-          variants={fade}
-          className="flex h-[min(52svh,380px)] w-full min-w-0 justify-end self-stretch lg:h-full lg:min-h-0"
-        >
+        <motion.div variants={fade} className="w-full">
           <div
-            className={`grid h-full w-full max-w-[min(100%,48rem)] grid-cols-[0.78fr_0.9fr] grid-rows-2 sm:max-w-[min(100%,54rem)] ${GAP} lg:max-w-[min(100%,62rem)]`}
+            className={`grid w-full grid-cols-2 ${GAP} lg:h-[var(--build-h)] lg:[grid-template-columns:var(--cols)] lg:grid-rows-2`}
+            style={{ ["--cols"]: screenFit ? `1fr calc(${SCREEN_H} / 1.5 * 1.07) 1fr` : cols }}
           >
-            <TallMorph />
-            <VideoTile
-              src={productFeatures[0]?.video}
-              label={productFeatures[0]?.title}
-            />
-            <VideoTile
-              src={productFeatures[1]?.video}
-              label={productFeatures[1]?.title}
-            />
+            {[SHOT_5, { src: productFeatures[1]?.video, label: productFeatures[1]?.title }].map((clip, i) => (
+              <div
+                key={`left-${i}`}
+                className={`relative aspect-video min-h-0 lg:col-start-1 lg:aspect-auto ${i === 0 ? "lg:row-start-1" : "lg:row-start-2"}`}
+              >
+                <VideoTile src={clip.src} label={clip.label} lift={clip.lift} drop={clip.drop} position={clip.position} />
+              </div>
+            ))}
+            <div className="relative col-span-2 aspect-[4/3] min-h-0 lg:col-span-1 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:aspect-auto">
+              <TallMorph focusY={screenFit ? "45%" : "18%"} />
+            </div>
+            {[SHOT_4, { src: productFeatures[0]?.video, label: productFeatures[0]?.title, lift: 12 }].map((clip, i) => (
+              <div
+                key={`right-${i}`}
+                className={`relative aspect-video min-h-0 lg:col-start-3 lg:aspect-auto ${i === 0 ? "lg:row-start-1" : "lg:row-start-2"}`}
+              >
+                <VideoTile src={clip.src} label={clip.label} lift={clip.lift} drop={clip.drop} position={clip.position} />
+              </div>
+            ))}
           </div>
         </motion.div>
       </motion.div>

@@ -177,9 +177,52 @@ const foamFurniture = {
     /* Embossed KARMO charcoal foam layers, heading centred, screen height
        under the header. Remove `image` to bring the acoustic-foam clip below
        back. */
-    image: `${IMG}/hero/karmo-embossed-charcoal-foam-layers.webp`,
-    imageAlt: "Layers of Karmo charcoal foam embossed with the KARMO logo",
-    imagePosition: "center",
+    /* Client's new hero (23 Nov 2026). Previous: hero/karmo-embossed-charcoal-foam-layers.webp */
+    image: `${IMG}/hero/embossed-karmo-poly-stack-hero.webp`,
+    imageAlt: "Stack of Karmo Poly foam embossed with the KARMO logo",
+    /* Lifted (client, 23 Nov 2026): anchored to the bottom, zoomed a touch and moved up,
+       so more of the lower stack shows. */
+    imagePosition: "center bottom",
+    imageStyle: { transform: "translateY(-6%) scale(1.1)", transformOrigin: "50% 0%" },
+    /* Slide 2 (client, 23 Nov 2026). Earlier slide-2 picture: hero/karmo-comfort-modern-living-room.webp */
+    moreSlides: [
+      {
+        image: `${IMG}/hero/warm-smile-sunlit-living-room.webp`,
+        alt: "Tanzin Tisha smiling in a sunlit living room with Karmo foam",
+        position: "center",
+        /* Set a touch lower (client) — moved only, no zoom; the strip it leaves at the top is
+           filled with the wall's own pale tone. */
+        style: { transform: "translateY(3%)" },
+        bg: "linear-gradient(180deg, #e1d6cd 0%, #e1d6cd 100%)",
+        /* White floor wedge (client's sketch): rises from the left edge at 38% of the
+           height and runs diagonally down to the bottom, reaching the model's yellow dress. */
+        floor: { clip: "polygon(0% 62%, 61% 100%, 0% 100%)" },
+        /* A light dark veil over the photo (client, 23 Nov 2026). */
+        shade: "rgba(0,0,0,0.16)",
+        /* Four stacks taking turns on that floor (glossy shadow under each): HD, Poly, 280, 1965. */
+        productPlace: { width: "21vw", left: "13vw", bottom: "7%", eager: true },
+        /* Phone framing (client, 23 Nov 2026): the model centred, a wider white floor along the
+           bottom and bigger stacks on it. */
+        mobilePosition: "74% center",
+        mobileStyle: {},
+        mobileFloor: { clip: "polygon(0% 70%, 100% 86%, 100% 100%, 0% 100%)" },
+        mobileProductPlace: { width: "52vw", left: "4vw", bottom: "10%", eager: true },
+        products: [
+          { src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 },
+          { src: `${IMG}/hero/foam-poly-hero-1200.webp`, w: 800, h: 605 },
+          { src: `${IMG}/hero/foam-280-hero-1200.webp`, w: 800, h: 608 },
+          { src: `${IMG}/hero/foam-1965-hero-1200.webp`, w: 800, h: 607 },
+        ],
+      },
+    ],
+    /* Order (client, 23 Nov 2026): the model slide first — its four stacks take turns (about
+       3.6 s each) — then the KARMO POLY slide with the heading for 6 s, then round again. */
+    firstSlideOff: false,
+    extraFirst: true,
+    productMs: 2900, /* 20% quicker (client, 23 Nov 2026); was 3600 */
+    /* The first stack shows only about a second before the next glides in (client). */
+    firstProductMs: 1000,
+    slideMs: 6000,
     video: "/pages/foam/videos/acoustic-foam-wall-pan.mp4",
     heading: "All your upholstery needs",
     /* 0.25 was slow-motion; 0.85 came back reading as barely slowed at all.
@@ -272,34 +315,14 @@ const foamFurniture = {
   },
 
   furnitureGrades: {
+    /* Section 4 shows the hover-to-open four-panel row instead of the full-width photo
+       (client, 22 Nov 2026). Set accordion: false to bring the photo back. */
+    accordion: true,
     lineup: `${IMG}/hero/hero-crafted-hq.webp`,
     alt: "Cream armchair with a KARMO foam label under a magnifying glass",
     heading: "All your upholstery needs",
   },
 
-  recommended: {
-    heading: "Which Karmo foam is right for you",
-    columns: [
-      {
-        id: "firm",
-        image: `${IMG}/why/why-firm-hq.webp`,
-        alt: "Upright seating on a firm sofa — cushions hold their shape",
-        caption: "If you need firm support that holds its shape",
-      },
-      {
-        id: "density",
-        image: `${IMG}/why/why-density-hq.webp`,
-        alt: "Cream armchair with a KARMO foam label under a magnifying glass",
-        caption: "If you want density that lasts for years",
-      },
-      {
-        id: "airflow",
-        image: `${IMG}/why/why-airflow-hq.webp`,
-        alt: "Relaxed seating by an open window — cool airflow comfort",
-        caption: "If you prefer cool, open airflow comfort",
-      },
-    ],
-  },
 
   shapeGrid: {
     skin: "organized",
@@ -343,6 +366,8 @@ const foamFurniture = {
       align: "left",
       image: "/pages/foam/bed-automotive/karmo_sofa_633x421.webp",
       alt: "Karmo foam armchair with a magnifying glass on the KARMO label",
+      /* The words sit higher on the wall (client, 23 Nov 2026). */
+      lift: "9rem",
       headingLead: "Designed",
       headingAccent: "to",
       headingEnd: "endure",
@@ -386,10 +411,10 @@ const foamFurniture = {
       ],
       photo: {
         src: `${IMG}/inside/cushion-cutaway-hq.webp`,
-        video: "/shared/videos/shorts/v1-tisa.mp4",
-        videoStart: 1,
+        /* Re-cut (23 Nov 2026): the black first 1.8 s and the thin black border trimmed off,
+           so it starts on the picture and fills its half. Original: v1-tisa.mp4. */
+        video: "/shared/videos/shorts/v1-tisa-clean.mp4",
         alt: "Tanzin Tisha for Karmo Foam",
-        caption: "Upholstery foam · no filler · rubber grade",
       },
     },
     faqs: [
@@ -424,14 +449,28 @@ const foamFurniture = {
 
   lounge: {
     layout: "overlay",
-    headingLead: "The comfort you feel every day",
+    /* No words on this band (client, 23 Nov 2026). Was: "The comfort you feel every day". */
+    headingLead: "",
+    /* The green HD stack on the right, standing on the room's floor with a glossy shadow. */
+    floorStage: {
+      /* No white wedge any more (client): the stacks stand straight on the room's own floor. */
+      /* Moved a little left (client): the room photo has no spare width to slide right. */
+      /* Same build as the hero, but the glossy mirror starts strong right under the stack and
+         fades away quickly downward (client, 23 Nov 2026). */
+      place: { width: "18.5vw", left: "auto", right: "15vw", bottom: "5%", mirrorOpacity: 0.7, mirrorFade: 30, mirrorSkew: 1.8 },
+      /* Phone: a bigger stack, still on the right. */
+      mobilePlace: { width: "40vw", left: "auto", right: "5vw", bottom: "5%", mirrorOpacity: 0.7, mirrorFade: 30, mirrorSkew: 1.8 },
+      /* Just the green HD stack, standing still (client, 23 Nov 2026). */
+      products: [{ src: `${IMG}/hero/foam-hd-hero-1200.webp`, w: 800, h: 616 }],
+    },
     image: {
       src: `${IMG}/mosaic/spotlight-emerald-left-hq.webp`,
       alt: "Emerald velvet armchair and oak dresser in a sunlit living room",
       width: 1280,
       height: 720,
       unoptimized: true,
-      position: "object-[center_58%]",
+      /* Phone: framed further left in the photo, so the chair sits more to the right. */
+      position: "object-[0%_58%] md:object-[center_58%]",
     },
     slides: [
       {
@@ -439,7 +478,7 @@ const foamFurniture = {
         align: "right",
         titleCard: true,
         headingScale: 80,
-        headingLead: "The comfort you feel every day",
+        headingLead: "",
         /* One even, light wash across the whole photo (no fade). The heading has its
            own shadow, so it stays readable on the pale wall. */
         titleOverlay: "linear-gradient(rgba(11,21,40,0.24), rgba(11,21,40,0.24))",
@@ -451,7 +490,8 @@ const foamFurniture = {
           width: 1280,
           height: 720,
           unoptimized: true,
-          position: "object-[center_58%]",
+          /* Phone: framed further left in the photo, so the chair sits more to the right. */
+      position: "object-[0%_58%] md:object-[center_58%]",
         },
       },
     ],

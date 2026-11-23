@@ -10,6 +10,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { reels } from "@/cms/pages/home";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Home films / shorts band — same shell split as DivisionEditorials
@@ -49,7 +50,7 @@ function ReelTile({ film, still, onOpen, active }) {
       aria-label={`Play ${film.title}`}
       className="group relative h-full min-h-0 w-full overflow-hidden bg-ink text-left"
     >
-      <video
+      <LazyVideo
         ref={videoRef}
         src={film.src}
         poster={film.poster}

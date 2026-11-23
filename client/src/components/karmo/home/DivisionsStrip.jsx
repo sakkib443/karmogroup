@@ -6,7 +6,8 @@ import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
-import { useSection, CmsText } from "@/cms/CmsProvider";
+import SectionHeading from "@/components/karmo/home/SectionHeading";
+import { useSection } from "@/cms/CmsProvider";
 import { imageStyle } from "@/cms/core";
 import { divisions as section } from "@/cms/pages/home";
 
@@ -68,37 +69,13 @@ export default function DivisionsStrip() {
     <section className="relative overflow-hidden bg-white py-8 md:py-10">
       <TextureSlides lighter />
 
-      <motion.div
-        variants={group}
-        {...reveal}
-        viewport={VIEWPORT}
-        className="relative z-[1] px-4 text-center"
-      >
-        <motion.div variants={fade} {...reveal} viewport={VIEWPORT}>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-brand">
-            {c.eyebrow}
-          </span>
-          <h2
-            className="display title-card-line mt-1 uppercase text-ink"
-            style={{
-              fontSize: "clamp(1.5rem, 1.08rem + 1.45vw, 2.25rem)",
-              fontWeight: 350,
-              fontVariationSettings: '"wght" 350',
-              lineHeight: 1.08,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            <CmsText value={c.title} size={c.titleSize} />{" "}
-            <CmsText className="text-brand" value={c.titleAccent} size={c.titleSize} />
-          </h2>
-        </motion.div>
-      </motion.div>
+      <SectionHeading eyebrow={c.eyebrow} title={c.title} titleAccent={c.titleAccent} titleSize={c.titleSize} reveal={reveal} />
 
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className={`relative z-[1] mt-3 grid grid-cols-2 gap-[2px] px-0 md:mt-3.5 md:gap-1 ${
+        className={`relative z-[1] mt-6 grid grid-cols-2 gap-[2px] px-0 md:mt-8 md:gap-1 ${
           tiles.length === 3 ? "md:grid-cols-3" : tiles.length >= 5 ? "md:grid-cols-4 lg:grid-cols-5" : "md:grid-cols-4"
         }`}
       >

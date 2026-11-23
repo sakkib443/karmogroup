@@ -44,25 +44,36 @@ const DEFAULT_COUNTERS = [
 ];
 
 /** Single counter card with choreographed rise & smooth slow count animation */
-function CounterCard({ item, index, isContainerInView }) {
+function CounterCard({ item, index, isContainerInView, ready }) {
   const numberRef = useRef(null);
   const targetValue = Number(item.value || 0);
+  /* The number on screen, so a late change in the target carries on from it, never from 0. */
+  const shownRef = useRef(0);
 
   useEffect(() => {
-    if (!isContainerInView || !numberRef.current) return;
+    /* Wait until the real figures are in (ready), so the count runs once and never restarts. */
+    if (!isContainerInView || !ready || !numberRef.current) return;
+    if (shownRef.current === targetValue) return;
 
     // Card smoothly floats up and settles first (0.75s + stagger), THEN the counter starts
-    const startDelayMs = (0.7 + index * 0.12) * 1000;
+    /* Counts as the card arrives (client, 23 Nov 2026) — no long wait first. */
+    const startDelayMs = (0.25 + index * 0.08) * 1000;
     let controls = null;
+    let lastShown = -1;
 
     const timer = setTimeout(() => {
       // Slower, graceful luxury count-up animation (~3.2s)
-      controls = animate(0, targetValue, {
-        duration: 3.2,
-        ease: [0.12, 0.96, 0.24, 1], // ultra-smooth luxury curve: steady build, silky gliding deceleration
+      controls = animate(shownRef.current, targetValue, {
+        /* An even run that eases gently into the final number and stops — the old curve
+           crawled through the last digits for over a second, which read as a glitch. */
+        duration: 1.8,
+        ease: [0.25, 0.6, 0.3, 1],
         onUpdate: (latest) => {
-          if (numberRef.current) {
-            numberRef.current.textContent = Math.round(latest).toLocaleString();
+          const next = Math.round(latest);
+          if (numberRef.current && next !== lastShown) {
+            lastShown = next;
+            shownRef.current = next;
+            numberRef.current.textContent = next.toLocaleString();
           }
         },
       });
@@ -72,22 +83,23 @@ function CounterCard({ item, index, isContainerInView }) {
       clearTimeout(timer);
       if (controls) controls.stop();
     };
-  }, [isContainerInView, targetValue, index]);
+  }, [isContainerInView, targetValue, index, ready]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 48, scale: 0.96 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={
         isContainerInView
-          ? { opacity: 1, y: 0, scale: 1 }
-          : { opacity: 0, y: 48, scale: 0.96 }
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 40 }
       }
       transition={{
         delay: index * 0.12,
         duration: 0.75,
         ease: [0.22, 1, 0.36, 1], // gentle, graceful settle into place
       }}
-      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-white/[0.07] p-5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37),inset_0_1px_1px_0_rgba(255,255,255,0.25)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:bg-white/[0.12] hover:shadow-[0_12px_36px_0_rgba(228,82,92,0.25),inset_0_1px_1px_0_rgba(255,255,255,0.35)] sm:p-6 lg:p-7"
+      style={{ willChange: "transform, opacity" }}
+      className="group relative flex flex-col justify-center overflow-hidden rounded-xl border border-white/20 bg-gradient-to-b from-[#0b1a33]/55 to-[#0b1a33]/40 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-colors duration-300 hover:border-white/40 hover:from-[#0b1a33]/65 sm:p-6 lg:px-7 lg:py-7"
     >
       {/* Top delicate frosted glass highlight */}
       <div
@@ -98,31 +110,31 @@ function CounterCard({ item, index, isContainerInView }) {
       {/* Subtle brand red ambient glow in the top-right corner */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-brand/15 blur-xl transition-all duration-300 group-hover:bg-brand/25 group-hover:opacity-100 opacity-40"
+        className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-60"
+        style={{ background: "radial-gradient(circle, rgba(228,82,92,0.28) 0%, rgba(228,82,92,0) 70%)" }}
       />
 
       {/* Number + Suffix on one line (never wraps) */}
       <div className="relative flex items-baseline whitespace-nowrap leading-none">
         {item.prefix ? (
-          <span className="mr-1 text-2xl font-black text-brand sm:text-3xl lg:text-4xl">
+          <span className="mr-1 text-2xl font-black text-brand sm:text-3xl">
             {item.prefix}
           </span>
         ) : null}
-        <span
-          ref={numberRef}
-          className="tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl lg:text-[2.85rem]"
-        >
-          0
+        <span className="relative inline-grid tabular-nums font-black tracking-tight text-white text-3xl sm:text-4xl xl:text-[2.75rem]">
+          {/* Final number held invisible, so the box is its full width from the first frame. */}
+          <span aria-hidden className="invisible col-start-1 row-start-1">{targetValue.toLocaleString()}</span>
+          <span ref={numberRef} className="col-start-1 row-start-1 text-left">0</span>
         </span>
         {item.suffix ? (
-          <span className="ml-1 text-xl font-bold tracking-tight text-brand sm:text-2xl lg:text-[1.75rem]">
+          <span className="ml-1 text-xl font-bold tracking-tight text-brand sm:text-2xl xl:text-[1.75rem]">
             {item.suffix}
           </span>
         ) : null}
       </div>
 
       {/* Clean Stat Title */}
-      <h3 className="relative mt-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white/90 transition-colors group-hover:text-white sm:text-[13px]">
+      <h3 className="relative mt-2.5 text-xs font-bold uppercase tracking-[0.14em] text-white/90 transition-colors group-hover:text-white sm:text-[13px] xl:text-[14px]">
         {item.title}
       </h3>
     </motion.div>
@@ -130,7 +142,10 @@ function CounterCard({ item, index, isContainerInView }) {
 }
 
 export default function ChemicalCounters() {
-  const { data: serverCounters } = useGetCountersQuery();
+  const { data: serverCounters, isLoading } = useGetCountersQuery();
+  /* Count only once the server's figures have arrived (or failed): reloading on this band
+     used to count the built-in figures, then wipe them and count again a second later. */
+  const ready = !isLoading;
   const containerRef = useRef(null);
 
   // Trigger when user scrolls and the section is nicely in front of them
@@ -147,16 +162,18 @@ export default function ChemicalCounters() {
   return (
     <div
       ref={containerRef}
-      className="relative order-1 flex w-full items-center justify-end px-4 py-8 sm:px-6 lg:order-2 lg:h-full lg:py-10 lg:pl-0 lg:pr-6 xl:pr-10 2xl:pr-14"
+      className="relative order-1 flex w-full items-center justify-center px-4 py-8 sm:px-6 lg:order-2 lg:h-full lg:p-10"
     >
-      {/* 2x2 Glassmorphism Grid with crisp rounded-xl corners */}
-      <div className="grid w-full max-w-[36rem] grid-cols-2 gap-4 sm:gap-5 lg:gap-5 xl:gap-6">
+      {/* Glassmorphism cards: two by two, dead centre of the photo side at every size */}
+      <div className="grid w-full max-w-[36rem] grid-cols-2 gap-4 sm:gap-5 lg:gap-6 xl:max-w-[40rem]">
         {activeCounters.map((item, index) => (
           <CounterCard
-            key={item._id || index}
+            /* keyed by place, so the cards stay put when the server's figures replace the defaults */
+            key={index}
             item={item}
             index={index}
             isContainerInView={isContainerInView}
+            ready={ready}
           />
         ))}
       </div>

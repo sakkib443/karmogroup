@@ -5,6 +5,7 @@ import { useInView, useReducedMotion } from "framer-motion";
 
 import VideoModal from "@/components/karmo/VideoModal";
 import { karmoFilms } from "@/data/films";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 function AdsReelTile({ film, onOpen }) {
   const tileRef = useRef(null);
@@ -33,7 +34,7 @@ function AdsReelTile({ film, onOpen }) {
       aria-label={`Play ${film.title}`}
       className="group relative aspect-[9/16] w-full overflow-hidden bg-ink text-left"
     >
-      <video
+      <LazyVideo
         ref={videoRef}
         src={film.src}
         loop

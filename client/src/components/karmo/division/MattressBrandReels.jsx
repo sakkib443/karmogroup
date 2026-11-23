@@ -8,6 +8,7 @@ import { FiArrowUpRight } from "react-icons/fi";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import TextureSlides from "@/components/karmo/home/TextureSlides";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * "Our mattress brands" as a reel band — the same shell as the home page's
@@ -54,7 +55,7 @@ function BrandTile({ item, active }) {
           slight scale hides the blur's soft edge. */}
       <span className="absolute inset-0" aria-hidden>
         {item.video ? (
-          <video
+          <LazyVideo
             ref={videoRef}
             src={item.video}
             poster={item.poster || undefined}

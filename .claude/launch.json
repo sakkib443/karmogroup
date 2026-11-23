@@ -28,6 +28,13 @@
       "runtimeArgs": [".claude/static-server.js", "recource/Karmo Website"],
       "port": 5501,
       "autoPort": true
+    },
+    {
+      "name": "meeting-doc",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".claude/static-server.js", "karmo-library/06-info/meeting-2026-11-21", "5520"],
+      "port": 5520,
+      "autoPort": true
     }
   ]
 }

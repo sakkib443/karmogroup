@@ -3,7 +3,7 @@ import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 import Partners from "@/components/karmo/home/Partners";
 import PartnerPromoBand from "@/components/karmo/home/PartnerPromoBand";
 import DivisionsStrip from "@/components/karmo/home/DivisionsStrip";
-import DivisionsAccordion from "@/components/karmo/home/DivisionsAccordion";
+// Hidden for now (kept for later): import DivisionsAccordion from "@/components/karmo/home/DivisionsAccordion";
 import Reels from "@/components/karmo/home/Reels";
 import ShopByMaterial from "@/components/karmo/home/ShopByMaterial";
 import ShopBySize from "@/components/karmo/home/ShopBySize";
@@ -49,7 +49,7 @@ export default async function HomePage() {
       <ExploreSplit cmsKey="explore" />
       <CmsAnchor section="divisions" />
       <DivisionsStrip />
-      <DivisionsAccordion />
+      {/* The colour-panel divisions row is hidden for now: <DivisionsAccordion /> */}
 
       {/* Sits after the divisions strip because that is where the page stops
           introducing the company and starts selling a product. */}

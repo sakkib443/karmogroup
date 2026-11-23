@@ -9,7 +9,8 @@ export const metadata = {
 
 /**
  * `/mattress` — the Mattress division catalogue, the client's ideal page.
- * Renders the shared `DivisionPage` template with the mattress data.
+ * Renders the shared `DivisionPage` template with the mattress data. Every
+ * picture is a file in public/ named in data/divisions/mattress.js.
  * Lives in (karmo-2) so it shares HeaderTwo + Footer with the homepage.
  */
 export default function MattressRoute() {

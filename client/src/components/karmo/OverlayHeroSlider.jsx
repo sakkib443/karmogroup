@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { mattressTitleOverlay } from "@/components/karmo/chrome/mattressHeroVeil";
 import { overlayStyle } from "@/cms/core";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
@@ -60,7 +61,7 @@ function SlideVideo({ video, on }) {
     }
   }, [on, video.rate]);
   return (
-    <video
+    <LazyVideo
       ref={ref}
       src={video.src}
       poster={video.poster}
@@ -174,6 +175,20 @@ export default function OverlayHeroSlider({
                 {s.video ? (
                   <SlideVideo video={s.video} on={on} />
                 ) : (
+                <>
+                {/* image.zoomOut (e.g. 0.92): the picture is shown a little smaller on a soft
+                    blurred copy of itself, so the frame stays filled — no gap, no hard edge. */}
+                {s.image.zoomOut || s.image.shiftDown ? (
+                  <Image
+                    src={s.image.src}
+                    alt=""
+                    aria-hidden
+                    fill
+                    sizes="20vw"
+                    unoptimized={Boolean(s.image.unoptimized)}
+                    className="scale-110 object-cover blur-2xl"
+                  />
+                ) : null}
                 <Image
                   src={s.image.src}
                   alt={on ? s.image.alt : ""}
@@ -186,8 +201,25 @@ export default function OverlayHeroSlider({
                   className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"
                   } ${s.image.className || ""}`}
-                  style={s.image.style}
+                  style={
+                    s.image.shiftDown
+                      ? {
+                          ...s.image.style,
+                          transform: `translateY(${s.image.shiftDown}%)`,
+                          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 7%)",
+                          maskImage: "linear-gradient(to bottom, transparent 0%, #000 7%)",
+                        }
+                      : s.image.zoomOut
+                      ? {
+                          ...s.image.style,
+                          transform: `scale(${s.image.zoomOut})`,
+                          WebkitMaskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, #000 78%, transparent 100%)",
+                          maskImage: "radial-gradient(ellipse 80% 80% at 50% 50%, #000 78%, transparent 100%)",
+                        }
+                      : s.image.style
+                  }
                 />
+                </>
                 )}
                 {s.image?.overlay ? (
                   <Image
@@ -344,7 +376,7 @@ export default function OverlayHeroSlider({
                         }}
                       >
                         <Heading
-                          className={`display hero-heading title-card-line whitespace-nowrap uppercase text-white ${
+                          className={`display hero-heading title-card-line whitespace-normal [text-wrap:balance] uppercase text-white sm:whitespace-nowrap ${
                             right ? "text-right" : middle || center ? "text-center" : ""
                           } ${s.headingClassName || ""}`}
                           style={{

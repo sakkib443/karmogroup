@@ -10,7 +10,6 @@ import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScal
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
 import ProductInside from "@/components/karmo/product/ProductInside";
-import ProductInsideFilm from "@/components/karmo/product/ProductInsideFilm";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -38,9 +37,9 @@ export default function ProductDetailPage({ product }) {
       <ProductHero product={product} />
       <ProductDescription description={mattressDescription(product)} />
       <ProductPromiseStrip />
-      <ProductInsideFilm product={product} />
+      {/* The animated 'moving layers' build band (ProductInsideFilm) was taken off the page (client, 22 Nov 2026) — the picture band below shows the same layers. */}
       <ProductInside product={product} />
-      <ProductFeatureSlides />
+      <ProductFeatureSlides product={product} />
       {product.film ? (
         <MattressFilmStage
           src={product.film.src}
@@ -48,11 +47,13 @@ export default function ProductDetailPage({ product }) {
           alt={`${product.name} film`}
           heading={product.film.heading}
           headingScale={1.2}
+          /* One screen under the 112px header plus a little more (52px) — client's ask, 22 Nov 2026. */
+          minH="calc(100svh - 60px)"
         />
       ) : null}
       <ProductVideoFeatures features={product.featureBands || []} />
       <ProductFirmnessScale highlight={product.firmness || "Medium Firm"} />
-      <ProductBuildAside />
+      <ProductBuildAside product={product} />
       <OrderAndContact />
     </>
   );

@@ -1,7 +1,51 @@
 "use client";
 
 import { useId, useState } from "react";
-import { FiChevronDown } from "react-icons/fi";
+import {
+  FiActivity,
+  FiAward,
+  FiCheckCircle,
+  FiChevronDown,
+  FiClipboard,
+  FiDroplet,
+  FiGrid,
+  FiHeart,
+  FiLayers,
+  FiList,
+  FiMaximize,
+  FiPenTool,
+  FiShield,
+  FiSliders,
+  FiStar,
+  FiTag,
+} from "react-icons/fi";
+
+/** An icon for each line, picked from its label / words (falls back to its section's icon). */
+const ICON_RULES = [
+  [/spring|coil|motion/, FiActivity],
+  [/moisture|dry|humid|water|air/, FiDroplet],
+  [/hygien|safe|allerg|dust/, FiShield],
+  [/cover|fabric|outer|knit|quilt|print/, FiGrid],
+  [/foam|fill|padding|wave|layer|transition|base|inner/, FiLayers],
+  [/design|aesthetic|pattern|colou?r/, FiPenTool],
+  [/durab|care|wash|last|test|warrant/, FiAward],
+  [/brand|line|type/, FiTag],
+  [/size|dimension|piece|sold/, FiMaximize],
+  [/comfort|feel|firm/, FiHeart],
+  [/grade|density|technical|detail/, FiSliders],
+];
+const SECTION_ICONS = [
+  [/inside/i, FiLayers],
+  [/spec/i, FiClipboard],
+  [/feature|benefit/i, FiStar],
+  [/size/i, FiMaximize],
+];
+const sectionIcon = (heading) => (SECTION_ICONS.find(([re]) => re.test(heading)) || [null, FiList])[1];
+const itemIcon = (item, heading) => {
+  const key = `${item.label || ""}`.toLowerCase();
+  const hit = key && ICON_RULES.find(([re]) => re.test(key));
+  return hit ? hit[1] : sectionIcon(heading) === FiList ? FiCheckCircle : sectionIcon(heading);
+};
 
 /**
  * The description under a product's buy box. Closed until clicked, on every
@@ -31,22 +75,42 @@ export default function ProductDescription({ description }) {
 
         <div id={panelId} className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
           <div className="min-h-0 overflow-hidden" aria-hidden={!open}>
-            <div className="max-w-3xl pb-8">
-              <h2 className="display text-[1.5rem] font-semibold leading-tight text-ink sm:text-[1.8rem]">{description.title}</h2>
-              <p className="body-copy mt-3 text-[15px] leading-[1.7] text-ink/65">{description.intro}</p>
-              {description.sections.map((section) => (
-                <div key={section.heading} className="mt-6">
-                  <h3 className="display text-[1.1rem] font-semibold text-ink">{section.heading}</h3>
-                  <ul className="mt-2.5 list-disc space-y-1.5 pl-5 marker:text-ink/35">
-                    {section.items.map((item) => (
-                      <li key={item.label || item.text} className="body-copy text-[15px] leading-[1.6] text-ink/65">
-                        {item.label ? <b className="font-semibold text-ink/85">{item.label}: </b> : null}
-                        {item.text}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="pb-10 pt-1">
+              <div className="max-w-3xl">
+                <h2 className="display text-[1.5rem] font-semibold leading-tight text-ink sm:text-[1.8rem]">{description.title}</h2>
+                <p className="body-copy mt-3 text-[15px] leading-[1.7] text-ink/65">{description.intro}</p>
+              </div>
+              {description.sections.map((section) => {
+                const SectionIcon = sectionIcon(section.heading);
+                return (
+                  <div key={section.heading} className="mt-8">
+                    <div className="flex items-center gap-3">
+                      <SectionIcon size={18} className="shrink-0 text-brand" aria-hidden />
+                      <h3 className="display text-[1.05rem] font-semibold uppercase tracking-[0.06em] text-ink">{section.heading}</h3>
+                      <span className="h-px flex-1 bg-ink/10" aria-hidden />
+                    </div>
+                    <ul className="mt-4 grid gap-3 md:grid-cols-2">
+                      {section.items.map((item) => {
+                        const Icon = itemIcon(item, section.heading);
+                        return (
+                          <li
+                            key={item.label || item.text}
+                            className="flex items-start gap-4 rounded-xl border border-ink/8 bg-[#faf8f5] p-4"
+                          >
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-brand">
+                              <Icon size={18} aria-hidden />
+                            </span>
+                            <span className="body-copy min-w-0 text-[14.5px] leading-[1.6] text-ink/65">
+                              {item.label ? <b className="block text-[13px] font-bold uppercase tracking-[0.08em] text-ink">{item.label}</b> : null}
+                              {item.text}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -78,7 +78,7 @@ export default function ShopBySize() {
             {/* Phones and tablets: the shared length as one line above the cards. */}
             {c.length ? (
               <p className="flex items-center gap-2.5 text-[13px] font-semibold text-ink/70 lg:hidden">
-                <span className="border border-brand bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+                <span className="bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
                   Length
                 </span>
                 {c.length}
@@ -88,10 +88,10 @@ export default function ShopBySize() {
             {/* Desktop: rows are shared (subgrid) so the length rule lines up with the pictures. */}
             <div className="@container mt-5 grid grid-cols-2 gap-3 [--card:calc((100cqw_-_12px)/2)] [--pic:calc(var(--card)*4/3)] sm:gap-4 sm:[--card:calc((100cqw_-_16px)/2)] lg:mt-0 lg:grid-cols-[104px_repeat(4,minmax(0,1fr))] lg:gap-x-5 lg:gap-y-0 lg:[--card:calc((100cqw_-_184px)/4)] lg:[--pic:max(200px,min(calc(var(--card)*4/3),calc(84svh_-_260px)))]">
               <LengthRule value={c.length} />
-              <WidthKey plain={plain} />
               {items.map((size, idx) => (
                 <SizeCard key={`${idx}-${size.name}`} size={size} plain={plain} />
               ))}
+              <WidthRule />
             </div>
 
           </div>
@@ -187,7 +187,7 @@ function LengthRule({ value }) {
         <span className="h-px w-3 bg-ink/40" />
       </div>
       <div className="absolute inset-y-0 left-0 right-7 flex flex-col items-center justify-center gap-2 text-center">
-        <span className="border border-brand bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+        <span className="bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
           Length
         </span>
         <span className="text-[12.5px] font-bold leading-relaxed tabular-nums text-ink">
@@ -200,20 +200,17 @@ function LengthRule({ value }) {
   );
 }
 
-/** Desktop only — sits in the width row, beside the first card's width tag. */
-function WidthKey({ plain }) {
+/** Desktop only — the WIDTH tag sits centred under the four cards (like LENGTH sits centred on the left), on a rule with end ticks. */
+function WidthRule() {
   return (
-    <div className="hidden pt-1 lg:col-start-1 lg:row-start-3 lg:block">
-      <div
-        className={`flex h-[27px] items-center gap-1.5 transition-transform duration-500 ease-out ${
-          plain ? "translate-y-[calc(var(--pic)*-0.075)]" : ""
-        }`}
-      >
-        <span className="border border-brand bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+    <div className="hidden lg:col-start-2 lg:col-span-4 lg:row-start-4 lg:block lg:pt-4">
+      <div className="relative flex h-6 items-center justify-center">
+        <span aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-ink/30" />
+        <span aria-hidden className="absolute left-0 top-1/2 h-3.5 w-px -translate-y-1/2 bg-ink/40" />
+        <span aria-hidden className="absolute right-0 top-1/2 h-3.5 w-px -translate-y-1/2 bg-ink/40" />
+        <span className="relative bg-black px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
           Width
         </span>
-        <span aria-hidden className="h-px flex-1 bg-ink/30" />
-        <span aria-hidden className="h-0 w-0 border-y-[4px] border-l-[6px] border-y-transparent border-l-ink/45" />
       </div>
     </div>
   );
