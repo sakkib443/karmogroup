@@ -603,7 +603,7 @@ const mattress = {
         name: "King Mattress",
         shortName: "King",
         href: "/mattress/king",
-        image: "/products/mattress/king-cover-navy-bedroom-v3.webp",
+        image: "/pages/mattress/divisions/karmo-king-mattress.jpeg", // was /products/mattress/king-cover-navy-bedroom-v3.webp
         imageHover: "/products/mattress/king-hover-navy-showcase.webp",
         alt: "Karmo King floral mattress in a luxury bedroom",
         was: "৳ 11,320",
@@ -623,7 +623,7 @@ const mattress = {
         name: "Prestige Mattress",
         shortName: "Prestige",
         href: "/mattress/prestige",
-        image: "/products/mattress/prestige-cover-luxury-floral.webp",
+        image: "/pages/mattress/divisions/karmo-prestige-mattress.jpeg", // was /products/mattress/prestige-cover-luxury-floral.webp
         imageHover: "/products/mattress/prestige-hover-vintage-damask.webp",
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
@@ -643,7 +643,7 @@ const mattress = {
         name: "Orthopedic Mattress",
         shortName: "Orthopedic",
         href: "/mattress/orthopedic",
-        image: "/products/mattress/orthopedic-cover-luxury-dark-lit.webp",
+        image: "/pages/mattress/divisions/karmo-orthopedic-mattress.jpeg", // was /products/mattress/orthopedic-cover-luxury-dark-lit.webp
         imageHover: "/products/mattress/orthopedic-hover-burgundy-showcase.webp",
         alt: "Karmo Orthopedic mattress in a dark luxury bedroom",
         was: "৳ 14,231",
@@ -663,7 +663,7 @@ const mattress = {
         name: "Imperial Euro Top Mattress",
         shortName: "Imperial Euro Top",
         href: "/mattress/imperial-eurotop",
-        image: "/products/mattress/imperial-cover-aatoi-bed.webp",
+        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress.jpeg", // was /products/mattress/imperial-cover-aatoi-bed.webp
         imageHover: "/products/mattress/imperial-hover-navy-studio.webp",
         alt: "Karmo Imperial Euro Top mattress on a curved boucle bed",
         was: "৳ 19,406",
@@ -683,7 +683,7 @@ const mattress = {
         name: "Bonnell Spring Mattress",
         shortName: "Bonnell Spring",
         href: "/mattress/bonnell-spring",
-        image: "/products/mattress/bonnell-cover-aatoi-green.webp",
+        image: "/pages/mattress/divisions/karmo-bonnell-spring-mattress.jpeg", // was /products/mattress/bonnell-cover-aatoi-green.webp
         imageHover: "/products/mattress/bonnell-hover-red-showcase.webp",
         alt: "Karmo Bonnell Spring mattress on a cream boucle bed",
         was: "৳ 23,675",
@@ -703,7 +703,7 @@ const mattress = {
         name: "Pillow Top Pocket Spring Mattress",
         shortName: "Pillow Top Pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        image: "/products/mattress/pillowtop-cover-aatoi-side.webp",
+        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress.jpeg", // was /products/mattress/pillowtop-cover-aatoi-side.webp
         imageHover: "/products/mattress/pillowtop-hover-leaf-display.webp",
         alt: "Karmo Pillow Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 52,396",
@@ -723,7 +723,7 @@ const mattress = {
         name: "Euro Top Pocket Spring Mattress",
         shortName: "Euro Top Pocket",
         href: "/mattress/euro-top-pocket-spring",
-        image: "/products/mattress/eurotop-cover-luxury-kingstyle.webp",
+        image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress.jpeg", // was /products/mattress/eurotop-cover-luxury-kingstyle.webp
         imageHover: "/products/mattress/eurotop-hover-quilted-studio.webp",
         alt: "Karmo Euro Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 48,515",
@@ -743,7 +743,7 @@ const mattress = {
         name: "Mattress Topper",
         shortName: "Topper",
         href: "/mattress/topper",
-        image: "/products/mattress/topper-cover-on-bed-folded.webp",
+        image: "/pages/mattress/divisions/karmo-mattress-topper.jpeg", // was /products/mattress/topper-cover-on-bed-folded.webp
         imageHover: "/products/mattress/topper-hover-elegant-bedroom.webp",
         alt: "Karmo mattress topper on the bed, with a folded topper beside",
         was: "৳ 5,821",
