@@ -27,6 +27,7 @@ import DivisionImagePair from "@/components/karmo/division/DivisionImagePair";
 import MattressLayers from "@/components/karmo/division/MattressLayers";
 import FurnitureBrands from "@/components/karmo/division/FurnitureBrands";
 import FurnitureGradesLineup from "@/components/karmo/division/FurnitureGradesLineup";
+import QuadMosaic from "@/components/karmo/division/QuadMosaic";
 import FoamFloorOverlay from "@/components/karmo/division/FoamFloorOverlay";
 import FoamGradesAccordion from "@/components/karmo/division/FoamGradesAccordion";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
@@ -123,9 +124,11 @@ export default function DivisionPage({ data }) {
   return (
     <>
       {data.bedAutomotiveHero && <BedAutomotiveHero />}
+      {/* A page may lift its lounge band (full-width photo + heading) to the top as the hero. */}
+      {data.lounge?.asHero && <DivisionAbout {...data.lounge} />}
       {data.videoHero && <DivisionVideoHero {...data.videoHero} />}
       {!data.banner?.hidden && <DivisionBanner {...data.banner} />}
-      {data.about?.asHero && !data.bedAutomotiveHero && !data.videoHero && (
+      {data.about?.asHero && !data.bedAutomotiveHero && !data.videoHero && !data.lounge?.asHero && (
         <DivisionAbout {...data.about} />
       )}
       {data.useHomeTrustStrip ? (
@@ -133,6 +136,7 @@ export default function DivisionPage({ data }) {
       ) : (
         <DivisionFeatures items={data.features} />
       )}
+      {data.quadMosaic && <QuadMosaic {...data.quadMosaic} />}
       {data.furnitureBrands && <FurnitureBrands {...data.furnitureBrands} />}
       {data.furnitureGrades?.accordion && <FoamGradesAccordion />}
       {data.furnitureGrades && !data.furnitureGrades.accordion && (
@@ -165,7 +169,7 @@ export default function DivisionPage({ data }) {
         ))}
       {data.footwearEndureBand && <FootwearEndureBand />}
       {data.explore && <ExploreSplit {...data.explore} />}
-      {data.lounge &&
+      {data.lounge && !data.lounge.asHero &&
         (data.lounge.floorStage ? (
           <div className="relative">
             <DivisionAbout {...data.lounge} />

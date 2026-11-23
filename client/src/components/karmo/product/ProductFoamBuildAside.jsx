@@ -41,7 +41,7 @@ export default function ProductFoamBuildAside() {
     <section className="relative overflow-hidden border-y border-ink/8 bg-white py-14 lg:py-20" aria-label="Inside every Karmo foam grade">
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/products/foam/foam-texture-bg.webp"
+          src="/products/foam/foam-pore-texture.webp"
           alt=""
           fill
           sizes="100vw"

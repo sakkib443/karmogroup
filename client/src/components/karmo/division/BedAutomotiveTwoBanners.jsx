@@ -28,6 +28,8 @@ export default function BedAutomotiveTwoBanners({
   rightImage = "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.webp",
   rightAlt = "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
   rightOverlay = false,
+  rightPosition = "object-center",
+  rowClass = "md:h-[min(49svh,535px)]",
 }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
@@ -39,7 +41,7 @@ export default function BedAutomotiveTwoBanners({
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className="grid w-full grid-cols-1 gap-[6px] md:h-[min(49svh,535px)] md:grid-cols-2"
+          className={`grid w-full grid-cols-1 gap-[6px] md:grid-cols-2 ${rowClass}`}
         >
           {/* Left Banner: Spotlight (Man on cloud / designed to endure) */}
           <motion.article
@@ -52,7 +54,7 @@ export default function BedAutomotiveTwoBanners({
                 alt={spotlight.alt || ""}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover object-[center_40%] transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                className={`object-cover ${spotlight.position || "object-[center_40%]"} transition-transform duration-700 ease-out group-hover:scale-[1.02]`}
                 priority={false}
               />
             ) : null}
@@ -64,6 +66,7 @@ export default function BedAutomotiveTwoBanners({
               />
             ) : null}
 
+            {spotlight?.headingLead ? (
             <div className="relative z-[1] flex h-full items-center justify-end px-6 py-6 sm:px-8 lg:px-10">
               <div className="max-w-[16rem] text-right sm:max-w-[18rem] lg:max-w-[20rem]">
                 <h3 className="display section-heading title-card-line uppercase text-white">
@@ -87,6 +90,7 @@ export default function BedAutomotiveTwoBanners({
                 ) : null}
               </div>
             </div>
+            ) : null}
           </motion.article>
 
           {/* Right Banner: showcase image (was the brand film) */}
@@ -100,7 +104,7 @@ export default function BedAutomotiveTwoBanners({
                 alt={rightAlt}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+                className={`object-cover ${rightPosition} transition-transform duration-700 ease-out group-hover:scale-[1.02]`}
               />
             ) : null}
 

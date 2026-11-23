@@ -151,12 +151,17 @@ export const fabricOptions = [
  * also in the gallery). Every mattress but the topper. A swatch with no render of its
  * own (Alpona, Green-Leaf) goes back to the product's cover.
  */
-const FABRIC_RENDERS = {
-  "red-wf": "/products/mattress/d-03.webp",
-  "l-white": "/products/mattress/d-04.webp",
-  "blue-3": "/products/mattress/d-08.webp",
-  "yellow-rose": "/products/mattress/d-07.webp",
-};
+const OLD_FABRIC_RENDERS = [
+  "/products/mattress/d-03.webp",
+  "/products/mattress/d-04.webp",
+  "/products/mattress/d-08.webp",
+  "/products/mattress/d-07.webp",
+];
+/** Each of the 13 swatches opens its own bedroom photo in that cloth (client, 24 Nov 2026).
+    1100px WebP, about 120 KB each, preloaded on the page so a click swaps at once. */
+const FABRIC_RENDERS = Object.fromEntries(
+  fabricOptions.map((f) => [f.id, `/products/mattress/fabric-scenes/${f.id}.webp`])
+);
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
 export const sizePresets = sizePresetsFor("euro-top-pocket-spring");
@@ -198,9 +203,20 @@ export const KARMO_LETTER_GALLERY = ["K", "A", "R", "M", "O"].map(
   (letter) => `/products/mattress/karmo-letters/letter-${letter}.webp`
 );
 
+/** Per-product K-A-R-M-O strips — the letters on a mattress in that product's own fabric. */
+const lettersIn = (folder) =>
+  ["K", "A", "R", "M", "O"].map(
+    (letter) => `/products/mattress/karmo-letters/${folder}/letter-${letter}.webp`
+  );
+const LETTERS_BY_ID = {
+  "euro-top-pocket-spring": lettersIn("eurotop"),
+  "bonnell-spring": lettersIn("bonnell"),
+  "pillow-top-pocket-spring": lettersIn("pillowtop"),
+};
+
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/products/mattress/king-cover-navy-bedroom-v3.webp",
+  "/products/mattress/king-cover-blue-floral-v4.webp",
   "/products/mattress/king-gallery/angle-front-v4.webp",
   "/products/mattress/king-gallery/angle-side-v4.webp",
   "/products/mattress/king-gallery/angle-detail-v4.webp",
@@ -215,7 +231,7 @@ const REAL_BY_ID = {
 export const SHARED_DETAIL_SHOTS = Array.from(
   { length: 9 },
   (_, i) => `/products/mattress/d-${String(i + 1).padStart(2, "0")}.webp`
-).filter((src) => !Object.values(FABRIC_RENDERS).includes(src));
+).filter((src) => !OLD_FABRIC_RENDERS.includes(src));
 
 export function getMattressProductSlugs() {
   return catalog.map((p) => p.id);
@@ -234,7 +250,7 @@ function toDetail(item) {
   const price = parseTaka(item.now);
   const mrp = parseTaka(item.was) || price;
   const realGallery = buildRealGallery(item);
-  const letterGallery = KARMO_LETTER_GALLERY;
+  const letterGallery = LETTERS_BY_ID[item.id] || KARMO_LETTER_GALLERY;
   /* PDP opens on the catalogue thumbnail (first real gallery shot). */
   const cover = item.image || realGallery[0] || letterGallery[0];
 

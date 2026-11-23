@@ -220,6 +220,19 @@ export default function ProductHero({ product }) {
   );
   const [qty, setQty] = useState(1);
 
+  /* Warm the browser cache with every fabric photo so a swatch click shows at once. */
+  useEffect(() => {
+    const scenes = [...new Set((product.fabrics || []).map((f) => f.scene).filter(Boolean))];
+    const t = setTimeout(() => {
+      scenes.forEach((src) => {
+        const img = new window.Image();
+        img.decoding = "async";
+        img.src = src;
+      });
+    }, 400);
+    return () => clearTimeout(t);
+  }, [product.fabrics]);
+
   useEffect(() => {
     const next = product.sizes?.find((s) => s.id === "queen") || product.sizes?.[0];
     const nextCover = product.cover || product.realGallery?.[0] || cover;
@@ -398,15 +411,8 @@ export default function ProductHero({ product }) {
                   >
                   <div className="relative overflow-hidden bg-[#f3f1ec]">
                   <div className="relative w-full" style={{ paddingTop: "100%" }}>
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={mainSrc}
-                        initial={reduce ? false : { opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={reduce ? undefined : { opacity: 0 }}
-                        transition={{ duration: 0.28 }}
-                        className="absolute inset-0"
-                      >
+                    {/* Instant swap — no fade out / fade in (client, 24 Nov 2026). */}
+                      <div className="absolute inset-0">
                         {product.film && mainSrc === product.film.src ? (
                           <LazyVideo
                             src={product.film.src}
@@ -427,11 +433,12 @@ export default function ProductHero({ product }) {
                             priority
                             quality={90}
                             sizes="(min-width: 1024px) 48vw, 100vw"
-                            className="object-contain object-center scale-[1.12]"
+                            className={`object-contain object-center ${
+                              letterGallery.includes(mainSrc) ? "" : "scale-[1.12]"
+                            }`}
                           />
                         ) : null}
-                      </motion.div>
-                    </AnimatePresence>
+                      </div>
                   </div>
                   </div>
 

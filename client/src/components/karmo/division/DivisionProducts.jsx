@@ -385,7 +385,7 @@ function MattressCatalogueCard({ item }) {
           alt={item.alt || item.name}
           fill
           sizes="(min-width: 1024px) 33vw, 50vw"
-          className={`object-cover object-center scale-[1.08] transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.1] ${
+          className={`object-cover object-center scale-[1.16] transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.18] ${
             hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
           }`}
         />
@@ -396,6 +396,7 @@ function MattressCatalogueCard({ item }) {
             fill
             sizes="(min-width: 1024px) 33vw, 50vw"
             aria-hidden
+            style={item.hoverZoom ? { transform: `scale(${item.hoverZoom})` } : undefined}
             className="object-cover object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
           />
         ) : null}

@@ -69,7 +69,8 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
         "Superior rebound and firm airflow so cushions recover quickly and stay comfortable.",
     },
   ],
-  spotlight: {
+  /* Old left banner, replaced 24 Nov 2026 — kept, unused, for a quick restore. */
+  oldSpotlight: {
     image: "/pages/foam/banner-01.webp",
     alt: "A calm living room with deep foam sofa seating",
     /* Light scrim so the dark heading stays readable against the bright sky —
@@ -98,6 +99,18 @@ const BED_AUTOMOTIVE_SHAPEGRID = {
   ],
   /* Right banner is now a still showcase image (the brand film was dropped at
      the client's ask) — the two banners share the width 50/50. */
+  /* Left: the auto-rickshaw under the lens (client, 24 Nov 2026) — replaces the
+     "Designed to endure" spotlight. Row is about 1.5 : 1 per cell so the square
+     rickshaw and the wide bed both show whole enough. */
+  spotlight: {
+    image: "/pages/foam/bed-automotive/karmo-tuktuk-under-the-lens.webp",
+    alt: "A green Karmo auto-rickshaw under a magnifying glass, revealing the foam in its seats",
+    position: "object-[center_60%]",
+    overlay: false,
+  },
+  rowClass: "md:h-[33vw]",
+  className: "mt-[6px] mb-1.5",
+  rightPosition: "object-[60%_center]",
   rightImage: "/pages/foam/bed-automotive/hospital-bed-foam-branding-showcase.webp",
   rightAlt:
     "A Karmo navy mattress on a hospital bed, a magnifying glass revealing the KARMO foam inside",
@@ -109,8 +122,18 @@ export function buildFoamCategoryData(key) {
 
   return {
     ...foam,
-    bedAutomotiveHero:
-      key === "bed-automotive" ? foam.bedAutomotiveHero : null,
+    /* Bed & Automotive: the old hero picture is skipped for now (client, 24 Nov 2026) —
+       the chair band ("Premium Automotive Foam") moves up and is the hero instead. */
+    bedAutomotiveHero: null,
+    /* After the icon strip: four pictures 2 × 2 whose quarters form one "রয়েছে কারমো" badge. */
+    quadMosaic: key === "bed-automotive" ? {
+      items: [
+        { src: "/pages/foam/bed-automotive/mosaic/tl-tuktuk.webp", alt: "Karmo foam in an auto-rickshaw seat, under a magnifying glass" },
+        { src: "/pages/foam/bed-automotive/mosaic/tr-sofa.webp", alt: "Karmo HD foam slabs beside a teal sofa" },
+        { src: "/pages/foam/bed-automotive/mosaic/bl-bag.webp", alt: "Karmo foam inside a backpack, under a magnifying glass" },
+        { src: "/pages/foam/bed-automotive/mosaic/br-shoe.webp", alt: "A sports shoe with a roll of Karmo foam" },
+      ],
+    } : null,
     // Footwear-only: drop the shared shape-grid feature cards and show just the
     // two "Designed to endure" shoe photos, full-bleed 50/50.
     footwearEndureBand: key === "footwear" ? true : null,
@@ -118,32 +141,10 @@ export function buildFoamCategoryData(key) {
     // "Built density by density" zones band.
     zones:
       key === "footwear" || key === "bed-automotive" ? null : foam.zones,
-    recommended: key === "bed-automotive" ? {
-      heading: "Why choose Karmo Bed & Automotive Foam",
-      uncropped: true,
-      imageOverlay: true,
-      columns: [
-        {
-          id: "sleep",
-          image: "/pages/foam/bed-automotive/why-sleep-landscape-v2.webp",
-          alt: "A woman resting comfortably on a bed in a naturally lit bedroom",
-          caption: "Comfort that supports restful sleep",
-        },
-        {
-          id: "journey",
-          image: "/pages/foam/bed-automotive/why-journey-landscape-v2.webp",
-          alt: "A passenger relaxing in a cushioned bus seat beside a coastal view",
-          caption: "Comfort that travels with you",
-        },
-        {
-          id: "support",
-          image: "/pages/foam/bed-automotive/karmo-tuktuk-under-the-lens.webp",
-          alt: "A green Karmo auto-rickshaw under a magnifying glass, revealing the foam in its seats",
-          caption: "Support for beds and beyond",
-          fit: "object-cover",
-        },
-      ],
-    } : foam.recommended,
+    /* Bed & Automotive: "Why choose" band removed (client, 24 Nov 2026); its auto-rickshaw
+       auto-rickshaw picture now fills the left of the two banners below, beside the hospital bed. */
+    recommended: key === "bed-automotive" ? null : foam.recommended,
+
     shapeGrid:
       key === "footwear"
         ? { hidden: true }
@@ -154,6 +155,7 @@ export function buildFoamCategoryData(key) {
       key === "bed-automotive" ? "bed-automotive-legacy" : foam.shapeGridVariant,
     lounge: key === "bed-automotive" ? {
       ...foam.lounge,
+      asHero: true,
       image: {
         ...foam.lounge.image,
         src: "/pages/foam/bed-automotive/executive-office-karmo-leather-chair.webp",

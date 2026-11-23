@@ -65,7 +65,7 @@ export default function FoamHero({ product }) {
   const cover = product.cover || realGallery[0];
   const catalogue = product.catalogue;
   const ref = (product.sizes || []).find((s) => s.id === "queen") || (product.sizes || [])[0];
-  const textureSrc = product.textureSrc || "/products/foam/foam-texture-bg.webp";
+  const textureSrc = product.textureSrc || "/products/foam/foam-pore-texture.webp";
   const buyboxIcons = product.buyboxIcons || [];
 
   const [mainSrc, setMainSrc] = useState(cover);

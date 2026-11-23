@@ -63,7 +63,7 @@ export default function ProductFoamFeatureSlides() {
     >
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
         <Image
-          src="/products/foam/foam-texture-bg.webp"
+          src="/products/foam/foam-pore-texture.webp"
           alt=""
           fill
           sizes="100vw"

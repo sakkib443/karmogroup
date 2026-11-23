@@ -7,7 +7,8 @@
  * leaf rule, body) and photo titles set on the photo like ExploreSplit.
  */
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import {
   LuArmchair,
   LuArrowDownToLine,
@@ -23,6 +24,7 @@ import {
 } from "react-icons/lu";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import FoamFeatureTriplet from "@/components/karmo/product/foam/FoamFeatureTriplet";
 
 /* Same band height and gutter as the homepage. */
 const BAND_H = "lg:h-[calc(100svh-32px)]";
@@ -89,19 +91,71 @@ const MEASURE_ICON = {
 const iconFor = (label) =>
   MEASURE_ICON[label] || MEASURE_ICON[String(label).split(" ")[0]] || LuRuler;
 
-/* Measures as solid dark tiles (the homepage's navy): icon, label, a big value. */
-function Rows({ rows }) {
+/* Counts the first number in a value up from 0 (like the homepage counters), keeping
+   the rest — "25 (±) kg/m³", "58.5 lbs", "111%". Values with no number show as they are. */
+function CountValue({ value, inView, delay = 0 }) {
+  const ref = useRef(null);
+  const reduce = useReducedMotion();
+  const text = String(value ?? "");
+  const m = text.match(/\d+(?:\.\d+)?/);
+  const target = m ? Number(m[0]) : 0;
+  const decimals = m && m[0].includes(".") ? m[0].split(".")[1].length : 0;
+  const before = m ? text.slice(0, m.index) : text;
+  const after = m ? text.slice(m.index + m[0].length) : "";
+
+  useEffect(() => {
+    if (!m || !ref.current) return;
+    if (reduce) {
+      ref.current.textContent = target.toFixed(decimals);
+      return;
+    }
+    if (!inView) return;
+    const controls = animate(0, target, {
+      duration: 1.8,
+      delay,
+      ease: [0.25, 0.6, 0.3, 1],
+      onUpdate: (v) => {
+        if (ref.current) ref.current.textContent = v.toFixed(decimals);
+      },
+    });
+    return () => controls.stop();
+  }, [inView, target, decimals, delay, reduce, m]);
+
+  if (!m) return <>{text}</>;
   return (
-    <dl className="mt-8 grid max-w-2xl grid-cols-2 gap-1.5 sm:grid-cols-3">
-      {rows.map(([label, value]) => {
+    <>
+      {before}
+      <span className="relative inline-grid">
+        <span aria-hidden className="invisible col-start-1 row-start-1">{target.toFixed(decimals)}</span>
+        <span ref={ref} className="col-start-1 row-start-1 text-left">{(0).toFixed(decimals)}</span>
+      </span>
+      {after}
+    </>
+  );
+}
+
+/* Measures as see-through glass tiles over the photo (the homepage counters' look):
+   icon, label, a big value that counts up when the tiles come into view. */
+function Rows({ rows }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.3 });
+  return (
+    <dl ref={ref} className="mt-8 grid max-w-2xl grid-cols-2 gap-1.5 sm:grid-cols-3">
+      {rows.map(([label, value], i) => {
         const Icon = iconFor(label);
         return (
-          <div key={label} className="flex flex-col bg-[#0b1a33] px-4 py-4 sm:px-5 sm:py-5">
+          <div
+            key={label}
+            className="relative flex flex-col overflow-hidden rounded-xl border border-white/20 bg-gradient-to-b from-[#0b1a33]/85 to-[#0b1a33]/70 px-4 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-[3px] sm:px-5 sm:py-5"
+          >
+            <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white">
               <Icon size={20} aria-hidden />
             </span>
-            <dt className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">{label}</dt>
-            <dd className="display mt-1 text-[1.25rem] font-bold leading-tight tabular-nums text-white sm:text-[1.4rem]">{value}</dd>
+            <dt className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/75">{label}</dt>
+            <dd className="display mt-1 whitespace-nowrap text-[1.25rem] font-bold leading-tight tabular-nums text-white sm:text-[1.4rem]">
+              <CountValue value={value} inView={inView} delay={0.25 + i * 0.08} />
+            </dd>
           </div>
         );
       })}
@@ -120,11 +174,15 @@ function KnowYourFoam({ product }) {
   return (
     <section className={`mb-[6px] grid bg-white lg:grid-cols-2 ${BAND_H}`} aria-label="Know your foam">
       <div className="relative aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-full">
-        <Image src="/pages/foam/detail/know-your-foam.webp" alt={`Inside ${product.name}`} fill unoptimized sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+        {/* The KARMO POLY stack from the foam-furniture hero (its second slide). */}
+        <Image src="/pages/foam/furniture/hero/embossed-karmo-poly-stack-hero.webp" alt={`Inside ${product.name}`} fill unoptimized sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover object-center" />
+        {/* Darker, moodier left photo (client, 24 Nov 2026). */}
+        <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/30 to-black/45" />
       </div>
       <motion.div {...reveal} className={`relative flex items-center overflow-hidden px-6 py-14 md:px-14 lg:py-10 lg:pl-14 xl:pl-20 ${SHELL_R}`}>
         <span className="pointer-events-none absolute inset-0" aria-hidden>
-          <Image src="/products/foam/foam-texture-bg.webp" alt="" fill sizes="50vw" className="object-cover opacity-[0.45]" />
+          {/* White, with only a soft foam texture behind (client, 24 Nov 2026). */}
+          <Image src="/products/foam/foam-pore-texture.webp" alt="" fill sizes="50vw" className="object-cover opacity-[0.45]" />
           <span className="absolute inset-0 bg-white/50" />
         </span>
         <motion.div variants={fade} className="relative z-[1] w-full">
@@ -236,6 +294,7 @@ export default function FoamDetailSections({ product }) {
   return (
     <>
       <KnowYourFoam product={product} />
+      <FoamFeatureTriplet />
       <MadeToFit catalogue={c} />
       <BuiltToLast catalogue={c} />
     </>

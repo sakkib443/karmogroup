@@ -260,7 +260,7 @@ function toDetail(item) {
     features: foamProductFeatures,
     imageAlt: item.alt,
     buyboxIcons: FOAM_BUYBOX_ICONS,
-    textureSrc: "/products/foam/foam-texture-bg.webp",
+    textureSrc: "/products/foam/foam-pore-texture.webp",
     pricingFamily: "foam",
   };
 }

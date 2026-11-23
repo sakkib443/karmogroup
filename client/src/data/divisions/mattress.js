@@ -623,7 +623,7 @@ const mattress = {
         name: "Prestige Mattress",
         shortName: "Prestige",
         href: "/mattress/prestige",
-        image: "/pages/mattress/divisions/karmo-prestige-mattress.jpeg", // was /products/mattress/prestige-cover-luxury-floral.webp
+        image: "/pages/mattress/divisions/karmo-prestige-mattress-v2.webp", // was /products/mattress/prestige-cover-luxury-floral.webp
         imageHover: "/products/mattress/prestige-hover-vintage-damask.webp",
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
@@ -724,7 +724,8 @@ const mattress = {
         shortName: "Euro Top Pocket",
         href: "/mattress/euro-top-pocket-spring",
         image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress.jpeg", // was /products/mattress/eurotop-cover-luxury-kingstyle.webp
-        imageHover: "/products/mattress/eurotop-hover-quilted-studio.webp",
+        imageHover: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-hover.webp",
+        hoverZoom: 1.25,
         alt: "Karmo Euro Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 48,515",
         now: "৳ 41,238",
