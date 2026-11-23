@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -10,40 +10,19 @@ import LazyVideo from "@/components/karmo/LazyVideo";
 /**
  * Comfort — one Karmo mattress, three ways to rest. Three equal parts side by side:
  *   left   — a hand pressing the cloth (fixed clip, the same on every mattress page)
- *   middle — the three sleeper photos, changing one after another for as long as the page is open
+ *   middle — the ball-drop clip (fixed, the same on every mattress page)
  *   right  — the Tanzin Tisha model film (fixed, the same on every mattress page)
  * A short title strip sits above. Stacks on phones.
  */
 
-const EASE = [0.33, 1, 0.68, 1];
-const FIRST_HOLD_MS = 80;
-const HOLD_MS = 2000;
-const FADE_S = 0.18;
-
-const SLIDES = [
-  {
-    id: "pose-01",
-    name: "Side sleep",
-    src: "/products/common/lifestyle/karmo-comfort-v3-pose-01.webp",
-    alt: "Side sleep on a Karmo mattress — young woman at rest",
-  },
-  {
-    id: "pose-02",
-    name: "Back sleep",
-    src: "/products/common/lifestyle/karmo-comfort-v3-pose-02d.webp",
-    alt: "Back sleep on the same Karmo mattress — young man at rest",
-  },
-  {
-    id: "pose-03",
-    name: "Pillow hug",
-    src: "/products/common/lifestyle/karmo-comfort-v3-pose-03.webp",
-    alt: "Stomach sleep on the same Karmo mattress — mature sleeper",
-  },
-];
+/* Middle part: ball-drop clip (client, 23 Nov 2026). It replaced the three rotating sleeper
+   photos: /products/common/lifestyle/karmo-comfort-v3-pose-01.webp, -pose-02d.webp, -pose-03.webp */
+const BALL = { src: "/pages/mattress/ball.mp4", label: "Ball drop" };
 
 /* Right part: the whole mattress TVC (62 s) for now, so the client can pick the parts to keep.
    The running time is shown on it as a review aid — remove with the TIME lines once decided. */
-const MODEL = { src: "/shared/videos/tvc-mattress.mp4", label: "Tanzin Tisha" };
+/* Swapped to the new mattress clip (client, 23 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4 */
+const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Tanzin Tisha" };
 
 /* One screen under the 112px header, plus a little (40px more), on every mattress page. */
 const PART = "group relative aspect-[4/5] overflow-hidden sm:aspect-auto sm:h-[calc(100svh-72px)]";
@@ -58,41 +37,6 @@ export default function ProductFeatureSlides({ product }) {
   const press = product?.insideClips?.press || { src: "/products/videos/inside/press-for-king.mp4", label: "Soft to the touch" };
 
   const [clock, setClock] = useState(0); // TIME: review aid
-  const midRef = useRef(null);
-  const firstSwapDone = useRef(false);
-  const [index, setIndex] = useState(0);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    const el = midRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return undefined;
-    }
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const visible = Boolean(entry?.isIntersecting);
-        setInView(visible);
-        if (visible) {
-          firstSwapDone.current = false;
-          setIndex(0);
-        }
-      },
-      { threshold: 0.2 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion || !inView) return undefined;
-    const delay = firstSwapDone.current ? HOLD_MS : FIRST_HOLD_MS;
-    const id = window.setTimeout(() => {
-      firstSwapDone.current = true;
-      setIndex((i) => (i + 1) % SLIDES.length);
-    }, delay);
-    return () => window.clearTimeout(id);
-  }, [reduceMotion, inView, index]);
 
   return (
     <section className="relative my-1.5 bg-[#f7f3ee]" aria-label="Comfort on a Karmo mattress">
@@ -142,39 +86,24 @@ export default function ProductFeatureSlides({ product }) {
           </div>
         </motion.div>
 
-        {/* Middle: the three sleepers, changing all the time. */}
-        <motion.div variants={fade} ref={midRef} className={`${PART} bg-[#ebe7e1]`}>
-          {SLIDES.map((slide, i) => {
-            const on = i === index;
-            return (
-              <motion.div
-                key={slide.id}
-                initial={false}
-                animate={{ opacity: on ? 1 : 0 }}
-                transition={{ duration: reduceMotion ? 0 : FADE_S, ease: EASE }}
-                className={`absolute inset-0 ${on ? "z-[1]" : "pointer-events-none z-0"}`}
-                aria-hidden={!on}
-              >
-                <Image
-                  src={slide.src}
-                  alt={on ? slide.alt : ""}
-                  fill
-                  sizes="(min-width: 640px) 33vw, 100vw"
-                  quality={82}
-                  className="object-cover object-[center_42%]"
-                />
-              </motion.div>
-            );
-          })}
-          <span aria-hidden className={`${SHADE} z-[2]`} />
-          <div className={`${BAR} z-[3]`}>
+        {/* Middle: ball-drop clip — fixed. */}
+        <motion.div variants={fade} className={`${PART} bg-ink`}>
+          <LazyVideo
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label={BALL.label}
+          >
+            <source src={BALL.src} type="video/mp4" />
+          </LazyVideo>
+          <span aria-hidden className={SHADE} />
+          <div className={BAR}>
             <span className={NUM}>02</span>
-            <span className={NAME}>{SLIDES[index].name}</span>
-            <span className="ml-auto flex gap-1.5" aria-hidden>
-              {SLIDES.map((s, i) => (
-                <span key={s.id} className={`h-px transition-all duration-500 ${i === index ? "w-8 bg-white" : "w-3 bg-white/40"}`} />
-              ))}
-            </span>
+            <span className={NAME}>{BALL.label}</span>
+            <span className="ml-auto h-px w-10 bg-white/70" />
           </div>
         </motion.div>
 
