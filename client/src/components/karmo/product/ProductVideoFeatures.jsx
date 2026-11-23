@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Two feature bands — editorial split (media + copy), moderate height.
@@ -37,7 +38,7 @@ export default function ProductVideoFeatures({ features = [] }) {
                 variants={fade}
                 className="group relative min-h-[min(36svh,280px)] overflow-hidden bg-ink lg:min-h-0"
               >
-                <video
+                <LazyVideo
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
                   autoPlay
                   muted
@@ -48,7 +49,7 @@ export default function ProductVideoFeatures({ features = [] }) {
                   aria-hidden
                 >
                   <source src={feat.video} type="video/mp4" />
-                </video>
+                </LazyVideo>
               </motion.div>
 
               <motion.div

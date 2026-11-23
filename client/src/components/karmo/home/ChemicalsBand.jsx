@@ -8,6 +8,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { imageStyle, overlayStyle } from "@/cms/core";
 import { chemicals } from "@/cms/pages/home";
+import ChemicalCounters from "@/components/karmo/home/ChemicalCounters";
 
 /**
  * Chemicals band — sits under Iconic brands (DivisionEditorials).
@@ -111,10 +112,7 @@ export default function ChemicalsBand() {
           ) : null}
         </motion.aside>
 
-        <div
-          className="relative order-1 min-h-[min(36svh,300px)] lg:order-2 lg:min-h-0"
-          aria-hidden
-        />
+        <ChemicalCounters />
       </motion.div>
     </section>
   );

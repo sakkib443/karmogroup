@@ -10,6 +10,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { imageStyle, overlayStyle } from "@/cms/core";
 import { explore } from "@/cms/pages/home";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Home Two — three-image explore gallery.
@@ -66,9 +67,9 @@ const FLAGSHIP_SHOTS = [
   },
   {
     id: "sunlit",
-    src: "/pages/foam/furniture/hero/foam-sunlit-sofa-v2.webp",
-    alt: "Cream armchair and Karmo foam slabs in a sunlit living room",
-    position: "object-[20%_bottom]",
+    src: "/pages/home/explore/foam-living-room-showcase-v2.webp",
+    alt: "Karmo foam living room showcase",
+    position: "object-bottom",
     tone: "bg-white",
     wash: "bg-gradient-to-l from-shade-deep/28 via-shade-deep/10 to-transparent",
   },
@@ -194,13 +195,13 @@ function VideoPanel({ panel }) {
         />
       )}
       {!reduceMotion && panel.film && (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={panel.film}
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           aria-hidden
           tabIndex={-1}
           className="absolute inset-0 h-full w-full object-cover"

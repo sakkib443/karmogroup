@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import FoamHero from "@/components/karmo/product/foam/FoamHero";
+import ProductDescription from "@/components/karmo/product/ProductDescription";
+import { foamDescription } from "@/components/karmo/product/productDescriptions";
 import FoamCatalogueSheet from "@/components/karmo/product/foam/FoamCatalogueSheet";
 import FoamRelated from "@/components/karmo/product/foam/FoamRelated";
 import ProductPromiseStrip, { FOAM_PROMISES } from "@/components/karmo/product/ProductPromiseStrip";
@@ -42,6 +44,7 @@ export default function FoamProductDetailPage({ product }) {
   return (
     <>
       <FoamHero product={product} />
+      <ProductDescription description={foamDescription(product)} />
       <ProductPromiseStrip items={FOAM_PROMISES} />
       <FoamDetailSections product={product} />
       <ProductFoamFeatureSlides />

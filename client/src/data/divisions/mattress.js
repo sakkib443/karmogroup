@@ -88,9 +88,9 @@ const mattress = {
     },
     {
       id: "delivery",
-      icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
-      title: "Free Delivery",
-      note: "Available",
+      icon: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
+      title: "Fast Delivery",
+      note: "Across Bangladesh",
     },
     {
       id: "stores",
@@ -100,32 +100,8 @@ const mattress = {
     },
   ],
 
-  /* Two pictures side by side, full width — under Our mattress brands, above
-     the film: sleeper positions on the red floral mattress + the sleep-support
-     infographic. (Its place in the page is set in DivisionPage.) */
-  imagePair: {
-    id: "mattress-sleep-support",
-    label: "Karmo mattress support for every sleeping position",
-    /* Half and half. Each cell is 1.15 : 1 — the square photo loses only a
-       strip of wall / rug top and bottom, the wide infographic only its plain
-       sides; every sleeper card, the bed and the icons stay whole. */
-    split: [50, 50],
-    cellAspect: 1.15,
-    images: [
-      {
-        src: "/pages/mattress/bands/sleep-positions-premium-floral.webp",
-        alt: "Karmo red floral mattress in a bedroom — support for side, back and stomach sleepers",
-        width: 1254,
-        height: 1254,
-      },
-      {
-        src: "/pages/mattress/bands/sleep-support-minimal-ad.webp",
-        alt: "Karmo mattress sleep support — side, back and stomach sleepers with breathable comfort, pressure relief, spinal alignment and motion isolation",
-        width: 1915,
-        height: 821,
-      },
-    ],
-  },
+  /* The side-by-side sleep pictures (imagePair) were taken off the page on 22 Nov 2026;
+     the two pictures are kept in karmo-library/05-originals-masters/mattress/unused-but-important/. */
 
   /* Showroom photo with the brand marks — the image pair follows right under
      it, then the film. The copy, link and per-brand `video` fields are only
@@ -133,7 +109,6 @@ const mattress = {
      try that again. */
   brochureBrands: {
     heading: "Our mattress brands",
-    eyebrow: "Karmo",
     eyebrowNote: "Mattress brands",
     titleLine1: "Our mattress",
     titleLine2: "brands",
@@ -142,58 +117,80 @@ const mattress = {
     link: { label: "Find your mattress", href: "#mattress-offers" },
     image: "/pages/mattress/brochure/page-03-brands.webp",
     imageAlt: "Karmo luxury mattress showroom interior",
-    /* One full-width photograph, shown whole at its own proportions. */
-    composed: true,
-    background: "/pages/mattress/bands/mattress-showroom-interior.webp",
-    backgroundAspect: "1774 / 887",
+    /* Bedroom photo, a soft dark shade on its left quarter, words on top and the
+       logos below in two columns (client's ask, 17 Nov). The earlier showroom photo
+       with logos baked in: set composed: true, shaded: false and background back to
+       "/pages/mattress/bands/mattress-showroom-interior.webp" (aspect "1774 / 887"). */
+    shaded: true,
+    eyebrow: "Karmo Mattress",
+    background: "/pages/mattress/bands/mattress-brands-bedroom-bg.webp",
+    backgroundPosition: "0% 65%",
+    /* Picture lifted a little (client's ask): moved up 2.5% of the band, zoomed 5% so no edge shows. */
+    backgroundShiftY: -2.5,
+    backgroundZoom: 1.05,
+    backgroundAspect: "1983 / 793",
     items: [
       {
         id: "imperial",
         href: "/mattress/imperial-eurotop",
-        src: "/pages/mattress/brochure/logos/logo-imperial-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-imperial-v2.webp",
         alt: "Karmo Imperial Mattress",
         video: "/shared/videos/shorts/fb-karmo-mattress-offer.mp4",
       },
       {
         id: "king",
         href: "/mattress/king",
-        src: "/pages/mattress/brochure/logos/logo-king-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-king-v2.webp",
         alt: "Karmo King Mattress",
         video: "/shared/videos/shorts/fb-reel-921228060438784.mp4",
       },
       {
         id: "prestige",
         href: "/mattress/prestige",
-        src: "/pages/mattress/brochure/logos/logo-prestige-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-prestige-v2.webp",
         alt: "Karmo Prestige Mattress",
         video: "/shared/videos/shorts/fb-reel-845505688502810.mp4",
       },
       {
         id: "orthopedic",
         href: "/mattress/orthopedic",
-        src: "/pages/mattress/brochure/logos/logo-orthopedic-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-orthopedic-v2.webp",
         alt: "Karmo Orthopaedic Mattress",
         video: "/shared/videos/shorts/fb-reel-785013297942063.mp4",
       },
       {
         id: "bonnell",
         href: "/mattress/bonnell-spring",
-        src: "/pages/mattress/brochure/logos/logo-bonnell-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-bonnell-v2.webp",
         alt: "Karmo Bonnell Spring Mattress",
         video: "/shared/videos/shorts/fb-reel-747210751746270.mp4",
       },
       {
         id: "natural",
         href: "/mattress",
-        src: "/pages/mattress/brochure/logos/logo-natural-trim.webp",
+        src: "/pages/mattress/brochure/logos/logo-natural-v2.webp",
         alt: "Karmo Natural Mattress",
         video: "/shared/videos/shorts/fb-reel-3242808395880988.mp4",
       },
       {
-        id: "pocket",
+        id: "euro-top-pocket",
+        href: "/mattress/euro-top-pocket-spring",
+        src: "/pages/mattress/brochure/logos/logo-euro-top-pocket-v1.webp",
+        alt: "Karmo Euro Top Pocket Spring Mattress",
+        video: "/shared/videos/shorts/fb-reel-1822025445099889.mp4",
+      },
+      {
+        id: "pillow-top-pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        src: "/pages/mattress/brochure/logos/logo-pocket-trim.webp",
-        alt: "Karmo Pocket Spring Mattress",
+        src: "/pages/mattress/brochure/logos/logo-pillow-top-pocket-v1.webp",
+        alt: "Karmo Pillow Top Pocket Spring Mattress",
+        video: "/shared/videos/shorts/fb-reel-1822025445099889.mp4",
+      },
+      {
+        id: "folding",
+        href: "/mattress#mattress-offers",
+        src: "/pages/mattress/brochure/logos/logo-folding-v1.webp",
+        alt: "Karmo Folding Mattress",
         video: "/shared/videos/shorts/fb-reel-1822025445099889.mp4",
         wide: true,
       },
@@ -318,6 +315,8 @@ const mattress = {
 
   /* Sleep Well film — own full-viewport stage, under Inside every Karmo. */
   mattressFilm: {
+    /* Shown right under the products section (client, 22 Nov 2026). */
+    afterProducts: true,
     /* "Mattress 5" film — 1080p, no audio (plays muted), web-compressed. */
     src: "/shared/videos/mattress-film-5.mp4",
     still: "/products/mattress/bands/mattress-film-5-still.webp",
@@ -336,6 +335,8 @@ const mattress = {
        callouts on the photo and the homepage mattress-edge strip underneath.
        Only the mattress division uses it; foam keeps the plain rail. */
     layout: "editorial",
+    /* Mattress-side strip under the band — changeable from the page like every picture. */
+    edge: "/pages/home/sizes/mattress-border-profile.webp?v=flush4",
     eyebrow: "Karmo Mattress",
     heading: "Built layer by layer",
     headingLead: "Built layer by",
@@ -431,6 +432,38 @@ const mattress = {
           /* Anchor to the bottom: when the frame crops the photo on a short
              or narrow screen, the top is cut, never the bottom. */
           position: "object-bottom",
+        },
+      },
+      {
+        /* Second slide (22 Nov 2026, FINAL): Summer Comfort Retreat — shown as it is, light shade, no words.
+           Tried before it (in karmo-library/05-originals-masters/mattress): mattress-red-floral-comfort-bedroom,
+           mattress-serene-sleep-floral, mattress-serene-summer-bedroom, mattress-calm-bedroom-comfort,
+           mattress-sunlit-floral-bedroom-petals. */
+        id: "summer-comfort-retreat",
+        align: "center",
+        titleCard: true,
+        titleOverlay:
+          "linear-gradient(to top, rgba(11,21,40,0.32) 0%, rgba(11,21,40,0.18) 50%, rgba(11,21,40,0.14) 100%)",
+        headingLead: "",
+        image: {
+          src: "/pages/mattress/hero/mattress-summer-comfort-retreat.webp",
+          alt: "Karmo mattress summer comfort retreat",
+          width: 1983,
+          height: 793,
+        },
+      },
+      {
+        id: "transformation",
+        /* Off at the client's ask — only the first slide shows. */
+        paused: true,
+        align: "center",
+        titleCard: true,
+        headingLead: "The Karmo Mattress Transformation",
+        image: {
+          src: "/pages/mattress/hero/karmo-style-mattress-transformation.webp",
+          alt: "A tired old bed beside a fresh Karmo mattress in a bright city bedroom",
+          width: 1774,
+          height: 887,
         },
       },
       {
@@ -570,7 +603,7 @@ const mattress = {
         name: "King Mattress",
         shortName: "King",
         href: "/mattress/king",
-        image: "/products/mattress/king-cover-luxury-floral-v2.webp",
+        image: "/pages/mattress/divisions/karmo-king-mattress.jpeg", // was /products/mattress/king-cover-navy-bedroom-v3.webp
         imageHover: "/products/mattress/king-hover-navy-showcase.webp",
         alt: "Karmo King floral mattress in a luxury bedroom",
         was: "৳ 11,320",
@@ -590,7 +623,7 @@ const mattress = {
         name: "Prestige Mattress",
         shortName: "Prestige",
         href: "/mattress/prestige",
-        image: "/products/mattress/prestige-cover-luxury-floral.webp",
+        image: "/pages/mattress/divisions/karmo-prestige-mattress.jpeg", // was /products/mattress/prestige-cover-luxury-floral.webp
         imageHover: "/products/mattress/prestige-hover-vintage-damask.webp",
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
@@ -610,7 +643,7 @@ const mattress = {
         name: "Orthopedic Mattress",
         shortName: "Orthopedic",
         href: "/mattress/orthopedic",
-        image: "/products/mattress/orthopedic-cover-luxury-dark-lit.webp",
+        image: "/pages/mattress/divisions/karmo-orthopedic-mattress.jpeg", // was /products/mattress/orthopedic-cover-luxury-dark-lit.webp
         imageHover: "/products/mattress/orthopedic-hover-burgundy-showcase.webp",
         alt: "Karmo Orthopedic mattress in a dark luxury bedroom",
         was: "৳ 14,231",
@@ -630,7 +663,7 @@ const mattress = {
         name: "Imperial Euro Top Mattress",
         shortName: "Imperial Euro Top",
         href: "/mattress/imperial-eurotop",
-        image: "/products/mattress/imperial-cover-aatoi-bed.webp",
+        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress.jpeg", // was /products/mattress/imperial-cover-aatoi-bed.webp
         imageHover: "/products/mattress/imperial-hover-navy-studio.webp",
         alt: "Karmo Imperial Euro Top mattress on a curved boucle bed",
         was: "৳ 19,406",
@@ -650,7 +683,7 @@ const mattress = {
         name: "Bonnell Spring Mattress",
         shortName: "Bonnell Spring",
         href: "/mattress/bonnell-spring",
-        image: "/products/mattress/bonnell-cover-aatoi-green.webp",
+        image: "/pages/mattress/divisions/karmo-bonnell-spring-mattress.jpeg", // was /products/mattress/bonnell-cover-aatoi-green.webp
         imageHover: "/products/mattress/bonnell-hover-red-showcase.webp",
         alt: "Karmo Bonnell Spring mattress on a cream boucle bed",
         was: "৳ 23,675",
@@ -670,7 +703,7 @@ const mattress = {
         name: "Pillow Top Pocket Spring Mattress",
         shortName: "Pillow Top Pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        image: "/products/mattress/pillowtop-cover-aatoi-side.webp",
+        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress.jpeg", // was /products/mattress/pillowtop-cover-aatoi-side.webp
         imageHover: "/products/mattress/pillowtop-hover-leaf-display.webp",
         alt: "Karmo Pillow Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 52,396",
@@ -690,7 +723,7 @@ const mattress = {
         name: "Euro Top Pocket Spring Mattress",
         shortName: "Euro Top Pocket",
         href: "/mattress/euro-top-pocket-spring",
-        image: "/products/mattress/eurotop-cover-luxury-kingstyle.webp",
+        image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress.jpeg", // was /products/mattress/eurotop-cover-luxury-kingstyle.webp
         imageHover: "/products/mattress/eurotop-hover-quilted-studio.webp",
         alt: "Karmo Euro Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 48,515",
@@ -710,7 +743,7 @@ const mattress = {
         name: "Mattress Topper",
         shortName: "Topper",
         href: "/mattress/topper",
-        image: "/products/mattress/topper-cover-on-bed-folded.webp",
+        image: "/pages/mattress/divisions/karmo-mattress-topper.jpeg", // was /products/mattress/topper-cover-on-bed-folded.webp
         imageHover: "/products/mattress/topper-hover-elegant-bedroom.webp",
         alt: "Karmo mattress topper on the bed, with a folded topper beside",
         was: "৳ 5,821",

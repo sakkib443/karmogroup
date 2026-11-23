@@ -22,6 +22,39 @@ interface ShippingQuoteArgs {
     productIds?: string[];
 }
 
+/** A cart line as the delivery quote weighs it. */
+interface CartQuoteItem {
+    id: string;
+    productId?: string;
+    quantity: number;
+    category?: string;
+    size?: string;
+    dims?: unknown;
+    option?: string;
+}
+
+interface CartQuoteArgs {
+    items: CartQuoteItem[];
+    subtotal: number;
+    area?: DeliveryArea;
+    city?: string;
+}
+
+const unwrapQuote = (response: { data?: ShippingQuote } | ShippingQuote): ShippingQuote => {
+    const data = (response as { data?: ShippingQuote })?.data ?? (response as ShippingQuote);
+    const cost = Number(data?.shippingCost ?? 0);
+    return {
+        shippingCost: cost,
+        estimatedDays: data?.estimatedDays ?? '3-5 days',
+        freeShipping: Boolean(data?.freeShipping),
+        freeReason: (data?.freeReason ?? null) as ShippingQuote['freeReason'],
+        areaRates: {
+            inside_dhaka: Number(data?.areaRates?.inside_dhaka ?? cost) || 0,
+            outside_dhaka: Number(data?.areaRates?.outside_dhaka ?? cost) || 0,
+        },
+    };
+};
+
 // One option in the checkout "Delivery Area" dropdown.
 export interface DeliveryZone {
     _id: string;
@@ -66,20 +99,29 @@ export const shippingApi = baseApi.injectEndpoints({
                 },
             }),
             // Unwrap { statusCode, success, message, data } → data and coerce types
-            transformResponse: (response: { data?: ShippingQuote } | ShippingQuote): ShippingQuote => {
-                const data = (response as { data?: ShippingQuote })?.data ?? (response as ShippingQuote);
-                const cost = Number(data?.shippingCost ?? 0);
-                return {
-                    shippingCost: cost,
-                    estimatedDays: data?.estimatedDays ?? '3-5 days',
-                    freeShipping: Boolean(data?.freeShipping),
-                    freeReason: (data?.freeReason ?? null) as ShippingQuote['freeReason'],
-                    areaRates: {
-                        inside_dhaka: Number(data?.areaRates?.inside_dhaka ?? cost) || 0,
-                        outside_dhaka: Number(data?.areaRates?.outside_dhaka ?? cost) || 0,
-                    },
-                };
-            },
+            transformResponse: unwrapQuote,
+        }),
+
+        // Public: what this cart costs to deliver, by weight — POST /api/shipping/quote
+        getCartDeliveryQuote: builder.query<ShippingQuote, CartQuoteArgs>({
+            query: ({ items, subtotal, area, city }) => ({
+                url: '/shipping/quote',
+                method: 'POST',
+                body: {
+                    subtotal,
+                    area,
+                    city,
+                    lines: items.map((i) => ({
+                        product: i.productId || i.id,
+                        quantity: i.quantity,
+                        division: i.category,
+                        size: i.size,
+                        dims: i.dims,
+                        option: i.option,
+                    })),
+                },
+            }),
+            transformResponse: unwrapQuote,
         }),
 
         // Public: active delivery zones + their rate for the checkout dropdown
@@ -194,6 +236,7 @@ export const shippingApi = baseApi.injectEndpoints({
 
 export const {
     useGetShippingQuoteQuery,
+    useGetCartDeliveryQuoteQuery,
     useGetDeliveryZonesQuery,
     useGetShippingSettingsQuery,
     useUpdateShippingSettingsMutation,

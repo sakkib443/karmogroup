@@ -207,12 +207,17 @@ const SIZE_KEY = {
 const WEIGHT_KEY = { hero: "weightHero", heading: "weightHeading" };
 const WIDTH_KEY = { hero: "widthHero", heading: "widthHeading" };
 
+/* The client settled on the defaults below; the panel is off and every visitor sees
+   exactly them. Set to true to bring the panel (and remembered choices) back. */
+const SHOW_PANEL = false;
+
 export default function ThemeControl({ children, families, classNames }) {
   const [open, setOpen] = useState(false);
   const [cfg, setCfg] = useState(DEFAULTS);
   const rootRef = useRef(null);
 
   useEffect(() => {
+    if (!SHOW_PANEL) return;
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (saved && typeof saved === "object") {
@@ -324,6 +329,7 @@ export default function ThemeControl({ children, families, classNames }) {
       {children}
 
       {/* Fixed to the right, under the header, where the old switcher sat. */}
+      {SHOW_PANEL ? (
       <div className="fixed right-3 top-[128px] z-[1000] sm:right-4">
         <button
           type="button"
@@ -441,6 +447,7 @@ export default function ThemeControl({ children, families, classNames }) {
           </div>
         ) : null}
       </div>
+      ) : null}
     </div>
   );
 }

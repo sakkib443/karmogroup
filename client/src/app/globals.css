@@ -1106,8 +1106,9 @@ svg.app-icon[fill="none"] {
   }
 
   .mattress-brands-band {
-    height: var(--mattress-brands-h, calc(100svh - 64px)) !important;
-    min-height: var(--mattress-brands-h, calc(100svh - 64px)) !important;
+    /* Mattress brands band: one screen plus a little (client's ask, 22 Nov 2026). */
+    height: var(--mattress-brands-h, calc(100svh + 50px)) !important;
+    min-height: var(--mattress-brands-h, calc(100svh + 50px)) !important;
   }
 
   .footwear-band {

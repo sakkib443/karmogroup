@@ -6,6 +6,7 @@
  */
 import { HOME_SECTIONS } from "./home";
 import { GLOBAL_SECTIONS } from "./global";
+import { FOAM_FURNITURE_SECTIONS } from "./foamFurniture";
 
 export const CMS_PAGES = [
   {
@@ -14,6 +15,13 @@ export const CMS_PAGES = [
     path: "/",
     description: "The front page — hero slider, divisions, films, partners and more.",
     sections: HOME_SECTIONS,
+  },
+  {
+    id: "foam-furniture",
+    label: "Foam — Furniture",
+    path: "/foam/furniture",
+    description: "The furniture & upholstery foam page — hero, room photos, large photos, the video and the banner.",
+    sections: FOAM_FURNITURE_SECTIONS,
   },
   {
     id: "global",

@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { FiArrowRight, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { mattressTitleOverlay } from "@/components/karmo/chrome/mattressHeroVeil";
 import { overlayStyle } from "@/cms/core";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 const EASE = [0.33, 1, 0.68, 1];
 const AUTOPLAY_MS = 5600;
@@ -60,14 +61,14 @@ function SlideVideo({ video, on }) {
     }
   }, [on, video.rate]);
   return (
-    <video
+    <LazyVideo
       ref={ref}
       src={video.src}
       poster={video.poster}
       muted
       playsInline
       loop={Boolean(video.loop)}
-      preload="auto"
+      preload="metadata"
       aria-hidden
       className={`absolute inset-0 h-full w-full object-cover ${video.position || "object-center"}`}
       style={video.style}
@@ -186,7 +187,7 @@ export default function HometexLoungeSlider({
                   sizes="100vw"
                   quality={90}
                   priority={i === 0}
-                  loading="eager"
+                  loading={i === 0 ? undefined : "lazy"}
                   unoptimized={Boolean(s.image.unoptimized)}
                   className={`${s.image.fit === "contain" ? "object-contain" : "object-cover"} ${
                     s.image.position || "object-center"

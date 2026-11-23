@@ -9,6 +9,7 @@ import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import { useSection, CmsText } from "@/cms/CmsProvider";
 import { overlayStyle } from "@/cms/core";
 import { promise } from "@/cms/pages/home";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * "Blending tradition with innovation" — the three-claim band, rebuilt to the
@@ -185,7 +186,7 @@ export default function FoamPromise({
 
      `background-attachment: fixed` rather than the hand-rolled clip-path rig
      the film needs: that rig only exists because there is no such property for
-     a `<video>` element. For an image the browser does it natively, and does it
+     a `<LazyVideo>` element. For an image the browser does it natively, and does it
      on the compositor instead of on every scroll frame in JS.
 
      Left to `bg-scroll` below the `md` breakpoint on purpose. iOS Safari has
@@ -207,7 +208,7 @@ export default function FoamPromise({
   headingSize,
 }) {
   /* One switch for every branch below, so a caller that asks for a film
-     without giving one gets the still rather than an empty `<video>`. */
+     without giving one gets the still rather than an empty `<LazyVideo>`. */
   const hasFilm = showFilm && Boolean(film);
   const reduce = useReducedMotion();
   const reveal = reduce ? {} : { initial: "hidden", whileInView: "show" };
@@ -243,7 +244,7 @@ export default function FoamPromise({
    * The two obvious ways to get a fixed background both fail here:
    *
    *   · `background-attachment: fixed` is a background-image property. There
-   *     is no equivalent for a `<video>` element.
+   *     is no equivalent for a `<LazyVideo>` element.
    *   · `position: sticky` sticks to the nearest scrollport, and an ancestor
    *     with `overflow: hidden` becomes that scrollport — which is exactly what
    *     clips the film in the other modes. Even without it, a sticky layer only
@@ -349,7 +350,7 @@ export default function FoamPromise({
   /**
    * Two stacked copies of one clip, cross-faded at the seam.
    *
-   * `<video loop>` restarts on a hard cut, and on a clip this short the jump
+   * `<LazyVideo loop>` restarts on a hard cut, and on a clip this short the jump
    * comes round often enough to be the only thing anyone notices. So the loop
    * is run by hand: when the playing copy is within CROSSFADE of its end, the
    * other starts from zero and the two swap opacity. This is `FilmBand`'s rig,
@@ -439,9 +440,9 @@ export default function FoamPromise({
           background, and `stillFixed` is what gives it the "stays put while the
           section slides over it" look the client asked for. */}
       {stillFixed ? (
-        /* A CSS background rather than `next/image`'s `<img>`: pinning to the
+        /* A CSS background rather than `next/image`'s `<img loading="lazy" decoding="async">`: pinning to the
            viewport is `background-attachment: fixed`, and that property has no
-           effect on a replaced element like an `<img>` — it only does anything
+           effect on a replaced element like an `<img loading="lazy" decoding="async">` — it only does anything
            on something painted as a background. `bg-scroll` under `md` opts
            small screens back out; see the `stillFixed` prop note for why. */
         <div
@@ -455,7 +456,7 @@ export default function FoamPromise({
         </div>
       )}
 
-      {/* The film. One set of `<video>` elements in every mode — the mode only
+      {/* The film. One set of `<LazyVideo>` elements in every mode — the mode only
           decides the two boxes they sit in, so the loop rig, the refs and the
           crossfade never change with it.
 
@@ -497,8 +498,8 @@ export default function FoamPromise({
                     : "absolute inset-0"
             }
           >
-            <video {...layerProps(0)} autoPlay src={film} />
-            <video {...layerProps(1)} autoPlay src={film} />
+            <LazyVideo {...layerProps(0)} autoPlay src={film} />
+            <LazyVideo {...layerProps(1)} autoPlay src={film} />
           </div>
         </div>
       )}

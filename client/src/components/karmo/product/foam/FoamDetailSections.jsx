@@ -120,7 +120,7 @@ function KnowYourFoam({ product }) {
   return (
     <section className={`mb-[6px] grid bg-white lg:grid-cols-2 ${BAND_H}`} aria-label="Know your foam">
       <div className="relative aspect-[4/3] overflow-hidden lg:aspect-auto lg:h-full">
-        <Image src="/pages/foam/detail/know-your-foam.png" alt={`Inside ${product.name}`} fill unoptimized sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+        <Image src="/pages/foam/detail/know-your-foam.webp" alt={`Inside ${product.name}`} fill unoptimized sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
       </div>
       <motion.div {...reveal} className={`relative flex items-center overflow-hidden px-6 py-14 md:px-14 lg:py-10 lg:pl-14 xl:pl-20 ${SHELL_R}`}>
         <span className="pointer-events-none absolute inset-0" aria-hidden>

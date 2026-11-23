@@ -39,12 +39,7 @@ export const hero = {
   defaults: {
     autoplaySec: 4.5,
     slides: [
-      { id: "home-video-assemble", media: video("/pages/home/videos/hero-video-1.mp4", "/pages/home/videos/hero-video-1-poster.webp"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 6 },
-      { id: "home-video-living", media: video("/pages/home/videos/hero-video-a.mp4", "/pages/home/videos/hero-video-a-poster.webp", { rate: 1.25, y: 68 }), heading: "Foam crafted for living", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 14.8 },
-      { id: "home-video-dining", media: video("/pages/home/videos/hero-video-b.mp4", "/pages/home/videos/hero-video-b-poster.webp", { rate: 1.25 }), heading: "Moments that make a house", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 10.4 },
-      { id: "home-video-lounge", media: video("/pages/home/videos/hero-video-c.mp4", "/pages/home/videos/hero-video-c-poster.webp", { rate: 1.25 }), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 12.2 },
-      { id: "home-room-tour-trial", media: video("/pages/home/videos/hero-room-tour-trial.mp4"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: noOverlay, holdSec: 10 },
-      { id: "home-journey-1965", media: photo("/pages/home/hero/home-hero-slide-01-mustard-room-hq.webp", "Mustard sofa in a blue-walled living room with plants and wood shelves"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
+      { id: "home-journey-1965", media: photo("/pages/home/hero/home-hero-slide-01-teal-mustard-v2-hq.webp", "Mustard sofa in a blue-walled living room with plants and wood shelves", pos("object-bottom")), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-living-scandi", media: photo("/pages/home/hero/home-hero-slide-living-scandi-v3-hq.webp", "Warm living room with a cream sofa, wood shelves and round coffee table"), heading: "The Journey Since 1965", headingSize: 100, align: "center", overlay: veil },
       { id: "home-chemicals-warehouse", media: photo("/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue drums in cinematic light"), heading: "Industrial chemistry built to last", headingSize: 100, align: "left", overlay: noOverlay },
       { id: "home-hometex-quilts", media: photo("/pages/home/hero/home-hero-slide-hometex-quilts-v2-hq.webp", "Stacked Karmo HomeTex floral quilts on a sunlit bed"), heading: "Moments that make a house", headingSize: 100, align: "left", overlay: noOverlay },
@@ -104,7 +99,7 @@ export const chemicals = {
     f.link("button", "Button"),
   ],
   defaults: {
-    background: img("/pages/home/hero/home-hero-slide-chemicals-hero-hq.webp", "Organized Karmo chemicals warehouse with blue industrial drums"),
+    background: img("/pages/home/hero/home-hero-slide-chemicals-hero-v2.webp", "Organized Karmo chemicals warehouse with blue industrial drums"),
     panelOverlay: { color: "#000000", opacity: 70 },
     eyebrow: "Karmo Chemicals",
     titleLine1: "The world of",
@@ -150,7 +145,7 @@ export const explore = {
     ],
     flagship: {
       shots: [
-        { image: img("/pages/foam/furniture/hero/foam-sunlit-sofa-v2.webp", "Cream armchair and Karmo foam slabs in a sunlit living room", pos("object-[20%_bottom]")), overlay: { color: SHADE, opacity: 0 } },
+        { image: img("/pages/home/explore/foam-living-room-showcase-v2.webp", "Karmo foam living room showcase", pos("object-bottom")), overlay: { color: SHADE, opacity: 0 } },
         { image: img("/shared/banners/magnific-3zztfkcrey.webp", "A Karmo Magnific lifestyle scene"), overlay: { color: SHADE, opacity: 0 } },
       ],
       line1: "Foam crafted",
@@ -188,8 +183,11 @@ export const divisions = {
 export const materials = {
   key: "materials",
   label: "Shop by material",
-  description: "Four material cards in an uneven grid.",
+  description: "The heading and four material cards in an uneven grid.",
   fields: [
+    f.text("eyebrow", "Small red title"),
+    f.text("title", "Heading", { size: true }),
+    f.text("titleAccent", "Heading — red part"),
     f.list("cards", "Cards", [
       f.image("image", "Photo"),
       f.overlay("overlay", "Darkness"),
@@ -199,6 +197,10 @@ export const materials = {
     ], { fixed: true, itemLabel: (c) => c.name }),
   ],
   defaults: {
+    eyebrow: "Our Materials",
+    title: "Shop by",
+    titleSize: 100,
+    titleAccent: "material",
     cards: [
       { name: "Rebonded Foam", line: "Support that lasts", lineSize: 100, href: "/mattress", image: img("/pages/home/materials/rebonded-foam-v15.webp", "Speckled terrazzo rebonded foam slab"), overlay: { color: "#000000", opacity: 0 } },
       { name: "Polyethylene Foam", line: "Hi-density core", lineSize: 100, href: "/mattress", image: img("/pages/home/materials/pe-foam-v2.webp", "Close-up of charcoal egg-crate contour foam"), overlay: { color: "#000000", opacity: 40 } },
@@ -231,8 +233,8 @@ export const promo = {
   ],
   defaults: {
     feature: {
-      image: img("/pages/home/promo-trio/feature-foam-seating-bion-shadow.webp", "Taupe velvet sofa with tan leather arm, window light and plant shadow", { x: 0, y: 50 }),
-      overlay: { color: SHADE, opacity: 35 },
+      image: img("/pages/home/promo-trio/taupe-sofa-quilted-armrest.webp", "Taupe Sofa with Quilted Armrest in living room setting", { x: 40, y: 100 }),
+      overlay: { color: SHADE, opacity: 28 },
       eyebrow: "Our popular products",
       line1: "Foam seating",
       line1Size: 100,
@@ -240,8 +242,8 @@ export const promo = {
       button: { label: "Shop the collection", href: "/foam" },
     },
     side: [
-      { title: "HomeTex bedding", titleSize: 100, cta: "Shop now", href: "/hometex", image: img("/pages/home/promo-trio/side-top-nvv867gyqd.webp", "Karmo HomeTex bedding"), overlay: { color: SHADE, opacity: 22 } },
-      { title: "Mattress range", titleSize: 100, cta: "Shop now", href: "/mattress", image: img("/pages/home/promo-trio/side-bottom-bxxj1zj5y2.webp", "Karmo mattress range"), overlay: { color: SHADE, opacity: 22 } },
+      { title: "HomeTex bedding", titleSize: 100, cta: "Shop now", href: "/hometex", image: img("/pages/home/promo-trio/side-top-nvv867gyqd.webp", "Karmo HomeTex bedding", { x: 50, y: 100 }), overlay: { color: SHADE, opacity: 22 } },
+      { title: "Mattress range", titleSize: 100, cta: "Shop now", href: "/mattress", image: img("/pages/home/promo-trio/side-bottom-bxxj1zj5y2.webp", "Karmo mattress range", { x: 50, y: 100 }), overlay: { color: SHADE, opacity: 22 } },
     ],
   },
 };
@@ -270,12 +272,12 @@ export const sizes = {
     titleAccent: "right mattress size",
     note: "Measure your bed from inside edge to inside edge, in inches, and pick the size that matches.",
     length: '72" / 75" / 78"',
-    edge: img("/pages/home/sizes/mattress-side-edge-tile.webp", "Side view of a Karmo pillow-top mattress showing its thickness", { fit: "contain" }),
+    edge: img("/pages/home/sizes/mattress-border-profile.webp", "Side view of a Karmo mattress showing its thickness", { fit: "contain" }),
     sizes: [
-      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-floral-v1.webp", "One person sleeping on a Karmo floral quilted single mattress", { fit: "contain" }) },
-      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-floral-v1.webp", "A couple sleeping on a Karmo floral quilted double mattress", { fit: "contain" }) },
-      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-floral-v1.webp", "A couple sleeping side by side on a Karmo floral quilted queen mattress", { fit: "contain" }) },
-      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-floral-v1.webp", "A family with a small child sleeping on a Karmo floral quilted king mattress", { fit: "contain" }) },
+      { name: "Single", width: '30" / 36" / 42"', fits: "Fits 1", href: "/mattress", image: img("/pages/home/sizes/size-single-pose-teal-leaf-v2.webp", "One person sleeping on a thick Karmo teal-leaf single mattress", { fit: "contain" }) },
+      { name: "Double", width: '48"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-double-pose-teal-leaf-v2.webp", "A couple napping on a Karmo teal-leaf double mattress", { fit: "contain" }) },
+      { name: "Queen", width: '60" / 66"', fits: "Fits 2", href: "/mattress", image: img("/pages/home/sizes/size-queen-pose-teal-leaf-v2.webp", "A couple sleeping side by side on a Karmo teal-leaf queen mattress", { fit: "contain" }) },
+      { name: "King", width: '72" / 75" / 78"', fits: "Fits 2 + child", href: "/mattress", image: img("/pages/home/sizes/size-king-pose-teal-leaf-v2.webp", "A family with a small child sleeping on a Karmo teal-leaf king mattress", { fit: "contain" }) },
     ],
   },
 };

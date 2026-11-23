@@ -225,7 +225,6 @@ function MattressFloatCard({ item }) {
               src={src}
               alt={item.alt || item.name}
               fill
-              priority
               unoptimized
               sizes="(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 92vw"
               className="object-contain object-bottom transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]"
@@ -385,7 +384,7 @@ function MattressCatalogueCard({ item }) {
           src={item.image}
           alt={item.alt || item.name}
           fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 33vw, 50vw"
           className={`object-cover object-center scale-[1.08] transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.1] ${
             hoverSrc ? "opacity-100 group-hover:opacity-0" : ""
           }`}
@@ -395,7 +394,7 @@ function MattressCatalogueCard({ item }) {
             src={hoverSrc}
             alt=""
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(min-width: 1024px) 33vw, 50vw"
             aria-hidden
             className="object-cover object-center opacity-0 transition-[transform,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100"
           />
@@ -407,15 +406,15 @@ function MattressCatalogueCard({ item }) {
         ) : null}
       </Link>
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 pb-3.5 pt-3 sm:px-3.5">
-        <h3 className="text-[16px] font-bold leading-snug text-ink sm:text-[17px]">
+      <div className="flex min-h-0 flex-1 flex-col px-2.5 pb-3 pt-2.5 sm:px-3.5 sm:pb-3.5 sm:pt-3">
+        <h3 className="text-[14px] font-bold leading-snug text-ink sm:text-[17px]">
           <Link href={href} className="transition-colors hover:text-brand">
             Karmo {item.name}
           </Link>
         </h3>
 
-        <div className="mt-2 flex items-end justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-[12px] text-ink/70">
+        <div className="mt-1.5 flex flex-col items-start gap-1 sm:mt-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+          <div className="flex items-center gap-1.5 text-[11px] text-ink/70 sm:text-[12px]">
             <Stars value={rating} />
             <span className="font-semibold tabular-nums text-ink">{rating.toFixed(1)}</span>
           </div>
@@ -423,7 +422,7 @@ function MattressCatalogueCard({ item }) {
             {price.was ? (
               <s className="text-[12px] tabular-nums text-ink/35">{price.was}</s>
             ) : null}
-            <span className="text-[18px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
+            <span className="text-[17px] font-bold tabular-nums leading-none text-brand sm:text-[20px]">
               {price.now}
             </span>
           </div>
@@ -470,7 +469,7 @@ function MattressCatalogueCard({ item }) {
         <div className="mt-auto pt-3.5">
           <Link
             href={href}
-            className="group/cta inline-flex h-11 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.12em] text-white transition-colors duration-300 hover:bg-brand-dark"
+            className="group/cta inline-flex h-10 w-full items-center justify-center gap-1.5 bg-brand text-[11px] font-bold uppercase tracking-[0.06em] text-white transition-colors duration-300 hover:bg-brand-dark sm:h-11 sm:gap-2.5 sm:text-[12px] sm:tracking-[0.12em]"
           >
             <Image
               src="/shared/trust/order-cartoon/cart-v2.webp"
@@ -478,7 +477,7 @@ function MattressCatalogueCard({ item }) {
               aria-hidden
               width={22}
               height={22}
-              className="h-[22px] w-[22px] object-contain transition-transform duration-300 group-hover/cta:scale-110"
+              className="h-[18px] w-[18px] object-contain transition-transform duration-300 group-hover/cta:scale-110 sm:h-[22px] sm:w-[22px]"
             />
             <span>Order Now</span>
           </Link>
@@ -569,6 +568,118 @@ function FoamCatalogueCard({ item }) {
   );
 }
 
+/**
+ * Comforter offer card. Three across, larger than the plain shop tile.
+ * The photo is framed on the roll so the old poster type stays out of the
+ * way; the name, price and facts live in the footer.
+ */
+function ComforterOfferCard({ item }) {
+  const href = item.href || "/contact";
+  const pct = discountPct(item.was, item.now);
+  const facts = item.facts?.length ? item.facts : ["One piece", "All season", "Microfiber"];
+
+  return (
+    <motion.article
+      variants={fade}
+      className="group flex h-full flex-col bg-white shadow-[0_16px_40px_rgba(11,26,51,0.08)] ring-1 ring-ink/[0.06] transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_24px_52px_rgba(11,26,51,0.14)]"
+    >
+      <Link
+        href={href}
+        className="relative block aspect-[5/4] shrink-0 overflow-hidden bg-[#f4f1ec] focus-visible:outline-none"
+      >
+        <Image
+          src={item.image}
+          alt={item.alt || item.name}
+          fill
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover object-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
+        />
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white to-transparent" />
+        {pct != null ? (
+          <span className="absolute left-3 top-3 bg-[#0b1a33] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
+            Save {pct}%
+          </span>
+        ) : null}
+      </Link>
+
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-5 pt-3.5 sm:px-6">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brand">
+          Karmo Comforter
+        </p>
+        <h3 className="mt-1.5 text-[1.25rem] font-bold leading-tight tracking-tight text-ink sm:text-[1.35rem]">
+          <Link href={href} className="transition-colors hover:text-brand">
+            {item.name}
+          </Link>
+        </h3>
+        {item.line ? (
+          <p className="mt-2 text-[13px] leading-relaxed text-ink/55">{item.line}</p>
+        ) : null}
+
+        <div className="mt-4 flex items-end justify-between gap-3">
+          <p className="flex items-baseline gap-2.5">
+            <span className="text-[1.55rem] font-bold tabular-nums leading-none text-brand">
+              {item.now}
+            </span>
+            {item.was ? (
+              <s className="text-[13px] tabular-nums text-ink/35">{item.was}</s>
+            ) : null}
+          </p>
+          <p className="mb-1 flex shrink-0 items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink/45">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#2F9E44]" />
+            In stock
+          </p>
+        </div>
+
+        <ul className="mt-4 grid grid-cols-3 bg-[#f6f3ee]">
+          {facts.map((fact) => (
+            <li
+              key={fact}
+              className="border-r border-white px-1.5 py-3 text-center last:border-r-0"
+            >
+              <span className="block text-[10px] font-bold uppercase leading-tight tracking-[0.12em] text-ink/70">
+                {fact}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-auto pt-4">
+          <Link
+            href={href}
+            className="group/cta inline-flex h-12 w-full items-center justify-center gap-2.5 bg-brand text-[12px] font-bold uppercase tracking-[0.14em] text-white transition-colors duration-300 hover:bg-brand-dark"
+          >
+            <Image
+              src="/shared/trust/order-cartoon/cart-v2.webp"
+              alt=""
+              aria-hidden
+              width={22}
+              height={22}
+              className="h-[22px] w-[22px] object-contain transition-transform duration-300 group-hover/cta:scale-110"
+            />
+            <span>Order Now</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden
+              className="transition-transform duration-300 group-hover/cta:translate-x-0.5"
+            >
+              <path
+                d="M5 12h14M13 6l6 6-6 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
 export default function DivisionProducts({
   eyebrow = "Best price",
   headingLead = "Hot offer",
@@ -580,7 +691,7 @@ export default function DivisionProducts({
   detailHref,
   textured = false,
   textureSrc = "/products/mattress/mosaic/karmo-pattern-texture.webp",
-  /** `catalogue` = mattress cards. `foam` = square foam shop cards. */
+  /** `catalogue` = mattress cards. `foam` = square foam shop cards. `comforter` = three-column offer cards. */
   variant = "default",
   /** Live-shop style: hover image fades in over the front photo. */
   hoverOverlay = false,
@@ -589,7 +700,8 @@ export default function DivisionProducts({
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const catalogue = variant === "catalogue";
   const foamGrid = variant === "foam";
-  const threeCol = catalogue || foamGrid;
+  const comforterGrid = variant === "comforter";
+  const threeCol = catalogue || foamGrid || comforterGrid;
 
   const list =
     categoryId === "all"
@@ -679,14 +791,20 @@ export default function DivisionProducts({
           viewport={VIEWPORT}
           className={
             threeCol
-              ? `relative z-[1] mx-auto grid w-full max-w-[1680px] grid-cols-1 items-stretch gap-5 px-5 sm:grid-cols-2 sm:gap-6 md:px-8 lg:grid-cols-3 lg:gap-7 lg:px-10 ${
-                  catalogue ? "pt-2 sm:pt-3 lg:pt-3" : "pt-6 sm:pt-8 lg:pt-10"
+              ? /* Mattress catalogue: two cards a row on phones too (client, 23 Nov 2026); tablet and
+                   desktop unchanged. */
+                `relative z-[1] mx-auto grid w-full items-stretch ${catalogue ? "grid-cols-2 gap-3 px-3 sm:px-5" : "grid-cols-1 gap-5 px-5"} sm:grid-cols-2 sm:gap-6 md:px-8 lg:grid-cols-3 lg:px-10 ${
+                  comforterGrid
+                    ? "max-w-[1540px] lg:gap-8 pt-4 sm:pt-6"
+                    : `max-w-[1680px] lg:gap-7 ${catalogue ? "pt-2 sm:pt-3 lg:pt-3" : "pt-6 sm:pt-8 lg:pt-10"}`
                 }`
               : "relative z-[1] mx-auto grid w-full max-w-[1760px] grid-cols-1 gap-5 px-6 sm:grid-cols-2 sm:gap-6 md:px-10 lg:grid-cols-4 lg:gap-8 lg:px-12"
           }
         >
           {list.map((item) =>
-            foamGrid ? (
+            comforterGrid ? (
+              <ComforterOfferCard key={item.id} item={item} />
+            ) : foamGrid ? (
               <FoamCatalogueCard key={item.id} item={item} />
             ) : catalogue ? (
               item.cardStyle === "float3d" ? (

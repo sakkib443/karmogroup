@@ -12,6 +12,7 @@ import {
 } from "react-icons/tb";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Mattress feature mosaic — Sleep Well claims (short) on top-left,
@@ -386,13 +387,13 @@ function InsidePhotoCard({ photo }) {
         />
       ) : null}
       {!reduceMotion && film ? (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={film}
           muted
           playsInline
           loop={startAt <= 0}
-          preload="auto"
+          preload="metadata"
           aria-label={photo.alt || ""}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
@@ -441,13 +442,13 @@ function FilmPanel({ film, still, filmAlt = "", overlay }) {
         />
       ) : null}
       {!reduceMotion && film ? (
-        <video
+        <LazyVideo
           ref={videoRef}
           src={film}
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           aria-label={filmAlt || "Karmo mattress film"}
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
@@ -587,12 +588,22 @@ function OrganizedSpotlight({ data, reveal }) {
         className="object-cover object-left"
         priority={false}
       />
-      <span aria-hidden className="absolute inset-0 bg-black/40" />
+      {/* `bare`: the photo alone — no shade, no words (Furniture, client 23 Nov 2026). */}
+      {data.bare ? null : <span aria-hidden className="absolute inset-0 bg-black/40" />}
+      {data.bare ? null : (
+      <>
       {/* Nudged up from true middle, right-aligned as before — was bottom-
           right, sitting low. Right alignment stays; only the vertical
           position moved. */}
       <div className={`relative z-[1] flex h-full items-center px-7 pb-16 pt-7 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10 lg:pb-24 lg:pt-10 ${left ? "justify-start" : "justify-end"}`}>
-        <div className={`max-w-[22rem] ${left ? "text-left" : "text-right"}`}>
+        {/* Furniture puts the line on the left of the armchair. A small lift
+            keeps it in the grey wall, clear of the arm — it was sitting on it. */}
+        <div
+          /* The lift only from tablet up — on a phone the photo is short and the words
+             were pushed off the top (client, 23 Nov 2026). */
+          className={`max-w-[22rem] ${left ? "text-left md:[transform:var(--lift)]" : "text-right"}`}
+          style={left ? { ["--lift"]: `translateY(-${data.lift || "6rem"})` } : undefined}
+        >
           <h3
             className="display title-card-line uppercase text-white"
             style={{
@@ -601,7 +612,9 @@ function OrganizedSpotlight({ data, reveal }) {
               fontSize: "clamp(1.28rem, 0.96rem + 1.1vw, 1.85rem)",
             }}
           >
-            Designed to {data.headingEnd}
+            {/* "Designed to" on the first line, "endure" under it (client, 23 Nov 2026). */}
+            <span className="block">Designed to</span>
+            <span className="block">{data.headingEnd}</span>
           </h3>
           {data.subline ? (
             <p
@@ -621,6 +634,8 @@ function OrganizedSpotlight({ data, reveal }) {
           ) : null}
         </div>
       </div>
+      </>
+      )}
     </motion.article>
   );
 }

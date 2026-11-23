@@ -1,11 +1,10 @@
+import { comforterShopItems } from "@/components/karmo/product/comforter/comforterDetailData";
+
 /**
  * HomeTex division — same template as the mattress (ideal) page.
  *
- * SCAFFOLD: images use the existing HomeTex artwork; product names and prices
- * are placeholders. Swap in the real catalogue when ready:
- *   · banner.slides — cutout HomeTex PNGs (bedding sets on transparent bg)
- *   · products[] — real SKUs, prices and images
- *   · features[].icon — proper HomeTex trust badges
+ * Banner and feature art are the existing HomeTex set. The product grid is
+ * the live comforter catalogue (karmogroup.com/comforter).
  * `promise` is left empty on purpose: the shared band's default copy already
  * covers bedding, so it reads correctly here.
  */
@@ -18,13 +17,13 @@ const hometex = {
     slides: [
       {
         id: "comforter-1",
-        bg: "/pages/hometex/comforter.png",
+        bg: "/pages/hometex/comforter.webp",
         headline: "Moments that make a house",
         align: "left",
       },
       {
         id: "comforter-2",
-        bg: "/pages/hometex/hometex-first-sub/bed.png",
+        bg: "/pages/hometex/hometex-first-sub/bed.webp",
         headline: "BREATHABLE WARMTH",
         align: "right",
         contentClassName: "pt-[18vh]",
@@ -59,9 +58,9 @@ const hometex = {
     },
     {
       id: "delivery",
-      title: "Free Delivery",
-      note: "Available",
-      icon: "/shared/trust/cartoon-v3/delivery-v2.webp",
+      title: "Fast Delivery",
+      note: "Across Bangladesh",
+      icon: "/shared/trust/cartoon-v3/delivery-fast-v1.webp",
     },
     {
       id: "stores",
@@ -79,19 +78,19 @@ const hometex = {
     columns: [
       {
         id: "comfort",
-        image: "/pages/hometex/hometex-first-sub/comforter-6.png",
+        image: "/pages/hometex/hometex-first-sub/comforter-6.webp",
         caption: "Unmatched Everyday Comfort",
         alt: "Karmo HomeTex bedding set",
       },
       {
         id: "cotton",
-        image: "/pages/hometex/hometex-first-sub/sleep.png",
+        image: "/pages/hometex/hometex-first-sub/sleep.webp",
         caption: "Premium Cotton Weave",
         alt: "Karmo HomeTex studio bedding",
       },
       {
         id: "everyone",
-        image: "/pages/hometex/hometex-first-sub/rounded.png",
+        image: "/pages/hometex/hometex-first-sub/rounded.webp",
         caption: "Pure Comfort For Everyone",
         alt: "Karmo HomeTex bedroom linen",
       },
@@ -115,11 +114,11 @@ const hometex = {
         hideIcon: true,
         hideLine: true,
         lightText: true,
-        background: "/pages/hometex/hometex-first-sub/comforter-6.png",
+        background: "/pages/hometex/hometex-first-sub/comforter-6.webp",
       },
       {
         id: "why-choose-us",
-        background: "/pages/hometex/hometex-first-sub/hometex-why-chose-us.png",
+        background: "/pages/hometex/hometex-first-sub/hometex-why-chose-us.webp",
         imageOnly: true,
         hideOverlay: true,
       },
@@ -128,7 +127,7 @@ const hometex = {
       align: "left",
       valign: "center",
       offsetY: "8rem",
-      image: "/pages/hometex/comfort-6.png",
+      image: "/pages/hometex/comfort-6.webp",
       alt: "Teal foam sofa in a bright contemporary living room",
       headingLead: "Designed",
       headingAccent: "to",
@@ -140,7 +139,7 @@ const hometex = {
       heading: "Inside every",
       accent: "set",
       body: "Open-cell polyurethane, no fillers, rubber-grade density and fine cell structure — cut to size for furniture makers, then tested one by one.",
-      background: "/pages/hometex/hometex-first-sub/dog.png",
+      background: "/pages/hometex/hometex-first-sub/dog.webp",
       layers: [
         {
           id: "open-cell",
@@ -174,7 +173,7 @@ const hometex = {
         },
       ],
       photo: {
-        src: "/pages/hometex/comfort-5.png",
+        src: "/pages/hometex/comfort-5.webp",
         alt: "Sofa cushion peeled back to show Karmo set foam inside",
         lightOverlay: true,
       },
@@ -213,7 +212,7 @@ const hometex = {
     sliderVariant: "hometex-floating",
     headingLead: "The comfort you feel every day",
     image: {
-      src: "/pages/hometex/comforter-3.png",
+      src: "/pages/hometex/comforter-3.webp",
       alt: "Karmo HomeTex luxury bedroom bedding collection",
       width: 1920,
       height: 1080,
@@ -233,7 +232,7 @@ const hometex = {
         },
         headingLead: "The comfort you feel every day",
         image: {
-          src: "/pages/hometex/comforter-3.png",
+          src: "/pages/hometex/comforter-3.webp",
           alt: "Karmo HomeTex golden comfort bed set",
           width: 1920,
           height: 1080,
@@ -253,7 +252,7 @@ const hometex = {
         },
         headingLead: "Elegance woven for peaceful nights",
         image: {
-          src: "/pages/hometex/hometex-slide-red.jpeg",
+          src: "/pages/hometex/hometex-slide-red.webp",
           alt: "Karmo HomeTex floral luxury duvet and bedding",
           width: 2880,
           height: 1235,
@@ -273,7 +272,7 @@ const hometex = {
         },
         headingLead: "Bespoke patterns, pure warmth",
         image: {
-          src: "/pages/hometex/hometex-slide-blue.jpeg",
+          src: "/pages/hometex/hometex-slide-blue.webp",
           alt: "Karmo HomeTex royal blue duvet bedroom setup",
           width: 2880,
           height: 1235,
@@ -322,81 +321,10 @@ const hometex = {
     headingLead: "Hot offer",
     headingAccent: "for you",
     offersId: "hometex-offers",
-    /* TODO: placeholder SKUs and prices — replace with the real HomeTex catalogue. */
-    items: [
-      {
-        id: "cotton-bedsheet-set",
-        category: "bed-sheets",
-        name: "Cotton Bed Sheet Set",
-        image: "/shared/divisions/hometex-karmo-bedding-set.webp",
-        alt: "Karmo cotton bed sheet set",
-        was: "৳ 3,200",
-        now: "৳ 2,720",
-      },
-      {
-        id: "premium-comforter",
-        category: "comforters",
-        name: "Premium Comforter",
-        image: "/shared/divisions/hometex-karmo-bedding-studio.webp",
-        alt: "Karmo premium comforter",
-        was: "৳ 4,500",
-        now: "৳ 3,825",
-      },
-      {
-        id: "complete-bedding",
-        category: "linen",
-        name: "Complete Bedding Set",
-        image: "/pages/hometex/divisions/hometex-bedding-set.webp",
-        alt: "Karmo complete bedding set",
-        was: "৳ 6,900",
-        now: "৳ 5,865",
-      },
-      {
-        id: "bedroom-linen",
-        category: "linen",
-        name: "Bedroom Linen Set",
-        image: "/shared/divisions/hometex-karmo-bedding-room.webp",
-        alt: "Karmo bedroom linen set",
-        was: null,
-        now: "৳ 4,200",
-      },
-      {
-        id: "pillow-pair",
-        category: "pillows",
-        name: "Cotton Pillow Pair",
-        image: "/pages/hometex/divisions/hometex-bed-linen.jpg",
-        alt: "Karmo cotton pillow pair",
-        was: "৳ 1,600",
-        now: "৳ 1,360",
-      },
-      {
-        id: "studio-duvet",
-        category: "comforters",
-        name: "Studio Duvet",
-        image: "/shared/divisions/hometex-karmo-bedding-studio.webp",
-        alt: "Karmo studio duvet",
-        was: "৳ 5,200",
-        now: "৳ 4,420",
-      },
-      {
-        id: "everyday-sheet",
-        category: "bed-sheets",
-        name: "Everyday Sheet Set",
-        image: "/shared/divisions/hometex-karmo-bedding-set.webp",
-        alt: "Karmo everyday sheet set",
-        was: null,
-        now: "৳ 2,100",
-      },
-      {
-        id: "luxury-linen",
-        category: "linen",
-        name: "Luxury Linen Collection",
-        image: "/pages/hometex/divisions/hometex-bedding-set.webp",
-        alt: "Karmo luxury linen collection",
-        was: "৳ 8,900",
-        now: "৳ 7,565",
-      },
-    ],
+    /* Same 18 prints as karmogroup.com/comforter, in the three-column offer cards. */
+    body: "",
+    variant: "comforter",
+    items: comforterShopItems,
   },
 };
 

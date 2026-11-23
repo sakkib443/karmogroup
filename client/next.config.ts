@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
       { source: "/dashboard/super-admin/:path*", destination: "/dashboard/admin/:path*", permanent: false },
     ];
   },
+  // Files in /public are served with max-age=0 by default, so every repeat
+  // visit re-checks each image and video. Let browsers keep them for a week.
+  async headers() {
+    return [
+      {
+        source: "/:all*(webp|png|jpg|jpeg|gif|svg|avif|mp4|webm|woff2)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" }],
+      },
+    ];
+  },
   // Emit .next/standalone so the Docker image ships only the server plus the
   // node_modules it actually imports (needed by the Dockerfile / Coolify).
   output: "standalone",
@@ -15,6 +25,13 @@ const nextConfig: NextConfig = {
   // stuck on their fallback/loading state (Next 16.1.2 + React 19). Leave off
   // until that interaction is resolved upstream.
   reactCompiler: false,
+  // Smaller responses and bundles (client, 23 Nov 2026).
+  poweredByHeader: false,
+  compress: true,
+  experimental: {
+    // Pull in only the icons / motion helpers a page uses, not whole packages.
+    optimizePackageImports: ["react-icons/fi", "react-icons/fa", "react-icons/bs", "react-icons/lu", "react-icons/tb", "framer-motion"],
+  },
   images: {
     // Serve images as-is, skipping Next's on-demand optimizer.
     //

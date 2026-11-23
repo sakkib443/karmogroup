@@ -159,7 +159,7 @@ const nav = [
         icon: `${MENU}/nav-hometex.webp?v=2`,
         items: [
           { name: "Bed Sheet", href: "/hometex", icon: `${MENU}/bedsheet.webp` },
-          { name: "Comforter", href: "/hometex", icon: `${MENU}/comforter.webp` },
+          { name: "Comforter", href: "/hometex#hometex-offers", icon: `${MENU}/comforter.webp` },
           { name: "Quilts & Bed Spreads", href: "/hometex", icon: `${MENU}/ac-quilt.webp` },
           { name: "Airflow Mosquito Net", href: "/hometex", icon: `${MENU}/natural.webp` },
           { name: "Wipes / Towels", href: "/hometex", icon: `${MENU}/soft.webp` },

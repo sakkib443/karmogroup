@@ -32,7 +32,7 @@ export const portfolioItems = [
     division: "foam",
     title: "Lavender block cushions",
     line: "Furniture foam",
-    image: "/pages/portfolio/divisions/foam-karmo-sofa-lavender-blocks.jpeg",
+    image: "/pages/portfolio/divisions/foam-karmo-sofa-lavender-blocks.webp",
     alt: "Lavender foam cushions stacked beside a Karmo sofa",
     href: "/foam",
   },

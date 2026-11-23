@@ -92,3 +92,9 @@ temp_interactive_push.bat
 
 # pnpm content-addressable store (never commit)
 .pnpm-store/
+
+# Archives and python cache
+*.zip
+__pycache__/
+*.pyc
+

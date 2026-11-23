@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
+import LazyVideo from "@/components/karmo/LazyVideo";
 
 /**
  * Firmness scale band — short centred heading, then a full-bleed graphic
@@ -45,8 +46,8 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
       </motion.div>
 
       <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
-        <div className="relative h-[min(50svh,520px)] w-full min-h-[280px] sm:min-h-[340px] lg:h-[min(52svh,580px)]">
-          <video
+        <div className="relative aspect-[1280/360] w-full min-h-[300px] sm:min-h-[340px]">
+          <LazyVideo
             className="absolute inset-0 h-full w-full object-cover object-center"
             autoPlay
             muted
@@ -60,7 +61,7 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
               src="/products/foam/videos/firmness-scale.mp4"
               type="video/mp4"
             />
-          </video>
+          </LazyVideo>
         </div>
       </div>
     </section>

@@ -10,7 +10,7 @@ import { LuTrash2, LuChevronLeft, LuTriangleAlert, LuMinus, LuPlus, LuX, LuCheck
 import { ShopHeader, LeafRule, TrustRow, BagIcon, LockIcon, TruckIcon, TagIcon, ORANGE, tk } from '@/components/karmo/shop/ShopChrome';
 import { toast } from 'react-hot-toast';
 import { useValidateCouponMutation } from '@/redux/api/couponApi';
-import { useGetShippingQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
+import { useGetCartDeliveryQuoteQuery, useGetShippingSettingsQuery } from '@/redux/api/shippingApi';
 import { useGetProductByIdQuery } from '@/redux/api/productApi';
 import {
     type AppliedCoupon,
@@ -339,15 +339,15 @@ const CartPage = () => {
         setCouponError('');
     };
 
-    // ─── Estimated shipping (no city yet → backend returns the default flat rate) ──
-    const { data: shippingQuote } = useGetShippingQuoteQuery(
-        { subtotal: selectedSubtotal },
+    // ─── Estimated delivery by weight (no address yet → the inside-Dhaka rate) ──
+    const { data: shippingQuote } = useGetCartDeliveryQuoteQuery(
+        { items: selectedItems, subtotal: selectedSubtotal },
         { skip: selectedSubtotal <= 0 },
     );
     const couponFreeShipping = couponHasFreeShipping(appliedCoupons);
     const couponDiscount = couponDiscountTotal(appliedCoupons);
-    const freeShipping = couponFreeShipping || (shippingQuote?.freeShipping ?? (selectedSubtotal >= 5000));
-    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? (selectedSubtotal >= 5000 ? 0 : 120));
+    const freeShipping = couponFreeShipping || Boolean(shippingQuote?.freeShipping);
+    const shippingCost = freeShipping ? 0 : (shippingQuote?.shippingCost ?? 0);
 
     // Live free-shipping threshold → "add ৳X more for free shipping" nudge.
     const { data: shipSettings } = useGetShippingSettingsQuery();
@@ -359,7 +359,7 @@ const CartPage = () => {
     const finalTotal = baseAmount + shippingCost;
     // What the order would cost with no coupons — shown struck-through when any coupon applies.
     const originalShipping = couponFreeShipping
-        ? (shippingQuote?.shippingCost ?? (selectedSubtotal >= 5000 ? 0 : 120))
+        ? (shippingQuote?.shippingCost ?? 0)
         : shippingCost;
     const preDiscountTotal = selectedSubtotal + originalShipping;
 
@@ -383,7 +383,7 @@ const CartPage = () => {
                 {savedItems.map((item) => (
                     <li key={item.id} className="flex items-center gap-4 px-5 py-4">
                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec]">
-                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
+                            <img loading="lazy" decoding="async" src={item.image} alt={item.name} className="h-full w-full object-contain p-1" />
                         </div>
                         <div className="min-w-0 flex-1">
                             <p className="display line-clamp-1 text-[13px] font-semibold uppercase tracking-[0.04em] text-ink">{item.name}</p>
@@ -485,7 +485,7 @@ const CartPage = () => {
                                         </button>
 
                                         <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-sm border border-ink/8 bg-[#f3f1ec] sm:h-32 sm:w-32">
-                                            <img src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
+                                            <img loading="lazy" decoding="async" src={item.image} alt={item.name} className="h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.04]" />
                                             {save > 0 ? (
                                                 <span className="absolute left-0 top-0 bg-brand px-1.5 py-0.5 text-[10px] font-bold text-white">−{save}%</span>
                                             ) : null}
@@ -612,7 +612,7 @@ const CartPage = () => {
                                         <div className="flex justify-between text-[#15803d]"><dt>Coupon discount</dt><dd className="tabular-nums">−{tk(couponDiscount)}</dd></div>
                                     )}
                                     <div className="flex justify-between">
-                                        <dt className="text-ink/60">Delivery <span className="block text-[11px] text-ink/35">Exact charge at checkout</span></dt>
+                                        <dt className="text-ink/60">Delivery <span className="block text-[11px] text-ink/35">Inside Dhaka rate · exact charge at checkout</span></dt>
                                         <dd className={freeShipping ? 'font-semibold text-[#15803d]' : 'tabular-nums'}>{freeShipping ? 'Free' : tk(shippingCost)}</dd>
                                     </div>
                                 </dl>

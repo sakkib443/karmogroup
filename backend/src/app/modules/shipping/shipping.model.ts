@@ -58,7 +58,8 @@ export interface IShippingSettings extends Document {
 const shippingSettingsSchema = new Schema<IShippingSettings>({
     _key: { type: String, default: 'main', unique: true },
     freeShippingThreshold: { type: Number, default: 5000 },
-    freeShippingByThresholdEnabled: { type: Boolean, default: true },
+    // Off: delivery is charged by weight, and every mattress costs over the threshold.
+    freeShippingByThresholdEnabled: { type: Boolean, default: false },
     defaultInsideDhakaRate: { type: Number, default: 60 },
     defaultOutsideDhakaRate: { type: Number, default: 120 },
     defaultEstimatedDays: { type: String, default: '3-5 days' },

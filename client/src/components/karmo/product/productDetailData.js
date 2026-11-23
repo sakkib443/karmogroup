@@ -35,7 +35,7 @@ export const productFeatures = [
     id: "durability",
     title: "Tested to last",
     body: "Pressed again and again on a test rig, so the comfort layers keep their shape and support for years of everyday use.",
-    video: `${VID}/pressure-press.gif?v=2`,
+    video: `${VID}/pressure-press.mp4`,
     poster: `${VID}/durability-test-poster.webp`,
   },
 ];
@@ -107,9 +107,24 @@ const FILM_HEADINGS = {
 const FILM_BY_ID = Object.fromEntries(
   Object.entries(FILM_HEADINGS).map(([id, heading]) => [
     id,
-    { src: `${VID}/film-${id}.mp4`, poster: `${FILMS}/${id}.webp`, heading },
+    /* Every film is cut to four shots (shots 1, 2, 3 + the quilting close-up; euro top: corner, pattern, hand press, quilting). ?v= makes browsers fetch the new file after a re-cut. */
+    { src: `${VID}/film-${id}.mp4?v=cut4`, poster: `${FILMS}/${id}.webp`, heading },
   ])
 );
+
+/**
+ * The "Inside every Karmo mattress" band and the three-part comfort band under it are FIXED:
+ * the same clips on every mattress page (client's rule, 22 Nov 2026). Clips are cut from the
+ * king film and the red mattress film (public/products/videos/inside/):
+ *   pan   — red floral cloth, camera moving across it      (left, top)
+ *   press — a hand pressing the red floral cloth           (three-part band, left)
+ *   feet  — feet and water bottle on the same navy cloth    (right, top)
+ */
+export const INSIDE_CLIPS = {
+  pan: { src: `${VID}/inside/pan-red.mp4`, label: "Cover in motion" },
+  press: { src: `${VID}/inside/press-for-king.mp4`, label: "Soft to the touch" },
+  feet: { src: `${VID}/inside/feet-for-king.mp4`, label: "Tested by weight" },
+};
 
 /** Cover / damask swatches — same fabric set as the buy box. */
 export const fabricOptions = [
@@ -127,10 +142,10 @@ export const fabricOptions = [
  * own (Alpona, Green-Leaf) goes back to the product's cover.
  */
 const FABRIC_RENDERS = {
-  "fabric-2": "/products/mattress/d-03.png", // Red-WF
-  "fabric-3": "/products/mattress/d-04.png", // L. White leaves
-  "fabric-4": "/products/mattress/d-08.png", // Blue-3
-  "fabric-5": "/products/mattress/d-07.png", // Yellow rose
+  "fabric-2": "/products/mattress/d-03.webp", // Red-WF
+  "fabric-3": "/products/mattress/d-04.webp", // L. White leaves
+  "fabric-4": "/products/mattress/d-08.webp", // Blue-3
+  "fabric-5": "/products/mattress/d-07.webp", // Yellow rose
 };
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
@@ -175,7 +190,7 @@ export const KARMO_LETTER_GALLERY = ["K", "A", "R", "M", "O"].map(
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/products/mattress/king-cover-luxury-floral-v2.webp",
+  "/products/mattress/king-cover-navy-bedroom-v3.webp",
   "/products/mattress/king-gallery/angle-front-v4.webp",
   "/products/mattress/king-gallery/angle-side-v4.webp",
   "/products/mattress/king-gallery/angle-detail-v4.webp",
@@ -189,7 +204,7 @@ const REAL_BY_ID = {
     (FABRIC_RENDERS) are left out — they appear only when that fabric is clicked. */
 export const SHARED_DETAIL_SHOTS = Array.from(
   { length: 9 },
-  (_, i) => `/products/mattress/d-${String(i + 1).padStart(2, "0")}.png`
+  (_, i) => `/products/mattress/d-${String(i + 1).padStart(2, "0")}.webp`
 ).filter((src) => !Object.values(FABRIC_RENDERS).includes(src));
 
 export function getMattressProductSlugs() {
@@ -254,6 +269,8 @@ function toDetail(item) {
     features: productFeatures,
     /** Own product film (or null) — first thumb in the gallery row. */
     film: FILM_BY_ID[item.id] || null,
+    /** Fixed clips for the Inside-every-Karmo-mattress band — identical on every mattress page. */
+    insideClips: INSIDE_CLIPS,
     /** Cross-section band — the same picture and layers on every page. */
     build: buildFor(),
     shortName: item.shortName || item.name,
