@@ -126,14 +126,24 @@ export const INSIDE_CLIPS = {
   feet: { src: `${VID}/inside/feet-for-king.mp4`, label: "Tested by weight" },
 };
 
-/** Cover / damask swatches — same fabric set as the buy box. */
+/** Cover fabrics — the full set of 13 (client, 23 Nov 2026), shown 7 + 6 on every mattress
+    page. Made from the originals in /pages/mattress/favrics (480px WebP squares).
+    Earlier set: /products/common/fabrics/fabric1…6.webp */
+const FAB = "/products/mattress/fabrics";
 export const fabricOptions = [
-  { id: "fabric-1", label: "Damask 1", image: "/products/common/fabrics/fabric1.webp" },
-  { id: "fabric-2", label: "Damask 2", image: "/products/common/fabrics/fabric2.webp" },
-  { id: "fabric-3", label: "Damask 3", image: "/products/common/fabrics/fabric3.webp" },
-  { id: "fabric-4", label: "Damask 4", image: "/products/common/fabrics/fabric4.webp" },
-  { id: "fabric-5", label: "Damask 5", image: "/products/common/fabrics/fabric5.webp" },
-  { id: "fabric-6", label: "Damask 6", image: "/products/common/fabrics/fabric6.webp" },
+  { id: "9-9r", label: "9-9R", image: `${FAB}/9-9r.webp` },
+  { id: "19-2b", label: "19-2B", image: `${FAB}/19-2b.webp` },
+  { id: "alpona", label: "Alpona", image: `${FAB}/alpona.webp` },
+  { id: "blue-3", label: "Blue-3", image: `${FAB}/blue-3.webp` },
+  { id: "green-leaf", label: "Green Leaf", image: `${FAB}/green-leaf.webp` },
+  { id: "l-white", label: "L. White", image: `${FAB}/l-white.webp` },
+  { id: "nakshi-kalas", label: "Nakshi Kalas", image: `${FAB}/nakshi-kalas.webp` },
+  { id: "navy-blue", label: "Navy Blue", image: `${FAB}/navy-blue.webp` },
+  { id: "off-white-02", label: "Off White 02", image: `${FAB}/off-white-02.webp` },
+  { id: "off-white", label: "Off White", image: `${FAB}/off-white.webp` },
+  { id: "pink", label: "Pink", image: `${FAB}/pink.webp` },
+  { id: "red-wf", label: "Red-WF", image: `${FAB}/red-wf.webp` },
+  { id: "yellow-rose", label: "Yellow Rose", image: `${FAB}/yellow-rose.webp` },
 ];
 
 /**
@@ -142,10 +152,10 @@ export const fabricOptions = [
  * own (Alpona, Green-Leaf) goes back to the product's cover.
  */
 const FABRIC_RENDERS = {
-  "fabric-2": "/products/mattress/d-03.webp", // Red-WF
-  "fabric-3": "/products/mattress/d-04.webp", // L. White leaves
-  "fabric-4": "/products/mattress/d-08.webp", // Blue-3
-  "fabric-5": "/products/mattress/d-07.webp", // Yellow rose
+  "red-wf": "/products/mattress/d-03.webp",
+  "l-white": "/products/mattress/d-04.webp",
+  "blue-3": "/products/mattress/d-08.webp",
+  "yellow-rose": "/products/mattress/d-07.webp",
 };
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
@@ -256,6 +266,8 @@ function toDetail(item) {
       item.id === "topper"
         ? fabricOptions
         : fabricOptions.map((fabric) => ({ ...fabric, scene: FABRIC_RENDERS[fabric.id] || cover })),
+    /** Lay the 13 swatches out as a bigger 7-column grid (7 + 6). */
+    fabricGrid: true,
     densities: null,
     colors: null,
     sizes: sizePresetsFor(item.id),

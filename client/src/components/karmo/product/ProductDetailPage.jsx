@@ -9,7 +9,7 @@ import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlide
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import ProductInside from "@/components/karmo/product/ProductInside";
+import MattressLayersExplode from "@/components/karmo/product/MattressLayersExplode";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -38,7 +38,9 @@ export default function ProductDetailPage({ product }) {
       <ProductDescription description={mattressDescription(product)} />
       <ProductPromiseStrip />
       {/* The animated 'moving layers' build band (ProductInsideFilm) was taken off the page (client, 22 Nov 2026) — the picture band below shows the same layers. */}
-      <ProductInside product={product} />
+      {/* Each mattress's own exploded layers, from the brochure (client, 23 Nov 2026).
+          The earlier shared picture band was <ProductInside product={product} />. */}
+      <MattressLayersExplode product={product} />
       <ProductFeatureSlides product={product} />
       {product.film ? (
         <MattressFilmStage

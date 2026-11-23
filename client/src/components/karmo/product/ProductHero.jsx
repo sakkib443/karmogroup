@@ -438,7 +438,9 @@ export default function ProductHero({ product }) {
                   {product.fabrics?.length ? (
                     <ul
                       className="order-1 mt-3 grid gap-2 lg:hidden"
-                      style={{ gridTemplateColumns: `repeat(${product.fabrics.length}, minmax(0, 1fr))` }}
+                      style={{
+                        gridTemplateColumns: `repeat(${product.fabricGrid ? 7 : product.fabrics.length}, minmax(0, 1fr))`,
+                      }}
                       aria-label={fabricTitle}
                     >
                       {product.fabrics.map((f) => {
@@ -551,7 +553,13 @@ export default function ProductHero({ product }) {
             <div className="mt-1 hidden lg:block">
               {product.fabrics?.length ? (
                 <OptionBlock title={fabricTitle}>
-                  <ul className="flex flex-wrap gap-1.5">
+                  <ul
+                    className={
+                      product.fabricGrid
+                        ? "grid max-w-[40rem] grid-cols-7 gap-2"
+                        : "flex flex-wrap gap-1.5"
+                    }
+                  >
                     {product.fabrics.map((f) => {
                       const on = fabric === f.id;
                       return (
@@ -565,17 +573,17 @@ export default function ProductHero({ product }) {
                               setFabric(f.id);
                               if (f.scene) setMainSrc(f.scene);
                             }}
-                            className={`relative block h-12 w-12 overflow-hidden border transition-colors sm:h-14 sm:w-14 ${
-                              on
-                                ? "border-brand"
-                                : "border-ink/15 hover:border-ink/35"
+                            className={`relative block overflow-hidden transition-colors ${
+                              product.fabricGrid
+                                ? `aspect-square w-full border-2 ${on ? "border-brand" : "border-transparent hover:border-ink/35"}`
+                                : `h-12 w-12 border sm:h-14 sm:w-14 ${on ? "border-brand" : "border-ink/15 hover:border-ink/35"}`
                             }`}
                           >
                             <Image
                               src={f.image}
                               alt=""
                               fill
-                              sizes="56px"
+                              sizes={product.fabricGrid ? "96px" : "56px"}
                               className="object-cover"
                             />
                           </button>

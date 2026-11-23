@@ -35,7 +35,9 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico?v=5" type="image/x-icon" />
         <link rel="apple-touch-icon" href="/favicon.png?v=5" />
       </head>
-      <body>
+      {/* Browser extensions (e.g. ColorZilla's cz-shortcut-listen) add attributes to <body>
+          before React loads; ignore those so they don't raise a hydration warning. */}
+      <body suppressHydrationWarning>
         <ReduxProvider>
           <ThemeProvider>
             {/* Header is fixed and 112px tall at z-10000. Toasts sit just

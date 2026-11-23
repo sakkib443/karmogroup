@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -19,9 +18,8 @@ import LazyVideo from "@/components/karmo/LazyVideo";
    photos: /products/common/lifestyle/karmo-comfort-v3-pose-01.webp, -pose-02d.webp, -pose-03.webp */
 const BALL = { src: "/pages/mattress/ball.mp4", label: "Ball drop" };
 
-/* Right part: the whole mattress TVC (62 s) for now, so the client can pick the parts to keep.
-   The running time is shown on it as a review aid — remove with the TIME lines once decided. */
-/* Swapped to the new mattress clip (client, 23 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4 */
+/* Right part: the new mattress clip (client, 23 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4.
+   Its running-time badge was removed (client, 23 Nov 2026). */
 const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Tanzin Tisha" };
 
 /* One screen under the 112px header, plus a little (40px more), on every mattress page. */
@@ -35,8 +33,6 @@ export default function ProductFeatureSlides({ product }) {
   const reduceMotion = useReducedMotion();
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
   const press = product?.insideClips?.press || { src: "/products/videos/inside/press-for-king.mp4", label: "Soft to the touch" };
-
-  const [clock, setClock] = useState(0); // TIME: review aid
 
   return (
     <section className="relative my-1.5 bg-[#f7f3ee]" aria-label="Comfort on a Karmo mattress">
@@ -117,7 +113,6 @@ export default function ProductFeatureSlides({ product }) {
             playsInline
             preload="metadata"
             aria-label={MODEL.label}
-            onTimeUpdate={(e) => setClock(e.currentTarget.currentTime)} /* TIME */
           >
             <source src={MODEL.src} type="video/mp4" />
           </LazyVideo>
@@ -125,9 +120,6 @@ export default function ProductFeatureSlides({ product }) {
           <div className={BAR}>
             <span className={NUM}>03</span>
             <span className={NAME}>{MODEL.label}</span>
-            <span className="rounded bg-black/55 px-2 py-0.5 text-[12px] font-semibold tabular-nums tracking-wider text-white" aria-hidden>
-              {/* TIME */}{Math.floor(clock / 60)}:{String(Math.floor(clock % 60)).padStart(2, "0")}
-            </span>
             <span className="ml-auto h-px w-10 bg-white/70" />
           </div>
         </motion.div>
