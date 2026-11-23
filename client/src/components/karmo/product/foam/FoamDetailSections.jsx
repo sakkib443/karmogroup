@@ -136,7 +136,7 @@ function CountValue({ value, inView, delay = 0 }) {
 
 /* Measures as see-through glass tiles over the photo (the homepage counters' look):
    icon, label, a big value that counts up when the tiles come into view. */
-function Rows({ rows }) {
+function Rows({ rows, light = false }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
   return (
@@ -146,14 +146,14 @@ function Rows({ rows }) {
         return (
           <div
             key={label}
-            className="relative flex flex-col overflow-hidden rounded-xl border border-white/20 bg-gradient-to-b from-[#0b1a33]/85 to-[#0b1a33]/70 px-4 py-4 shadow-[0_8px_24px_rgba(0,0,0,0.25)] backdrop-blur-[3px] sm:px-5 sm:py-5"
+            className={`relative flex flex-col overflow-hidden rounded-xl border px-4 ${light ? "border-white/20 bg-[#0b1a33]/35" : "border-ink/10 bg-white/25"} py-4 shadow-[0_6px_20px_rgba(11,26,51,0.08)] backdrop-blur-[6px] sm:px-5 sm:py-5`}
           >
-            <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+            <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white">
               <Icon size={20} aria-hidden />
             </span>
-            <dt className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/75">{label}</dt>
-            <dd className="display mt-1 whitespace-nowrap text-[1.25rem] font-bold leading-tight tabular-nums text-white sm:text-[1.4rem]">
+            <dt className={`mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${light ? "text-white/75" : "text-ink/55"}`}>{label}</dt>
+            <dd className={`display mt-1 whitespace-nowrap text-[1.25rem] font-bold leading-tight tabular-nums sm:text-[1.4rem] ${light ? "text-white" : "text-ink"}`}>
               <CountValue value={value} inView={inView} delay={0.25 + i * 0.08} />
             </dd>
           </div>
@@ -177,7 +177,7 @@ function KnowYourFoam({ product }) {
         {/* The KARMO POLY stack from the foam-furniture hero (its second slide). */}
         <Image src="/pages/foam/furniture/hero/embossed-karmo-poly-stack-hero.webp" alt={`Inside ${product.name}`} fill unoptimized sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover object-center" />
         {/* Darker, moodier left photo (client, 24 Nov 2026). */}
-        <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/35 via-black/30 to-black/45" />
+        <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/50 to-black/65" />
       </div>
       <motion.div {...reveal} className={`relative flex items-center overflow-hidden px-6 py-14 md:px-14 lg:py-10 lg:pl-14 xl:pl-20 ${SHELL_R}`}>
         <span className="pointer-events-none absolute inset-0" aria-hidden>
@@ -255,7 +255,7 @@ function MadeToFit({ catalogue }) {
       <Copy light eyebrow="Sizes" note="Cut to order" line1="Made to" line2="fit" tagline="Every set">
         <Body light>Each sofa set comes with five sit and five back pieces. Bed sheets are cut in five thicknesses, or to any size you need.</Body>
       </Copy>
-      <Rows rows={rows} />
+      <Rows light rows={rows} />
     </Banner>
   );
 }
@@ -266,12 +266,7 @@ function BuiltToLast({ catalogue }) {
   if (!features.length) return null;
   return (
     <>
-      <PhotoPair
-        shots={[
-          { src: "/pages/foam/furniture/why/why-density-hq.webp", alt: "Dense Karmo Foam", line1: "Dense", line2: "by design", note: "Fine, even cells that hold their shape for years." },
-          { src: "/pages/foam/furniture/why/why-airflow-hq.webp", alt: "Air moving through Karmo Foam", line1: "Open", line2: "airflow", note: "Air moves through the foam, so it sits cooler." },
-        ]}
-      />
+      {/* "Dense by design" / "Open airflow" photo pair removed (client, 24 Nov 2026). */}
       <Banner src="/pages/foam/furniture/hero/karmo-embossed-charcoal-foam-layers.webp" alt="Charcoal Karmo Foam layers embossed with the Karmo name" label="Features">
         <Copy light eyebrow="No filler" note="Inside the foam" line1="Built to" line2="last" tagline="Why it lasts">
           {catalogue.use ? <Body light>{catalogue.use}</Body> : null}

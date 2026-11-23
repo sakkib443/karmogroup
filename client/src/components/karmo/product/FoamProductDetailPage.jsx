@@ -7,7 +7,6 @@ import { foamDescription } from "@/components/karmo/product/productDescriptions"
 import FoamCatalogueSheet from "@/components/karmo/product/foam/FoamCatalogueSheet";
 import FoamRelated from "@/components/karmo/product/foam/FoamRelated";
 import ProductPromiseStrip, { FOAM_PROMISES } from "@/components/karmo/product/ProductPromiseStrip";
-import ProductFoamFeatureSlides from "@/components/karmo/product/ProductFoamFeatureSlides";
 import FoamDetailSections from "@/components/karmo/product/foam/FoamDetailSections";
 import FoamStaticDetail from "@/components/karmo/product/foam/FoamStaticDetail";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
@@ -47,7 +46,7 @@ export default function FoamProductDetailPage({ product }) {
       <ProductDescription description={foamDescription(product)} />
       <ProductPromiseStrip items={FOAM_PROMISES} />
       <FoamDetailSections product={product} />
-      <ProductFoamFeatureSlides />
+      {/* "Feel the density — Three ways to sit" band removed (client, 24 Nov 2026). */}
       <FoamRelated current={product.slug} />
       <OrderAndContact />
     </>
