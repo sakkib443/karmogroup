@@ -603,7 +603,7 @@ const mattress = {
         name: "King Mattress",
         shortName: "King",
         href: "/mattress/king",
-        image: "/pages/mattress/divisions/karmo-king-mattress.jpeg", // was /products/mattress/king-cover-navy-bedroom-v3.webp
+        image: "/pages/mattress/divisions/karmo-king-mattress-v2.webp", // was /products/mattress/king-cover-navy-bedroom-v3.webp
         imageHover: "/products/mattress/king-hover-navy-showcase.webp",
         alt: "Karmo King floral mattress in a luxury bedroom",
         was: "৳ 11,320",
