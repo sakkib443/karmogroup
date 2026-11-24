@@ -603,8 +603,8 @@ const mattress = {
         name: "King Mattress",
         shortName: "King",
         href: "/mattress/king",
-        image: "/pages/mattress/divisions/karmo-king-mattress-v2.webp", // was /products/mattress/king-cover-navy-bedroom-v3.webp
-        imageHover: "/products/mattress/king-hover-navy-showcase.webp",
+        image: "/pages/mattress/divisions/karmo-king-mattress-v3.webp", // was karmo-king-mattress-v2.webp (client, 24 Nov 2026)
+        imageHover: "/pages/mattress/divisions/karmo-king-mattress-hover.webp", // was /products/mattress/king-hover-navy-showcase.webp
         alt: "Karmo King floral mattress in a luxury bedroom",
         was: "৳ 11,320",
         now: "৳ 9,622",
@@ -623,8 +623,8 @@ const mattress = {
         name: "Prestige Mattress",
         shortName: "Prestige",
         href: "/mattress/prestige",
-        image: "/pages/mattress/divisions/karmo-prestige-mattress-v2.webp", // was /products/mattress/prestige-cover-luxury-floral.webp
-        imageHover: "/products/mattress/prestige-hover-vintage-damask.webp",
+        image: "/pages/mattress/divisions/karmo-prestige-mattress-v3.webp", // was karmo-prestige-mattress-v2.webp (client, 24 Nov 2026)
+        imageHover: "/pages/mattress/divisions/karmo-prestige-mattress-hover.webp", // was /products/mattress/prestige-hover-vintage-damask.webp
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
         now: "৳ 10,447",
