@@ -663,8 +663,8 @@ const mattress = {
         name: "Imperial Euro Top Mattress",
         shortName: "Imperial Euro Top",
         href: "/mattress/imperial-eurotop",
-        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress.jpeg", // was /products/mattress/imperial-cover-aatoi-bed.webp
-        imageHover: "/products/mattress/imperial-hover-navy-studio.webp",
+        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress-v2.webp", // was /products/mattress/imperial-cover-aatoi-bed.webp
+        imageHover: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress-hover.webp", // was /products/mattress/imperial-hover-navy-studio.webp
         alt: "Karmo Imperial Euro Top mattress on a curved boucle bed",
         was: "৳ 19,406",
         now: "৳ 16,495",
