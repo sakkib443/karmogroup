@@ -121,7 +121,7 @@ const FILM_BY_ID = Object.fromEntries(
  *   feet  — feet and water bottle on the same navy cloth    (right, top)
  */
 export const INSIDE_CLIPS = {
-  pan: { src: `${VID}/inside/pan-red.mp4`, label: "Cover in motion" },
+  pan: { src: `${VID}/inside/pan-blue.mp4`, label: "Cover in motion" }, /* blue recolour of pan-red.mp4 (client, 24 Nov 2026) — red was already on the page */
   press: { src: `${VID}/inside/press-for-king.mp4`, label: "Soft to the touch" },
   feet: { src: `${VID}/inside/feet-for-king.mp4`, label: "Tested by weight" },
 };

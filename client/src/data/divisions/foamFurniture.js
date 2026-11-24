@@ -199,6 +199,11 @@ const foamFurniture = {
         floor: { clip: "polygon(0% 62%, 61% 100%, 0% 100%)" },
         /* A light dark veil over the photo (client, 23 Nov 2026). */
         shade: "rgba(0,0,0,0.16)",
+        /* Approved taglines (docs/copy/taglines.md, Generic) sliding in over the upper-left
+           wall, one per stack, on the stacks' clock (client, 24 Nov 2026). */
+        taglines: ["The Journey Since 1965", "Largest Raw Material Stock", "International Quality Certified", "Redefining Everyday Comfort"],
+        taglinePlace: { left: "0", top: "22%", width: "60%" },
+        mobileTaglinePlace: { left: "0", top: "12%", width: "100%" },
         /* Four stacks taking turns on that floor (glossy shadow under each): HD, Poly, 280, 1965. */
         productPlace: { width: "21vw", left: "13vw", bottom: "7%", eager: true },
         /* Phone framing (client, 23 Nov 2026): the model centred, a wider white floor along the

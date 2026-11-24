@@ -40,8 +40,9 @@ export default function ProductDetailPage({ product }) {
       {/* The animated 'moving layers' build band (ProductInsideFilm) was taken off the page (client, 22 Nov 2026) — the picture band below shows the same layers. */}
       {/* Each mattress's own exploded layers, from the brochure (client, 23 Nov 2026).
           The earlier shared picture band was <ProductInside product={product} />. */}
-      <MattressLayersExplode product={product} />
+      {/* The three-video band now sits above the layers (client, 24 Nov 2026). */}
       <ProductFeatureSlides product={product} />
+      <MattressLayersExplode product={product} />
       {product.film ? (
         <MattressFilmStage
           src={product.film.src}

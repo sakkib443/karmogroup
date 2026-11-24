@@ -5,12 +5,13 @@ import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import LazyVideo from "@/components/karmo/LazyVideo";
+import { TallMorph } from "@/components/karmo/product/ProductBuildAside";
 
 /**
  * Comfort — one Karmo mattress, three ways to rest. Three equal parts side by side:
  *   left   — a hand pressing the cloth (fixed clip, the same on every mattress page)
- *   middle — the ball-drop clip (fixed, the same on every mattress page)
- *   right  — the Tanzin Tisha model film (fixed, the same on every mattress page)
+ *   middle — the rotating layer pictures (TallMorph, from ProductBuildAside)
+ *   right  — the ball-drop clip (fixed, the same on every mattress page)
  * A short title strip sits above. Stacks on phones.
  */
 
@@ -18,9 +19,7 @@ import LazyVideo from "@/components/karmo/LazyVideo";
    photos: /products/common/lifestyle/karmo-comfort-v3-pose-01.webp, -pose-02d.webp, -pose-03.webp */
 const BALL = { src: "/pages/mattress/ball.mp4", label: "Ball drop" };
 
-/* Right part: the new mattress clip (client, 23 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4.
-   Its running-time badge was removed (client, 23 Nov 2026). */
-const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Tanzin Tisha" };
+/* The model film now lives in the middle of ProductBuildAside (client, 24 Nov 2026). */
 
 /* One screen under the 112px header, plus a little (40px more), on every mattress page. */
 const PART = "group relative aspect-[4/5] overflow-hidden sm:aspect-auto sm:h-[calc(100svh-72px)]";
@@ -82,7 +81,13 @@ export default function ProductFeatureSlides({ product }) {
           </div>
         </motion.div>
 
-        {/* Middle: ball-drop clip — fixed. */}
+        {/* Middle: the rotating layer pictures, moved up from the five-part "Inside every Karmo mattress" band;
+            the Tanzin Tisha film went down there in its place (client, 24 Nov 2026). */}
+        <motion.div variants={fade} className={`${PART} bg-ink`}>
+          <TallMorph focusY="18%" />
+        </motion.div>
+
+        {/* Right: ball-drop clip, in the old spring spot (client 24 Nov 2026). */}
         <motion.div variants={fade} className={`${PART} bg-ink`}>
           <LazyVideo
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
@@ -97,32 +102,12 @@ export default function ProductFeatureSlides({ product }) {
           </LazyVideo>
           <span aria-hidden className={SHADE} />
           <div className={BAR}>
-            <span className={NUM}>02</span>
+            <span className={NUM}>03</span>
             <span className={NAME}>{BALL.label}</span>
             <span className="ml-auto h-px w-10 bg-white/70" />
           </div>
         </motion.div>
 
-        {/* Right: the Tanzin Tisha model film — fixed. */}
-        <motion.div variants={fade} className={`${PART} bg-ink`}>
-          <LazyVideo
-            className="absolute inset-0 h-full w-full object-cover object-[55%_center] transition-transform duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label={MODEL.label}
-          >
-            <source src={MODEL.src} type="video/mp4" />
-          </LazyVideo>
-          <span aria-hidden className={SHADE} />
-          <div className={BAR}>
-            <span className={NUM}>03</span>
-            <span className={NAME}>{MODEL.label}</span>
-            <span className="ml-auto h-px w-10 bg-white/70" />
-          </div>
-        </motion.div>
       </motion.div>
     </section>
   );

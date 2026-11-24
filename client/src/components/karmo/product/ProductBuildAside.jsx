@@ -55,7 +55,9 @@ const SLIDES = [
 ];
 
 /* Fallback clips; each mattress page passes its own (product.insideClips). Left column: feet-and-water-bottle shot over the press test; right column: the red-cloth clip over the ball drop (the hand-press clip lives in the three-part band, ProductFeatureSlides). */
-const DEFAULT_PAN = { src: "/products/videos/inside/pan-red.mp4", label: "Cover in motion" };
+const DEFAULT_PAN = { src: "/products/videos/inside/pan-blue.mp4", label: "Cover in motion" };
+/* Middle tall column: the Tanzin Tisha model film; the rotating layer pictures (TallMorph) moved to the middle of the three-part band, ProductFeatureSlides (client, 24 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4. */
+const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Tanzin Tisha", position: "55% center" };
 const DEFAULT_FEET = { src: "/products/videos/inside/feet-for-king.mp4", label: "Tested by weight" };
 
 function HoverChrome({ label }) {
@@ -79,7 +81,7 @@ function HoverChrome({ label }) {
 }
 
 /* focusY: which part of the tall pictures stays in view when the tile crops them (higher % = pictures sit a little higher). */
-function TallMorph({ focusY = "18%" }) {
+export function TallMorph({ focusY = "18%" }) {
   const reduceMotion = useReducedMotion();
   const rootRef = useRef(null);
   const firstSwapDone = useRef(false);
@@ -299,7 +301,7 @@ export default function ProductBuildAside({ product, cols = "1fr 1fr 1fr", scree
               </div>
             ))}
             <div className="relative col-span-2 aspect-[4/3] min-h-0 lg:col-span-1 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:aspect-auto">
-              <TallMorph focusY={screenFit ? "45%" : "18%"} />
+              <VideoTile src={MODEL.src} label={MODEL.label} position={MODEL.position} />
             </div>
             {[SHOT_4, { src: productFeatures[0]?.video, label: productFeatures[0]?.title, lift: 12 }].map((clip, i) => (
               <div

@@ -29,17 +29,17 @@ const TYPE_CSS = `.foam-grade-type,.foam-grade-type *{font-family:${condensed.st
 
 const IMG = "/pages/foam/furniture/grades";
 
-/* Catalogue order: Poly, 280, 480, 2001, HD, 4G, 1965. top / bottom = the column's gradient —
+/* Catalogue order: Poly, 280, 2001, HD, 4G, Signature, 1965 (480 taken off, blue Signature added before 1965 — client, 24 Nov 2026). top / bottom = the column's gradient —
    a colour OPPOSITE to the foam (client, 23 Nov 2026), so the foam stands out: grey on red,
    coral on teal, brown on sky blue, purple on yellow, green on magenta, sage on orange,
    yellow on navy. */
 const GRADES = [
   { id: "poly", name: "Poly", sub: "Karmo", colour: "Ash", grade: "Standard Grade", density: "25", top: "#a81c25", bottom: "#df4a50", href: "/foam/poly", src: `${IMG}/foam-poly-orig.webp`, w: 800, h: 605 },
   { id: "280", name: "280", sub: "Karmo", colour: "Pink", grade: "Semi Rubber Grade", density: "30", top: "#0c7a6f", bottom: "#22b3a2", href: "/foam/combo-280", src: `${IMG}/foam-280-orig.webp`, w: 800, h: 608 },
-  { id: "480", name: "480", sub: "Karmo", colour: "Brick", grade: "Full Rubber Grade", density: "35", top: "#2867a6", bottom: "#5b9fdb", href: "/foam/furniture", src: `${IMG}/foam-480-orig-v2.webp`, w: 570, h: 456, fit: 0.95, drop: 5 },
   { id: "2001", name: "2001", sub: "Karmo", colour: "Purple", grade: "Full Rubber Grade", density: "37", top: "#cf9a00", bottom: "#f4c846", href: "/foam/combo-2001", src: `${IMG}/foam-2001-orig.webp`, w: 800, h: 599 },
   { id: "hd", name: "HD", sub: "Karmo", colour: "Lime Green", grade: "Full Rubber Grade", density: "40", top: "#9c1249", bottom: "#d8487f", href: "/foam/hd", src: `${IMG}/foam-hd-orig.webp`, w: 800, h: 616 },
   { id: "4g", name: "4G", sub: "Karmo", colour: "Olive", grade: "Pure Rubber Grade", density: "45", top: "#b94a26", bottom: "#ef8a58", href: "/foam/combo-4g", src: `${IMG}/foam-4g-orig.webp`, w: 800, h: 600 },
+  { id: "signature", name: "Signature", nameScale: 0.48, sub: "Karmo", colour: "Blue", grade: "Premium Grade", density: "55", top: "#7c3a12", bottom: "#c27a3e", href: "/foam/combo-signature", src: `${IMG}/foam-signature-orig.webp`, w: 800, h: 637 },
   { id: "1965", name: "1965", sub: "Karmo", colour: "Bright Yellow", grade: "Full Rubber Grade", density: "50", top: "#132c66", bottom: "#2f56a8", href: "/foam/combo-1965", src: `${IMG}/foam-1965-orig.webp`, w: 800, h: 607 },
 ];
 
@@ -153,7 +153,9 @@ function Panel({ item, active, mode, geo, wide, onOpen, onClose }) {
       aria-label={`Karmo ${item.name} foam — ${item.grade}, ${item.colour}, ${item.density} kg/m³`}
       className={`@container relative block min-w-0 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white md:col-span-1 md:aspect-auto md:h-auto md:min-h-0 md:[flex-basis:0%] md:[flex-grow:var(--fg)] ${active ? "col-span-2 aspect-[4/5]" : wide ? "col-span-2 aspect-[16/10]" : "aspect-[3/4]"}`}
       style={{
-        background: `linear-gradient(180deg, ${item.top} 0%, ${item.bottom} 30%, color-mix(in srgb, ${item.bottom} 18%, #ffffff) 78%, #fbf9f6 100%)`,
+        /* Full colour top to bottom: deep at the top, a little lighter at the foot, never white (client, 24 Nov 2026). */
+        /* Stronger fall (client, 24 Nov 2026): a deeper top, a clearly lighter — still coloured — foot. */
+        background: `linear-gradient(180deg, color-mix(in srgb, ${item.top} 62%, #000000) 0%, ${item.top} 30%, ${item.bottom} 70%, color-mix(in srgb, ${item.bottom} 62%, #ffffff) 100%)`,
         /* Desktop only (md:): the open column swells, the rest narrow. */
         ["--fg"]: active ? OPEN_GROW : 1,
         transition: `flex-grow ${MS}ms ${EASE}`,
@@ -202,7 +204,8 @@ function Panel({ item, active, mode, geo, wide, onOpen, onClose }) {
               lineHeight: 1,
               letterSpacing: "0.01em",
               marginTop: "0.04em",
-              fontSize: "min(9rem, 26cqw)",
+              /* nameScale: a long name (Signature) is set smaller so it stays inside its column. */
+              fontSize: `min(${9 * (item.nameScale || 1)}rem, ${26 * (item.nameScale || 1)}cqw)`,
               color: "transparent",
               WebkitTextStroke: "0.9px rgba(255,255,255,0.95)",
               /* No soft shadow inside the hollow letters — at most a hair of one. */

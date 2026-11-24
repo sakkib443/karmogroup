@@ -228,7 +228,7 @@ export default function DivisionVideoHero({
               }}
             />,
             /* Optional white floor wedge and a product standing on it (glossy shadow + mirror). */
-            sl.floor || sl.product || sl.products || sl.shade ? (
+            sl.floor || sl.product || sl.products || sl.shade || sl.taglines ? (
               <div
                 key={`${sl.image}-stage`}
                 aria-hidden
@@ -251,6 +251,9 @@ export default function DivisionVideoHero({
                 {sl.shade ? <div className="absolute inset-0" style={{ background: sl.shade }} /> : null}
                 {sl.products?.length || sl.product ? (
                   <ProductCycler items={sl.products || [sl.product]} place={(isPhone && sl.mobileProductPlace) || sl.productPlace || sl.product} active={slide === i + 1} every={productMs} firstMs={firstProductMs} />
+                ) : null}
+                {sl.taglines?.length ? (
+                  <TaglineCycler items={sl.taglines} place={(isPhone && sl.mobileTaglinePlace) || sl.taglinePlace || {}} active={slide === i + 1} every={productMs} firstMs={firstProductMs} />
                 ) : null}
               </div>
             ) : null,
@@ -470,6 +473,53 @@ export function ProductCycler({ items, place, active, every = 3600, firstMs }) {
               />
             </div>
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* Approved taglines sliding in one at a time over a slide's empty upper corner, on the same
+   clock as the foam stacks below (client, 24 Nov 2026). Each line glides in from the left and
+   leaves to the right. place: { left, top, width, size } — size is the font size. */
+export function TaglineCycler({ items, place, active, every = 3600, firstMs }) {
+  const [cur, setCur] = useState(0);
+  useEffect(() => {
+    if (active) setCur(0);
+  }, [active]);
+  useEffect(() => {
+    if (!active || items.length < 2) return undefined;
+    const wait = cur === 0 && firstMs ? firstMs : every;
+    const id = window.setTimeout(() => setCur((c) => (c + 1) % items.length), wait);
+    return () => window.clearTimeout(id);
+  }, [active, items.length, every, firstMs, cur]);
+  return (
+    <div
+      className="absolute"
+      style={{ left: place.left ?? "0", top: place.top ?? "22%", width: place.width ?? "60%", height: "2.4em", fontSize: "clamp(1.12rem, 0.92rem + 1.45vw, 2.4rem)" }}
+    >
+      {items.map((t, idx) => {
+        const on = idx === cur;
+        const before = (idx - cur + items.length) % items.length === items.length - 1;
+        return (
+          /* The same type as the hero heading on slide 1 (and the Home / HomeTex / Bed &
+             Automotive heroes): white, light weight, wide tracking, soft dark shadow. */
+          <p
+            key={t}
+            className="display absolute inset-x-0 top-0 whitespace-nowrap text-center uppercase text-white"
+            style={{
+              fontWeight: 350,
+              fontVariationSettings: '"wght" 350',
+              letterSpacing: "0.12em",
+              lineHeight: 1.1,
+              textShadow: "0 2px 28px rgba(0,0,0,0.55)",
+              opacity: on ? 1 : 0,
+              transform: `translateY(${on ? 0 : before ? -40 : 40}%)`,
+              transition: "opacity 650ms ease-in-out, transform 850ms cubic-bezier(0.16,1,0.3,1)",
+            }}
+          >
+            {t}
+          </p>
         );
       })}
     </div>
