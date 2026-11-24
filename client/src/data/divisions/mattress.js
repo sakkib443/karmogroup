@@ -703,7 +703,7 @@ const mattress = {
         name: "Pillow Top Pocket Spring Mattress",
         shortName: "Pillow Top Pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress.jpeg", // was /products/mattress/pillowtop-cover-aatoi-side.webp
+        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress-v2.webp", // was /products/mattress/pillowtop-cover-aatoi-side.webp
         imageHover: "/products/mattress/pillowtop-hover-leaf-display.webp",
         alt: "Karmo Pillow Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 52,396",
