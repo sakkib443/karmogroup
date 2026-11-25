@@ -407,7 +407,7 @@ function InsidePhotoCard({ photo }) {
   );
 }
 
-function FilmPanel({ film, still, filmAlt = "", overlay }) {
+function FilmPanel({ film, still, filmAlt = "", overlay, topImage, topImageFade = ["72%", "82%"], position }) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef(null);
   const wrapRef = useRef(null);
@@ -451,6 +451,23 @@ function FilmPanel({ film, still, filmAlt = "", overlay }) {
           preload="metadata"
           aria-label={filmAlt || "Karmo mattress film"}
           className="absolute inset-0 h-full w-full object-cover object-center"
+          style={position ? { objectPosition: position } : undefined}
+        />
+      ) : null}
+      {/* A still laid over the film that fades out toward the bottom, so the film's moving grass
+          shows below and the still (the foam and everything above it) stays on top
+          (client, 26 Nov 2026 — foam furniture). */}
+      {topImage ? (
+        <Image
+          src={topImage}
+          alt={filmAlt}
+          fill
+          sizes="(min-width: 768px) 34vw, 100vw"
+          className="pointer-events-none object-cover object-center"
+          style={{
+            WebkitMaskImage: `linear-gradient(to bottom, #000 0%, #000 ${topImageFade[0]}, transparent ${topImageFade[1]})`,
+            maskImage: `linear-gradient(to bottom, #000 0%, #000 ${topImageFade[0]}, transparent ${topImageFade[1]})`,
+          }}
         />
       ) : null}
       {overlay && <div className="absolute inset-0 bg-black/20 pointer-events-none" />}
@@ -764,9 +781,12 @@ function OrganizedGrid({ highlights, spotlight, inside, reveal, stage }) {
           variants={group}
           {...reveal}
           viewport={VIEWPORT}
-          className={`grid h-[calc(100svh-112px)] w-full grid-cols-1 grid-rows-2 gap-[6px] md:grid-rows-1 ${spotlight?.even ? "md:grid-cols-2" : "md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"}`}
+          className={`grid w-full grid-cols-1 gap-[6px] ${spotlight?.middleFilm ? "h-[calc(100svh-50px)]" : "h-[calc(100svh-112px)]"} ${spotlight?.middleFilm ? "grid-rows-3 md:grid-cols-3" : `grid-rows-2 ${spotlight?.even ? "md:grid-cols-2" : "md:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]"}`} md:grid-rows-1`}
         >
           <OrganizedSpotlight data={spotlight} reveal={reveal} />
+          {/* Optional third part in the middle: a film between the picture and the right-hand film
+              (client, 26 Nov 2026 — foam furniture). */}
+          {spotlight?.middleFilm ? <FilmPanel film={spotlight.middleFilm} filmAlt={spotlight.middleFilmAlt} topImage={spotlight.middleImage} position={spotlight.middleFilmPosition} /> : null}
           <InsidePhotoCard photo={inside?.photo} />
         </motion.div>
       </div>

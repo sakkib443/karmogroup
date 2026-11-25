@@ -376,6 +376,16 @@ const foamFurniture = {
       headingLead: "Designed",
       headingAccent: "to",
       headingEnd: "endure",
+      /* Three parts now (client, 26 Nov 2026): picture, this film in the middle, Tisha film on the right. */
+      middleFilm: "/pages/foam/furniture/videos/foam-furniture-middle-v4.mp4",
+      middleFilmAlt: "Karmo HD foam stack in a green field",
+      /* v4: a thin slice of the empty haze between the hills and the grass was taken out (seam blended), so the column shows the hills and the moving grass together (client, 26 Nov 2026). */
+      middleFilmPosition: "center 40%",
+      /* The film itself now carries the foam picture: the still covers everything down to just
+         under the stack, plus a soft curve over the figure, so only moving grass shows at the
+         bottom (client, 26 Nov 2026). Made from the still karmo-hd-foam-field.webp (now in the library folder below);
+         the plain film is in karmo-library/05-originals-masters/
+         foam-furniture-middle-2026-11-26/. */
     },
     inside: {
       heading: "Inside every",

@@ -162,6 +162,28 @@ const OLD_FABRIC_RENDERS = [
 const FABRIC_RENDERS = Object.fromEntries(
   fabricOptions.map((f) => [f.id, `/products/mattress/fabric-scenes/${f.id}.webp`])
 );
+/** Each mattress's own bedroom photos per cloth (client, 26 Nov 2026). The first three mattresses
+    (King, Prestige, Orthopedic) share one set of ten; Imperial Euro Top has its own ten. A cloth
+    with no photo here falls back to the shared set (FABRIC_RENDERS). */
+const scenesIn = (folder, ids) => Object.fromEntries(ids.map((id) => [id, `/products/mattress/fabric-scenes/${folder}/${id}.webp`]));
+const KING_FABRIC_RENDERS = scenesIn("king", ["red-wf", "yellow-rose", "pink", "navy-blue", "l-white", "nakshi-kalas", "9-9r", "19-2b", "off-white", "off-white-02"]);
+/* Yellow Rose (second take) and Nakshi Kalas — used on the 3rd and 4th mattresses (client, 26 Nov 2026). */
+const IMPERIAL_EXTRA = {
+  "yellow-rose": "/products/mattress/fabric-scenes/imperial-eurotop/yellow-rose-v2.webp",
+  "nakshi-kalas": "/products/mattress/fabric-scenes/imperial-eurotop/nakshi-kalas.webp",
+};
+const FABRIC_RENDERS_BY_ID = {
+  king: KING_FABRIC_RENDERS,
+  prestige: KING_FABRIC_RENDERS,
+  /* 5th mattress: the same set as the first three (client, 26 Nov 2026). */
+  "bonnell-spring": KING_FABRIC_RENDERS,
+  /* Orthopedic: the King set, with Imperial's Yellow Rose and Nakshi Kalas (client, 26 Nov 2026). */
+  orthopedic: { ...KING_FABRIC_RENDERS, "yellow-rose": IMPERIAL_EXTRA["yellow-rose"], "nakshi-kalas": IMPERIAL_EXTRA["nakshi-kalas"] },
+  "imperial-eurotop": {
+    ...scenesIn("imperial-eurotop", ["19-2b", "9-9r", "off-white", "off-white-02", "pink", "red-wf", "navy-blue", "l-white"]),
+    ...IMPERIAL_EXTRA,
+  },
+};
 
 /** @deprecated Prefer sizePresetsFor(slug) — kept for older imports. */
 export const sizePresets = sizePresetsFor("euro-top-pocket-spring");
@@ -289,7 +311,10 @@ function toDetail(item) {
     fabrics:
       item.id === "topper"
         ? fabricOptions
-        : fabricOptions.map((fabric) => ({ ...fabric, scene: FABRIC_RENDERS[fabric.id] || cover })),
+        : fabricOptions.map((fabric) => ({
+            ...fabric,
+            scene: FABRIC_RENDERS_BY_ID[item.id]?.[fabric.id] || FABRIC_RENDERS[fabric.id] || cover,
+          })),
     /** Lay the 13 swatches out as a bigger 7-column grid (7 + 6). */
     fabricGrid: true,
     densities: null,
