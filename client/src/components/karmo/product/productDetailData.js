@@ -216,7 +216,7 @@ const LETTERS_BY_ID = {
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
 export const KING_REAL_GALLERY = [
-  "/pages/mattress/divisions/karmo-king-mattress-v3.webp",
+  "/pages/mattress/divisions/karmo-king-mattress-main.webp",
   "/products/mattress/king-gallery/angle-front-v4.webp",
   "/products/mattress/king-gallery/angle-side-v4.webp",
   "/products/mattress/king-gallery/angle-detail-v4.webp",
