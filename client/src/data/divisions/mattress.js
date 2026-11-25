@@ -603,8 +603,8 @@ const mattress = {
         name: "King Mattress",
         shortName: "King",
         href: "/mattress/king",
-        image: "/pages/mattress/divisions/karmo-king-mattress-v3.webp", // was karmo-king-mattress-v2.webp (client, 24 Nov 2026)
-        imageHover: "/pages/mattress/divisions/karmo-king-mattress-hover.webp", // was /products/mattress/king-hover-navy-showcase.webp
+        image: "/pages/mattress/divisions/karmo-king-mattress-main.webp", // was karmo-king-mattress-v3.webp (client, 25 Nov 2026)
+        imageHover: "/pages/mattress/divisions/karmo-king-mattress-hover-v2.webp", // was karmo-king-mattress-hover.webp (client, 25 Nov 2026)
         alt: "Karmo King floral mattress in a luxury bedroom",
         was: "৳ 11,320",
         now: "৳ 9,622",
@@ -623,7 +623,7 @@ const mattress = {
         name: "Prestige Mattress",
         shortName: "Prestige",
         href: "/mattress/prestige",
-        image: "/pages/mattress/divisions/karmo-prestige-mattress-v3.webp", // was karmo-prestige-mattress-v2.webp (client, 24 Nov 2026)
+        image: "/pages/mattress/divisions/karmo-prestige-mattress-main.webp", // was karmo-prestige-mattress-v3.webp (client, 25 Nov 2026)
         imageHover: "/pages/mattress/divisions/karmo-prestige-mattress-hover.webp", // was /products/mattress/prestige-hover-vintage-damask.webp
         alt: "Karmo Prestige floral mattress in a luxury bedroom",
         was: "৳ 12,290",
@@ -663,7 +663,7 @@ const mattress = {
         name: "Imperial Euro Top Mattress",
         shortName: "Imperial Euro Top",
         href: "/mattress/imperial-eurotop",
-        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress-v2.webp", // was /products/mattress/imperial-cover-aatoi-bed.webp
+        image: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress-main.webp", // was karmo-imperial-euro-top-mattress-v2.webp (client, 25 Nov 2026)
         imageHover: "/pages/mattress/divisions/karmo-imperial-euro-top-mattress-hover.webp", // was /products/mattress/imperial-hover-navy-studio.webp
         alt: "Karmo Imperial Euro Top mattress on a curved boucle bed",
         was: "৳ 19,406",
@@ -683,7 +683,7 @@ const mattress = {
         name: "Bonnell Spring Mattress",
         shortName: "Bonnell Spring",
         href: "/mattress/bonnell-spring",
-        image: "/pages/mattress/divisions/karmo-bonnell-spring-mattress.jpeg", // was /products/mattress/bonnell-cover-aatoi-green.webp
+        image: "/pages/mattress/divisions/karmo-bonnell-spring-mattress-main.webp", // was karmo-bonnell-spring-mattress.jpeg (client, 25 Nov 2026)
         imageHover: "/products/mattress/bonnell-hover-red-showcase.webp",
         alt: "Karmo Bonnell Spring mattress on a cream boucle bed",
         was: "৳ 23,675",
@@ -703,7 +703,7 @@ const mattress = {
         name: "Pillow Top Pocket Spring Mattress",
         shortName: "Pillow Top Pocket",
         href: "/mattress/pillow-top-pocket-spring",
-        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress-v2.webp", // was /products/mattress/pillowtop-cover-aatoi-side.webp
+        image: "/pages/mattress/divisions/karmo-pillow-top-pocket-spring-mattress-main.webp", // was karmo-pillow-top-pocket-spring-mattress-v2.webp (client, 25 Nov 2026)
         imageHover: "/products/mattress/pillowtop-hover-leaf-display.webp",
         alt: "Karmo Pillow Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 52,396",
@@ -723,8 +723,8 @@ const mattress = {
         name: "Euro Top Pocket Spring Mattress",
         shortName: "Euro Top Pocket",
         href: "/mattress/euro-top-pocket-spring",
-        image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress.jpeg", // was /products/mattress/eurotop-cover-luxury-kingstyle.webp
-        imageHover: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-hover.webp",
+        image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress-main.webp", // was karmo-euro-top-pocket-spring-mattress.jpeg (client, 25 Nov 2026)
+        imageHover: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-hover-v2.webp", // was karmo-euro-top-pocket-spring-hover.webp (client, 25 Nov 2026)
         hoverZoom: 1.25,
         alt: "Karmo Euro Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 48,515",
