@@ -208,10 +208,18 @@ const lettersIn = (folder) =>
   ["K", "A", "R", "M", "O"].map(
     (letter) => `/products/mattress/karmo-letters/${folder}/letter-${letter}.webp`
   );
+/* New K-A-R-M-O sets from /pages/mattress/mattress left side iamge karmo (client, 25 Nov 2026).
+   Earlier: eurotop, bonnell, pillowtop folders; King, Prestige, Orthopedic and Imperial used the shared set.
+   King, Prestige and Orthopedic were given the same five pictures ("classic"). The topper keeps the shared set. */
+const CLASSIC_LETTERS = lettersIn("classic");
 const LETTERS_BY_ID = {
-  "euro-top-pocket-spring": lettersIn("eurotop"),
-  "bonnell-spring": lettersIn("bonnell"),
-  "pillow-top-pocket-spring": lettersIn("pillowtop"),
+  king: CLASSIC_LETTERS,
+  prestige: CLASSIC_LETTERS,
+  orthopedic: CLASSIC_LETTERS,
+  "imperial-eurotop": lettersIn("imperial"),
+  "euro-top-pocket-spring": lettersIn("eurotop-v2"),
+  "bonnell-spring": lettersIn("bonnell-v2"),
+  "pillow-top-pocket-spring": lettersIn("pillowtop-v2"),
 };
 
 /** King — bottom row: catalogue thumb first, then fresh multi-angle shots. */
