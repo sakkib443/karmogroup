@@ -32,9 +32,6 @@ const VB_W = 1000;
 const COMPACT_W = 690;
 const MIN_LABEL_GAP = 70;
 const BRAND = "#D44348";
-/* Close-up of the quilted cover beside the drawing — the same on every mattress for now;
-   a mattress can set its own with `photo` in mattressLayers.js (client, 26 Nov 2026). */
-const LAYERS_PHOTO = "/products/mattress/inside/fabric-quilt-closeup.webp";
 
 /* Base colour + grain for foam-type parts (filters in <Defs>). */
 const FOAM = {
@@ -506,63 +503,43 @@ export default function MattressLayersExplode({ product }) {
         </span>
       </div>
 
-      {/* Close-up of the quilted cover down the left, melting into the warm background, so the
-          photo and the layer drawing read as one picture (client, 26 Nov 2026). The words that sat
-          on the left moved to the right, over the drawing. */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 -z-[5] hidden w-[38%] lg:block" aria-hidden>
-        <Image
-          src={spec.photo || LAYERS_PHOTO}
-          alt=""
-          fill
-          sizes="38vw"
-          className="object-cover object-center"
-          style={{
-            WebkitMaskImage: "linear-gradient(to right, #000 0%, #000 52%, rgba(0,0,0,0.55) 74%, transparent 100%)",
-            maskImage: "linear-gradient(to right, #000 0%, #000 52%, rgba(0,0,0,0.55) 74%, transparent 100%)",
-          }}
-        />
-        <span className="absolute inset-0 bg-gradient-to-t from-[#ecdfcf]/55 via-transparent to-[#fbf7f1]/35" />
-      </div>
+      <div className="mx-auto grid max-w-[1560px] items-center gap-x-10 px-5 pb-10 pt-12 sm:px-8 lg:min-h-[calc(100svh-112px)] lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)] lg:px-14 lg:py-10">
+        <div className="max-w-xl">
+          <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-brand">Layer by layer</p>
+          <h2 className="display mt-3 text-[1.7rem] font-light uppercase leading-[1.05] tracking-[0.01em] text-ink sm:text-[2.1rem] lg:text-[2.6rem]">
+            Inside every <span className="block font-bold text-brand">Karmo {name}</span>
+          </h2>
+          <p className="body-copy mt-3 max-w-xl text-[15px] leading-relaxed text-ink/65">{spec.lead}</p>
+          <span className="mt-6 inline-flex items-center gap-2 border border-ink/12 bg-white/70 px-3.5 py-2 text-[12px] font-bold uppercase tracking-[0.14em] text-ink/75 backdrop-blur">
+            <FiLayers className="text-brand" aria-hidden />
+            {n} layers
+          </span>
+        </div>
 
-      <div className="mx-auto grid max-w-[1680px] items-center px-5 pb-10 pt-10 sm:px-8 lg:min-h-[calc(100svh-112px)] lg:grid-cols-[minmax(0,0.3fr)_minmax(0,1fr)] lg:px-14 lg:py-8">
-        {/* Desktop: room for the photo (it sits behind, full height). */}
-        <div className="hidden lg:block" aria-hidden />
-
-        <div className="min-w-0">
-          {/* Phones and tablets: the same photo as a short band on top, fading into the background. */}
-          <div className="relative -mx-5 mb-6 aspect-[16/10] overflow-hidden sm:-mx-8 lg:hidden" aria-hidden>
-            <Image
-              src={spec.photo || LAYERS_PHOTO}
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover object-center"
-              style={{
-                WebkitMaskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
-                maskImage: "linear-gradient(to bottom, #000 60%, transparent 100%)",
-              }}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-3 lg:pl-[6%]">
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-brand">Layer by layer</p>
-              <h2 className="display mt-2 text-[1.6rem] font-light uppercase leading-[1.05] tracking-[0.01em] text-ink sm:text-[2rem] lg:text-[2.3rem]">
-                Inside every <span className="font-bold text-brand">Karmo {name}</span>
-              </h2>
-              <p className="body-copy mt-2 max-w-2xl text-[15px] leading-relaxed text-ink/65">{spec.lead}</p>
+        {/* The client's own layer picture (orthopedic), background cut out, in place of the
+            drawing (client, 26 Nov 2026). */}
+        {spec.layersImage ? (
+          <div className="mt-8 lg:mt-0">
+            <div
+              className="relative mx-auto w-full"
+              style={{ aspectRatio: "1652 / 962", maxWidth: "calc((100svh - 190px) * 1.7173)" }}
+            >
+              <Image
+                src={spec.layersImage}
+                alt={`The layers inside the Karmo ${name}`}
+                fill
+                sizes="(min-width: 1024px) 66vw, 100vw"
+                className="object-contain"
+              />
             </div>
-            <span className="inline-flex shrink-0 items-center gap-2 border border-ink/12 bg-white/70 px-3.5 py-2 text-[12px] font-bold uppercase tracking-[0.14em] text-ink/75 backdrop-blur">
-              <FiLayers className="text-brand" aria-hidden />
-              {n} layers
-            </span>
           </div>
-
+        ) : (
+        <>
         {/* ── Desktop: drawing + red leaders to the names ── */}
-        <div className="mt-4 hidden md:block">
+        <div className="mt-6 hidden md:block lg:mt-0">
           <div
             className="@container relative mx-auto"
-            style={{ width: `min(100%, calc((100svh - 318px) * ${ratio.toFixed(4)}))`, aspectRatio: `${VB_W} / ${L.vbH}` }}
+            style={{ width: `min(100%, calc((100svh - 150px) * ${ratio.toFixed(4)}))`, aspectRatio: `${VB_W} / ${L.vbH}` }}
           >
             <Stack layers={layers} fabric={spec.fabric} active={active} setActive={setActive} />
             <ol className="absolute inset-0" aria-label={`Layers of the Karmo ${name}`}>
@@ -622,7 +599,8 @@ export default function MattressLayersExplode({ product }) {
             ))}
           </ol>
         </div>
-        </div>
+        </>
+        )}
       </div>
     </section>
   );
