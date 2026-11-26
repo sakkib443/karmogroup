@@ -45,6 +45,12 @@ const DEFAULT_BUYBOX_ICONS = [
 
 const EASE = [0.22, 1, 0.36, 1];
 
+/* Photos where the mattress already fills the frame — the big picture shows them at
+   their own size instead of the usual 1.12 zoom, so no edge is cut (client, 26 Nov 2026). */
+const FULL_FRAME_SHOTS = new Set([
+  "/pages/mattress/divisions/karmo-euro-top-pocket-spring-hover-v2.webp",
+]);
+
 const SIZE_ICONS = {
   single: "/products/common/size-icons/single.webp",
   double: "/products/common/size-icons/double.webp",
@@ -434,7 +440,7 @@ export default function ProductHero({ product }) {
                             quality={90}
                             sizes="(min-width: 1024px) 48vw, 100vw"
                             className={`object-contain object-center ${
-                              letterGallery.includes(mainSrc) ? "" : "scale-[1.12]"
+                              letterGallery.includes(mainSrc) || FULL_FRAME_SHOTS.has(mainSrc) ? "" : "scale-[1.12]"
                             }`}
                           />
                         ) : null}

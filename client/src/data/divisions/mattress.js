@@ -127,7 +127,8 @@ const mattress = {
     backgroundPosition: "0% 65%",
     /* Picture lifted a little (client's ask): moved up 2.5% of the band, zoomed 5% so no edge shows. */
     backgroundShiftY: -2.5,
-    backgroundZoom: 1.05,
+    /* Zoomed out so more of the mattress shows (client, 26 Nov 2026). Was 1.05. */
+    backgroundZoom: 0.85,
     backgroundAspect: "1983 / 793",
     items: [
       {
@@ -725,7 +726,8 @@ const mattress = {
         href: "/mattress/euro-top-pocket-spring",
         image: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-mattress-main.webp", // was karmo-euro-top-pocket-spring-mattress.jpeg (client, 25 Nov 2026)
         imageHover: "/pages/mattress/divisions/karmo-euro-top-pocket-spring-hover-v2.webp", // was karmo-euro-top-pocket-spring-hover.webp (client, 25 Nov 2026)
-        hoverZoom: 1.25,
+        /* hoverZoom: 1.25 was for the old hover photo; the new one already fills the frame,
+           so the zoom cut off both sides of the mattress (client, 26 Nov 2026). */
         alt: "Karmo Euro Top Pocket Spring mattress in a luxury bedroom",
         was: "৳ 48,515",
         now: "৳ 41,238",
