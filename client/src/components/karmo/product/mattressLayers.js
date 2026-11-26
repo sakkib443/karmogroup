@@ -30,6 +30,8 @@ const POCKET_CORE = [
 export const MATTRESS_LAYERS = {
   king: {
     fabric: `${FAB}/navy-blue.webp`,
+    /* The client's own layer picture (background cut out) replaces the drawing (client, 26 Nov 2026). */
+    layersImage: "/products/mattress/inside/king-layers-cutout.webp",
     lead: "A mattress for everyone — high-density PE sandwiched between rebonded foam from the finest chips.",
     layers: [
       QUILT,
@@ -42,6 +44,8 @@ export const MATTRESS_LAYERS = {
   },
   prestige: {
     fabric: `${FAB}/l-white.webp`,
+    /* The client's own layer picture (background cut out) replaces the drawing (client, 26 Nov 2026). */
+    layersImage: "/products/mattress/inside/prestige-layers-cutout.webp",
     lead: "Two in one — one side hard, one side soft. PE foam sandwiched between felt and rebonded foam.",
     layers: [
       QUILT,
@@ -54,6 +58,8 @@ export const MATTRESS_LAYERS = {
   },
   orthopedic: {
     fabric: `${FAB}/19-2b.webp`,
+    /* The client's own layer picture (background cut out) replaces the drawing on this page (client, 26 Nov 2026). */
+    layersImage: "/products/mattress/inside/orthopedic-layers-cutout.webp",
     lead: "Built around the contour of the body and spine — felt and a rebonded core for firm, even support.",
     layers: [
       QUILT,
