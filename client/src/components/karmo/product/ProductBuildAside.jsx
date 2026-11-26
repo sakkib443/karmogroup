@@ -57,10 +57,11 @@ const SLIDES = [
 /* Fallback clips; each mattress page passes its own (product.insideClips). Left column: feet-and-water-bottle shot over the press test; right column: the red-cloth clip over the ball drop (the hand-press clip lives in the three-part band, ProductFeatureSlides). */
 const DEFAULT_PAN = { src: "/products/videos/inside/pan-blue.mp4", label: "Cover in motion" };
 /* Middle tall column: the Tanzin Tisha model film; the rotating layer pictures (TallMorph) moved to the middle of the three-part band, ProductFeatureSlides (client, 24 Nov 2026). Earlier: /shared/videos/tvc-mattress.mp4. */
-const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Tanzin Tisha", position: "55% center" };
+/* Label was "Tanzin Tisha"; the clip compares spring types (client, 26 Nov 2026). */
+const MODEL = { src: "/pages/mattress/mattress-model-film.mp4", label: "Karmo Tempered Spring vs Normal Spring", position: "55% center" };
 const DEFAULT_FEET = { src: "/products/videos/inside/feet-for-king.mp4", label: "Tested by weight" };
 
-function HoverChrome({ label }) {
+export function HoverChrome({ label }) {
   return (
     <>
       <span
@@ -72,7 +73,7 @@ function HoverChrome({ label }) {
         className="pointer-events-none absolute inset-[10%] z-[2] border-2 border-white/0 transition-all duration-500 ease-out group-hover:border-white/95 sm:inset-[12%] lg:inset-[13%]"
       />
       <span className="pointer-events-none absolute inset-0 z-[2] flex items-center justify-center">
-        <span className="display translate-y-1 text-[13px] font-semibold uppercase tracking-[0.16em] text-white opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:text-[14px] lg:text-[15px]">
+        <span className="display max-w-[70%] translate-y-1 text-center text-[13px] font-semibold uppercase leading-snug tracking-[0.16em] text-white opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 sm:text-[14px] lg:text-[15px]">
           {label}
         </span>
       </span>

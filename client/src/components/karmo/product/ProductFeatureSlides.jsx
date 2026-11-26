@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import LazyVideo from "@/components/karmo/LazyVideo";
-import { TallMorph } from "@/components/karmo/product/ProductBuildAside";
+import { HoverChrome, TallMorph } from "@/components/karmo/product/ProductBuildAside";
 
 /**
  * Comfort — one Karmo mattress, three ways to rest. Three equal parts side by side:
@@ -23,10 +23,6 @@ const BALL = { src: "/pages/mattress/ball.mp4", label: "Ball drop" };
 
 /* One screen under the 112px header, plus a little (40px more), on every mattress page. */
 const PART = "group relative aspect-[4/5] overflow-hidden sm:aspect-auto sm:h-[calc(100svh-72px)]";
-const SHADE = "pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent";
-const BAR = "absolute inset-x-0 bottom-0 flex items-center gap-4 px-6 pb-6 text-white";
-const NUM = "display text-[13px] font-bold tabular-nums tracking-[0.14em] text-white/80";
-const NAME = "display text-[15px] font-bold uppercase tracking-[0.14em] sm:text-[16px]";
 
 export default function ProductFeatureSlides({ product }) {
   const reduceMotion = useReducedMotion();
@@ -73,12 +69,8 @@ export default function ProductFeatureSlides({ product }) {
           >
             <source src={press.src} type="video/mp4" />
           </LazyVideo>
-          <span aria-hidden className={SHADE} />
-          <div className={BAR}>
-            <span className={NUM}>01</span>
-            <span className={NAME}>{press.label}</span>
-            <span className="ml-auto h-px w-10 bg-white/70" />
-          </div>
+          {/* Same hover frame and centred name as the middle part (client, 26 Nov 2026). Earlier: a bottom bar with 01 and the name. */}
+          <HoverChrome label={press.label} />
         </motion.div>
 
         {/* Middle: the rotating layer pictures, moved up from the five-part "Inside every Karmo mattress" band;
@@ -100,12 +92,8 @@ export default function ProductFeatureSlides({ product }) {
           >
             <source src={BALL.src} type="video/mp4" />
           </LazyVideo>
-          <span aria-hidden className={SHADE} />
-          <div className={BAR}>
-            <span className={NUM}>03</span>
-            <span className={NAME}>{BALL.label}</span>
-            <span className="ml-auto h-px w-10 bg-white/70" />
-          </div>
+          {/* Same hover frame and centred name as the middle part (client, 26 Nov 2026). Earlier: a bottom bar with 03 and the name. */}
+          <HoverChrome label={BALL.label} />
         </motion.div>
 
       </motion.div>
