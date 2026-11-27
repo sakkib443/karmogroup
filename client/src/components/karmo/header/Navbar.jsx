@@ -66,12 +66,12 @@ const nav = [
         href: "/foam/furniture",
         icon: `${MENU}/set-block.webp`,
         items: [
-          { name: "Karmo Poly", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-poly.webp` },
-          { name: "Karmo 280", href: "/foam/combo-280", icon: `${MENU}/grade-280.webp` },
-          { name: "Karmo 2001", href: "/foam/combo-2001", icon: `${MENU}/grade-2001.webp` },
-          { name: "Karmo HD", href: "/foam/furniture#foam-offers", icon: `${MENU}/grade-hd.webp` },
-          { name: "Karmo 4G", href: "/foam/combo-4g", icon: `${MENU}/grade-4g.webp` },
-          { name: "Karmo 1965", href: "/foam/combo-1965", icon: `${MENU}/grade-1965.webp` },
+          { name: "Karmo Poly", href: "/foam/furniture#foam-offers", icon: `${MENU}/foam-icons/poly.webp` },
+          { name: "Karmo 280", href: "/foam/combo-280", icon: `${MENU}/foam-icons/280.webp` },
+          { name: "Karmo 2001", href: "/foam/combo-2001", icon: `${MENU}/foam-icons/2001.webp` },
+          { name: "Karmo HD", href: "/foam/furniture#foam-offers", icon: `${MENU}/foam-icons/hd.webp` },
+          { name: "Karmo 4G", href: "/foam/combo-4g", icon: `${MENU}/foam-icons/4g.webp` },
+          { name: "Karmo 1965", href: "/foam/combo-1965", icon: `${MENU}/foam-icons/1965.webp` },
           { name: "Karmo Signature", href: "/foam/combo-signature", icon: `${MENU}/grade-signature.webp` },
           { name: "Foam (Sit)", href: "/foam/furniture#foam-offers", icon: `${MENU}/set-block.webp` },
           { name: "Foam (Back)", href: "/foam/furniture#foam-offers", icon: `${MENU}/set-block.webp` },
@@ -118,17 +118,20 @@ const nav = [
         label: "Mattress",
         heading: "All mattresses",
         href: "/mattress",
+        /* No "All mattresses" heading in the hover panel — the Mattress tab itself opens /mattress (client, 28 Nov 2026). */
+        hideHeading: true,
         icon: `${MENU}/nav-mattress.webp?v=2`,
+        /* Line icons from the client's King icon (28 Nov 2026): same mattress, a red sign per product. */
         items: [
-          { name: "Karmo Euro Top Mattress", href: "/mattress/imperial-eurotop", icon: `${MENU}/imperial.webp` },
-          { name: "Karmo King Mattress", href: "/mattress/king", icon: `${MENU}/king.webp` },
-          { name: "Karmo Prestige Mattress", href: "/mattress/prestige", icon: `${MENU}/prestige.webp` },
-          { name: "Karmo Orthopaedic Mattress", href: "/mattress/orthopedic", icon: `${MENU}/orthopedic.webp` },
-          { name: "Karmo Bonnell Spring Mattress", href: "/mattress/bonnell-spring", icon: `${MENU}/bonnell.webp` },
-          { name: "Karmo Pocket Spring Mattress", href: "/mattress/pillow-top-pocket-spring", icon: `${MENU}/pocket.webp` },
-          { name: "Karmo Euro Top Pocket Spring Mattress", href: "/mattress/euro-top-pocket-spring", icon: `${MENU}/pocket.webp` },
-          { name: "Karmo Folding Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/folding.webp` },
-          { name: "Karmo Mattress Topper", href: "/mattress/topper", icon: `${MENU}/soft.webp` },
+          { name: "Karmo King Mattress", href: "/mattress/king", icon: `${MENU}/mattress-icons/king-v4.webp` },
+          { name: "Karmo Prestige Mattress", href: "/mattress/prestige", icon: `${MENU}/mattress-icons/prestige-v5.webp` },
+          { name: "Karmo Orthopaedic Mattress", href: "/mattress/orthopedic", icon: `${MENU}/mattress-icons/orthopedic-v5.webp` },
+          { name: "Karmo Euro Top Mattress", href: "/mattress/imperial-eurotop", icon: `${MENU}/mattress-icons/imperial-v5.webp` },
+          { name: "Karmo Bonnell Spring Mattress", href: "/mattress/bonnell-spring", icon: `${MENU}/mattress-icons/bonnell-v5.webp` },
+          { name: "Karmo Pocket Spring Mattress", href: "/mattress/pillow-top-pocket-spring", icon: `${MENU}/mattress-icons/pocket-v6.webp` },
+          { name: "Karmo Euro Top Pocket Spring Mattress", href: "/mattress/euro-top-pocket-spring", icon: `${MENU}/mattress-icons/eurotop-pocket-v4.webp` },
+          { name: "Karmo Folding Mattress", href: "/mattress#mattress-offers", icon: `${MENU}/mattress-icons/folding-v5.webp` },
+          { name: "Karmo Mattress Topper", href: "/mattress/topper", icon: `${MENU}/mattress-icons/topper-v5.webp` },
         ],
       },
     ],
@@ -321,6 +324,8 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
         ? "h-[26px] w-[26px]"
         : size === "panelParent"
           ? "h-[50px] w-[50px]"
+          : size === "panelWide"
+            ? "h-[38px] w-[52px]"
           : size === "panelItem"
             ? "h-[34px] w-[34px]"
             : size === "parent"
@@ -333,6 +338,8 @@ function MenuGlyph({ icon, alt = "", size = "md" }) {
         ? 26
         : size === "panelParent"
           ? 50
+          : size === "panelWide"
+            ? 52
           : size === "panelItem"
             ? 34
             : size === "parent"
@@ -527,7 +534,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                   aria-hidden
                   fill
                   sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="pointer-events-none z-0 object-cover object-center opacity-[0.16]"
+                  className="pointer-events-none z-0 object-cover object-center opacity-[0.09]"
                 />
                 <div
                   className={`relative z-[1] grid w-full min-w-0 divide-x divide-ink/6 px-5 py-5 ${
@@ -545,6 +552,7 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                     {entry.columns.map((col) => (
                       <div key={col.label} className="min-w-0 px-4 first:pl-1 last:pr-1">
                         {/* Parent category — larger icon + type so it reads above sub-rows */}
+                        {col.hideHeading ? null : (
                         <div className="flex min-h-[3.25rem] items-end border-b border-ink/10 pb-3.5">
                           {col.href && !(entry.linksDisabled && !col.enabled) ? (
                             <Link
@@ -575,17 +583,27 @@ function DivisionNav({ panel, openPanel, leaveMenuZone, dismissPanel }) {
                             </span>
                           )}
                         </div>
+                        )}
 
-                        <ul className="pt-1">
+                        <ul className={col.hideHeading ? "" : "pt-1"}>
                           {col.items.map((item, itemIndex) => {
                             const rowClass =
                               "group flex min-h-11 items-center justify-between gap-2.5 py-1 transition-colors duration-200";
+                            // Mattress rows: a little more air between one row and the next (client, 28 Nov 2026).
+                            const airy = typeof item.icon === "string" && /\/(mattress|foam)-icons\//.test(item.icon);
                             const body = (
-                              <span className="flex min-w-0 items-center gap-2.5">
+                              <span className={`flex min-w-0 items-center gap-2.5 ${airy ? "py-1.5" : ""}`}>
                                 {item.icon ? (
-                                  <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-white/55 text-ink/60">
-                                    <MenuGlyph icon={item.icon} alt="" size="panelItem" />
-                                  </span>
+                                  /* The mattress line icons are wide drawings: larger, and no tile behind them (client, 28 Nov 2026). */
+                                  typeof item.icon === "string" && /\/(mattress|foam)-icons\//.test(item.icon) ? (
+                                    <span className="flex h-[40px] w-[56px] shrink-0 items-center justify-center">
+                                      <MenuGlyph icon={item.icon} alt="" size="panelWide" />
+                                    </span>
+                                  ) : (
+                                    <span className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[4px] border border-ink/15 bg-white/55 text-ink/60">
+                                      <MenuGlyph icon={item.icon} alt="" size="panelItem" />
+                                    </span>
+                                  )
                                 ) : null}
                                 <span className="line-clamp-2 text-[11px] font-semibold uppercase leading-snug tracking-[0.06em] text-ink/85">
                                   {item.name}

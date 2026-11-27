@@ -9,7 +9,7 @@ import ProductFeatureSlides from "@/components/karmo/product/ProductFeatureSlide
 import ProductFirmnessScale from "@/components/karmo/product/ProductFirmnessScale";
 import ProductBuildAside from "@/components/karmo/product/ProductBuildAside";
 import ProductVideoFeatures from "@/components/karmo/product/ProductVideoFeatures";
-import MattressLayersExplode from "@/components/karmo/product/MattressLayersExplode";
+import MattressLayersExplode, { MattressLayersAssemble } from "@/components/karmo/product/MattressLayersExplode";
 import MattressFilmStage from "@/components/karmo/division/MattressFilmStage";
 import OrderAndContact from "@/components/karmo/home/OrderAndContact";
 
@@ -42,6 +42,7 @@ export default function ProductDetailPage({ product }) {
           The earlier shared picture band was <ProductInside product={product} />. */}
       {/* Layers first, then the three-video band (client, 26 Nov 2026). On 24 Nov the videos sat above. */}
       <MattressLayersExplode product={product} />
+      <MattressLayersAssemble product={product} />
       <ProductFeatureSlides product={product} />
       {product.film ? (
         <MattressFilmStage

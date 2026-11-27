@@ -6,6 +6,7 @@ import SmoothScroll from "@/components/karmo/SmoothScroll";
 import Header from "@/components/karmo/header/Header";
 import ThemeControl from "@/components/karmo/chrome/ThemeControl";
 import HomeTwoSectionSnap from "@/components/karmo/chrome/HomeTwoSectionSnap";
+import OfferPopup from "@/components/karmo/chrome/OfferPopup";
 import { CmsScope } from "@/cms/CmsProvider";
 import { getPageContent } from "@/cms/server";
 
@@ -56,6 +57,8 @@ export default async function KarmoTwoLayout({
       {/* Always glued above the footer on every karmo-2 page */}
       <CertifiedBy />
       <Footer />
+      {/* First-visit offer card (client, 28 Nov 2026) — content in src/data/offerPopup.js. */}
+      <OfferPopup />
       </CmsScope>
     </ThemeControl>
   );

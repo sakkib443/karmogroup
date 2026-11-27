@@ -27,6 +27,9 @@ const POCKET_CORE = [
   PANEL_BASE,
 ];
 
+/* The four parts of the quilted cover, as the client's layer pictures list them. */
+const JACQUARD_PARTS = ["Exclusive Jacquard Fabrics for Mattress", "4mm Soft Foam", "8 oz micro fiber Padding", "PP Non woven Fabrics"];
+
 export const MATTRESS_LAYERS = {
   king: {
     fabric: `${FAB}/navy-blue.webp`,
@@ -41,6 +44,21 @@ export const MATTRESS_LAYERS = {
       { mat: "rebond", t: 38, title: "High-density rebonded foam", note: "Even support from edge to edge" },
       TRAY,
     ],
+    /* The opening bed section (MattressLayersAssemble), matched to the client's King picture
+       above it: same parts, same names, same thicknesses (client, 27 Nov 2026). */
+    front: {
+      thickness: [null, 14, 34, 66, 34, 118],
+      baseGap: 120, // room to see down into the open base
+      chips: "grey",
+      labels: [
+        { title: "Quilted Jacquard Top", parts: JACQUARD_PARTS },
+        { title: "Padding" },
+        { title: "Rebonded Foam" },
+        { title: "PE Sheet" },
+        { title: "Rebonded Foam" },
+        { title: "Quilted Border & Base", parts: JACQUARD_PARTS },
+      ],
+    },
   },
   prestige: {
     fabric: `${FAB}/l-white.webp`,

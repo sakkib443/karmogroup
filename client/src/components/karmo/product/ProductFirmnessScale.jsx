@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
-import LazyVideo from "@/components/karmo/LazyVideo";
+import FirmnessKettlebells from "@/components/karmo/product/FirmnessKettlebells";
 
 /**
  * Firmness scale band — short centred heading, then a full-bleed graphic
@@ -16,12 +16,30 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
   const reveal = reduceMotion ? {} : { initial: "hidden", whileInView: "show" };
 
   return (
-    <section className="bg-white" aria-label="Mattress firmness scale">
+    <section
+      className="relative flex min-h-[calc(100svh-112px)] flex-col overflow-hidden bg-white"
+      aria-label="Mattress firmness scale"
+    >
+      {/* One full screen under the header. Background: the homepage's quilted damask, used the
+          same way as there (cover, 50% strength, white wash on top) — client, 27 Nov 2026. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url(/shared/divisions/karmo-damask-quilted-v3.webp)",
+            backgroundSize: "cover",
+            backgroundPosition: "50% 50%",
+            backgroundRepeat: "no-repeat",
+            opacity: 0.5,
+          }}
+        />
+        <div className="absolute inset-0" style={{ backgroundColor: "rgba(255,255,255,0.7)" }} />
+      </div>
       <motion.div
         variants={group}
         {...reveal}
         viewport={VIEWPORT}
-        className="shell pt-6 pb-2 text-center sm:pt-7 sm:pb-2.5 lg:pt-8"
+        className="shell relative pt-8 pb-0 text-center sm:pt-10 lg:pt-12"
       >
         <motion.p
           variants={fade}
@@ -45,24 +63,10 @@ export default function ProductFirmnessScale({ highlight = "Medium Firm" }) {
         </motion.p>
       </motion.div>
 
-      <div className="relative w-full overflow-hidden bg-[#f3f1ec]">
-        <div className="relative aspect-[1280/360] w-full min-h-[300px] sm:min-h-[340px]">
-          <LazyVideo
-            className="absolute inset-0 h-full w-full object-cover object-center"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/products/common/medium-soft.webp"
-            aria-label={`Karmo firmness scale from cloud-soft to extra firm — ${highlight} highlighted for this mattress`}
-          >
-            <source
-              src="/products/foam/videos/firmness-scale.mp4"
-              type="video/mp4"
-            />
-          </LazyVideo>
-        </div>
+      {/* The scale, drawn and animated in code (replaced the old firmness video, client 27 Nov 2026). */}
+      {/* sits at the bottom of the screen-high section */}
+      <div className="relative mt-auto pt-4">
+        <FirmnessKettlebells highlight={highlight} />
       </div>
     </section>
   );
