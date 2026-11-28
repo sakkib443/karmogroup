@@ -47,7 +47,7 @@ export default function FoamProductDetailPage({ product }) {
       <ProductPromiseStrip items={FOAM_PROMISES} />
       <FoamDetailSections product={product} />
       {/* "Feel the density — Three ways to sit" band removed (client, 24 Nov 2026). */}
-      <FoamRelated current={product.slug} />
+      {/* "More foam — Other grades" taken off the foam detail page (client, 28 Nov 2026): <FoamRelated current={product.slug} /> */}
       <OrderAndContact />
     </>
   );

@@ -796,9 +796,9 @@ export default function Navbar({ scrolled = false }) {
           {/* Resting: the wide "Karmo Group" wordmark. Scrolled: the compact
               short "KARMO" mark. Cross-faded, same as the pair they replaced. */}
           <Logo
-            src={logos.headerLogo?.src || "/brand/logo-group.png"}
-            width={logos.headerLogo?.width || 1272}
-            height={logos.headerLogo?.height || 320}
+            src={logos.headerLogo?.src || "/brand/logo-group-2026.png"}
+            width={logos.headerLogo?.width || 2544}
+            height={logos.headerLogo?.height || 640}
             quality={100}
             className={`absolute left-0 top-1/2 origin-left -translate-y-[60%] h-[52px] w-auto sm:h-[80px] lg:h-[108px] xl:h-[92px] min-[1700px]:h-[108px] transition-[opacity,transform] ${LOGO_EASE} ${
               scrolled
