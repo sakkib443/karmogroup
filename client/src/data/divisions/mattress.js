@@ -123,13 +123,12 @@ const mattress = {
        "/pages/mattress/bands/mattress-showroom-interior.webp" (aspect "1774 / 887"). */
     shaded: true,
     eyebrow: "Karmo Mattress",
-    background: "/pages/mattress/bands/mattress-brands-bedroom-bg.webp",
-    backgroundPosition: "0% 65%",
-    /* Picture lifted a little (client's ask): moved up 2.5% of the band, zoomed 5% so no edge shows. */
-    backgroundShiftY: -2.5,
-    /* Zoomed out so more of the mattress shows (client, 26 Nov 2026). Was 1.05. */
-    backgroundZoom: 0.85,
-    backgroundAspect: "1983 / 793",
+    /* The client's sunlit bedroom with the red floral Karmo mattress (client, 28 Nov 2026), shown whole,
+       no zoom or shift. Before: mattress-brands-bedroom-bg.webp at "0% 65%", shifted -2.5%, zoom 0.85,
+       aspect "1983 / 793". */
+    background: "/pages/mattress/bands/mattress-brands-bedroom-sunlit.webp",
+    backgroundPosition: "center 60%",
+    backgroundAspect: "1916 / 821",
     items: [
       {
         id: "imperial",
@@ -446,11 +445,16 @@ const mattress = {
         titleOverlay:
           "linear-gradient(to top, rgba(11,21,40,0.32) 0%, rgba(11,21,40,0.18) 50%, rgba(11,21,40,0.14) 100%)",
         headingLead: "",
+        /* The client's "কারমো'র আরামে সব GONE!" picture replaces "গরমের আরাম সব GONE"
+           (client, 28 Nov 2026), with an 80px band of its own window light added on top so the
+           heading clears the header. Was /pages/mattress/hero/mattress-summer-comfort-retreat.webp, 1983×793. */
         image: {
-          src: "/pages/mattress/hero/mattress-summer-comfort-retreat.webp",
-          alt: "Karmo mattress summer comfort retreat",
-          width: 1983,
-          height: 793,
+          src: "/pages/mattress/hero/mattress-peaceful-meditation-v2.webp",
+          alt: "A man meditating on a red floral Karmo mattress: Anxiety, Tension, Stress, gone",
+          width: 1978,
+          height: 875,
+          /* Anchored to the top: when a shorter screen crops the picture, the floor goes, never the heading. */
+          position: "object-top",
         },
       },
       {

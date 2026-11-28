@@ -25,6 +25,7 @@ import {
 
 import { group, rise as fade, VIEWPORT } from "@/components/karmo/motion";
 import FoamFeatureTriplet from "@/components/karmo/product/foam/FoamFeatureTriplet";
+import FoamTestingBand from "@/components/karmo/product/foam/FoamTestingBand";
 
 /* Same band height and gutter as the homepage. */
 const BAND_H = "lg:h-[calc(100svh-32px)]";
@@ -136,9 +137,37 @@ function CountValue({ value, inView, delay = 0 }) {
 
 /* Measures as see-through glass tiles over the photo (the homepage counters' look):
    icon, label, a big value that counts up when the tiles come into view. */
-function Rows({ rows, light = false }) {
+/* `clear`: see-through tiles, only a faint dark tint and a thin border (client, 28 Nov 2026). */
+/* `glass`: frosted see-through tiles with white type, for a bright photo (client, 28 Nov 2026). */
+function Rows({ rows, light = false, clear = false, glass = false }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
+  if (glass) {
+    /* Small frosted cards sized in screen-width units (vw) from tablet up, so they keep the size
+       and spot the client marked over the rug at any screen width (client, 28 Nov 2026). */
+    return (
+      <dl ref={ref} className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-[4.2%]">
+        {rows.map(([label, value], i) => {
+          const Icon = iconFor(label);
+          return (
+            <div
+              key={label}
+              className="relative flex flex-col overflow-hidden rounded-2xl border border-white/40 bg-[#1a2230]/[0.28] px-4 py-4 shadow-[0_12px_32px_rgba(0,0,0,0.18)] backdrop-blur-md backdrop-saturate-150 last:col-span-2 md:rounded-[0.9vw] md:px-[1vw] md:py-[1vw] md:last:col-span-1"
+            >
+              <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white md:h-[1.9vw] md:w-[1.9vw]">
+                <Icon className="h-[18px] w-[18px] md:h-[0.95vw] md:w-[0.95vw]" aria-hidden />
+              </span>
+              <dt className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.45)] md:mt-[0.6vw] md:text-[max(9px,0.6vw)]">{label}</dt>
+              <dd className="display mt-1 whitespace-nowrap text-[1.05rem] font-bold leading-tight tabular-nums text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.45)] md:mt-[0.2vw] md:text-[1.05vw]">
+                <CountValue value={value} inView={inView} delay={0.25 + i * 0.08} />
+              </dd>
+            </div>
+          );
+        })}
+      </dl>
+    );
+  }
   return (
     <dl ref={ref} className="mt-8 grid max-w-2xl grid-cols-2 gap-1.5 sm:grid-cols-3">
       {rows.map(([label, value], i) => {
@@ -146,13 +175,13 @@ function Rows({ rows, light = false }) {
         return (
           <div
             key={label}
-            className={`relative flex flex-col overflow-hidden rounded-xl border px-4 ${light ? "border-white/20 bg-[#0b1a33]/35" : "border-ink/10 bg-white/25"} py-4 shadow-[0_6px_20px_rgba(11,26,51,0.08)] backdrop-blur-[6px] sm:px-5 sm:py-5`}
+            className={`relative flex flex-col overflow-hidden rounded-xl border px-4 ${clear ? (light ? "border-white/25 bg-black/20" : "border-ink/15 bg-ink/[0.09] backdrop-blur-[2px]") : `${light ? "border-white/20 bg-[#0b1a33]/35" : "border-ink/10 bg-white/25"} shadow-[0_6px_20px_rgba(11,26,51,0.08)] backdrop-blur-[6px]`} py-4 sm:px-5 sm:py-5`}
           >
             <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-white">
               <Icon size={20} aria-hidden />
             </span>
-            <dt className={`mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${light ? "text-white/75" : "text-ink/55"}`}>{label}</dt>
+            <dt className={`mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] ${light ? "text-white/75" : clear ? "text-ink/75" : "text-ink/55"}`}>{label}</dt>
             <dd className={`display mt-1 whitespace-nowrap text-[1.25rem] font-bold leading-tight tabular-nums sm:text-[1.4rem] ${light ? "text-white" : "text-ink"}`}>
               <CountValue value={value} inView={inView} delay={0.25 + i * 0.08} />
             </dd>
@@ -181,9 +210,10 @@ function KnowYourFoam({ product }) {
       </div>
       <motion.div {...reveal} className={`relative flex items-center overflow-hidden px-6 py-14 md:px-14 lg:py-10 lg:pl-14 xl:pl-20 ${SHELL_R}`}>
         <span className="pointer-events-none absolute inset-0" aria-hidden>
-          {/* White, with only a soft foam texture behind (client, 24 Nov 2026). */}
-          <Image src="/products/foam/foam-pore-texture.webp" alt="" fill sizes="50vw" className="object-cover opacity-[0.45]" />
-          <span className="absolute inset-0 bg-white/50" />
+          {/* The client's foam-sheet photo behind the numbers (client, 28 Nov 2026).
+              Before: a soft pore texture at 45% under a white wash. */}
+          <Image src="/products/foam/foam-sheet-closeup.webp" alt="" fill sizes="50vw" className="object-cover object-center" />
+          <span className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/60 to-white/50" />
         </span>
         <motion.div variants={fade} className="relative z-[1] w-full">
           <Copy eyebrow={c.grade || "Karmo Foam"} note={c.color || "Catalogue"} line1="Know your" line2="foam" tagline="Factory tested">
@@ -192,22 +222,50 @@ function KnowYourFoam({ product }) {
                 `${product.name} is ${c.grade ? c.grade.toLowerCase() : "Karmo"} foam${c.noFiller ? " with no filler" : ""}. Every number below comes from the Karmo Foam Catalogue.`}
             </Body>
           </Copy>
-          <Rows rows={rows} />
+          <Rows clear rows={rows} />
         </motion.div>
       </motion.div>
     </section>
   );
 }
 
-/* Full-bleed photo banner, copy on the left over a soft wash. */
-function Banner({ src, alt, label, children }) {
+/* Full-bleed photo banner, copy over a soft wash (left by default; copyRight puts it on the right).
+   aside: an optional foam picture standing on the floor, on the side away from the copy (desktop and tablet). */
+/* soft: only a light shade, and the glass cards pinned low over the rug, where the client marked them (client, 28 Nov 2026). */
+function Banner({ src, alt, label, aside, copyRight = false, soft = false, children }) {
   const reveal = useReveal();
+  const reduceMotion = useReducedMotion();
+  const wash = soft
+    ? "bg-gradient-to-l from-black/30 via-black/10 to-transparent"
+    : copyRight
+      ? "bg-gradient-to-l from-shade-deep/80 via-shade-deep/45 to-transparent"
+      : "bg-gradient-to-r from-shade-deep/80 via-shade-deep/45 to-transparent";
   return (
     <section className={`relative mb-[6px] flex min-h-[78svh] items-center overflow-hidden ${BAND_H}`} aria-label={label}>
-      <Image src={src} alt={alt} fill unoptimized sizes="100vw" className="object-cover object-center" />
-      <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-r from-shade-deep/80 via-shade-deep/45 to-transparent" />
-      <motion.div {...reveal} className={`relative z-[1] w-full px-6 py-14 md:px-14 ${SHELL_L}`}>
-        <motion.div variants={fade} className="max-w-2xl">{children}</motion.div>
+      <Image src={src} alt={alt} fill unoptimized sizes="100vw" className={`object-cover ${soft ? "object-[22%_center]" : "object-center"}`} />
+      <span aria-hidden className={`pointer-events-none absolute inset-0 ${wash}`} />
+      {aside ? (
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className={`pointer-events-none absolute bottom-[5%] z-[1] hidden w-[33vw] max-w-[640px] md:block ${copyRight ? "left-[15%]" : "right-[4%] lg:right-[5%]"}`}
+        >
+          {/* soft floor shadow under the foam */}
+          <span aria-hidden className="absolute -bottom-[3%] left-[8%] right-[4%] h-[14%] rounded-[50%] bg-black/45 blur-2xl" />
+          <Image src={aside.src} alt={aside.alt} width={1200} height={855} sizes="40vw" className="relative h-auto w-full drop-shadow-[0_24px_30px_rgba(0,0,0,0.35)]" />
+        </motion.div>
+      ) : null}
+      <motion.div
+        {...reveal}
+        className={
+          soft
+            ? "absolute inset-x-6 top-8 z-[1] md:inset-x-auto md:top-auto md:bottom-[8.5%] md:left-[45.7%] md:w-[40.8%]"
+            : `relative z-[1] flex w-full px-6 py-14 md:px-14 ${copyRight ? `md:justify-end ${SHELL_R}` : SHELL_L}`
+        }
+      >
+        <motion.div variants={fade} className={soft ? "w-full" : "max-w-2xl"}>{children}</motion.div>
       </motion.div>
     </section>
   );
@@ -251,11 +309,13 @@ function MadeToFit({ catalogue }) {
   ];
 
   return (
-    <Banner src="/pages/foam/furniture/rooms/room-cream-sectional-hq.webp" alt="A cream sectional sofa on Karmo Foam" label="Sizes">
-      <Copy light eyebrow="Sizes" note="Cut to order" line1="Made to" line2="fit" tagline="Every set">
-        <Body light>Each sofa set comes with five sit and five back pieces. Bed sheets are cut in five thicknesses, or to any size you need.</Body>
-      </Copy>
-      <Rows light rows={rows} />
+    /* The client's own room picture with Karmo 2001 foam on the floor (client, 28 Nov 2026), and only
+       the three size cards, as frosted glass, on the right. Removed the same day: the "Sizes / Made to
+       fit" heading and text, and the earlier table-less room with a separate foam picture on it. */
+    <Banner src="/pages/foam/furniture/rooms/room-sunlit-sectional-2001.webp" alt="A cream sectional sofa with a stack of purple Karmo 2001 foam on the floor" label="Sizes"
+      copyRight
+      soft>
+      <Rows glass rows={rows} />
     </Banner>
   );
 }
@@ -289,9 +349,11 @@ export default function FoamDetailSections({ product }) {
   return (
     <>
       <KnowYourFoam product={product} />
-      <FoamFeatureTriplet />
+      <FoamFeatureTriplet product={product} />
       <MadeToFit catalogue={c} />
-      <BuiltToLast catalogue={c} />
+      {/* The "Built to last" banner was taken off the foam pages (client, 28 Nov 2026): <BuiltToLast catalogue={c} /> */}
+      {/* In its place, the mattress page's "Inside every Karmo" band in foam: heading + five test clips (client, 28 Nov 2026). */}
+      <FoamTestingBand product={product} />
     </>
   );
 }

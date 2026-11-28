@@ -15,7 +15,8 @@ export const brand = {
     f.image("footerLogo", "Footer logo", { help: "Shown on a dark background — use a light or coloured version." }),
   ],
   defaults: {
-    headerLogo: img("/brand/logo-group.png", "Karmo Group", { fit: "contain", width: 1272, height: 320 }),
+    /* The client's new agency logo (factory with smoke, KARMO® GROUP), 28 Nov 2026; was /brand/logo-group.png. */
+    headerLogo: img("/brand/logo-group-2026.png", "Karmo Group", { fit: "contain", width: 2544, height: 640 }),
     headerLogoCompact: img("/brand/logo-compact.png", "Karmo", { fit: "contain", width: 412, height: 120 }),
     footerLogo: img("/brand/logo.png", "Karmo", { fit: "contain", width: 384, height: 53 }),
   },

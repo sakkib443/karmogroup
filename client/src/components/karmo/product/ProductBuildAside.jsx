@@ -179,7 +179,7 @@ export function TallMorph({ focusY = "18%" }) {
 }
 
 /* lift (% of the tile): moves the picture up inside its tile — e.g. so the surface under the bouncing ball shows. The strip it uncovers at the bottom is the same pale colour, and the picture's lower edge fades into it. */
-function VideoTile({ src, label, lift, drop, position }) { // always fills its relative wrapper
+export function VideoTile({ src, label, lift, drop, position }) { // always fills its relative wrapper
   const gif = typeof src === "string" && src.split("?")[0].endsWith(".gif");
   const mediaClass =
     "absolute inset-0 h-full w-full object-cover transition-transform duration-[1100ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]";
